@@ -1,0 +1,55 @@
+{% extends "apostello/base.html" %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+{% block side_bar %}
+<p><a class="btn btn-default" href="{% url 'keyword' keyword.id %}">Edit</a></p>
+{%if archive%}
+<p><a class="btn btn-default" href="{% url 'keyword_responses' keyword.id %}">Replies ({{ keyword.fetch_matches|length }})</a><p>
+{%else%}
+<p><a class="btn btn-default" href="{% url 'keyword_responses_archive' keyword.id %}">Archived Replies ({{ keyword.num_archived_matches }})</a></p>
+{%endif%}
+<p><a class="btn btn-default" href="{% url 'keyword_csv' keyword.id %}">Export "{{ keyword.keyword }}" responses</a></p>
+<p><a class="btn btn-default" href="{% url 'keyword_wall' keyword.id %}">Live Updates</a></p>
+<p><a class="btn btn-default" href="{% url 'keyword_wall_curator' keyword.id %}">Live Curator</a></p>
+{% endblock %}
+{% block content %}
+<h2>{{keyword}} {%if archive%}(Archived){%endif%}</h2>
+
+<div class="input-group"> <span class="input-group-addon">Filter</span>
+    <input id="filter" type="text" class="form-control" placeholder="Type here...">
+</div>
+<div id="incoming_keyword_table"></div>
+
+{%if form%}
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+<form method="post" >
+    {% csrf_token %}
+    {% bootstrap_form form  %}
+    {% buttons %}
+        <button type="submit" class="btn btn-danger">
+             Archive all!
+        </button>
+    {% endbuttons %}
+</form>
+{%endif%}
+{% endblock %}
+{% block morejs %}
+{{form.media}}
+<script src="{%static 'js/tables/keyword_resp_table.js'%}"></script>
+{%if archive%}
+<script>
+React.render(
+     React.createElement(KeywordRespTables, {url:"{%url 'api:keyword_sms_archive' keyword.id %}", pollInterval: 20000}, viewingArchive=true),
+     document.getElementById('incoming_keyword_table')
+    );
+</script>
+{%else%}
+<script>
+React.render(
+     React.createElement(KeywordRespTables, {url:"{%url 'api:keyword_sms' keyword.id %}", pollInterval: 20000}, viewingArchive=false),
+     document.getElementById('incoming_keyword_table')
+    );
+</script>
+{%endif%}
+
+{% endblock %}

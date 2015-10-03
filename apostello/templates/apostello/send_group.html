@@ -1,0 +1,33 @@
+{% extends "apostello/base.html" %}
+{% load bootstrap3 %}
+{% block content %}
+{{form.media}}
+Send a message to a group:<br>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+<form method="post" action="send/group/">
+    {% csrf_token %}
+    {% bootstrap_form form  %}
+    {% buttons %}
+        <button type="submit" class="btn btn-primary" id='#send'>Send ($0)</button>
+    {% endbuttons %}
+</form>
+{%endblock%}
+{% block morejs %}
+    <script>
+        $(document).ready(function() { $("#id_recipient_group").select2(); });
+       $(document).ready($(function(){
+        $('select').select2()
+        .on("change", function(e) {
+          var group_costs = {};
+          {%for x in group_nums%}
+          group_costs['{{x.0}}'] = {{x.1}};
+          {%endfor%}
+          if (e.val==="") {var cost = "$0"} else{
+          var cost = "$" + group_costs[e.val];
+          };
+          document.getElementById("#send").innerHTML = "Send (" + cost + ")"
+        })
+      }));
+    </script>
+{% endblock %}

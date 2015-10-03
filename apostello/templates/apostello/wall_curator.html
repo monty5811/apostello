@@ -1,0 +1,52 @@
+{% load staticfiles %}{% load compress %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% compress css %}
+<link type="text/css" rel="stylesheet" href="{% static 'css/materialize.min.css' %}"  media="screen,projection"/>
+<link href="{% static 'css/apostello.cards.css' %}" rel="stylesheet" />
+{% endcompress %}
+</head>
+<body>
+  <div class="row">
+    <div class="col s8"><h4>Available Messages</h4><p>Green is active. Grey is not. (Click to toggle.)</p><div id="curate"></div></div>
+    <div class="col s2 offset-s1"><h4>Live Preview</h4><p>(Click to remove.)</p><div id="wall"></div></div>
+  </div>
+<script src="https://fb.me/react-0.13.1.js"></script>
+<script src="https://fb.me/JSXTransformer-0.13.1.js"></script>
+<script src="//code.jquery.com/jquery.min.js"></script>
+{% compress js %}
+<script type="text/javascript" src="{% static 'js/materialize.min.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
+{% endcompress %}
+{% compress js %}
+<script src="{% static 'js/curate.js' %}"></script>
+{% endcompress %}
+{% if keyword %}
+<script type="text/jsx">
+React.render(
+  <ResponseWall title="{{keyword.keyword}}" url="{%url 'api:keyword_sms' keyword.id %}" pollInterval={5000} curating={true} />,
+  document.getElementById('curate')
+);
+</script>
+<script type="text/jsx">
+React.render(
+  <ResponseWall title="{{keyword.keyword}}" url="{%url 'api:keyword_sms' keyword.id %}" pollInterval={750} curating={false} preview={true}/>,
+  document.getElementById('wall')
+);
+</script>
+{% else %}
+<script type="text/jsx">
+React.render(
+  <ResponseWall url="{%url 'api:in_log' %}" pollInterval={5000} curating={true} />,
+  document.getElementById('curate')
+);
+</script>
+<script type="text/jsx">
+React.render(
+  <ResponseWall url="{%url 'api:in_log' %}" pollInterval={750} curating={false} preview={true}/>,
+  document.getElementById('wall')
+);
+</script>
+{% endif %}
+</body>

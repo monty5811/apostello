@@ -1,0 +1,52 @@
+{% load staticfiles %}{% load compress %}{% load bootstrap3 %}{% load cache %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% include 'apostello/includes/head.html' %}
+{% block morehead %}
+{% endblock %}
+</head>
+<body>
+{% include 'apostello/includes/navbar.html' %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">{% bootstrap_messages %}</div>
+  </div>
+  <div class="row">
+    <div class="col-md-2">
+      {% block side_bar %} {% endblock %}
+    </div>
+    <div class="col-md-10">
+      {% block content %} {% endblock %}
+    </div>
+  </div>
+</div>
+{% include 'apostello/includes/footer.html' %}
+{% compress js %}
+<script src="{% static 'js/select2.min.js' %}"></script>
+{% endcompress %}
+{% block morejs %}
+{% endblock %}
+<script>
+$(document).ready(function () {
+    (function ($) {
+        $('#filter').keyup(function () {
+            var rex = new RegExp($(this).val(), 'i');
+            $('.searchable tr').hide();
+            $('.searchable tr').filter(function () {
+                return rex.test($(this).text());
+            }).show();
+        })
+    }(jQuery));
+});
+</script>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-19144900-5', 'auto');
+  ga('send', 'pageview');
+</script>
+</body>
+</html>

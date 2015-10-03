@@ -1,0 +1,70 @@
+{% extends "apostello/base.html" %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+{% block side_bar %}
+{% if keyword %}
+<p><a class="btn btn-default" href="{% url 'keyword_responses' keyword.id %}">Replies ({{ keyword.fetch_matches.count }})</a></p>
+<p><a class="btn btn-default" href="{% url 'keyword_responses_archive' keyword.id %}">Archived Replies ({{ keyword.num_archived_matches }})</a></p>
+{% endif %}
+{% if object.is_archived %}
+<p><a id="{{ object.id }}" class="btn btn-default" onclick="remove_{{ identifier }}(false, {{ object.id }})">Un-Archive</a></p>
+{%elif object%}
+<p><a id="{{ object.id }}" class="btn btn-danger" onclick="remove_{{ identifier }}(true, {{ object.id }})">Remove</a></p>
+{% endif %}
+{% endblock %}
+{% block content %}
+{{form.media}}
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+<form method="post" >
+    {% csrf_token %}
+    {% bootstrap_form form  %}
+    {% if identifier == 'group' %}
+    <input type="checkbox" id="checkbox" >Select all/none</input>
+    {% endif %}
+    <p>
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">
+            {{ submit_text }}
+        </button>
+    {% endbuttons %}
+</form>
+
+{%if sms_history%}
+{%if user.profile.can_see_incoming%}
+<br>
+<h4>Recent Incoming History</h4>
+<div class="input-group"> <span class="input-group-addon">Filter</span>
+    <input id="filter" type="text" class="form-control" placeholder="Type here...">
+</div>
+<div id="incoming_table"></div>
+<script src="{%static 'js/tables/incoming_table.js'%}"></script>
+<script>
+React.render(
+     React.createElement(InTable, {url:"{%url 'api:contact_recent_sms' object.id %}", pollInterval: 20000}),
+     document.getElementById('incoming_table')
+    );
+</script>
+{%endif%}
+{%endif%}
+{% endblock %}
+{% block morejs %}
+<script>$(document).ready(function() { $("#id_members").select2(); });</script>
+<script>$(document).ready(function() { $("#id_owners").select2(); });</script>
+<script>$(document).ready(function() { $("#id_groups").select2(); });</script>
+<script>$(document).ready(function() { $("#id_subscribed_to_digest").select2(); });</script>
+{%if sms_history%}
+{%endif%}
+{% if identifier == 'group' %}
+<script>$("#id_members").select2();
+$("#checkbox").click(function(){
+    if($("#checkbox").is(':checked') ){
+    $("#id_members > option").prop("selected","selected");
+    $("#id_members").trigger("change");
+    }else{
+    $("#id_members > option").removeAttr("selected");
+    $("#id_members").trigger("change");
+    }
+    });
+</script>
+{% endif %}
+{% endblock %}

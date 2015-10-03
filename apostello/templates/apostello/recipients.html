@@ -1,0 +1,35 @@
+{% extends "apostello/base.html" %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+{% block side_bar %}
+<p><a class="btn btn-success" href="{% url 'recipient' %}">New Contact</a></p>
+{% endblock %}
+{% block content %}
+<div class="col-sm-8">
+{%if user.is_staff%}
+Archived Contacts = {{archived_contacts}}<br>
+Blacklisted Contacts = {{blacklisted_contacts}}<br>
+Total Active Contacts = {{total_contacts}}
+{%endif%}
+<div class="input-group"> <span class="input-group-addon">Filter</span>
+    <input id="filter" type="text" class="form-control" placeholder="Type here...">
+</div>
+<div id="contacts_table"></div>
+</div>
+{% block morejs %}
+<script src="{%static 'js/tables/contacts_table.js'%}"></script>
+<script>
+{% if request.user.is_staff %}
+React.render(
+     React.createElement(ContactsTable, {url:"{%url 'api:recipients' %}", pollInterval: 20000, isStaff: true}),
+     document.getElementById('contacts_table')
+    );
+{% else %}
+React.render(
+     React.createElement(ContactsTable, {url:"{%url 'api:recipients' %}", pollInterval: 20000, isStaff: false}),
+     document.getElementById('contacts_table')
+    );
+{% endif %}
+</script>
+{% endblock %}
+{% endblock %}

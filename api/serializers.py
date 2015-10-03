@@ -1,0 +1,81 @@
+# -*- coding: utf-8 -*-
+from rest_framework import serializers
+
+from apostello.models import (Keyword, Recipient, RecipientGroup, SmsInbound,
+                              SmsOutbound)
+
+
+class RecipientSerializer(serializers.ModelSerializer):
+    url = serializers.CharField(source='get_absolute_url')
+
+    class Meta:
+        model = Recipient
+        fields = ('first_name', 'last_name',
+                  'pk',
+                  'url',
+                  'full_name',
+                  'is_archived', 'is_blocking'
+                  )
+
+
+class RecipientGroupSerializer(serializers.ModelSerializer):
+    cost = serializers.CharField(source='calculate_cost')
+    url = serializers.CharField(source='get_absolute_url')
+    members = serializers.ListField(source='all_recipients_names')
+
+    class Meta:
+        model = RecipientGroup
+        fields = ('name',
+                  'pk',
+                  'description',
+                  'members',
+                  'cost',
+                  'url')
+
+
+class KeywordSerializer(serializers.ModelSerializer):
+    url = serializers.CharField(source='get_absolute_url')
+    responses_url = serializers.CharField(source='get_responses_url')
+    num_replies = serializers.CharField(source='num_matches')
+    num_archived_replies = serializers.CharField(source='num_archived_matches')
+    is_live = serializers.BooleanField()
+
+    class Meta:
+        model = Keyword
+        fields = ('keyword',
+                  'pk',
+                  'description',
+                  'custom_response',
+                  'is_live',
+                  'url', 'responses_url',
+                  'num_replies', 'num_archived_replies')
+
+
+class SmsInboundSerializer(serializers.ModelSerializer):
+    time_received = serializers.DateTimeField(format='%d %b %H:%M')
+
+    class Meta:
+        model = SmsInbound
+        fields = ('sid', 'pk',
+                  'sender_name', 'sender_num',
+                  'content',
+                  'time_received',
+                  'dealt_with', 'is_archived', 'display_on_wall',
+                  'matched_keyword', 'matched_colour', 'matched_link',
+                  'sender_url',
+                  )
+
+
+class SmsOutboundSerializer(serializers.ModelSerializer):
+    time_sent = serializers.DateTimeField(format='%d %b %H:%M')
+    recipient = serializers.StringRelatedField()
+
+    class Meta:
+        model = SmsOutbound
+        fields = ('content',
+                  'pk',
+                  'time_sent',
+                  'sent_by',
+                  'recipient',
+                  'recipient_url',
+                  )

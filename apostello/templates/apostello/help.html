@@ -1,0 +1,49 @@
+{% extends "apostello/base.html" %}
+{% load bootstrap3 %}
+{% block content %}
+
+<h3 id="usage">Usage</h3>
+
+<p>Please bear in mind that each message you send costs <a href="https://www.twilio.com/sms/pricing">money</a>, so please do not send frivolous messages.</p>
+
+<p>Additionally, try not to send too many messages. Do not abuse this system, people do not like being bombarded with messages all day.</p>
+
+<p>In order to send a message to a group, click <code>Send to --&gt; Group</code>, compose your message and choose your group, then click send. Your message will then be sent to each group member (at a rate of about 1 per second, so it may take a couple of minutes for larger groups).</p>
+
+<p>In order to message an individual, or an ad-hoc groups of individuals, click <code>Send to --&gt; Individuals</code>, compose your message and choose the person or persons you wish to contact, then click send.</p>
+
+<p>When you are sending a message, you will be able to see how much it should cost in the <code>Send</code> button.</p>
+
+<p>All keywords that you are authorised to view can be seen in <code>Keywords</code> and you can see responses by clicking on the number in the “responses” column. Click on a keyword in order to edit it or to view the live updating wall for that keyword.</p>
+
+<h3 id="faqs">FAQs</h3>
+
+<p>Q. How do I “mail merge” my messages? </p>
+
+<p>A. Any occurrence of <code>%name%</code> in any outgoing message will be converted to the first name of each recipient of the message. This also applies to automatic replies sent out by the system.</p>
+
+<p>Q. Can I send a message to a group without visiting this site? </p>
+
+<p>A. No, you must come here to send a message. However the site should work fine on your phone or tablet.</p>
+
+<p>Q. What’s a keyword? </p>
+
+<p>A. All incoming messages are expected to start with a keyword (maximum length, 12) followed by a space. This is to allow easy collection, grouping, tracking and export of incoming messages and to make it easy to use this service for things like event sign ups or polls and surveys.</p>
+
+<p>Q. I thought there was a particular keyword, but I can’t see it? </p>
+
+<p>A. You either don’t have access, or someone deleted it. You can request access from the Production Team, who can also recovery deleted keywords.</p>
+
+<p>Q. How do I get rid of matched keyword responses? </p>
+
+<p>A. Click <code>Archive</code> to remove a single message, or <code>Archive all now!</code> to remove all the messages for a keyword.</p>
+
+<p>Q. What happened to all my keyword responses? </p>
+
+<p>A. Someone probably archived them. You can view them by clicking on the <code>Archived Replies</code> button when viewing a keyword.</p>
+
+<p>Q. How can I stop getting messages? </p>
+
+<p>A. Reply to any message with <code>stop</code> and you will be unsubscribed from all future messages. You will need to send <code>start</code> to the same number to receive messages again. We cannot reactivate you - the unsubscribing is handled by Twilio and will stop you from receiving any messages from us. This is not a good idea if you want to sign up for things using this service.</p>
+
+{% endblock %}

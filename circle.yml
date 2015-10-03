@@ -1,0 +1,13 @@
+---
+machine:
+  python:
+    version: 3.4.3
+dependencies:
+    override:
+        - pip install -r requirements.txt
+test:
+  override:
+    - py.test . --nomigrations -n 2 --cov="." --cov-report="html" --junitxml="$CIRCLE_TEST_REPORTS/junit.xml"
+general:
+  artifacts:
+    - "coverage_html_report"

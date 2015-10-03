@@ -1,0 +1,48 @@
+body {
+    background-color: #5c569c;
+    font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-touch-callout: none;
+    padding: 30px 25px;
+}
+
+.card-panel {
+    margin: 7px;
+    font-size: 70px;
+}
+
+.preview {
+    margin: 3px;
+    font-size: 20px;
+    min-width: 150px;
+}
+
+.curate {
+    margin: 4px;
+    font-size: 40px;
+    min-width: 150px;
+}
+
+.card-panel > .time {
+   font-size: 8px;
+   padding: 15px 0px 0px 0px;
+}
+
+.card > .time {
+   font-size: 5px;
+   padding: 5px 0px 0px 0px;
+}
+
+.grey-txt {
+  color: #e5e4e2;
+}
+
+.waves-effect.waves-apostello .waves-ripple {
+     /* The alpha value allows the text and background color
+     of the button to still show through. */
+    background-color: rgba(92, 86, 156, 0.99);
+}

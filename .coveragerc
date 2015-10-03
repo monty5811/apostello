@@ -1,0 +1,13 @@
+[run]
+omit =
+    *settings*
+    *tests*
+    *migrations*
+    *__init__.py*
+    *wsgi*
+    *manage.py*
+    venv*
+source =
+    .
+[html]
+directory = coverage_html_report

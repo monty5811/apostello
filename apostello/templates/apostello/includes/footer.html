@@ -1,0 +1,8 @@
+{% load cache %}
+{% cache 72000 footer TWILIO_FROM_NUM %}
+<footer class="footer">
+  <div class="container">
+    <p class="text-muted">You are sending from {{ TWILIO_FROM_NUM }}</p>
+  </div>
+</footer>
+{% endcache %}
