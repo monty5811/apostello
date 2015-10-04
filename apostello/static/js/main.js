@@ -10,42 +10,6 @@ openSpan = '<span class="grey-txt">', closeSpan = '</span>';
    sms = sms.join(' ');
    return sms
 }
-function toggle_archive(archive, base_url, id) {
-      $.ajax({
-            url : base_url+id,
-            type : "POST",
-            data : {'archive': archive},
-            success : function(json) {
-              $('#'+id).hide();
-            },
-            error : function(xhr,errmsg,err) {
-                console.log(xhr.status + ": " + xhr.responseText);
-            }
-        });
-}
-function remove_keyword(archive, id) {toggle_archive(archive, '/api/v1/keywords/', id)}
-function remove_group(archive, id) {toggle_archive(archive, '/api/v1/groups/', id)}
-function remove_recipient(archive, id) {toggle_archive(archive, '/api/v1/recipients/', id)}
-function remove_sms(archive, id) {toggle_archive(archive, '/api/v1/sms/in/', id)}
-
-function deal_with_sms(id, deal_with) {
-    $.ajax({
-            url : '/api/v1/sms/in/'+id,
-            type : "POST",
-            data : {'deal_with': deal_with },
-            success : function(json) {
-              if (json.dealt_with){
-              $('#dw'+json.pk).html("<a class='btn btn-xs btn-success' onclick='deal_with_sms("+json.pk+", false)'>Completed</a>");
-              }
-              else{
-              $('#dw'+json.pk).html("<a class='btn btn-xs btn-danger' onclick='deal_with_sms("+json.pk+", true)'>Requires Action</a>");
-              }
-            },
-            error : function(xhr,errmsg,err) {
-                console.log(xhr.status + ": " + xhr.responseText);
-            }
-        });
-}
 function display_on_wall(id, display_bool) {
     $.ajax({
             url : '/api/v1/sms/in/'+id,
