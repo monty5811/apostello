@@ -23,6 +23,6 @@ def recent(request):
     for x in range(-30, 1):
         delta = timezone.timedelta(days=x)
         today = td + delta
-        xlabels.append(today.strftime('%-d %b'))
+        xlabels.append(today.strftime('%d %b'))
     bar_chart.x_labels = xlabels
     return HttpResponse(bar_chart.render(), content_type='image/svg+xml')
