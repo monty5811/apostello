@@ -1,38 +1,36 @@
-{% load staticfiles %}{% load compress %}
+{% load staticfiles %}
+{% load compress %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-{% compress css %}
-<link type="text/css" rel="stylesheet" href="{% static 'css/materialize.min.css' %}"  media="screen,projection"/>
-<link href="{% static 'css/apostello.cards.css' %}" rel="stylesheet" />
-{% endcompress %}
+{% include 'apostello/includes/head.html' %}
 </head>
-<body>
-<div class="row">
-<div class="col s12" id="content"></div>
+<body style="background-color: #5c569c">
+<div class="container-fluid">
+  <div class="col-md-10 col-md-offset-1">
+  <br>
+    <div class="row">
+      <div id="content"></div>
+    </div>
+  </div>
 </div>
-<script src="https://fb.me/react-0.13.1.js"></script>
-<script src="https://fb.me/JSXTransformer-0.13.1.js"></script>
-<script src="//code.jquery.com/jquery.min.js"></script>
-{% compress js %}
-<script type="text/javascript" src="{% static 'js/materialize.min.js' %}"></script>
-<script src="{% static 'js/main.js' %}"></script>
-{% endcompress %}
 {% compress js %}
 <script src="{% static 'js/curate.js' %}"></script>
 {% endcompress %}
 {% if keyword %}
-<script type="text/jsx">
+<script>
 React.render(
-<ResponseWall url="{%url 'api:keyword_live_wall' keyword.id %}" pollInterval={500} curating={false} preview={false}/>,
-  document.getElementById('content')
+     React.createElement(ResponseWall,
+     {pollInterval: 500, curating:false, preview:false, url: "{%url 'api:keyword_live_wall' keyword.id %}"}),
+     document.getElementById('content')
 );
 </script>
 {% else %}
-<script type="text/jsx">
+<script>
 React.render(
- <ResponseWall url="{%url 'api:all_live_wall' %}" pollInterval={500} curating={false} preview={false}/>,
-    document.getElementById('content')
+     React.createElement(ResponseWall,
+     {pollInterval: 500, curating:false, url: "{%url 'api:all_live_wall'%}", preview: false}),
+     document.getElementById('content')
 );
 </script>
 {% endif %}

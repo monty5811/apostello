@@ -1,28 +1,39 @@
+var Panel = React.createClass({
+    render: function () {
+        var first_word = this.props.content.split(" ")[0];
+        var rest_of_message = this.props.content.split(" ").splice(1).join(" ")
+        return (
+            <div className={"panel"} onClick={this.props.toggleCard} style={this.props.styles}>
+                <div className={"panel-body"}>
+                    <span style={{"color": "#D3D3D3"}}>{first_word}</span> {rest_of_message}
+                </div>
+            </div>
+        )
+    }
+});
 var Response = React.createClass({
     render: function () {
         if (this.props.curating) {
             if (this.props.display_on_wall) {
-                var className = "card-panel curate green waves-effect waves-light";
+                var styles = {"backgroundColor": "#ffffff"};
             } else {
-                var className = "card-panel curate grey waves-effect waves-light";
+                var styles = {"backgroundColor": "#616161"};
             }
             return (
-                <div className={className} onClick={this.props.toggleCard}>
-                    <div dangerouslySetInnerHTML={{__html: grey_keyword(this.props.content)}}></div>
+                <div className={"col-lg-6"}>
+                    <Panel toggleCard={this.props.toggleCard} styles={styles} content={this.props.content}/>
                 </div>
             )
         } else {
-            if (this.props.preview) {
-                var className = "card-panel preview white waves-effect waves-apostello"
-            } else {
-                var className = "card-panel white waves-effect waves-apostello"
-            }
             if (this.props.display_on_wall) {
+                if (this.props.preview) {
+                    var styles = {"backgroundColor": "#ffffff"};
+                } else {
+                    var styles = {"backgroundColor": "#ffffff", "fontSize": "200%"};
+                }
                 return (
-                    <div className={className} onClick={this.props.toggleCard}>
-                        <div dangerouslySetInnerHTML={{__html: grey_keyword(this.props.content)}}></div>
-                    </div>
-                )
+                    <Panel toggleCard={this.props.toggleCard} styles={styles} content={this.props.content}/>
+                    )
             } else {
                 return null
             }
@@ -33,11 +44,6 @@ var Response = React.createClass({
 var ResponseWall = React.createClass({
     toggleCard: function (response) {
         var that = this;
-        if (this.props.curating) {
-        } else {
-            this.state.data.splice(this.state.data.indexOf(response), 1);
-            this.setState({date: this.state.data});
-        }
         if (response.display_on_wall) {
             var tmp = 'false';
         } else {

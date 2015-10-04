@@ -1,34 +1,3 @@
-function grey_keyword(sms) {
-openSpan = '<span class="grey-txt">', closeSpan = '</span>';
-   /* Make the sentence into an array */
-   sms = sms.split(' ');
-   /* Add span to the beginning of the array */
-   sms.unshift( openSpan );
-   /* Add  as the 3th value in the array */
-   sms.splice( 2, 0, closeSpan );
-   /* Turn it back into a string */
-   sms = sms.join(' ');
-   return sms
-}
-function display_on_wall(id, display_bool) {
-    $.ajax({
-            url : '/api/v1/sms/in/'+id,
-            type : "POST",
-            data : {'display_on_wall': display_bool },
-            success : function(json) {
-                console.log(json)
-              if (json.display_on_wall){
-              $('#dw'+json.pk).html("<a class='btn btn-xs btn-success' onclick='display_on_wall("+json.pk+", false)'>Showing</a>");
-              }
-              else{
-              $('#dw'+json.pk).html("<a class='btn btn-xs btn-danger' onclick='display_on_wall("+json.pk+", true)'>Hidden</a>");
-              }
-            },
-            error : function(xhr,errmsg,err) {
-                console.log(xhr.status + ": " + xhr.responseText);
-            }
-        });
-}
 // This function gets cookie with a given name
 function getCookie(name) {
     var cookieValue = null;
