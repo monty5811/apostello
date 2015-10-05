@@ -13,6 +13,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY',
 INSTALLED_APPS = (
     # built in apps
     'django.contrib.admin',
+    'django.contrib.admindocs',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',

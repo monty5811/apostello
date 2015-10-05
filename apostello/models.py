@@ -162,6 +162,7 @@ class Keyword(models.Model):
         else:
             not_ended = timezone.now() < self.deactivate_time
         return started and not_ended
+    is_live.boolean = True
 
     def fetch_matches(self):
         return SmsInbound.objects.filter(matched_keyword=self.keyword,

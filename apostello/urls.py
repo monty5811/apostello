@@ -10,6 +10,7 @@ from apostello.views import (ElvantoImportView, ItemView, SendAdhoc, SendGroup,
                              SimpleView)
 
 admin.autodiscover()
+
 # index and two sending views, dashboard
 urlpatterns = [
     url(r'^$', SimpleView.as_view(template_name="apostello/index.html", required_perms=[]), name='index'),
@@ -107,6 +108,7 @@ urlpatterns += [
 
 # auth and admin
 urlpatterns += [
+    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url('', include('social.apps.django_app.urls', namespace='social')),
 ]
