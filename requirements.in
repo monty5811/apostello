@@ -15,6 +15,7 @@ django-phonenumber-field
 django-solo
 django-twilio
 djangorestframework
+docutils
 ElvantoAPI
 ipython
 gunicorn
