@@ -8,6 +8,8 @@ dependencies:
 test:
   override:
     - py.test . --nomigrations -n 2 --cov="." --cov-report="html" --junitxml="$CIRCLE_TEST_REPORTS/junit.xml"
+  post:
+    - pip install coveralls && coveralls
 general:
   artifacts:
     - "coverage_html_report"
