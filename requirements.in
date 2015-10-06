@@ -34,4 +34,6 @@ python-dotenv
 python3-memcached
 python-social-auth
 requests
+sphinx
+sphinx-autobuild
 twilio
