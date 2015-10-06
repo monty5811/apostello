@@ -25,7 +25,6 @@ In order to set up an instance of apostello you will need:
 
  - Twilio account and a purchased number.
  - Google account, preferably a Google Apps Domain. Currently all users log in with a Google account. A Google Apps domain can be white listed in the application settings. Alternatively individual Google accounts can also be white listed. Support for other login options is planned.
- - Mailgun account for email notifications. Support for alternatives is planned.
 
 ## Development
 
