@@ -3,6 +3,7 @@ anyjson
 billiard
 celery
 Django<1.9
+django-allauth
 django-appconf
 django-bootstrap3
 django-celery
@@ -32,6 +33,5 @@ pytest-pep8
 pytest-xdist
 python-dotenv
 python3-memcached
-python-social-auth
 requests
 twilio

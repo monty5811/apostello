@@ -17,6 +17,7 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # apostello
@@ -25,14 +26,20 @@ INSTALLED_APPS = (
     'graphs',
     # third party apps
     'rest_framework',
-    'social.apps.django_app.default',
     'djcelery',
     'bootstrap3',
     'datetimewidget',
     'compressor',
     'django_extensions',
     'solo',
+    # auth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 )
+
+SITE_ID = 1
 
 MIDDLEWARE_CLASSES = (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
@@ -46,13 +53,12 @@ MIDDLEWARE_CLASSES = (
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
-    'social.apps.django_app.context_processors.backends',
-    'social.apps.django_app.context_processors.login_redirect',
     "django.core.context_processors.request",
     'django.core.context_processors.static',
     'django.contrib.auth.context_processors.auth',
     'django.contrib.messages.context_processors.messages',
     'apostello.context_processors.global_settings',
+    'django.template.context_processors.request',
 )
 
 STATICFILES_FINDERS = (
@@ -68,7 +74,7 @@ STATIC_ROOT = '/webapps/apostello/static/'
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
-    'social.backends.google.GoogleOAuth2',
+    'allauth.account.auth_backends.AuthenticationBackend',
 )
 
 ROOT_URLCONF = 'apostello.urls'
@@ -118,20 +124,13 @@ MAILGUN_ACCESS_KEY = os.environ['MAILGUN_ACCESS_KEY']
 MAILGUN_SERVER_NAME = os.environ['MAILGUN_SERVER_NAME']
 
 # social login settings
-SOCIAL_AUTH_URL_NAMESPACE = 'social'
-SOCIAL_AUTH_LOGIN_REDIRECT_ULR = '/'
-SOCIAL_AUTH_MODEL = 'apostello'
-SOCIAL_AUTH_USER_MODEL = 'auth.User'
-SOCIAL_AUTH_STRATEGY = 'social.strategies.django_strategy.DjangoStrategy'
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_USERNAME_REQUIRED = False
+WHITELISTED_LOGIN_DOMAINS = os.environ.get('WHITELISTED_LOGIN_DOMAINS', '').split(',')
 
-LOGIN_URL = '/login/google-oauth2'
-LOGIN_ERROR_URL = '/'
 LOGIN_REDIRECT_URL = '/'
-
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ['SOCIAL_AUTH_GOOGLE_OAUTH2_KEY']
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ['SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET']
-SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_DOMAINS = os.environ['SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_DOMAINS'].split(',')
-SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_EMAILS = os.environ['SOCIAL_AUTH_GOOGLE_OAUTH2_WHITELISTED_EMAILS'].split(',')
 
 # Elvanto credentials
 ELVANTO_KEY = os.environ['ELVANTO_KEY']

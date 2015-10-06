@@ -430,7 +430,12 @@ class DefaultResponses(SingletonModel):
 
 class UserProfile(models.Model):
     """Primarily used to change user permissions, can extend for other uses too"""
-    user = models.ForeignKey(User, unique=True)
+    user = models.OneToOneField(User, unique=True)
+
+    approved = models.BooleanField(
+        default=False,
+        help_text='This must be true to grant users access to the site.'
+    )
 
     can_see_groups = models.BooleanField(default=True)
     can_see_contact_names = models.BooleanField(default=True)
@@ -444,6 +449,16 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return "Profile: " + str(self.user)
+
+    def save(self, *args, **kwargs):
+        if self.pk is None:
+            # on first save, approve whitelisted domains
+            email = self.user.email
+            email_domain = email.split('@')[1]
+            safe_domains = settings.WHITELISTED_LOGIN_DOMAINS
+            if email_domain in safe_domains:
+                self.approved = True
+        super(UserProfile, self).save(*args, **kwargs)
 
 
 User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])

@@ -1,0 +1,36 @@
+{% load compress %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% include 'apostello/includes/head.html' %}
+{% compress css %}
+<style>
+body {
+    color: #ffffff;
+    background-color: #222222;
+    padding: 50px;
+}
+a {
+    color: #ffffff;
+    font-weight: bold;
+}
+a:hover {
+    color: #ffffff;
+    font-weight: bold;
+}
+div {
+    border-radius: 5px;
+}
+</style>
+{% endcompress %}
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-4 col-sm-offset-4" style="background-color: #5c569c; padding: 10px">
+        {% block content %}
+        {% endblock %}
+      </div>
+    </div>
+  </div>
+</body>
