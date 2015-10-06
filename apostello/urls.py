@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.views.generic import TemplateView
 
 from apostello.decorators import keyword_access_check
 from apostello.forms import (KeywordForm, ManageRecipientGroupForm,
@@ -14,6 +15,7 @@ admin.autodiscover()
 # index and two sending views, dashboard
 urlpatterns = [
     url(r'^$', SimpleView.as_view(template_name="apostello/index.html", required_perms=[]), name='index'),
+    url(r'not_approved/$', TemplateView.as_view(template_name='apostello/not_approved.html'), name='not_approved'),
     url(r'^help/$', SimpleView.as_view(template_name="apostello/help.html", required_perms=[]), name='help'),
     url(r'^send/adhoc/', SendAdhoc.as_view(required_perms=['can_send_sms']), name='send_adhoc'),
     url(r'^send/group/', SendGroup.as_view(required_perms=['can_send_sms']), name='send_group'),
@@ -110,7 +112,7 @@ urlpatterns += [
 urlpatterns += [
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', include(admin.site.urls)),
-    url('', include('social.apps.django_app.urls', namespace='social')),
+    url(r'^accounts/', include('allauth.urls')),
 ]
 # apps etc
 urlpatterns += [
