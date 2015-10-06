@@ -10,7 +10,6 @@ django-compressor
 django-datetime-widget
 django-debug-toolbar
 django-extensions
-django-mailgun
 django-phonenumber-field
 django-solo
 django-twilio

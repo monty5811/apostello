@@ -113,9 +113,11 @@ REST_FRAMEWORK = {
 }
 
 # email settings
-EMAIL_BACKEND = 'django_mailgun.MailgunBackend'
-MAILGUN_ACCESS_KEY = os.environ['MAILGUN_ACCESS_KEY']
-MAILGUN_SERVER_NAME = os.environ['MAILGUN_SERVER_NAME']
+EMAIL_USE_TLS = True
+EMAIL_HOST = os.environ.get('DJANGO_EMAIL_HOST', 'smtp.mailgun.org')
+EMAIL_HOST_USER = os.environ.get('DJANGO_EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('DJANGO_EMAIL_HOST_PASSWORD', '')
+EMAIL_PORT = 587
 
 # social login settings
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
