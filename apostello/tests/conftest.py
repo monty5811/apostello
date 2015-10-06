@@ -209,7 +209,8 @@ def users(recipients, keywords):
     user = User.objects.create_user(username='test',
                                     email='test@example.com',
                                     password='top_secret')
-    user.profile
+    user.profile.approved = True
+    user.profile.save()
     user.is_staff = True
     user.save()
     p = UserProfile.objects.get(user=user)
@@ -221,14 +222,16 @@ def users(recipients, keywords):
     user2 = User.objects.create_user(username='test2',
                                      email='test2@example.com',
                                      password='top2_secret')
-    user2.profile
+    user2.profile.approved = True
+    user2.profile.save()
     user2.save()
     keywords['test'].owners.add(user2)
 
     user3 = User.objects.create_user(username='test3',
                                      email='test3@example.com',
                                      password='top2_secret')
-    user3.profile
+    user3.profile.approved = True
+    user3.profile.save()
     user3.save()
 
     c = Client()
