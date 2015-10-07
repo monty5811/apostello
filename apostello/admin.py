@@ -10,6 +10,7 @@ from apostello import models
 admin.site.register(models.SiteConfiguration, SingletonModelAdmin)
 admin.site.register(models.DefaultResponses, SingletonModelAdmin)
 
+
 @admin.register(models.SmsOutbound)
 class SmsOutboundAdmin(admin.ModelAdmin):
     list_display = (

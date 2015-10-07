@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.utils.timezone import get_current_timezone
 
 import pytest
+from allauth.account.models import EmailAddress
 from apostello.models import *
 
 
@@ -209,11 +210,16 @@ def users(recipients, keywords):
     user = User.objects.create_user(username='test',
                                     email='test@example.com',
                                     password='top_secret')
-    user.profile.approved = True
     user.profile.save()
     user.is_staff = True
     user.save()
+    allauth_email = EmailAddress.objects.create(user=user,
+                                                email=user.email,
+                                                primary=True,
+                                                verified=True)
+    allauth_email.save()
     p = UserProfile.objects.get(user=user)
+    p.approved = True
     p.can_send_sms = True
     p.can_see_contact_nums = True
     p.can_import = True
@@ -222,17 +228,33 @@ def users(recipients, keywords):
     user2 = User.objects.create_user(username='test2',
                                      email='test2@example.com',
                                      password='top2_secret')
-    user2.profile.approved = True
-    user2.profile.save()
     user2.save()
+    user2.profile.save()
+    p = UserProfile.objects.get(user=user2)
+    p.approved = True
+    p.save()
+    allauth_email = EmailAddress.objects.create(user=user2,
+                                                email=user2.email,
+                                                primary=True,
+                                                verified=True)
+    allauth_email.save()
     keywords['test'].owners.add(user2)
 
     user3 = User.objects.create_user(username='test3',
                                      email='test3@example.com',
                                      password='top2_secret')
+    user3.save()
+    user3.profile.save()
+    p = UserProfile.objects.get(user=user3)
+    p.approved = True
+    p.save()
     user3.profile.approved = True
     user3.profile.save()
-    user3.save()
+    allauth_email = EmailAddress.objects.create(user=user3,
+                                                email=user3.email,
+                                                primary=True,
+                                                verified=True)
+    allauth_email.save()
 
     c = Client()
     c.login(username='test', password='top_secret')
