@@ -81,7 +81,6 @@ def smsin():
                                      sender_name="John Calvin",
                                      sender_num="+447927401749",
                                      matched_keyword="test",
-                                     replied_with="",
                                      sid='12345')
     sms1.save()
     sms3 = SmsInbound.objects.create(content='test message',
@@ -89,7 +88,6 @@ def smsin():
                                      sender_name="John Calvin",
                                      sender_num="+447927401749",
                                      matched_keyword="test",
-                                     replied_with="",
                                      sid='123456789')
     sms3.save()
     sms2 = SmsInbound.objects.create(content='archived message',
@@ -97,7 +95,6 @@ def smsin():
                                      sender_name="John Calvin",
                                      sender_num="+447927401749",
                                      matched_keyword="test",
-                                     replied_with="",
                                      sid='123456789a',
                                      is_archived=True)
     sms2.save()

@@ -23,18 +23,27 @@ from apostello.validators import (TWILIO_INFO_WORDS, TWILIO_START_WORDS,
 
 
 class RecipientGroup(models.Model):
-    """A Recipient Group is a collection of people for sending messages to"""
+    """
+    Stores groups of recipients.
+    """
     is_archived = models.BooleanField("Archived", default=False)
-    name = models.CharField("Name of group",
-                            max_length=30,
-                            unique=True,
-                            validators=[gsm_validator])
-    description = models.CharField("Group description", max_length=200)
+    name = models.CharField(
+        "Name of group",
+        max_length=30,
+        unique=True,
+        validators=[gsm_validator],
+    )
+    description = models.CharField(
+        "Group description",
+        max_length=200,
+    )
 
     def send_message(self, content, sent_by, eta=None):
+        """Sends message to group"""
         group_send_message_task.delay(content, self.name, sent_by, eta)
 
     def archive(self):
+        """Archives the group"""
         self.is_archived = True
         self.save()
 
@@ -45,6 +54,7 @@ class RecipientGroup(models.Model):
         return [str(x) for x in self.recipient_set.all()]
 
     def calculate_cost(self):
+        """Calculates cost of sending to this group"""
         return settings.SENDING_COST * self.recipient_set.all().count()
 
     def get_absolute_url(self):
@@ -58,31 +68,59 @@ class RecipientGroup(models.Model):
 
 
 class Recipient(models.Model):
-    """A Recipient is a contact that receives SMSs"""
+    """
+    Stores the name and number of recipeints.
+    """
     is_archived = models.BooleanField("Archived", default=False)
-    is_blocking = models.BooleanField("Has blocked", default=False)
-    first_name = models.CharField("First Name",
-                                  max_length=settings.MAX_NAME_LENGTH,
-                                  validators=[gsm_validator])
-    last_name = models.CharField("Last Name",
-                                 max_length=40,
-                                 validators=[gsm_validator])
-    number = PhoneNumberField(unique=True, validators=[not_twilio_num])
+    is_blocking = models.BooleanField(
+        "Blocking",
+        default=False,
+        help_text="If our number has received on of Twilio's stop words, we are now blocked."
+    )
+    first_name = models.CharField(
+        "First Name",
+        max_length=settings.MAX_NAME_LENGTH,
+        validators=[gsm_validator],
+    )
+    last_name = models.CharField(
+        "Last Name",
+        max_length=40,
+        validators=[gsm_validator],
+    )
+    number = PhoneNumberField(
+        unique=True,
+        validators=[not_twilio_num],
+        help_text="Cannot be our number, or we get a SMS loop."
+    )
     groups = models.ManyToManyField(RecipientGroup, blank=True)
 
     def personalise(self, message):
-        """Any occurence of "%name" will be replaced with the Recipient's first name"""
+        """
+        Personalises outgoing message:
+        any occurence of "%name" will be replaced with
+        the Recipient's first name
+        """
         return message.replace('%name%', self.first_name)
 
     def send_message(self, content='test message', group=None, sent_by='', eta=None):
+        """Sends message"""
         if self.is_blocking:
             return
         elif eta is None:
-            recipient_send_message_task.delay(self.pk, content, group, sent_by)
+            recipient_send_message_task.delay(
+                self.pk,
+                content,
+                group,
+                sent_by
+            )
         else:
-            recipient_send_message_task.apply_async(args=[self.pk, content, group, sent_by], eta=eta)
+            recipient_send_message_task.apply_async(
+                args=[self.pk, content, group, sent_by],
+                eta=eta
+            )
 
     def archive(self):
+        """Archives recipient"""
         self.is_archived = True
         self.groups.clear()
         self.save()
@@ -92,7 +130,10 @@ class Recipient(models.Model):
 
     @cached_property
     def full_name(self):
-        return u"{fn} {ln}".format(fn=self.first_name, ln=self.last_name)
+        return u"{fn} {ln}".format(
+            fn=self.first_name,
+            ln=self.last_name
+        )
 
     def __str__(self):
         return self.full_name
@@ -102,40 +143,77 @@ class Recipient(models.Model):
 
 
 class Keyword(models.Model):
-    """Keywords are used to group and collect incoming messages"""
+    """
+    Stores a keyword with its related data.
+    """
     is_archived = models.BooleanField("Archived", default=False)
-    keyword = models.SlugField("Keyword",
-                               max_length=12,
-                               unique=True,
-                               validators=[validate_lower,
-                                           gsm_validator,
-                                           twilio_reserved,
-                                           no_overlap_keyword])
-    description = models.CharField("Keyword Description", max_length=200)
-    custom_response = models.CharField("Auto response",
-                                       max_length=100,
-                                       blank=True,
-                                       validators=[gsm_validator, less_than_sms_char_limit])
-    deactivated_response = models.CharField("Deactivated response",
-                                            max_length=100,
-                                            blank=True,
-                                            validators=[gsm_validator, less_than_sms_char_limit],
-                                            help_text="Use this if you want a custom response after deactivation. e.g. 'You are too late for this event, sorry!'")
-    too_early_response = models.CharField("Not yet activated response",
-                                          max_length=1000,
-                                          blank=True,
-                                          validators=[gsm_validator, less_than_sms_char_limit],
-                                          help_text="Use this if you want a custom response before. e.g. 'You are too early for this event, please try agian on Monday!'")
-    activate_time = models.DateTimeField("Activation Time", default=timezone.now)
-    deactivate_time = models.DateTimeField("Deactivation Time", blank=True, null=True)
-    owners = models.ManyToManyField(User, blank=True, verbose_name='Limit viewing to only these people')
-    subscribed_to_digest = models.ManyToManyField(User,
-                                                  blank=True,
-                                                  verbose_name='Subscribed to daily emails.',
-                                                  related_name='subscribers')
-    last_email_sent_time = models.DateTimeField("Time of last sent email", blank=True, null=True)
+    keyword = models.SlugField(
+        "Keyword",
+        max_length=12,
+        unique=True,
+        validators=[validate_lower,
+                    gsm_validator,
+                    twilio_reserved,
+                    no_overlap_keyword]
+    )
+    description = models.CharField(
+        "Keyword Description",
+        max_length=200,
+    )
+    custom_response = models.CharField(
+        "Auto response",
+        max_length=100,
+        blank=True,
+        validators=[gsm_validator, less_than_sms_char_limit],
+        help_text='This text will be sent back as a reply when any incoming message matches this keyword. If empty, the site wide response will be used.'
+    )
+    deactivated_response = models.CharField(
+        "Deactivated response",
+        max_length=100,
+        blank=True,
+        validators=[gsm_validator, less_than_sms_char_limit],
+        help_text="Use this if you want a custom response after deactivation. e.g. 'You are too late for this event, sorry!'"
+    )
+    too_early_response = models.CharField(
+        "Not yet activated response",
+        max_length=1000,
+        blank=True,
+        validators=[gsm_validator, less_than_sms_char_limit],
+        help_text="Use this if you want a custom response before. e.g. 'You are too early for this event, please try agian on Monday!'"
+    )
+    activate_time = models.DateTimeField(
+        "Activation Time",
+        default=timezone.now,
+        help_text='The keyword will not be active before this time and so no messages will be able to match it. Leave blank to activate now.'
+
+    )
+    deactivate_time = models.DateTimeField(
+        "Deactivation Time",
+        blank=True,
+        null=True,
+        help_text='The keyword will not be active after this time and so no messages will be able to match it. Leave blank to never deactivate.'
+    )
+    owners = models.ManyToManyField(
+        User,
+        blank=True,
+        verbose_name='Limit viewing to only these people',
+        help_text='If this field is empty, any user can see this keyword. If populated, then only the named users and staff will have access.'
+    )
+    subscribed_to_digest = models.ManyToManyField(
+        User,
+        blank=True,
+        verbose_name='Subscribed to daily emails.',
+        related_name='subscribers',
+        help_text='Choose users that will receive daily updates of matched messages.'
+    )
+    last_email_sent_time = models.DateTimeField(
+        "Time of last sent email",
+        blank=True,
+        null=True
+    )
 
     def construct_reply(self, sender):
+        """Makes reply to an incoming message"""
         # check if keyword is active
         if not self.is_live():
             if self.deactivated_response != '' and timezone.now() > self.deactivate_time:
@@ -156,6 +234,7 @@ class Keyword(models.Model):
         return reply
 
     def is_live(self):
+        """Determines if keyword is active"""
         started = timezone.now() > self.activate_time
         if self.deactivate_time is None:
             not_ended = True
@@ -165,26 +244,36 @@ class Keyword(models.Model):
     is_live.boolean = True
 
     def fetch_matches(self):
-        return SmsInbound.objects.filter(matched_keyword=self.keyword,
-                                         is_archived=False)
+        """Fetches un-archived messages that match keyword"""
+        return SmsInbound.objects.filter(
+            matched_keyword=self.keyword,
+            is_archived=False
+        )
 
     def fetch_archived_matches(self):
-        return SmsInbound.objects.filter(matched_keyword=self.keyword,
-                                         is_archived=True)
+        """Fetches archived messages that match keyword"""
+        return SmsInbound.objects.filter(
+            matched_keyword=self.keyword,
+            is_archived=True
+        )
 
     def num_matches(self):
+        """Fetches number of un-archived messages that match keyword"""
         return self.fetch_matches().count()
 
     def num_archived_matches(self):
+        """Fetches number of archived messages that match keyword"""
         return self.fetch_archived_matches().count()
 
     def is_locked(self):
+        """Determines if keyword is locked"""
         if len(self.owners.all()) > 0:
             return True
         else:
             return False
 
     def can_user_access(self, user):
+        """Checks if user is allowed to access this keyword"""
         if user in self.owners.all():
             return True
         elif user.is_staff:
@@ -193,6 +282,7 @@ class Keyword(models.Model):
             return False
 
     def archive(self):
+        """Archives this keyword"""
         self.is_archived = True
         self.save()
         for sms in self.fetch_matches():
@@ -212,7 +302,7 @@ class Keyword(models.Model):
 
     @staticmethod
     def _match(sms):
-        """Match keyword or raise exception"""
+        """Matches keyword or raises exception"""
         if sms == "":
             raise NoKeywordMatchException
         if sms.lower().strip().startswith(TWILIO_STOP_WORDS):
@@ -234,7 +324,7 @@ class Keyword(models.Model):
 
     @staticmethod
     def match(sms):
-        """Match keyword at start of sms"""
+        """Matches keyword at start of sms"""
         try:
             return Keyword._match(sms)
         except NoKeywordMatchException:
@@ -242,7 +332,7 @@ class Keyword(models.Model):
 
     @staticmethod
     def lookup_colour(sms):
-        """Returns a hex colour for shading rows of table"""
+        """Generates colour for sms"""
         keyword = Keyword.match(sms)
 
         if keyword == 'stop':
@@ -270,9 +360,18 @@ class Keyword(models.Model):
 
 class SmsInbound(models.Model):
     """A SmsInbound is a message that was sent to the twilio number."""
-    sid = models.CharField("Message SID", max_length=34, unique=True)
+    sid = models.CharField(
+        "SID",
+        max_length=34,
+        unique=True,
+        help_text="Twilio's unique ID for this SMS"
+    )
     is_archived = models.BooleanField("Is Archived", default=False)
-    dealt_with = models.BooleanField("Dealt With?", default=False)
+    dealt_with = models.BooleanField(
+        "Dealt With?",
+        default=False,
+        help_text='Used, for example, to mark people as registered for an event.'
+    )
     content = models.CharField("Message body", blank=True, max_length=1600)
     time_received = models.DateTimeField(blank=True, null=True)
     sender_name = models.CharField("Sent by", max_length=200)
@@ -280,8 +379,11 @@ class SmsInbound(models.Model):
     matched_keyword = models.CharField(max_length=12)
     matched_colour = models.CharField(max_length=7)
     matched_link = models.CharField(max_length=200)
-    replied_with = models.CharField("Replied with", max_length=300, blank=True)
-    display_on_wall = models.BooleanField(default=False)
+    display_on_wall = models.BooleanField(
+        "Display on Wall?",
+        default=False,
+        help_text='If True, SMS will be shown on all live walls.'
+    )
 
     def archive(self):
         self.is_archived = True
@@ -320,13 +422,37 @@ class SmsInbound(models.Model):
 
 
 class SmsOutbound(models.Model):
-    """An SmsOutbound is an SMS that has been sent out by the app."""
-    sid = models.CharField(max_length=34, unique=True)
-    content = models.CharField("Message", max_length=1600, validators=[gsm_validator])
+    """
+    An SmsOutbound is an SMS that has been sent out by the app.
+    """
+    sid = models.CharField(
+        "SID",
+        max_length=34,
+        unique=True,
+        help_text="Twilio's unique ID for this SMS"
+    )
+    content = models.CharField(
+        "Message",
+        max_length=1600,
+        validators=[gsm_validator],
+    )
     time_sent = models.DateTimeField(default=timezone.now)
-    sent_by = models.CharField("Sender", max_length=200)
-    recipient_group = models.ForeignKey(RecipientGroup, null=True, blank=True)
-    recipient = models.ForeignKey(Recipient, blank=True, null=True)
+    sent_by = models.CharField(
+        "Sender",
+        max_length=200,
+        help_text='User that sent message. Stored for auditing purposes.'
+    )
+    recipient_group = models.ForeignKey(
+        RecipientGroup,
+        null=True,
+        blank=True,
+        help_text="Group (if any) that message was sent to"
+    )
+    recipient = models.ForeignKey(
+        Recipient,
+        blank=True,
+        null=True
+    )
 
     def __str__(self):
         return self.content
@@ -340,6 +466,12 @@ class SmsOutbound(models.Model):
 
 
 class SiteConfiguration(SingletonModel):
+    """
+    Stores site wide configuration options.
+
+    This is a singleton object, there should only be a single instance
+    of this model.
+    """
     site_name = models.CharField(
         max_length=255,
         default='apostello'
@@ -378,6 +510,12 @@ def fetch_default_resp_length():
 
 
 class DefaultResponses(SingletonModel):
+    """
+    Stores the site wide default responses.
+
+    This is a singleton object, there should only be a single instance
+    of this model.
+    """
     default_no_keyword_auto_reply = models.TextField(
         max_length=1000,
         default='Thank you, %name%, your message has been received.',
@@ -429,7 +567,11 @@ class DefaultResponses(SingletonModel):
 
 
 class UserProfile(models.Model):
-    """Primarily used to change user permissions, can extend for other uses too"""
+    """
+    Stores permissions related to a User.
+
+    The default profile is created on first access to user.profile.
+    """
     user = models.OneToOneField(User, unique=True)
 
     approved = models.BooleanField(

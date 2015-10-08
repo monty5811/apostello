@@ -61,7 +61,6 @@ class TestTasks:
                                         sender_name="John Calvin",
                                         sender_num="+447927401749",
                                         matched_keyword="test",
-                                        replied_with="",
                                         sid='123fasdfdfaw45')
         sms.save()
         send_keyword_digest()

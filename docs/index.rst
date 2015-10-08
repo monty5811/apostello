@@ -24,6 +24,7 @@ apostello was written for use at St Columba's Free Church as we couldn't find a 
    features
    getting_started
    development
+   api
 
 
 
