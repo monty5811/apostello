@@ -594,12 +594,16 @@ class UserProfile(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk is None:
-            # on first save, approve whitelisted domains
-            email = self.user.email
-            email_domain = email.split('@')[1]
-            safe_domains = settings.WHITELISTED_LOGIN_DOMAINS
-            if email_domain in safe_domains:
-                self.approved = True
+            try:
+                # on first save, approve whitelisted domains
+                email = self.user.email
+                email_domain = email.split('@')[1]
+                safe_domains = settings.WHITELISTED_LOGIN_DOMAINS
+                if email_domain in safe_domains:
+                    self.approved = True
+            except IndexError:
+                # no email adress
+                pass
         super(UserProfile, self).save(*args, **kwargs)
 
 
