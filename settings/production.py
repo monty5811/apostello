@@ -16,6 +16,14 @@ DATABASES = {'default': {'ENGINE': 'django.db.backends.postgresql_psycopg2',
                          }
              }
 
+# cache templates in production
+TEMPLATES[0]['OPTIONS']['loaders'] = [
+    ('django.template.loaders.cached.Loader', [
+        'django.template.loaders.filesystem.Loader',
+        'django.template.loaders.app_directories.Loader',
+    ]),
+]
+
 # Only run Opbeat in production
 INSTALLED_APPS += (
     'opbeat.contrib.django',

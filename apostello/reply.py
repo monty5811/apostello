@@ -33,11 +33,16 @@ def get_person_or_ask_for_name(from_, sms_body, keyword_obj):
             from apostello.models import SiteConfiguration
             config = SiteConfiguration.get_solo()
             if not config.disable_all_replies:
-                person_from.send_message(content=fetch_default_reply('auto_name_request'),
-                                         sent_by="auto name request")
+                person_from.send_message(
+                    content=fetch_default_reply('auto_name_request'),
+                    sent_by="auto name request"
+                )
                 notify_office_mail.delay(
                     '[Apostello] Unknown Contact!',
-                    'SMS:%s\nFrom:%s\n\n\nThis person is unknown and has been asked for their name.' % (sms_body, from_),
+                    'SMS: {0}\nFrom: {1}\n\n\nThis person is unknown and has been asked for their name.'.format(
+                        sms_body,
+                        from_
+                    ),
                 )
 
     return person_from
@@ -63,7 +68,7 @@ def reply_to_incoming(person_from, from_, sms_body, keyword):
             # update person's name:
             person_from.first_name = sms_body.split()[1].strip()
             person_from.last_name = " ".join(sms_body.split()[2:]).strip()
-            if len(person_from.last_name) < 1:
+            if not person_from.last_name:
                 raise ValidationError('No last name')
             person_from.save()
             # update old messages with this person's name
@@ -71,13 +76,20 @@ def reply_to_incoming(person_from, from_, sms_body, keyword):
             # thank person
             notify_office_mail.delay(
                 '[Apostello] New Signup!',
-                'SMS:\n\t%s\nFrom:\n\t%s\n' % (sms_body, from_),
+                'SMS:\n\t{0}\nFrom:\n\t{1}\n'.format(
+                    sms_body,
+                    from_,
+                ),
             )
+            # TODO update to use .format() and add help text to model
             return fetch_default_reply('name_update_reply') % person_from.first_name
         except (ValidationError, IndexError):
             notify_office_mail.delay(
                 '[Apostello] New Signup - FAILED!',
-                'SMS:\n\t%s\nFrom:\n\t%s\n' % (sms_body, from_),
+                'SMS:\n\t{0}\nFrom:\n\t{1}\n'.format(
+                    sms_body,
+                    from_
+                ),
             )
             return fetch_default_reply('name_failure_reply')
     else:

@@ -22,9 +22,8 @@ def exists_and_archived(form, model_class, identifier):
     except Exception:
         return None
 
-    if 'unique' in all_errors:
-        if instance.is_archived:
-            return instance
+    if ('unique' in all_errors) and instance.is_archived:
+        return instance
 
     return None
 

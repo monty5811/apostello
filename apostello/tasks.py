@@ -172,7 +172,10 @@ def warn_on_blacklist(recipient_pk):
     recipient = Recipient.objects.get(pk=recipient_pk)
     notify_office_mail.delay(
         '[Apostello] Blacklist Update',
-        "%s (%s) is now blocking us" % (str(recipient.number), str(recipient)),
+        "{0] ({1}) is now blocking us".format(
+            str(recipient.number),
+            str(recipient),
+        ),
     )
 
 
@@ -181,8 +184,12 @@ def warn_on_blacklist_receipt(recipient_pk, sms):
     from apostello.models import Recipient
     recipient = Recipient.objects.get(pk=recipient_pk)
     if recipient.is_blocking:
-        email_body = "%s has blacklisted us in the past but has just sent this message:" % (str(recipient))
-        email_body += "\n\n\t%s\n\nYou may need to email them as we cannot currently reply to them." % (sms)
+        email_body = "{0} has blacklisted us in the past but has just sent this message:".format(
+            str(recipient)
+        )
+        email_body += "\n\n\t{0}\n\nYou may need to email them as we cannot currently reply to them.".format(
+            sms
+        )
         notify_office_mail.delay(
             '[Apostello] Blacklist Receipt Notice',
             email_body,
@@ -202,8 +209,12 @@ def send_keyword_digest():
         if new_responses.count() > 0:
             for subscriber in keyword.subscribed_to_digest.all():
                 send_async_mail.delay(
-                    'Daily update for "%s" responses' % str(keyword),
-                    "The following text messages have been received today:\n\n%s" % "\n".join([str(x) for x in new_responses]),
+                    'Daily update for "{0}" responses'.format(
+                        str(keyword)
+                    ),
+                    "The following text messages have been received today:\n\n{0]".format(
+                        "\n".join([str(x) for x in new_responses])
+                    ),
                     [subscriber.email]
                 )
 
@@ -216,7 +227,7 @@ def post_to_slack(msg):
     from apostello.models import SiteConfiguration
     config = SiteConfiguration.get_solo()
     url = config.slack_url
-    if len(url) > 0:
+    if url:
         data = {'text': msg, 'username': 'apostello', "icon_emoji": ":speech_balloon:"}
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         requests.post(url, data=json.dumps(data), headers=headers)

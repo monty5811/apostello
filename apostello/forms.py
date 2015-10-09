@@ -8,32 +8,41 @@ from apostello.validators import gsm_validator, less_than_sms_char_limit
 
 
 class SendAdhocRecipientsForm(forms.Form):
-    content = forms.CharField(validators=[gsm_validator, less_than_sms_char_limit],
-                              required=True,
-                              min_length=1)
+    content = forms.CharField(
+        validators=[gsm_validator, less_than_sms_char_limit],
+        required=True,
+        min_length=1
+    )
     recipients = forms.ModelMultipleChoiceField(
         queryset=Recipient.objects.filter(is_archived=False),
         required=True,
         help_text=''
     )
-    scheduled_time = forms.DateTimeField(required=False,
-                                         widget=DateTimeWidget(bootstrap_version=3, options={'format': 'yyyy-mm-dd hh:ii'}),
-                                         help_text='Leave this blank to send your message immediately, otherwise select a date and time to schedule your message')
+    scheduled_time = forms.DateTimeField(
+        required=False,
+        widget=DateTimeWidget(bootstrap_version=3, options={'format': 'yyyy-mm-dd hh:ii'}),
+        help_text='Leave this blank to send your message immediately, otherwise select a date and time to schedule your message'
+    )
 
 
 class SendRecipientGroupForm(forms.Form):
-    content = forms.CharField(validators=[gsm_validator, less_than_sms_char_limit],
-                              required=True,
-                              min_length=1)
+    content = forms.CharField(
+        validators=[gsm_validator, less_than_sms_char_limit],
+        required=True,
+        min_length=1
+    )
     recipient_group = forms.ModelChoiceField(
         queryset=RecipientGroup.objects.filter(
-            is_archived=False),
+            is_archived=False
+        ),
         required=True,
         empty_label='Choose a group...'
     )
-    scheduled_time = forms.DateTimeField(required=False,
-                                         widget=DateTimeWidget(bootstrap_version=3, options={'format': 'yyyy-mm-dd hh:ii'}),
-                                         help_text='Leave this blank to send your message immediately, otherwise select a date and time to schedule your message')
+    scheduled_time = forms.DateTimeField(
+        required=False,
+        widget=DateTimeWidget(bootstrap_version=3, options={'format': 'yyyy-mm-dd hh:ii'}),
+        help_text='Leave this blank to send your message immediately, otherwise select a date and time to schedule your message'
+    )
 
 
 class ManageRecipientGroupForm(forms.ModelForm):
@@ -43,9 +52,12 @@ class ManageRecipientGroupForm(forms.ModelForm):
         exclude = ['is_archived']
 
     # Representing the many to many related field in SmsGroup
-    members = forms.ModelMultipleChoiceField(queryset=Recipient.objects.filter(is_archived=False),
-                                             required=False
-                                             )
+    members = forms.ModelMultipleChoiceField(
+        queryset=Recipient.objects.filter(
+            is_archived=False
+        ),
+        required=False
+    )
 
     def __init__(self, *args, **kwargs):
         if 'instance' in kwargs:
@@ -69,7 +81,9 @@ class RecipientForm(forms.ModelForm):
     class Meta:
         model = Recipient
         exclude = ['is_archived', 'is_blocking']
-        widgets = {'number': forms.TextInput(attrs={'placeholder': '+447259006790'})}
+        widgets = {
+            'number': forms.TextInput(attrs={'placeholder': '+447259006790'})
+        }
 
 
 class KeywordForm(forms.ModelForm):
@@ -92,8 +106,10 @@ class ArchiveKeywordResponses(forms.Form):
 
 
 class CsvImport(forms.Form):
-    csv_data = forms.CharField(help_text='John, Calvin, +447095237960',
-                               widget=forms.Textarea)
+    csv_data = forms.CharField(
+        help_text='John, Calvin, +447095237960',
+        widget=forms.Textarea
+    )
 
 
 class ElvantoImport(forms.Form):

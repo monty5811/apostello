@@ -77,12 +77,7 @@ def import_elvanto_groups(group_ids, user_email):
             bad_ppl.append(person)
 
         group.save()
-        if len(bad_ppl) == 0:
-            # send good email
-            send_async_mail.delay('[Apostello] Successful Elvanto Group Import',
-                                  '"{}" was imported successfully.'.format(group_name),
-                                  [user_email])
-        else:
+        if bad_ppl:
             # send email with failed data
             failed_people = ""
             for p in bad_ppl:
@@ -95,4 +90,9 @@ def import_elvanto_groups(group_ids, user_email):
 
             send_async_mail.delay('[Apostello] Failed Elvanto Group Import' + group_name,
                                   email_body,
+                                  [user_email])
+        else:
+            # send good email
+            send_async_mail.delay('[Apostello] Successful Elvanto Group Import',
+                                  '"{}" was imported successfully.'.format(group_name),
                                   [user_email])

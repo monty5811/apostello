@@ -87,15 +87,15 @@ class TestKeywordNoDb():
         assert Keyword.match("stop    ") == 'stop'
         assert Keyword.match("\nSTOP    ") == 'stop'
         for x in ["stopall", "unsubscribe", "cancel", "end", "quit"]:
-            assert Keyword.match("%s" % x) == 'stop'
+            assert Keyword.match("{0}".format(x)) == 'stop'
 
     def test_start(self):
         for x in ["start", "yes"]:
-            assert Keyword.match("%s" % x) == 'start'
+            assert Keyword.match("{0}".format(x)) == 'start'
 
     def test_info(self):
         for x in ["help", "info"]:
-            assert Keyword.match("%s" % x) == 'info'
+            assert Keyword.match("{0}".format(x)) == 'info'
 
     def test_name(self):
         assert Keyword.match("name John Calvin") == 'name'

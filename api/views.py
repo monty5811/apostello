@@ -39,9 +39,9 @@ class ApiMember(APIView):
     def post(self, request, format=None, **kwargs):
         pk = kwargs['pk']
         reingest_sms = True if request.data.get('reingest', False) == 'true' else False
-        deal_with_sms = request.data.get('deal_with', None)
-        archive = request.data.get('archive', None)
-        display_on_wall = request.data.get('display_on_wall', None)
+        deal_with_sms = request.data.get('deal_with')
+        archive = request.data.get('archive')
+        display_on_wall = request.data.get('display_on_wall')
 
         obj = get_object_or_404(self.model_class, pk=pk)
         if archive is not None:

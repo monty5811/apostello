@@ -267,7 +267,7 @@ class Keyword(models.Model):
 
     def is_locked(self):
         """Determines if keyword is locked"""
-        if len(self.owners.all()) > 0:
+        if self.owners.all().count() > 0:
             return True
         else:
             return False
@@ -410,7 +410,7 @@ class SmsInbound(models.Model):
     def save(self, *args, **kwargs):
         super(SmsInbound, self).save(*args, **kwargs)
         keyword_ = Keyword.objects.filter(keyword=self.matched_keyword)
-        if len(keyword_) > 0:
+        if keyword_.count() > 0:
             cache.set('keyword_{}_only_live'.format(keyword_[0].pk), None, 0)
             cache.set('keyword_{}_all'.format(keyword_[0].pk), None, 0)
 

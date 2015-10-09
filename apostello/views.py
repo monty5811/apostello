@@ -25,6 +25,9 @@ from apostello.utils import exists_and_archived
 
 
 class SimpleView(LoginRequiredMixin, ProfilePermsMixin, View):
+    """
+    Simple view that can ensures user is logged in and has permissions.
+    """
     template_name = ''
     required_perms = []
 
@@ -38,6 +41,9 @@ class SimpleView(LoginRequiredMixin, ProfilePermsMixin, View):
 
 
 class SendAdhoc(LoginRequiredMixin, ProfilePermsMixin, View):
+    """
+    Displays form for sending messages to individuals or ad-hoc groups.
+    """
     required_perms = []
 
     def get(self, request, *args, **kwargs):
@@ -53,15 +59,28 @@ class SendAdhoc(LoginRequiredMixin, ProfilePermsMixin, View):
                                        sent_by=str(request.user))
 
             if form.cleaned_data['scheduled_time'] is None:
-                messages.info(request, "Sending \"%s\"...\nPlease check the logs for verification..." % (form.cleaned_data['content']))
+                messages.info(
+                    request,
+                    "Sending \"{0}\"...\nPlease check the logs for verification...".format(
+                        form.cleaned_data['content']
+                    )
+                )
             else:
-                messages.info(request, "'%s' has been successfully queued." % form.cleaned_data['content'])
+                messages.info(
+                    request,
+                    "'{0}' has been successfully queued.".format(
+                        form.cleaned_data['content']
+                    )
+                )
             return redirect(reverse("send_adhoc"))
         else:
             return render(request, "apostello/send_adhoc.html", {'form': form})
 
 
 class SendGroup(LoginRequiredMixin, ProfilePermsMixin, View):
+    """
+    Displays form for sending messages to a group.
+    """
     required_perms = []
 
     def get(self, request, *args, **kwargs):
@@ -80,9 +99,20 @@ class SendGroup(LoginRequiredMixin, ProfilePermsMixin, View):
                 sent_by=str(request.user)
             )
             if form.cleaned_data['scheduled_time'] is None:
-                messages.info(request, "Sending '%s' to '%s'...\nPlease check the logs for verification..." % (form.cleaned_data['content'], form.cleaned_data['recipient_group']))
+                messages.info(
+                    request,
+                    "Sending '{0}' to '{1}'...\nPlease check the logs for verification...".format(
+                        form.cleaned_data['content'],
+                        form.cleaned_data['recipient_group']
+                    )
+                )
             else:
-                messages.info(request, "'%s' has been successfully queued." % form.cleaned_data['content'])
+                messages.info(
+                    request,
+                    "'{0}' has been successfully queued.".format(
+                        form.cleaned_data['content']
+                    )
+                )
             return redirect(reverse('send_group'))
         else:
             context['form'] = form
@@ -135,7 +165,12 @@ class ItemView(LoginRequiredMixin, ProfilePermsMixin, View):
             if new_instance is not None:
                 # if we have a clash with existing object and it is archived,
                 # redirect there, otherwise return form with errors
-                messages.info(request, "'%s' already exists. Click the button to bring it back from the archive." % str(new_instance))
+                messages.info(
+                    request,
+                    "'{0}' already exists. Click the button to bring it back from the archive.".format(
+                        str(new_instance)
+                    )
+                )
                 return redirect(new_instance.get_absolute_url())
             else:
                 return render(request, "apostello/item.html",
@@ -150,6 +185,9 @@ class ItemView(LoginRequiredMixin, ProfilePermsMixin, View):
 @keyword_access_check
 @login_required
 def keyword_responses(request, pk, archive=False):
+    """
+    Displays the responses for a single keyword.
+    """
     keyword = get_object_or_404(Keyword, pk=pk)
 
     if archive is False and request.method == 'POST':
@@ -170,6 +208,9 @@ def keyword_responses(request, pk, archive=False):
 @keyword_access_check
 @login_required
 def keyword_csv(request, pk):
+    """
+    Returns a CSV with the responses for a single keyword.
+    """
     keyword = get_object_or_404(Keyword, pk=pk)
     # Create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(content_type='text/csv')
@@ -188,30 +229,45 @@ def keyword_csv(request, pk):
 @keyword_access_check
 @login_required
 def keyword_wall(request, pk):
+    """
+    Displays the live wall for a single keyword.
+    """
     keyword = get_object_or_404(Keyword, pk=pk)
     return render(request, "apostello/wall.html", {'keyword': keyword})
 
 
 @login_required
 def wall(request):
+    """
+    Displays the live wall for the whole site.
+    """
     return render(request, "apostello/wall.html", {})
 
 
 @keyword_access_check
 @login_required
 def keyword_wall_curate(request, pk):
+    """
+    Displays the live wall curating interface for a single keyword.
+    """
     keyword = get_object_or_404(Keyword, pk=pk)
     return render(request, "apostello/wall_curator.html", {'keyword': keyword})
 
 
 @login_required
 def wall_curate(request):
+    """
+    Displays the live wall curating interface for the whole site.
+    """
     return render(request, "apostello/wall_curator.html", {})
 
 
 @login_required
 @check_user_perms
 def import_recipients(request):
+    """
+    Displays the CSV import form.
+    """
     if request.method == 'POST':
         form = CsvImport(request.POST)
         if form.is_valid():
@@ -230,12 +286,18 @@ def import_recipients(request):
                 except Exception:
                     # catch bad rows and display to the user
                     bad_rows.append(row)
-            if len(bad_rows) == 0:
-                messages.success(request, "Importing your data now...")
-                return redirect('/')
-            else:
-                messages.warning(request, "Uh oh, something went wrong with these imports!")
+            if bad_rows:
+                messages.warning(
+                    request,
+                    "Uh oh, something went wrong with these imports!"
+                )
                 return render(request, "apostello/importer.html", {'form': CsvImport(), 'bad_rows': bad_rows})
+            else:
+                messages.success(
+                    request,
+                    "Importing your data now..."
+                )
+                return redirect('/')
 
         context = {'form': form}
         return render(request, 'apostello/importer.html', context)
@@ -246,6 +308,9 @@ def import_recipients(request):
 
 
 class ElvantoImportView(LoginRequiredMixin, ProfilePermsMixin, View):
+    """
+    Displays the Elvanto import form.
+    """
     required_perms = []
 
     def get(self, request, *args, **kwargs):
@@ -258,7 +323,10 @@ class ElvantoImportView(LoginRequiredMixin, ProfilePermsMixin, View):
             group_ids = form.cleaned_data['elvanto_groups']
             # start async task:
             import_elvanto_groups.delay(group_ids, request.user.email)
-            messages.success(request, "Your groups are being updated, you should get an email confirmation when they are done.")
+            messages.success(
+                request,
+                "Your groups are being updated, you should get an email confirmation when they are done."
+            )
             return redirect("/")
 
         context = {'form': form}
@@ -267,6 +335,10 @@ class ElvantoImportView(LoginRequiredMixin, ProfilePermsMixin, View):
 
 @twilio_view
 def sms(request):
+    """
+    Handles all incoming messages from Twilio.
+    This is the start of the message processing pipeline.
+    """
     r = twiml.Response()
     params = request.POST
     from_ = params['From']
