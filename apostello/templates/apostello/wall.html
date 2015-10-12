@@ -21,7 +21,7 @@
 <script>
 React.render(
      React.createElement(ResponseWall,
-     {pollInterval: 500, curating:false, preview:false, url: "{%url 'api:keyword_live_wall' keyword.id %}"}),
+     {pollInterval: 500, curating:false, preview:false, url: "{%url 'api:keyword_live_wall_only_live' keyword.id %}"}),
      document.getElementById('content')
 );
 </script>
@@ -29,7 +29,7 @@ React.render(
 <script>
 React.render(
      React.createElement(ResponseWall,
-     {pollInterval: 500, curating:false, url: "{%url 'api:all_live_wall'%}", preview: false}),
+     {pollInterval: 500, curating:false, url: "{%url 'api:all_live_wall_only_live'%}", preview: false}),
      document.getElementById('content')
 );
 </script>

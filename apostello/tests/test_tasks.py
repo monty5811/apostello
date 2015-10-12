@@ -63,6 +63,8 @@ class TestTasks:
                                         matched_keyword="test",
                                         sid='123fasdfdfaw45')
         sms.save()
+        keywords['test'].subscribed_to_digest.add(users['staff'])
+        keywords['test'].save()
         send_keyword_digest()
 
     def test_log_msg_in(self, recipients):
@@ -73,3 +75,6 @@ class TestTasks:
         log_msg_in(p, datetime.now(), calvin.pk)
 
         assert SmsInbound.objects.filter(content="New test message").count() == 1
+
+    def test_warn_on_blacklist_receipt(self, recipients):
+        warn_on_blacklist_receipt(recipients['wesley'].pk, 'stop')

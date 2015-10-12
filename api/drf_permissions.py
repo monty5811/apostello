@@ -26,14 +26,9 @@ class CanSeeIncoming(permissions.BasePermission):
         return request.user.profile.can_see_incoming
 
 
-class CanSeeContactNums(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return request.user.profile.can_see_contact_nums
-
-
 class CanSeeKeyword(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        if not obj.is_locked:
+        if not obj.is_locked():
             return True
 
         return obj.can_user_access(request.user)

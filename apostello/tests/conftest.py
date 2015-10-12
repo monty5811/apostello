@@ -1,19 +1,14 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 
+import pytest
+from allauth.account.models import EmailAddress
 from django.contrib.auth.models import User
 from django.test import Client
 from django.utils import timezone
 from django.utils.timezone import get_current_timezone
 
-import pytest
-from allauth.account.models import EmailAddress
 from apostello.models import *
-
-
-@pytest.fixture()
-def no_requests(monkeypatch):
-    monkeypatch.delattr("requests.sessions.Session.request")
 
 
 @pytest.fixture

@@ -5,6 +5,13 @@ from .common import *
 
 TESTING = True
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
+    }
+}
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'default')
 
@@ -35,4 +42,4 @@ PASSWORD_HASHERS = (
 
 DJANGO_TWILIO_FORGERY_PROTECTION = False
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'

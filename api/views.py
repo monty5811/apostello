@@ -81,7 +81,11 @@ class ApiCollectionKeywordSms(APIView):
     archive = False
 
     def get(self, request, format=None, **kwargs):
-        objs = SmsInbound.objects.filter(matched_keyword=str(Keyword.objects.get(pk=kwargs['pk'])))
+        keyword_obj = Keyword.objects.get(pk=kwargs['pk'])
+        self.check_object_permissions(request, keyword_obj)
+        objs = SmsInbound.objects.filter(
+            matched_keyword=str(keyword_obj)
+        )
         if self.archive:
             objs = objs.filter(is_archived=True)
         else:
@@ -95,18 +99,24 @@ class ApiCollectionKeywordWall(APIView):
     only_live = False
 
     def get(self, request, format=None, **kwargs):
+        keyword_obj = Keyword.objects.get(pk=kwargs['pk'])
+        self.check_object_permissions(request, keyword_obj)
         # check cache
         if self.only_live:
             objs = cache.get('keyword_{}_only_live'.format(kwargs['pk']))
             if objs is None:
-                objs = SmsInbound.objects.filter(matched_keyword=str(Keyword.objects.get(pk=kwargs['pk'])))
+                objs = SmsInbound.objects.filter(
+                    matched_keyword=str(keyword_obj)
+                )
                 objs = objs.filter(is_archived=False)
                 objs = objs.filter(display_on_wall=True)
                 cache.set('keyword_{}_only_live'.format(kwargs['pk']), objs, 120)
         else:
             objs = cache.get('keyword_{}_all'.format(kwargs['pk']))
             if objs is None:
-                objs = SmsInbound.objects.filter(matched_keyword=str(Keyword.objects.get(pk=kwargs['pk'])))
+                objs = SmsInbound.objects.filter(
+                    matched_keyword=str(keyword_obj)
+                )
                 objs = objs.filter(is_archived=False)
                 cache.set('keyword_{}_all'.format(kwargs['pk']), objs, 120)
 

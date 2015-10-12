@@ -212,7 +212,7 @@ def send_keyword_digest():
                     'Daily update for "{0}" responses'.format(
                         str(keyword)
                     ),
-                    "The following text messages have been received today:\n\n{0]".format(
+                    "The following text messages have been received today:\n\n{0}".format(
                         "\n".join([str(x) for x in new_responses])
                     ),
                     [subscriber.email]
