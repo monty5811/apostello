@@ -11,6 +11,7 @@ from .serializers import SmsInboundSerializer
 
 
 class ApiCollection(APIView):
+    """Basic collection view. Check user is authenticated by default."""
     permission_classes = (IsAuthenticated,)
     model_class = None
     serializer_class = None
@@ -26,6 +27,7 @@ class ApiCollection(APIView):
 
 
 class ApiMember(APIView):
+    """Basic member view. Check user is authenticated by default."""
     permission_classes = (IsAuthenticated,)
     model_class = None
     serializer_class = None
@@ -37,6 +39,7 @@ class ApiMember(APIView):
         return Response(serializer.data)
 
     def post(self, request, format=None, **kwargs):
+        """Handles all the toggle buttons."""
         pk = kwargs['pk']
         reingest_sms = True if request.data.get('reingest', False) == 'true' else False
         deal_with_sms = request.data.get('deal_with')
