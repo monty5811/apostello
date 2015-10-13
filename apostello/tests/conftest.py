@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.test import Client
 from django.utils import timezone
 from django.utils.timezone import get_current_timezone
+from selenium import webdriver
 
 from apostello.models import *
 
@@ -262,3 +263,12 @@ def users(recipients, keywords):
             'c_out': c_out}
 
     return objs
+
+
+@pytest.mark.usefixtures("users")
+@pytest.yield_fixture(scope='module')
+def browser(request):
+    driver = webdriver.Firefox()
+
+    yield driver
+    driver.quit()

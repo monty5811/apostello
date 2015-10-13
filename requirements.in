@@ -29,8 +29,11 @@ pytest-env
 pytest-flakes
 pytest-isort
 pytest-pep8
+pytest-testmon
+pytest-watch
 pytest-xdist
 python-dotenv
 python3-memcached
 requests
+selenium
 twilio

@@ -3,7 +3,7 @@ import pytest
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-from .. import models
+from apostello import models
 
 
 @pytest.mark.django_db

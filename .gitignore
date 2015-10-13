@@ -70,3 +70,7 @@ target/
 #
 .idea/*
 .c9/
+
+.testmondata
+.tmontmp/
+.coverage*
