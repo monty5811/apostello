@@ -347,7 +347,11 @@ def sms(request):
     # get person object and optionally ask for their name
     person_from = get_person_or_ask_for_name(from_, sms_body, keyword_obj)
     log_msg_in.delay(params, timezone.now(), person_from.pk)
-    post_to_slack.delay("%s\nFrom: %s\n(matched: %s)" % (sms_body, str(person_from), str(keyword_obj)))
+    post_to_slack.delay(
+        "{0}\nFrom: {1}\n(matched: {2})".format(
+            sms_body, str(person_from), str(keyword_obj)
+        )
+    )
 
     reply = reply_to_incoming(person_from, from_, sms_body, keyword_obj)
 

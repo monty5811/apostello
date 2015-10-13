@@ -7,6 +7,8 @@ from ..elvanto import (fix_elvanto_numbers, grab_elvanto_groups,
 
 
 class TestElvantoNumbers:
+    """Test normalising of Elvanto numbers"""
+
     def test_no_change(self):
         assert '+44790445806' == fix_elvanto_numbers('+44790445806')
 
@@ -21,6 +23,8 @@ class TestElvantoNumbers:
 
 
 class TestTryBothFields:
+    """Test falling back to "phone" field"""
+
     def test_mobile_good(self):
         assert try_both_num_fields('+447902537905', '') == '+447902537905'
 
@@ -35,6 +39,11 @@ class TestTryBothFields:
 
 
 class TestApi:
+    """
+    Test api methods.
+
+    Note - this calls the Elvanto api and will hit their site.
+    """
     def test_grab_elvanto_groups(self):
         groups = grab_elvanto_groups()
         assert groups[0] == (u'41dd51d9-d3c5-11e4-95ba-068b656294b7', u'Geneva')

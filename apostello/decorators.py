@@ -10,6 +10,8 @@ from apostello.models import Keyword
 
 
 def keyword_access_check(method):
+    """Checks a user can access a specific keyword."""
+
     @wraps(method)
     def wrapper(request, *args, **kwargs):
         if request.user.is_staff:
@@ -29,6 +31,7 @@ def keyword_access_check(method):
 
 
 def check_user_perms(view=None, require=None):
+    """Checks a user has the specified permissions."""
     if view is None:
         return partial(check_user_perms, require=require)
 

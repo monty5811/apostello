@@ -36,6 +36,8 @@ from apostello import models
 ])
 @pytest.mark.django_db
 class TestNotLoggedIn:
+    """Test site urls when not logged in."""
+
     def test_not_logged_in(self, url, status_code, recipients, groups, smsin, smsout, users):
         assert users['c_out'].get(url).status_code == status_code
 
@@ -79,6 +81,8 @@ class TestNotLoggedIn:
 ])
 @pytest.mark.django_db
 class TestStaff:
+    """Test site urls when logged in as staff"""
+
     def test_staff(self, url, status_code, recipients, groups, smsin, smsout, keywords, users):
         assert users['c_staff'].get(url).status_code == status_code
 
@@ -128,12 +132,16 @@ class TestStaff:
 ])
 @pytest.mark.django_db
 class TestNotStaff:
+    """Test site urls when logged in a normal user"""
+
     def test_in(self, url, status_code, recipients, groups, smsin, smsout, keywords, users):
         assert users['c_in'].get(url).status_code == status_code
 
 
 @pytest.mark.django_db
 class TestOthers:
+    """Test posting as a user"""
+
     def test_api_posts(self, recipients, groups, smsin, smsout, keywords, users):
         for endpoint in ['sms']:
             for param in ['reingest', 'deal_with', 'archive', 'display_on_wall']:

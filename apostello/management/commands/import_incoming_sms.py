@@ -5,6 +5,10 @@ from apostello.logs import import_incoming_sms
 
 
 class Command(BaseCommand):
+    """
+    Checks Twilio's incoming logs for our number and updates the
+    database to match.
+    """
     args = ''
     help = 'Import incoming messages from twilio'
 

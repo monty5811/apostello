@@ -8,6 +8,9 @@ from apostello.models import Keyword, Recipient, SmsInbound, SmsOutbound
 
 
 def import_incoming_sms():
+    """
+    Loops over all incoming messages in Twilio's logs and adds them to our db.
+    """
     try:
         sms_page = twilio_client.messages.iter(to_=settings.TWILIO_FROM_NUM)
         for x in sms_page:
@@ -41,6 +44,9 @@ def import_incoming_sms():
 
 
 def import_outgoing_sms():
+    """
+    Loops over all outgoing messages in Twilio's logs and adds them to our db.
+    """
     try:
         sms_page = twilio_client.messages.iter(from_=settings.TWILIO_FROM_NUM)
         for x in sms_page:

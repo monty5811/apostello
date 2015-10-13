@@ -6,6 +6,9 @@ from apostello.models import (Keyword, Recipient, RecipientGroup, SmsInbound,
 
 
 class RecipientSerializer(serializers.ModelSerializer):
+    """
+    Serializes apostello.models.Recipient for use in table.
+    """
     url = serializers.CharField(source='get_absolute_url')
 
     class Meta:
@@ -19,6 +22,9 @@ class RecipientSerializer(serializers.ModelSerializer):
 
 
 class RecipientGroupSerializer(serializers.ModelSerializer):
+    """
+    Serializes apostello.models.RecipientGroup for use in table.
+    """
     cost = serializers.CharField(source='calculate_cost')
     url = serializers.CharField(source='get_absolute_url')
     members = serializers.ListField(source='all_recipients_names')
@@ -34,6 +40,9 @@ class RecipientGroupSerializer(serializers.ModelSerializer):
 
 
 class KeywordSerializer(serializers.ModelSerializer):
+    """
+    Serializes apostello.models.Keyword for use in table.
+    """
     url = serializers.CharField(source='get_absolute_url')
     responses_url = serializers.CharField(source='get_responses_url')
     num_replies = serializers.CharField(source='num_matches')
@@ -52,6 +61,9 @@ class KeywordSerializer(serializers.ModelSerializer):
 
 
 class SmsInboundSerializer(serializers.ModelSerializer):
+    """
+    Serializes apostello.models.SmsInbound for use in log and wall.
+    """
     time_received = serializers.DateTimeField(format='%d %b %H:%M')
 
     class Meta:
@@ -67,6 +79,9 @@ class SmsInboundSerializer(serializers.ModelSerializer):
 
 
 class SmsOutboundSerializer(serializers.ModelSerializer):
+    """
+    Serializes apostello.models.SmsOutbound for use in log.
+    """
     time_sent = serializers.DateTimeField(format='%d %b %H:%M')
     recipient = serializers.StringRelatedField()
 

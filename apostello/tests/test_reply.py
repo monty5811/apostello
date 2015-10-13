@@ -9,6 +9,8 @@ from ..utils import fetch_default_reply
 
 @pytest.mark.django_db
 class TestKeywordReplier:
+    """Tests apostello.reply.keyword_replier function."""
+
     def test_no_existing_keyword(self, recipients):
         assert keyword_replier(None, recipients['calvin']) == fetch_default_reply('keyword_no_match').replace("%name%", "John")
 
@@ -18,6 +20,8 @@ class TestKeywordReplier:
 
 @pytest.mark.django_db
 class TestReply:
+    """Tests apostello.reply.reply_to_incoming fn."""
+
     def test_name(self, recipients):
         sms_body = "name John Calvin"
         k_obj = Keyword.match(sms_body)
@@ -50,6 +54,8 @@ class TestReply:
 
 @pytest.mark.django_db
 class TestGetOrAskPerson():
+    """Tests apostello.reply.get_person_or_ask_for_name fn."""
+
     def test_known(self, recipients):
         assert recipients['calvin'] == get_person_or_ask_for_name('+447927401749', 'hello', 'hello')
 

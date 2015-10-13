@@ -8,10 +8,17 @@ from apostello.tasks import send_async_mail
 
 
 def elvanto():
+    """Shortcut to create Elvanto API instance"""
     return ElvantoAPI.Connection(APIKey=settings.ELVANTO_KEY)
 
 
 def grab_elvanto_groups():
+    """
+    Returns a list of elvanto groups.
+    Each group is a tuple: ('group id', 'group name').
+
+    TODO: replace with a list of named tuples
+    """
     e_api = elvanto()
     data = e_api._Post("groups/getAll")
     if data['status'] == 'ok':
@@ -21,7 +28,11 @@ def grab_elvanto_groups():
 
 
 def fix_elvanto_numbers(num_string):
-    '''Checks if number starts with +447 or 077 and normalises'''
+    """
+    Checks if number starts with +447 or 077 and normalises
+
+    TODO: modify for other locales
+    """
     number = re.sub("[^0-9]", "", num_string)
     if number.startswith(settings.COUNTRY_CODE + '7'):
         number = "+" + number
@@ -34,12 +45,26 @@ def fix_elvanto_numbers(num_string):
 
 
 def try_both_num_fields(mobile, phone):
+    """
+    Returns a person's phone number by checking both the
+    'mobile' and 'phone' fields.
+    """
     mobile_ = fix_elvanto_numbers(mobile)
     final_num = mobile_ if mobile_ is not None else fix_elvanto_numbers(phone)
     return final_num
 
 
 def grab_elvanto_people(group_id):
+    """
+    Returns the group name and a list of dictionaries.
+    Each dictionary has a "number", "first_name" and "last_name"
+    for each person.
+
+    An empty list is returned if the group is empty.
+
+    TODO: return a list of namedtuples
+    TODO: do not return empty list, raise exception
+    """
     e_api = elvanto()
     data = e_api._Post("groups/getInfo", id=group_id, fields=['people'])
     group_name = data['group'][0]['name']
@@ -53,7 +78,7 @@ def grab_elvanto_people(group_id):
 
 def import_elvanto_groups(group_ids, user_email):
     """
-    Import all people from groups provided
+    Imports all people from groups provided.
     """
     from apostello.models import Recipient, RecipientGroup
     for group_id in group_ids:

@@ -6,5 +6,7 @@ class ApostelloException(Exception):
 
 
 class NoKeywordMatchException(ApostelloException):
-    """"""
+    """
+    SMS matches no keywords.
+    """
     pass

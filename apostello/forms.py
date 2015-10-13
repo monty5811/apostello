@@ -8,6 +8,9 @@ from apostello.validators import gsm_validator, less_than_sms_char_limit
 
 
 class SendAdhocRecipientsForm(forms.Form):
+    """
+    Sends an sms to ad-hoc groups.
+    """
     content = forms.CharField(
         validators=[gsm_validator, less_than_sms_char_limit],
         required=True,
@@ -26,6 +29,9 @@ class SendAdhocRecipientsForm(forms.Form):
 
 
 class SendRecipientGroupForm(forms.Form):
+    """
+    Sends an sms to pre-defined group.
+    """
     content = forms.CharField(
         validators=[gsm_validator, less_than_sms_char_limit],
         required=True,
@@ -46,6 +52,11 @@ class SendRecipientGroupForm(forms.Form):
 
 
 class ManageRecipientGroupForm(forms.ModelForm):
+    """
+    Manages RecipientGroup updates and creation.
+
+    __init__ and save are overridden to pull in group members.
+    """
 
     class Meta:
         model = RecipientGroup
@@ -77,6 +88,9 @@ class ManageRecipientGroupForm(forms.ModelForm):
 
 
 class RecipientForm(forms.ModelForm):
+    """
+    Updates Recipients.
+    """
 
     class Meta:
         model = Recipient
@@ -87,6 +101,9 @@ class RecipientForm(forms.ModelForm):
 
 
 class KeywordForm(forms.ModelForm):
+    """
+    Updates Keywords.
+    """
 
     class Meta:
         model = Keyword
@@ -102,10 +119,18 @@ class KeywordForm(forms.ModelForm):
 
 
 class ArchiveKeywordResponses(forms.Form):
+    """
+    Used on keyword log page to allow user to archive all matching messages.
+
+    Single tick-box field for confirmation.
+    """
     tick_to_archive_all_responses = forms.BooleanField()
 
 
 class CsvImport(forms.Form):
+    """
+    Handles CSV imports.
+    """
     csv_data = forms.CharField(
         help_text='John, Calvin, +447095237960',
         widget=forms.Textarea
@@ -113,5 +138,8 @@ class CsvImport(forms.Form):
 
 
 class ElvantoImport(forms.Form):
+    """
+    Handles Elvanto imports.
+    """
     group_choices = grab_elvanto_groups()
     elvanto_groups = forms.MultipleChoiceField(choices=group_choices)

@@ -14,6 +14,9 @@ from apostello.models import *
 
 @pytest.fixture
 def recipients():
+    """
+    Create a bunch of recipients for testing.
+    """
     calvin = Recipient.objects.create(first_name="John",
                                       last_name="Calvin",
                                       number='+447927401749')
@@ -48,6 +51,9 @@ def recipients():
 @pytest.mark.usefixtures("recipients")
 @pytest.fixture
 def groups(recipients):
+    """
+    Creates some groups with recipients.
+    """
     test_group = RecipientGroup.objects.create(name="Test Group",
                                                description="This is a test group",
                                                )
@@ -72,6 +78,11 @@ def groups(recipients):
 
 @pytest.fixture
 def smsin():
+    """
+    Creates some messages.
+
+    Numbers match users.
+    """
     sms1 = SmsInbound.objects.create(content='test message',
                                      time_received=timezone.now(),
                                      sender_name="John Calvin",
@@ -104,6 +115,7 @@ def smsin():
 @pytest.fixture
 @pytest.mark.usefixtures("recipients", "groups")
 def smsout(recipients, groups):
+    """Creates a single outbound message"""
     smsout = SmsOutbound.objects.create(sid='123456',
                                         content='test',
                                         sent_by='test',
@@ -116,74 +128,114 @@ def smsout(recipients, groups):
 
 @pytest.fixture
 def keywords():
+    """Creates various keywords for testing different options"""
     # keywords:
-    test = Keyword.objects.create(keyword="test",
-                                  description="This is an active test keyword with custom response",
-                                  custom_response="Test custom response with %name%",
-                                  activate_time=timezone.make_aware(datetime.strptime('Jun 1 1970  1:33PM', '%b %d %Y %I:%M%p'),
-                                                                    get_current_timezone()),
-                                  deactivate_time=timezone.make_aware(datetime.strptime('Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'),
-                                                                      get_current_timezone()))
+    test = Keyword.objects.create(
+        keyword="test",
+        description="This is an active test keyword with custom response",
+        custom_response="Test custom response with %name%",
+        activate_time=timezone.make_aware(
+            datetime.strptime('Jun 1 1970  1:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
+        ),
+        deactivate_time=timezone.make_aware(
+            datetime.strptime('Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
+        )
+    )
     test.save()
     # active with custom response
-    test2 = Keyword.objects.create(keyword="2test",
-                                   description="This is an active test keyword with no custom response",
-                                   custom_response="",
-                                   activate_time=timezone.make_aware(datetime.strptime('Jun 1 1970  1:33PM', '%b %d %Y %I:%M%p'),
-                                                                     get_current_timezone()),
-                                   deactivate_time=timezone.make_aware(datetime.strptime('Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'),
-                                                                       get_current_timezone()))
+    test2 = Keyword.objects.create(
+        keyword="2test",
+        description="This is an active test keyword with no custom response",
+        custom_response="",
+        activate_time=timezone.make_aware(
+            datetime.strptime('Jun 1 1970  1:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
+        ),
+        deactivate_time=timezone.make_aware(
+            datetime.strptime('Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
+        )
+    )
     test2.save()
     # active with custom response
-    test_expired = Keyword.objects.create(keyword="expired_test",
-                                          description="This is an expired test keyword with no custom response",
-                                          custom_response="",
-                                          activate_time=timezone.make_aware(datetime.strptime('Jun 1 1970  1:33PM', '%b %d %Y %I:%M%p'),
-                                                                            get_current_timezone()),
-                                          deactivate_time=timezone.make_aware(datetime.strptime('Jun 1 1975  1:33PM', '%b %d %Y %I:%M%p'),
-                                                                              get_current_timezone()))
+    test_expired = Keyword.objects.create(
+        keyword="expired_test",
+        description="This is an expired test keyword with no custom response",
+        custom_response="",
+        activate_time=timezone.make_aware(
+            datetime.strptime('Jun 1 1970  1:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
+        ),
+        deactivate_time=timezone.make_aware(
+            datetime.strptime('Jun 1 1975  1:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
+        )
+    )
     test_expired.save()
     # not yet active with custom response
-    test_early = Keyword.objects.create(keyword="early_test",
-                                        description="This is a not yet active test keyword with no custom response",
-                                        custom_response="",
-                                        activate_time=timezone.make_aware(datetime.strptime('Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'),
-                                                                          get_current_timezone()),
-                                        deactivate_time=timezone.make_aware(datetime.strptime('Jun 1 2400  1:35PM', '%b %d %Y %I:%M%p'),
-                                                                            get_current_timezone()))
+    test_early = Keyword.objects.create(
+        keyword="early_test",
+        description="This is a not yet active test keyword with no custom response",
+        custom_response="",
+        activate_time=timezone.make_aware(
+            datetime.strptime('Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
+        ),
+        deactivate_time=timezone.make_aware(
+            datetime.strptime('Jun 1 2400  1:35PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
+        )
+    )
     test_early.save()
 
-    test_no_end = Keyword.objects.create(keyword="test_no_end",
-                                         description="This has no end",
-                                         custom_response="Will always reply",
-                                         activate_time=timezone.make_aware(datetime.strptime('Jun 1 1400  1:33PM', '%b %d %Y %I:%M%p'),
-                                                                           get_current_timezone()))
+    test_no_end = Keyword.objects.create(
+        keyword="test_no_end",
+        description="This has no end",
+        custom_response="Will always reply",
+        activate_time=timezone.make_aware(
+            datetime.strptime('Jun 1 1400  1:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
+        )
+    )
     test_no_end.save()
     # test deactivated response
-    test_deac_resp_fail = Keyword.objects.create(keyword="test_cust_endf",
-                                                 description="This has a diff reply",
-                                                 custom_response="Hi!",
-                                                 deactivated_response="Too slow, Joe!",
-                                                 activate_time=timezone.make_aware(
-                                                     datetime.strptime('Jun 1 1400  1:33PM', '%b %d %Y %I:%M%p'),
-                                                     get_current_timezone()))
+    test_deac_resp_fail = Keyword.objects.create(
+        keyword="test_cust_endf",
+        description="This has a diff reply",
+        custom_response="Hi!",
+        deactivated_response="Too slow, Joe!",
+        activate_time=timezone.make_aware(
+            datetime.strptime('Jun 1 1400  1:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
+        )
+    )
 
-    test_deac_resp = Keyword.objects.create(keyword="test_cust_end",
-                                            description="This has a diff reply",
-                                            custom_response="Just in time!",
-                                            deactivated_response="Too slow, Joe!",
-                                            deactivate_time=timezone.make_aware(datetime.strptime('Jun 1 1400  2:33PM', '%b %d %Y %I:%M%p'),
-                                                                                get_current_timezone()),
-                                            activate_time=timezone.make_aware(datetime.strptime('Jun 1 1400  1:33PM', '%b %d %Y %I:%M%p'),
-                                                                              get_current_timezone()))
+    test_deac_resp = Keyword.objects.create(
+        keyword="test_cust_end",
+        description="This has a diff reply",
+        custom_response="Just in time!",
+        deactivated_response="Too slow, Joe!",
+        deactivate_time=timezone.make_aware(
+            datetime.strptime('Jun 1 1400  2:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
+        ),
+        activate_time=timezone.make_aware(
+            datetime.strptime('Jun 1 1400  1:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
+        )
+    )
     test_no_end.save()
 
-    test_early_with_response = Keyword.objects.create(keyword="early_test2",
-                                                      description="This is a not yet active test keyword with a custom response",
-                                                      too_early_response="This is far too early",
-                                                      activate_time=timezone.make_aware(
-                                                          datetime.strptime('Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'), get_current_timezone()),
-                                                      )
+    test_early_with_response = Keyword.objects.create(
+        keyword="early_test2",
+        description="This is a not yet active test keyword with a custom response",
+        too_early_response="This is far too early",
+        activate_time=timezone.make_aware(
+            datetime.strptime('Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'), get_current_timezone()
+        ),
+    )
     test_early.save()
 
     keywords = {'test': test,
@@ -200,6 +252,7 @@ def keywords():
 @pytest.mark.usefixtures("recipients", "keywords")
 @pytest.fixture()
 def users(recipients, keywords):
+    """Create apostello users"""
     user = User.objects.create_user(username='test',
                                     email='test@example.com',
                                     password='top_secret')
@@ -268,6 +321,7 @@ def users(recipients, keywords):
 @pytest.mark.usefixtures("users")
 @pytest.yield_fixture(scope='module')
 def browser(request):
+    """Setup selenium browser."""
     driver = webdriver.Firefox()
 
     yield driver
