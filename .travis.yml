@@ -8,7 +8,6 @@ env:
   - DJANGO_EMAIL_HOST=not_used_in_tests
   - DJANGO_EMAIL_HOST_USER=not_used_in_tests
   - DJANGO_EMAIL_HOST_PASSWORD=not_used_in_tests
-  - TWILIO_FROM_NUM="+15005550006"
   - SLACK_URL=''
   - FROM_EMAIL=noreply@example.com
 install: "pip install -r requirements.txt"
