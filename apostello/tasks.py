@@ -162,7 +162,7 @@ def notify_office_mail(subject, body):
     send_async_mail(
         subject,
         body,
-        to_
+        [to_]
     )
 
 

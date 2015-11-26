@@ -7,8 +7,10 @@ import djcelery
 # Django settings
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY',
-                            'w;ioufpwqofjpwoifwpa09fuq039uq3u4uepoivqnwjdfvlwdv')
+SECRET_KEY = os.environ.get(
+    'DJANGO_SECRET_KEY',
+    'w;ioufpwqofjpwoifwpa09fuq039uq3u4uepoivqnwjdfvlwdv'
+)
 
 INSTALLED_APPS = (
     # built in apps
@@ -21,7 +23,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # apostello
-    'apostello',
+    'apostello.apps.ApostelloConfig',
     'api',
     'graphs',
     # third party apps
