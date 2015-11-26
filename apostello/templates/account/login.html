@@ -3,24 +3,22 @@
 {% load account socialaccount %}
 {% load bootstrap3 %}
 {% load url from future %}
+{% load staticfiles %}
 {% block content %}
 {% get_providers as socialaccount_providers %}
+
 <h3>{% trans "Sign In" %}</h3>
 {% if socialaccount_providers %}
-<p>{% blocktrans with site.name as site_name %}Please sign in with one of your existing third party accounts. Or, <a href="{{ signup_url }}">sign up</a>
-for an {{site_name}} account and sign in below:{% endblocktrans %}</p>
-<div class="socialaccount_ballot">
-  <ul class="socialaccount_providers">
-    {% include "socialaccount/snippets/provider_list.html" with process="login" %}
-  </ul>
-  <div class="login-or">{% trans 'or' %}</div><br>
-</div>
-{% include "socialaccount/snippets/login_extra.html" %}
+<a href="/accounts/google/login/?next=%2F&process=login"><img src="{% static 'images/goog_login.png' %}" height="46" alt="Google"></a>
+<p>or</p>
+ <button class="btn btn-default" type="button" data-toggle="collapse" data-target="#emailLogin" aria-expanded="false" aria-controls="collapseExample">
+   Email >>
+</button>
+<div class="collapse" id="emailLogin">
 {% else %}
-<p>{% blocktrans %}If you have not created an account yet, then please
-<a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
+<div class="collapse in" id="emailLogin">
 {% endif %}
-
+<br>
 <form class="login" method="POST" action="{% url 'account_login' %}">
   {% csrf_token %}
   {% bootstrap_form form %}
@@ -30,5 +28,8 @@ for an {{site_name}} account and sign in below:{% endblocktrans %}</p>
   <button class="btn btn-primary" type="submit">{% trans "Sign In" %}</button>
   <br><br>
   <p><a href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a></p>
+<p>{% blocktrans %}If you have not yet created an account, please
+<a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
 </form>
+</div>
 {% endblock %}
