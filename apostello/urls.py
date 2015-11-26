@@ -3,6 +3,8 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
 
+from allauth.account.views import PasswordChangeView
+
 from apostello.decorators import keyword_access_check
 from apostello.forms import (KeywordForm, ManageRecipientGroupForm,
                              RecipientForm)
@@ -112,6 +114,10 @@ urlpatterns += [
 urlpatterns += [
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', include(admin.site.urls)),
+    # over ride success url:
+    url(r"^accounts/password/change/$",
+        PasswordChangeView.as_view(success_url='/'),
+        name="account_change_password"),
     url(r'^accounts/', include('allauth.urls')),
 ]
 # apps etc
