@@ -4,6 +4,7 @@ import hashlib
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.core.cache.utils import make_template_fragment_key
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils import timezone
@@ -604,6 +605,10 @@ class UserProfile(models.Model):
             except IndexError:
                 # no email adress
                 pass
+        else:
+            # any other save, we want to refresh navbar:
+            key = make_template_fragment_key('navbar', [self.user])
+            cache.delete(key)
         super(UserProfile, self).save(*args, **kwargs)
 
 
