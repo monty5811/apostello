@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
+from allauth.account.views import PasswordChangeView
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
-
-from allauth.account.views import PasswordChangeView
 
 from apostello.decorators import keyword_access_check
 from apostello.forms import (KeywordForm, ManageRecipientGroupForm,

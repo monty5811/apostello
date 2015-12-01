@@ -1,6 +1,6 @@
 import pytest
-
 from django.core import mail
+
 
 @pytest.mark.django_db
 class TestSignup:
