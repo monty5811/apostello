@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from ..forms import ManageRecipientGroupForm
-from ..models import RecipientGroup
-from ..utils import exists_and_archived
+from apostello.exceptions import ArchivedItemException
+from apostello.forms import ManageRecipientGroupForm
+from apostello.models import RecipientGroup
+from apostello.utils import exists_and_archived
 
 
 @pytest.mark.django_db
@@ -22,4 +23,5 @@ class TestExistsAndArchived:
                      'members': []}
         form = ManageRecipientGroupForm(data=form_data)
         form.is_valid()
-        assert exists_and_archived(form, RecipientGroup, 'group') is None
+        with pytest.raises(ArchivedItemException):
+            exists_and_archived(form, RecipientGroup, 'group')

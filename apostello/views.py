@@ -14,6 +14,7 @@ from phonenumber_field.validators import validate_international_phonenumber
 from twilio import twiml
 
 from apostello.decorators import check_user_perms, keyword_access_check
+from apostello.exceptions import ArchivedItemException
 from apostello.forms import (ArchiveKeywordResponses, CsvImport, ElvantoImport,
                              SendAdhocRecipientsForm, SendRecipientGroupForm)
 from apostello.mixins import LoginRequiredMixin, ProfilePermsMixin
@@ -161,10 +162,10 @@ class ItemView(LoginRequiredMixin, ProfilePermsMixin, View):
             form.save()
             return redirect(self.redirect_url)
         else:
-            new_instance = exists_and_archived(form, self.model_class, self.identifier)
-            if new_instance is not None:
+            try:
                 # if we have a clash with existing object and it is archived,
                 # redirect there, otherwise return form with errors
+                new_instance = exists_and_archived(form, self.model_class, self.identifier)
                 messages.info(
                     request,
                     "'{0}' already exists. Click the button to bring it back from the archive.".format(
@@ -172,13 +173,13 @@ class ItemView(LoginRequiredMixin, ProfilePermsMixin, View):
                     )
                 )
                 return redirect(new_instance.get_absolute_url())
-            else:
+            except ArchivedItemException:
                 return render(request, "apostello/item.html",
                               dict(form=form,
                                    redirect_url=self.redirect_url,
                                    submit_text="Submit",
                                    identifier=self.identifier,
-                                   object=new_instance)
+                                   object=None)
                               )
 
 
