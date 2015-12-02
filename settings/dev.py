@@ -17,8 +17,6 @@ DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3',
 
 # celery
 BROKER_URL = 'amqp://guest:guest@127.0.0.1:5672'
-BROKER_BACKEND = 'memory'
-CELERY_ALWAYS_EAGER = True
 
 # compress when debug is on:
 COMPRESS_ENABLED = True

@@ -2,7 +2,6 @@
 from datetimewidget.widgets import DateTimeWidget
 from django import forms
 
-from apostello.elvanto import grab_elvanto_groups
 from apostello.models import Keyword, Recipient, RecipientGroup
 from apostello.validators import gsm_validator, less_than_sms_char_limit
 
@@ -135,11 +134,3 @@ class CsvImport(forms.Form):
         help_text='John, Calvin, +447095237960',
         widget=forms.Textarea
     )
-
-
-class ElvantoImport(forms.Form):
-    """
-    Handles Elvanto imports.
-    """
-    group_choices = grab_elvanto_groups()
-    elvanto_groups = forms.MultipleChoiceField(choices=group_choices)

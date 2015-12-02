@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from rest_framework import serializers
 
-from apostello.models import (Keyword, Recipient, RecipientGroup, SmsInbound,
-                              SmsOutbound)
+from apostello.models import (ElvantoGroup, Keyword, Recipient, RecipientGroup,
+                              SmsInbound, SmsOutbound)
 
 
 class RecipientSerializer(serializers.ModelSerializer):
@@ -37,6 +37,22 @@ class RecipientGroupSerializer(serializers.ModelSerializer):
                   'members',
                   'cost',
                   'url')
+
+
+class ElvantoGroupSerializer(serializers.ModelSerializer):
+    """
+    Serializers apostello.models.ElvantoGroup
+    """
+    last_synced = serializers.DateTimeField(format='%d %b %H:%M')
+
+    class Meta:
+        model = ElvantoGroup
+        fields = (
+            'name',
+            'pk',
+            'sync',
+            'last_synced',
+        )
 
 
 class KeywordSerializer(serializers.ModelSerializer):

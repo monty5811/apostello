@@ -8,6 +8,7 @@ Models
 .. autoclass:: apostello.models.UserProfile
 .. autoclass:: apostello.models.Recipient
 .. autoclass:: apostello.models.RecipientGroup
+.. autoclass:: apostello.models.ElvantoGroup
 .. autoclass:: apostello.models.Keyword
 .. autoclass:: apostello.models.SmsInbound
 .. autoclass:: apostello.models.SmsOutbound

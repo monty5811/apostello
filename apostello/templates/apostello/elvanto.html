@@ -1,22 +1,33 @@
 {% extends "apostello/base.html" %}
-{% load bootstrap3 %}
-{% block morejs %}
-{{form.media}}
-<script>
-$(document).ready(function() { $("#id_elvanto_groups").select2(); });
-</script>
+{% load staticfiles %}
+{% block side_bar %}
+<div id="elvanto_fetch_button"></div>
+<br>
+
+<div id="elvanto_pull_button"></div>
 {% endblock %}
 {% block content %}
-<p>Please choose the elvanto groups you wish to import - you should get an email confirmation on completion.
-<p>Note that importing an existing group will overwrite group and update any of its members already in the system.<br>
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-<form method="post" action="">
-    {% csrf_token %}
-    {% bootstrap_form form  %}
-    {% buttons %}
-        <button type="submit" class="btn btn-primary">
-             Import
-        </button>
-    {% endbuttons %}
-</form>
+<div class="col-md-7 col-sm-12">
+<div class="input-group"> <span class="input-group-addon">Filter</span>
+    <input id="filter" type="text" class="form-control" placeholder="Type here...">
+</div>
+<div id="elvanto_table"></div>
+</div>
+{%endblock%}
+{% block morejs %}
+<script src="{%static 'js/tables/elvanto.js'%}"></script>
+<script>
+React.render(
+     React.createElement(ElvantoFetchButton, {url:"{%url 'api:fetch_elvanto_groups' %}"}),
+     document.getElementById('elvanto_fetch_button')
+    );
+React.render(
+     React.createElement(ElvantoPullButton, {url:"{%url 'api:pull_elvanto_groups' %}"}),
+     document.getElementById('elvanto_pull_button')
+    );
+React.render(
+     React.createElement(ElvantoTable, {url:"{%url 'api:elvanto_groups' %}", pollInterval: 50000}),
+     document.getElementById('elvanto_table')
+    );
+</script>
 {% endblock %}

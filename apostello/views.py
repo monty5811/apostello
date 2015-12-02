@@ -8,20 +8,20 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from django.views.generic import View
+from django.views.generic import TemplateView, View
 from django_twilio.decorators import twilio_view
 from phonenumber_field.validators import validate_international_phonenumber
 from twilio import twiml
 
 from apostello.decorators import check_user_perms, keyword_access_check
 from apostello.exceptions import ArchivedItemException
-from apostello.forms import (ArchiveKeywordResponses, CsvImport, ElvantoImport,
+from apostello.forms import (ArchiveKeywordResponses, CsvImport,
                              SendAdhocRecipientsForm, SendRecipientGroupForm)
 from apostello.mixins import LoginRequiredMixin, ProfilePermsMixin
 from apostello.models import (Keyword, Recipient, RecipientGroup,
                               SiteConfiguration)
 from apostello.reply import get_person_or_ask_for_name, reply_to_incoming
-from apostello.tasks import import_elvanto_groups, log_msg_in, post_to_slack
+from apostello.tasks import log_msg_in, post_to_slack
 from apostello.utils import exists_and_archived
 
 
@@ -308,30 +308,12 @@ def import_recipients(request):
         return render(request, 'apostello/importer.html', context)
 
 
-class ElvantoImportView(LoginRequiredMixin, ProfilePermsMixin, View):
+class ElvantoImportView(LoginRequiredMixin, ProfilePermsMixin, TemplateView):
     """
     Displays the Elvanto import form.
     """
     required_perms = []
-
-    def get(self, request, *args, **kwargs):
-        context = {'form': ElvantoImport()}
-        return render(request, "apostello/elvanto.html", context)
-
-    def post(self, request, *args, **kwargs):
-        form = ElvantoImport(request.POST)
-        if form.is_valid():
-            group_ids = form.cleaned_data['elvanto_groups']
-            # start async task:
-            import_elvanto_groups.delay(group_ids, request.user.email)
-            messages.success(
-                request,
-                "Your groups are being updated, you should get an email confirmation when they are done."
-            )
-            return redirect("/")
-
-        context = {'form': form}
-        return render(request, "apostello/elvanto.html", context)
+    template_name = 'apostello/elvanto.html'
 
 
 @twilio_view

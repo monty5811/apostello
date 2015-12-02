@@ -148,6 +148,25 @@ class TestOthers:
                 for value in ['true', 'false']:
                     users['c_staff'].post('/api/v1/' + endpoint + '/in/1', {param: value})
 
+    def test_api_elvanto_posts(self, users):
+        # turn on
+        config = models.SiteConfiguration.get_solo()
+        config.sync_elvanto = True
+        config.save()
+        users['c_staff'].post('/api/v1/elvanto/group_fetch/', {})
+        users['c_staff'].post('/api/v1/elvanto/group_pull/', {})
+        r = users['c_staff'].get('/api/v1/elvanto/groups/')
+        assert len(r.data) == 5
+        r = users['c_staff'].get('/api/v1/elvanto/group/1')
+        assert r.data['name'] == 'Geneva'
+        assert r.data['pk'] == 1
+        r = users['c_staff'].post('/api/v1/elvanto/group/1', {'sync': 'false'})
+        assert r.data['sync']
+        assert models.ElvantoGroup.objects.get(pk=1).sync
+        r = users['c_staff'].post('/api/v1/elvanto/group/1', {'sync': 'true'})
+        assert r.data['sync'] is False
+        assert models.ElvantoGroup.objects.get(pk=1).sync is False
+
     def test_send_adhoc_now(self, recipients, users):
         users['c_staff'].post('/send/adhoc/', {'content': 'test', 'recipients': ['1']})
 
@@ -218,10 +237,10 @@ class TestOthers:
     def test_elvanto_import_not_valid(self, users):
         users['c_staff'].post('/elvanto/import/', {})
 
-    def test_elvanto_import_valid(self, users):
-        from apostello.elvanto import grab_elvanto_groups
-        group_id = grab_elvanto_groups()[2][0]
-        users['c_staff'].post('/elvanto/import/', {'elvanto_groups': [group_id]})
+    # def test_elvanto_import_valid(self, users):
+    #     from apostello.elvanto import grab_elvanto_groups
+    #     group_id = grab_elvanto_groups()[2][0]
+    #     users['c_staff'].post('/elvanto/import/', {'elvanto_groups': [group_id]})
 
     def test_no_csv(self, users):
         assert users['c_in'].get('/keyword/responses/csv/500/').status_code == 404

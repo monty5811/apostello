@@ -234,10 +234,24 @@ def post_to_slack(msg):
 
 
 # Elvanto import
-@task()
-def import_elvanto_groups(group_ids, user_email):
-    from apostello.elvanto import import_elvanto_groups
-    import_elvanto_groups(group_ids, user_email)
+@periodic_task(run_every=(crontab(hour="2", minute="30", day_of_week="*")))
+def fetch_elvanto_groups(force=False):
+    """Fetches all Elvanto groups"""
+    from apostello.models import SiteConfiguration
+    config = SiteConfiguration.get_solo()
+    if force or config.sync_elvanto:
+        from apostello.models import ElvantoGroup
+        ElvantoGroup.fetch_all_groups()
+
+
+@periodic_task(run_every=(crontab(hour="3", minute="0", day_of_week="*")))
+def pull_elvanto_groups(force=False):
+    """Pulls all the Elvanto groups that are set to sync"""
+    from apostello.models import SiteConfiguration
+    config = SiteConfiguration.get_solo()
+    if force or config.sync_elvanto:
+        from apostello.models import ElvantoGroup
+        ElvantoGroup.pull_all_groups()
 
 
 # import twilio log
@@ -247,7 +261,7 @@ def import_incoming_sms_task():
     import_incoming_sms()
 
 
-@task()
+@task
 def import_outgoing_sms_task():
     from apostello.logs import import_outgoing_sms
     import_outgoing_sms()

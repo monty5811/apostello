@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 from django.core.cache import cache
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.views.generic import View
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apostello.mixins import LoginRequiredMixin, ProfilePermsMixin
 from apostello.models import Keyword, Recipient, SmsInbound
+from apostello.tasks import fetch_elvanto_groups, pull_elvanto_groups
 
 from .serializers import SmsInboundSerializer
 
@@ -45,6 +49,7 @@ class ApiMember(APIView):
         deal_with_sms = request.data.get('deal_with')
         archive = request.data.get('archive')
         display_on_wall = request.data.get('display_on_wall')
+        e_sync = request.data.get('sync')
 
         obj = get_object_or_404(self.model_class, pk=pk)
         if archive is not None:
@@ -64,6 +69,11 @@ class ApiMember(APIView):
                 obj.display_on_wall = True
             else:
                 obj.display_on_wall = False
+        if e_sync is not None:
+            if e_sync == 'true':
+                obj.sync = False
+            else:
+                obj.sync = True
 
         obj.save()
         serializer = self.serializer_class(obj)
@@ -146,3 +156,19 @@ class ApiCollectionAllWall(APIView):
 
         serializer = SmsInboundSerializer(objs, many=True)
         return Response(serializer.data)
+
+
+class ElvantoPullButton(LoginRequiredMixin, ProfilePermsMixin, View):
+    required_perms = ['can_see_groups']
+
+    def post(self, request, format=None, **kwargs):
+        pull_elvanto_groups.delay(force=True)
+        return JsonResponse({'status': 'pulling'})
+
+
+class ElvantoFetchButton(LoginRequiredMixin, ProfilePermsMixin, View):
+    required_perms = ['can_see_groups']
+
+    def post(self, request, format=None, **kwargs):
+        fetch_elvanto_groups.delay(force=True)
+        return JsonResponse({'status': 'fetching'})

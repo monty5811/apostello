@@ -4,14 +4,15 @@ from rest_framework.permissions import IsAuthenticated
 from api.drf_permissions import (CanSeeContactNames, CanSeeGroups,
                                  CanSeeIncoming, CanSeeKeyword, CanSeeKeywords,
                                  CanSeeOutgoing)
-from api.serializers import (KeywordSerializer, RecipientGroupSerializer,
-                             RecipientSerializer, SmsInboundSerializer,
-                             SmsOutboundSerializer)
+from api.serializers import (ElvantoGroupSerializer, KeywordSerializer,
+                             RecipientGroupSerializer, RecipientSerializer,
+                             SmsInboundSerializer, SmsOutboundSerializer)
 from api.views import (ApiCollection, ApiCollectionAllWall,
                        ApiCollectionKeywordSms, ApiCollectionKeywordWall,
-                       ApiCollectionRecentSms, ApiMember)
-from apostello.models import (Keyword, Recipient, RecipientGroup, SmsInbound,
-                              SmsOutbound)
+                       ApiCollectionRecentSms, ApiMember, ElvantoFetchButton,
+                       ElvantoPullButton)
+from apostello.models import (ElvantoGroup, Keyword, Recipient, RecipientGroup,
+                              SmsInbound, SmsOutbound)
 
 # api
 urlpatterns = [
@@ -108,6 +109,28 @@ urlpatterns = [
             permission_classes=(IsAuthenticated, CanSeeGroups)
         ),
         name='group'),
+    # Elvanto groups
+    url(r'^v1/elvanto/groups/$',
+        ApiCollection.as_view(
+            model_class=ElvantoGroup,
+            serializer_class=ElvantoGroupSerializer,
+            permission_classes=(IsAuthenticated, CanSeeGroups)
+        ),
+        name='elvanto_groups'),
+    url(r'^v1/elvanto/group/(?P<pk>[0-9]+)$',
+        ApiMember.as_view(
+            model_class=ElvantoGroup,
+            serializer_class=ElvantoGroupSerializer,
+            permission_classes=(IsAuthenticated, CanSeeGroups)
+        ),
+        name='elvanto_group'),
+    # Elvanto group buttons
+    url(r'^v1/elvanto/group_fetch/$',
+        ElvantoFetchButton.as_view(),
+        name='fetch_elvanto_groups'),
+    url(r'^v1/elvanto/group_pull/$',
+        ElvantoPullButton.as_view(),
+        name='pull_elvanto_groups'),
     # keyword views
     url(r'^v1/keywords/$',
         ApiCollection.as_view(

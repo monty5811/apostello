@@ -12,7 +12,9 @@ from django.utils.functional import cached_property
 from phonenumber_field.modelfields import PhoneNumberField
 from solo.models import SingletonModel
 
-from apostello.exceptions import NoKeywordMatchException
+from apostello.elvanto import elvanto, try_both_num_fields
+from apostello.exceptions import (ElvantoException, NoKeywordMatchException,
+                                  NotValidPhoneNumber)
 from apostello.tasks import (group_send_message_task,
                              recipient_send_message_task)
 from apostello.utils import fetch_default_reply
@@ -66,6 +68,94 @@ class RecipientGroup(models.Model):
 
     class Meta:
         ordering = ['name']
+
+
+class ElvantoGroup(models.Model):
+    """
+    Stores details of Elvanto Groups.
+    """
+    sync = models.BooleanField("Automatic Sync", default=False)
+    name = models.CharField("Group Name", max_length=255)
+    e_id = models.CharField("Elvanto ID", max_length=36, unique=True)
+    last_synced = models.DateTimeField(blank=True, null=True)
+
+    def create_apostello_group(self):
+        """
+        Returns the internal apostello group.
+
+        Creates it if it does not already exist
+        """
+        grp = RecipientGroup.objects.get_or_create(name=self.apostello_group_name)[0]
+        grp.description = 'Imported from Elvanto'
+        grp.save()
+        return grp
+
+    def pull(self):
+        """Pulls group from Elvanto into related apostello group."""
+        apostello_group = self.create_apostello_group()
+        e_api = elvanto()
+        data = e_api._Post("groups/getInfo", id=self.e_id, fields=['people'])
+        if data['status'] != 'ok':
+            raise ElvantoException
+
+        if data['group'][0]['people']:
+            for prsn in data['group'][0]['people']['person']:
+                ElvantoGroup.add_person(apostello_group, prsn)
+
+        apostello_group.save()
+        self.last_synced = timezone.now()
+        self.save()
+
+    @staticmethod
+    def add_person(grp, prsn):
+        try:
+            number = try_both_num_fields(prsn['mobile'], prsn['phone'])
+        except NotValidPhoneNumber:
+            print('Adding {0} {1} failed'.format(prsn['firstname'], prsn['lastname']))
+            return
+        # create person
+        prsn_obj = Recipient.objects.get_or_create(number=number)[0]
+        prsn_obj.first_name = prsn['firstname'] if not prsn['preferred_name'] else prsn['preferred_name']
+        prsn_obj.last_name = prsn['lastname']
+        prsn_obj.save()
+        # add person to group
+        grp.recipient_set.add(prsn_obj)
+
+    @staticmethod
+    def fetch_all_groups():
+        """
+        Pulls all group names and ids from Elvanto.
+        """
+        e_api = elvanto()
+        data = e_api._Post("groups/getAll")
+        if data['status'] != 'ok':
+            raise ElvantoException
+
+        for grp in data['groups']['group']:
+            grp_obj = ElvantoGroup.objects.get_or_create(e_id=grp['id'])[0]
+            grp_obj.name = grp['name']
+            grp_obj.save()
+
+    @staticmethod
+    def pull_all_groups():
+        """
+        Pulls people from groups and updates the related apostello group.
+        """
+        for grp in ElvantoGroup.objects.all():
+            if grp.sync:
+                grp.pull()
+
+    @property
+    def apostello_group_name(self):
+        """
+        Name of internal group.
+
+        Just preprend an [E] before the group name.
+        """
+        return '[E] {0}'.format(self.name)
+
+    def __str__(self):
+        return self.apostello_group_name
 
 
 class Recipient(models.Model):
@@ -495,7 +585,11 @@ class SiteConfiguration(SingletonModel):
     )
     slack_webhook = models.URLField(
         blank=True,
-        help_text='Post all incoming messages to this slack hook. Leave blank to diable.'
+        help_text='Post all incoming messages to this slack hook. Leave blank to disable.'
+    )
+    sync_elvanto = models.BooleanField(
+        default=False,
+        help_text='Toggle automatic syncing of Elvanto groups. Sync will be done overnight',
     )
 
     def __str__(self):
