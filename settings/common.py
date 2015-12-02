@@ -34,6 +34,7 @@ INSTALLED_APPS = (
     'compressor',
     'django_extensions',
     'solo',
+    'django_twilio',
     # auth
     'allauth',
     'allauth.account',

@@ -3,6 +3,7 @@ import csv
 import io
 
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
@@ -17,7 +18,7 @@ from apostello.decorators import check_user_perms, keyword_access_check
 from apostello.exceptions import ArchivedItemException
 from apostello.forms import (ArchiveKeywordResponses, CsvImport,
                              SendAdhocRecipientsForm, SendRecipientGroupForm)
-from apostello.mixins import LoginRequiredMixin, ProfilePermsMixin
+from apostello.mixins import ProfilePermsMixin
 from apostello.models import (Keyword, Recipient, RecipientGroup,
                               SiteConfiguration)
 from apostello.reply import get_person_or_ask_for_name, reply_to_incoming

@@ -2,7 +2,7 @@ amqp
 anyjson
 billiard
 celery
-Django<1.9
+Django
 django-allauth
 django-appconf
 django-bootstrap3
