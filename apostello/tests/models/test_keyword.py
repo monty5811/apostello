@@ -2,8 +2,8 @@
 from datetime import datetime
 
 import pytest
-from django.utils import timezone
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 from apostello.models import Keyword, SmsInbound
 from apostello.utils import fetch_default_reply
