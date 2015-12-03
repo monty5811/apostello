@@ -12,7 +12,7 @@ django-datetime-widget
 django-debug-toolbar
 django-extensions
 django-phonenumber-field
-django-solo
+#django-solo
 django-twilio
 djangorestframework
 docutils

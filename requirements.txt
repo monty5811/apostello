@@ -25,7 +25,7 @@ django-datetime-widget==0.9.3
 django-debug-toolbar==1.4
 django-extensions==1.5.9
 django-phonenumber-field==1.0.0
-django-solo==1.1.0
+git+git://github.com/monty5811/django-solo.git@6497f86800084008febbe0f2247d7aa6be4e0d96 # added manually until django-solo 1.1.1 is on pypi
 django-twilio==0.8.0
 django==1.9
 djangorestframework==3.3.1

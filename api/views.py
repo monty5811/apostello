@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -7,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apostello.mixins import LoginRequiredMixin, ProfilePermsMixin
+from apostello.mixins import ProfilePermsMixin
 from apostello.models import Keyword, Recipient, SmsInbound
 from apostello.tasks import fetch_elvanto_groups, pull_elvanto_groups
 

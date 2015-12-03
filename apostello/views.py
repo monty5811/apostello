@@ -3,8 +3,8 @@ import csv
 import io
 
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -264,8 +264,8 @@ def wall_curate(request):
     return render(request, "apostello/wall_curator.html", {})
 
 
-@login_required
 @check_user_perms
+@login_required
 def import_recipients(request):
     """
     Displays the CSV import form.

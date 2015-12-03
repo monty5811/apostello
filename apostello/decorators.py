@@ -46,6 +46,10 @@ def check_user_perms(view=None, require=None):
             if request.user.is_staff:
                 return view(*args, **kwargs)
         else:
+            # check for anon users:
+            # this hsould not be neccessary, but it works...
+            if not request.user.is_authenticated():
+                return redirect(settings.LOGIN_URL)
             # check approval status:
             if not request.user.profile.approved:
                 return redirect(reverse('not_approved'))

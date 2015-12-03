@@ -25,7 +25,7 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
     ]),
 ]
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['testserver']
 
 DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3'}}
 

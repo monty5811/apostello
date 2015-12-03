@@ -12,7 +12,7 @@ SECRET_KEY = os.environ.get(
     'w;ioufpwqofjpwoifwpa09fuq039uq3u4uepoivqnwjdfvlwdv'
 )
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     # built in apps
     'django.contrib.admin',
     'django.contrib.admindocs',
@@ -40,11 +40,11 @@ INSTALLED_APPS = (
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-)
+]
 
 SITE_ID = 1
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -53,7 +53,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
+]
 
 TEMPLATES = [
     {
@@ -74,21 +74,21 @@ TEMPLATES = [
     },
 ]
 
-STATICFILES_FINDERS = (
+STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     # other finders..
     'compressor.finders.CompressorFinder',
-)
+]
 
 STATIC_URL = '/static/'
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-STATIC_ROOT = '/webapps/apostello/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-AUTHENTICATION_BACKENDS = (
+AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
-)
+]
 
 ROOT_URLCONF = 'apostello.urls'
 WSGI_APPLICATION = 'apostello.wsgi.application'

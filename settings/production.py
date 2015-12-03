@@ -33,6 +33,8 @@ OPBEAT = {
     'APP_ID': os.environ.get('OPBEAT_APP_ID', ''),
     'SECRET_TOKEN': os.environ.get('OPBEAT_SECRET_TOKEN', ''),
 }
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = [
     'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
-) + MIDDLEWARE_CLASSES
+] + MIDDLEWARE_CLASSES
+
+STATIC_ROOT = '/webapps/apostello/static/'
