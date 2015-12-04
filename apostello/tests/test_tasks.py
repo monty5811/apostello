@@ -4,8 +4,8 @@ from datetime import datetime
 import pytest
 from twilio.rest.exceptions import TwilioRestException
 
-from ..models import *
-from ..tasks import *
+from apostello.models import *
+from apostello.tasks import *
 
 
 @pytest.mark.django_db
@@ -37,19 +37,19 @@ class TestTasks:
                                 'test',
                                 eta=None)
 
-    def test_import_incoming_sms_task(self):
-        import_incoming_sms_task()
-
-    def test_import_outgoing_sms_task(self):
-        import_outgoing_sms_task()
-
     def test_check_log_consistent(self):
+        # TODO mock response from Twilio so we can test this
         with pytest.raises(TwilioRestException):
-            check_log_consistent('0')
+            check_incoming_log(page_id=0, fetch_all=False)
+        with pytest.raises(TwilioRestException):
+            check_incoming_log(fetch_all=True)
 
     def test_check_outgoing_log_consistent(self):
+        # TODO mock response from Twilio so we can test this
         with pytest.raises(TwilioRestException):
-            check_recent_outgoing_log('0')
+            check_outgoing_log(page_id=0, fetch_all=False)
+        with pytest.raises(TwilioRestException):
+            check_outgoing_log(fetch_all=True)
 
     def test_send_keyword_digest(self, keywords, smsin, users):
         send_keyword_digest()

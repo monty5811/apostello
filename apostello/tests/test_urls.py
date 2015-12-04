@@ -4,6 +4,7 @@ import pytest
 from apostello import models
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("url,status_code", [
     ('/', 302),
     ('/send/adhoc/', 302),
@@ -42,6 +43,7 @@ class TestNotLoggedIn:
         assert users['c_out'].get(url).status_code == status_code
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("url,status_code", [
     ('/', 200),
     ('/send/adhoc/', 200),
@@ -87,6 +89,7 @@ class TestStaff:
         assert users['c_staff'].get(url).status_code == status_code
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("url,status_code", [
     ('/', 200),
     ('/send/adhoc/', 302),
@@ -138,6 +141,7 @@ class TestNotStaff:
         assert users['c_in'].get(url).status_code == status_code
 
 
+@pytest.mark.slow
 @pytest.mark.django_db
 class TestOthers:
     """Test posting as a user"""

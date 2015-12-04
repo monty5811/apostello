@@ -40,6 +40,7 @@ class TestTryBothFields:
             try_both_num_fields('+448902537905', '+457902537905')
 
 
+@pytest.mark.slow
 @pytest.mark.django_db
 class TestApi:
     """

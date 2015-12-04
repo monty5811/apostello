@@ -3,6 +3,7 @@ from django.core import mail
 
 
 @pytest.mark.django_db
+@pytest.mark.slow
 class TestSignup:
     def test_sign_up(self, live_server, browser, users):
         """

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from ..models import Keyword
-from ..reply import (get_person_or_ask_for_name, keyword_replier,
-                     reply_to_incoming)
-from ..utils import fetch_default_reply
+from apostello.models import Keyword
+from apostello.reply import (get_person_or_ask_for_name, keyword_replier,
+                             reply_to_incoming)
+from apostello.utils import fetch_default_reply
 
 
 @pytest.mark.django_db

@@ -70,6 +70,7 @@ def test_request_data():
     }
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("msg,reply", [
     (u"Test", u"Test custom response"),
     (u"2testing", u"your message has been received"),
@@ -88,6 +89,7 @@ class TestTwilioView:
         assert reply in str(resp.content)
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("msg,reply", [
     (u"Test", u"Test custom response"),
     (u"2testing", u"your message has been received"),
