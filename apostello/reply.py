@@ -3,7 +3,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 
 from apostello.models import Recipient
-from apostello.tasks import (check_recent_outgoing_log, notify_office_mail,
+from apostello.tasks import (check_outgoing_log, notify_office_mail,
                              update_msgs_name, warn_on_blacklist,
                              warn_on_blacklist_receipt)
 from apostello.utils import fetch_default_reply
@@ -51,7 +51,7 @@ def get_person_or_ask_for_name(from_, sms_body, keyword_obj):
 def reply_to_incoming(person_from, from_, sms_body, keyword):
     # update outgoing log 1 minute from now:
     if not settings.TESTING:
-        check_recent_outgoing_log.apply_async(args=[0], countdown=60)
+        check_outgoing_log.apply_async(countdown=60)
 
     if keyword == "start":
         person_from.is_blocking = False

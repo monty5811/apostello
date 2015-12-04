@@ -4,6 +4,7 @@ import pytest
 
 
 @pytest.mark.django_db
+@pytest.mark.slow
 class TestLogin:
     @pytest.mark.parametrize("uri", [
         '/',

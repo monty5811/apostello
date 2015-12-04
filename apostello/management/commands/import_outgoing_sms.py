@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.core.management.base import BaseCommand
 
-from apostello.logs import import_outgoing_sms
+from apostello.logs import check_outgoing_log
 
 
 class Command(BaseCommand):
@@ -13,4 +13,4 @@ class Command(BaseCommand):
     help = 'Import outgoing messages from twilio'
 
     def handle(self, *args, **options):
-        import_outgoing_sms()
+        check_outgoing_log(fetch_all=True)

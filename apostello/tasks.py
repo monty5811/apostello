@@ -66,56 +66,15 @@ def recipient_send_message_task(recipient_pk, body, group, sent_by):
 # SMS logging and consistency checks
 
 @task()
-def check_log_consistent(page_id):
-    from apostello.models import Keyword, Recipient, SmsInbound
-    check_next_page = False
-    for x in twilio_client.messages.list(page=page_id, page_size=50, to=settings.TWILIO_FROM_NUM):
-        sms, created = SmsInbound.objects.get_or_create(sid=x.sid)
-        if created:
-            sender, s_created = Recipient.objects.get_or_create(number=x.from_)
-            if s_created:
-                sender.first_name = 'Unknown'
-                sender.last_name = 'Person'
-                sender.save()
-
-            sms.content = x.body
-            sms.time_received = timezone.make_aware(x.date_created,
-                                                    timezone.get_current_timezone())
-            sms.sender_name = str(sender)
-            sms.sender_num = x.from_
-            sms.matched_keyword = str(Keyword.match(x.body.strip()))
-            sms.matched_colour = Keyword.lookup_colour(x.body.strip())
-            sms.is_archived = True
-            sms.save()
-            check_next_page = True
-
-    if check_next_page:
-        check_log_consistent.delay(page_id + 1)
+def check_incoming_log(page_id=0, fetch_all=False):
+    from apostello.logs import check_incoming_log
+    check_incoming_log(page_id=page_id, fetch_all=fetch_all)
 
 
 @task()
-def check_recent_outgoing_log(page_id):
-    from apostello.models import Recipient, SmsOutbound
-    check_next_page = False
-    for x in twilio_client.messages.list(page=page_id, page_size=50, from_=settings.TWILIO_FROM_NUM):
-        recip, r_created = Recipient.objects.get_or_create(number=x.to)
-        if r_created:
-            recip.first_name = 'Unknown'
-            recip.last_name = 'Person'
-            recip.save()
-
-        sms, created = SmsOutbound.objects.get_or_create(sid=x.sid)
-        if created:
-            sms.content = x.body
-            sms.time_sent = timezone.make_aware(x.date_sent,
-                                                timezone.get_current_timezone())
-            sms.sent_by = "Unknown - imported"
-            sms.recipient = recip
-            sms.save()
-            check_next_page = True
-
-    if check_next_page:
-        check_recent_outgoing_log.delay(page_id + 1)
+def check_outgoing_log(page_id=0, fetch_all=False):
+    from apostello.logs import check_outgoing_log
+    check_outgoing_log(page_id=page_id, fetch_all=fetch_all)
 
 
 @task()
@@ -132,7 +91,7 @@ def log_msg_in(p, t, from_pk):
                               matched_link=Keyword.get_log_link(matched_keyword),
                               matched_colour=Keyword.lookup_colour(p['Body'].strip()))
     # check log is consistent:
-    check_log_consistent.delay(0)
+    check_incoming_log.delay()
 
 
 @task()
@@ -252,16 +211,3 @@ def pull_elvanto_groups(force=False):
     if force or config.sync_elvanto:
         from apostello.models import ElvantoGroup
         ElvantoGroup.pull_all_groups()
-
-
-# import twilio log
-@task()
-def import_incoming_sms_task():
-    from apostello.logs import import_incoming_sms
-    import_incoming_sms()
-
-
-@task
-def import_outgoing_sms_task():
-    from apostello.logs import import_outgoing_sms
-    import_outgoing_sms()
