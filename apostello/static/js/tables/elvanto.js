@@ -119,7 +119,7 @@ var ElvantoTable = React.createClass({
                     ),
                     React.createElement(
                         'th',
-                        { className: 'col-sm-1 col-lg-1' },
+                        { className: 'col-sm-1 col-lg-2' },
                         'Sync?'
                     )
                 )

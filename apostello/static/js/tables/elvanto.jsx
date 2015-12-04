@@ -75,7 +75,7 @@ var ElvantoTable = React.createClass({
             <tr>
             <th className="col-sm-2 col-md-6 col-lg-6">Group</th>
             <th className="col-sm-2 col-md-5 col-lg-5">Last Synced</th>
-            <th className="col-sm-1 col-lg-1">Sync?</th>
+            <th className="col-sm-1 col-lg-2">Sync?</th>
             </tr>
             </thead>
             <tbody className="searchable">
@@ -93,7 +93,7 @@ var ElvantoFetchButton = React.createClass({
             type : "POST",
             data : {},
             success : function(json) {
-              window.alert("Groups are being fetched, it may take a mcouple of minutes")
+              window.alert("Groups are being fetched, it may take a couple of minutes")
             },
             error : function(xhr,errmsg,err) {
                 window.alert("uh, oh. That didn't work.")
