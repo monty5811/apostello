@@ -131,7 +131,7 @@ def warn_on_blacklist(recipient_pk):
     recipient = Recipient.objects.get(pk=recipient_pk)
     notify_office_mail.delay(
         '[Apostello] Blacklist Update',
-        "{0] ({1}) is now blocking us".format(
+        "{0} ({1}) is now blocking us".format(
             str(recipient.number),
             str(recipient),
         ),
