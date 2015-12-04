@@ -20,11 +20,16 @@ class ApiCollection(APIView):
     permission_classes = (IsAuthenticated,)
     model_class = None
     serializer_class = None
+    related_field = None
     filter_list = False
     filters = {}
 
     def get(self, request, format=None):
-        objs = self.model_class.objects.all()
+        if self.related_field is None:
+            objs = self.model_class.objects.all()
+        else:
+            objs = self.model_class.objects.all(
+            ).select_related(self.related_field)
         if self.filter_list:
             objs = objs.filter(**self.filters)
         serializer = self.serializer_class(objs, many=True)

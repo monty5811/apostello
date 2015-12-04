@@ -29,6 +29,7 @@ urlpatterns = [
             model_class=SmsOutbound,
             serializer_class=SmsOutboundSerializer,
             permission_classes=(IsAuthenticated, CanSeeOutgoing),
+            related_field='recipient',
         ),
         name='out_log'),
     url(r'^v1/sms/live_wall/in/$',
