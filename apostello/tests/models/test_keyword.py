@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
+
 import pytest
+from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 from apostello.models import Keyword, SmsInbound
 from apostello.utils import fetch_default_reply
@@ -79,9 +83,6 @@ class TestKeywords():
     def test_get_log_link_str(self, keywords):
         assert Keyword.get_log_link('test_no_link') == '#'
 
-
-@pytest.mark.django_db
-class TestKeywordNoDb():
     def test_stop(self):
         assert Keyword.match("Stop it!") == 'stop'
         assert Keyword.match("stop    ") == 'stop'
@@ -111,3 +112,20 @@ class TestKeywordNoDb():
 
     def test_lookup_colour_none(self):
         assert Keyword.lookup_colour('nope') == '#B6B6B6'
+
+    def test_dates_wrong_way_round(self):
+        k = Keyword.objects.create(
+            keyword="time_test",
+            description="This is an active test keyword with no custom response",
+            custom_response="",
+            activate_time=timezone.make_aware(
+                datetime.strptime('Jun 1 2000  1:33PM', '%b %d %Y %I:%M%p'),
+                timezone.get_current_timezone()
+            ),
+            deactivate_time=timezone.make_aware(
+                datetime.strptime('Jun 1 1970  1:33PM', '%b %d %Y %I:%M%p'),
+                timezone.get_current_timezone()
+            )
+        )
+        with pytest.raises(ValidationError):
+            k.full_clean()

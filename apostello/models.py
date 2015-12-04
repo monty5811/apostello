@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.cache.utils import make_template_fragment_key
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils import timezone
@@ -378,6 +379,10 @@ class Keyword(models.Model):
         self.save()
         for sms in self.fetch_matches():
             sms.archive()
+
+    def clean(self):
+        if self.activate_time > self.deactivate_time:
+            raise ValidationError("The start time must be before the end time!")
 
     def save(self, force_insert=False, force_update=False, *args, **kwargs):
         # force keywords to be lower case on save
