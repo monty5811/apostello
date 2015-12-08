@@ -39,23 +39,24 @@ var OutTable = React.createClass({
         setInterval(this.loadResponsesFromServer, this.props.pollInterval);
     },
     render: function () {
-        var that = this;
-        var groupNodes = this.state.data.map(function (sms, index) {
+        var rows = this.state.data.map(function (sms, index) {
                 return (<SmsOutRow sms={sms} key={index}/>)
         });
         return (
-            <table className="table table-condensed table-striped table-responsive" width="100%" style={{'tableLayout':'fixed', 'wordWrap':'break-word'}}>
+            <div className="table-responsive">
+            <table className="table table-sm table-striped" style={{'tableLayout':'fixed', 'wordWrap':'break-word'}}>
             <thead>
             <tr>
-            <th className="col-sm-1">To</th>
+            <th>To</th>
             <th>Message</th>
-            <th className="col-sm-1">Sent</th>
+            <th>Sent</th>
             </tr>
             </thead>
             <tbody className="searchable">
-            {groupNodes}
+            {rows}
             </tbody>
             </table>
+            </div>
         );
     }
 });

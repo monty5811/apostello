@@ -4,6 +4,10 @@
 apostello/static/CACHE
 static/CACHE
 
+# front end
+bower_components/
+node_modules/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -12,7 +12,7 @@
 {% block morejs %}
 <script src="{%static 'js/tables/keywords_table.js'%}"></script>
 <script>
-React.render(
+ReactDOM.render(
      React.createElement(KeywordsTable, {url:"{%url 'api:keywords' %}", pollInterval: 20000}),
      document.getElementById('keywords_table')
     );

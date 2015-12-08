@@ -3,7 +3,7 @@ var ReprocessButton = React.createClass({
         if (this.props.sms.loading){
         return(<div/>);
         } else {
-        return(<a className='btn btn-default btn-xs' onClick={this.props.reprocessSms}>Reprocess</a>)
+        return(<a className='btn btn-secondary btn-sm' onClick={this.props.reprocessSms}>Reprocess</a>)
         }
     }
 });
@@ -35,7 +35,7 @@ var SmsInRow = React.createClass({
                 <KeywordCell sms={this.props.sms}></KeywordCell>
                 <td>{this.props.sms.content}</td>
                 <td>{this.props.sms.time_received}</td>
-                <td className="hidden-sm hidden-xs"><ReprocessButton sms={this.props.sms} reprocessSms={this.props.reprocessSms}/></td>
+                <td><ReprocessButton sms={this.props.sms} reprocessSms={this.props.reprocessSms}/></td>
             </tr>
         )
     }
@@ -77,24 +77,26 @@ var InTable = React.createClass({
     },
     render: function () {
         var that = this;
-        var groupNodes = this.state.data.map(function (sms, index) {
+        var rows = this.state.data.map(function (sms, index) {
                 return (<SmsInRow sms={sms} key={index} reprocessSms={that.reprocessSms.bind(null, sms)}/>)
         });
         return (
-            <table className="table table-condensed table-striped table-responsive" width="100%" style={{'tableLayout':'fixed', 'wordWrap':'break-word'}}>
+            <div className="table-responsive">
+            <table className="table table-sm table-striped" style={{'tableLayout':'fixed', 'wordWrap':'break-word'}}>
             <thead>
             <tr>
-            <th className="col-sm-1">From</th>
-            <th className="col-sm-1">Keyword</th>
+            <th>From</th>
+            <th>Keyword</th>
             <th>Message</th>
-            <th className="col-sm-1">Time</th>
-            <th className="col-sm-1 hidden-sm hidden-xs"></th>
+            <th>Time</th>
+            <th></th>
             </tr>
             </thead>
             <tbody className="searchable">
-            {groupNodes}
+            {rows}
             </tbody>
             </table>
+            </div>
         );
     }
 });

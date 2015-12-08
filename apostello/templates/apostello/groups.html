@@ -14,7 +14,7 @@
 {% block morejs %}
 <script src="{%static 'js/tables/groups_table.js'%}"></script>
 <script>
-React.render(
+ReactDOM.render(
      React.createElement(GroupTable, {url:"{%url 'api:recipient_groups' %}", pollInterval: 20000}),
      document.getElementById('groups_table')
     );

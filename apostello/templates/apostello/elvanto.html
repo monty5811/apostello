@@ -17,15 +17,15 @@
 {% block morejs %}
 <script src="{%static 'js/tables/elvanto.js'%}"></script>
 <script>
-React.render(
+ReactDOM.render(
      React.createElement(ElvantoFetchButton, {url:"{%url 'api:fetch_elvanto_groups' %}"}),
      document.getElementById('elvanto_fetch_button')
     );
-React.render(
+ReactDOM.render(
      React.createElement(ElvantoPullButton, {url:"{%url 'api:pull_elvanto_groups' %}"}),
      document.getElementById('elvanto_pull_button')
     );
-React.render(
+ReactDOM.render(
      React.createElement(ElvantoTable, {url:"{%url 'api:elvanto_groups' %}", pollInterval: 50000}),
      document.getElementById('elvanto_table')
     );

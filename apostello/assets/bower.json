@@ -1,0 +1,25 @@
+{
+  "name": "apostello",
+  "description": "",
+  "main": "gulpfile.js",
+  "authors": [
+    "Dean Montgomery <montgomery.dean97@gmail.com>"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/monty5811/apostello",
+  "moduleType": [
+    "es6",
+    "node"
+  ],
+  "private": true,
+  "dependencies": {
+    "bootstrap": "v4.0.0-alpha",
+    "select2": "~4.0.1",
+    "select2-bootstrap-css": "~1.4.6",
+    "react": "~0.14.3"
+  },
+  "resolutions": {
+    "bootstrap": "v4.0.0-alpha",
+    "select2": "^3.3.2"
+  }
+}

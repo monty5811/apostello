@@ -2,15 +2,15 @@
 {% load staticfiles %}
 {% load bootstrap3 %}
 {% block side_bar %}
-<p><a class="btn btn-default" href="{% url 'keyword' keyword.id %}">Edit</a></p>
+<p><a class="btn btn-secondary" href="{% url 'keyword' keyword.id %}">Edit</a></p>
 {%if archive%}
-<p><a class="btn btn-default" href="{% url 'keyword_responses' keyword.id %}">Replies ({{ keyword.fetch_matches|length }})</a><p>
+<p><a class="btn btn-secondary" href="{% url 'keyword_responses' keyword.id %}">Replies ({{ keyword.fetch_matches|length }})</a><p>
 {%else%}
-<p><a class="btn btn-default" href="{% url 'keyword_responses_archive' keyword.id %}">Archived Replies ({{ keyword.num_archived_matches }})</a></p>
+<p><a class="btn btn-secondary" href="{% url 'keyword_responses_archive' keyword.id %}">Archived Replies ({{ keyword.num_archived_matches }})</a></p>
 {%endif%}
-<p><a class="btn btn-default" href="{% url 'keyword_csv' keyword.id %}">Export "{{ keyword.keyword }}" responses</a></p>
-<p><a class="btn btn-default" href="{% url 'keyword_wall' keyword.id %}">Live Updates</a></p>
-<p><a class="btn btn-default" href="{% url 'keyword_wall_curator' keyword.id %}">Live Curator</a></p>
+<p><a class="btn btn-secondary" href="{% url 'keyword_csv' keyword.id %}">Export "{{ keyword.keyword }}" responses</a></p>
+<p><a class="btn btn-secondary" href="{% url 'keyword_wall' keyword.id %}">Live Updates</a></p>
+<p><a class="btn btn-secondary" href="{% url 'keyword_wall_curator' keyword.id %}">Live Curator</a></p>
 {% endblock %}
 {% block content %}
 <h2>{{keyword}} {%if archive%}(Archived){%endif%}</h2>
@@ -38,14 +38,14 @@
 <script src="{%static 'js/tables/keyword_resp_table.js'%}"></script>
 {%if archive%}
 <script>
-React.render(
+ReactDOM.render(
      React.createElement(KeywordRespTables, {url:"{%url 'api:keyword_sms_archive' keyword.id %}", pollInterval: 20000}, viewingArchive=true),
      document.getElementById('incoming_keyword_table')
     );
 </script>
 {%else%}
 <script>
-React.render(
+ReactDOM.render(
      React.createElement(KeywordRespTables, {url:"{%url 'api:keyword_sms' keyword.id %}", pollInterval: 20000}, viewingArchive=false),
      document.getElementById('incoming_keyword_table')
     );

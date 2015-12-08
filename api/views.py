@@ -12,7 +12,7 @@ from apostello.mixins import ProfilePermsMixin
 from apostello.models import Keyword, Recipient, SmsInbound
 from apostello.tasks import fetch_elvanto_groups, pull_elvanto_groups
 
-from .serializers import SmsInboundSerializer
+from .serializers import SmsInboundSerializer, SmsInboundSimpleSerializer
 
 
 class ApiCollection(APIView):
@@ -113,55 +113,21 @@ class ApiCollectionKeywordSms(APIView):
         return Response(serializer.data)
 
 
-class ApiCollectionKeywordWall(APIView):
-    permission_classes = (IsAuthenticated,)
-    only_live = False
-
-    def get(self, request, format=None, **kwargs):
-        keyword_obj = Keyword.objects.get(pk=kwargs['pk'])
-        self.check_object_permissions(request, keyword_obj)
-        # check cache
-        if self.only_live:
-            objs = cache.get('keyword_{}_only_live'.format(kwargs['pk']))
-            if objs is None:
-                objs = SmsInbound.objects.filter(
-                    matched_keyword=str(keyword_obj)
-                )
-                objs = objs.filter(is_archived=False)
-                objs = objs.filter(display_on_wall=True)
-                cache.set('keyword_{}_only_live'.format(kwargs['pk']), objs, 120)
-        else:
-            objs = cache.get('keyword_{}_all'.format(kwargs['pk']))
-            if objs is None:
-                objs = SmsInbound.objects.filter(
-                    matched_keyword=str(keyword_obj)
-                )
-                objs = objs.filter(is_archived=False)
-                cache.set('keyword_{}_all'.format(kwargs['pk']), objs, 120)
-
-        serializer = SmsInboundSerializer(objs, many=True)
-        return Response(serializer.data)
-
-
 class ApiCollectionAllWall(APIView):
     permission_classes = (IsAuthenticated,)
-    only_live = False
 
     def get(self, request, format=None, **kwargs):
-        # check cache
-        if self.only_live:
-            objs = cache.get('wall_only_live')
-            if objs is None:
-                objs = SmsInbound.objects.filter(is_archived=False).filter(display_on_wall=True)
-                cache.set('wall_only_live', objs, 120)
-        else:
-            objs = cache.get('wall_all')
-            if objs is None:
-                objs = SmsInbound.objects.filter(is_archived=False)
-                cache.set('wall_all', objs, 120)
+        cache_key = 'live_wall'
+        data = cache.get(cache_key)
+        if data is None:
+            objs = SmsInbound.objects.filter(
+                is_archived=False
+            )[0:100]
+            serializer = SmsInboundSimpleSerializer(objs, many=True)
+            data = serializer.data
+            cache.set(cache_key, data, 120)
 
-        serializer = SmsInboundSerializer(objs, many=True)
-        return Response(serializer.data)
+        return Response(data)
 
 
 class ElvantoPullButton(LoginRequiredMixin, ProfilePermsMixin, View):

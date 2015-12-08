@@ -94,6 +94,22 @@ class SmsInboundSerializer(serializers.ModelSerializer):
                   )
 
 
+class SmsInboundSimpleSerializer(serializers.ModelSerializer):
+    """
+    Serializes apostello.models.SmsInbound for use in log and wall.
+    """
+    time_received = serializers.DateTimeField(format='%d %b %H:%M')
+
+    class Meta:
+        model = SmsInbound
+        fields = ('pk',
+                  'content',
+                  'time_received',
+                  'is_archived', 'display_on_wall',
+                  'matched_keyword',
+                  )
+
+
 class SmsOutboundSerializer(serializers.ModelSerializer):
     """
     Serializes apostello.models.SmsOutbound for use in log.

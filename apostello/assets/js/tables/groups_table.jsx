@@ -1,6 +1,6 @@
 var ArchiveButton = React.createClass({
     render: function () {
-        return(<a className='btn btn-default btn-xs' onClick={this.props.archiveGroup}>Archive</a>)
+        return(<a className='btn btn-secondary btn-sm' onClick={this.props.archiveGroup}>Archive</a>)
     }
 });
 var KeywordCell = React.createClass({
@@ -10,7 +10,6 @@ var KeywordCell = React.createClass({
         }
         else {
             return (<td><b><a href={this.props.sms.matched_link} style={{"color": "#212121"}}>{this.props.sms.matched_keyword}</a></b></td>)
-
         }
     }
 });
@@ -21,7 +20,7 @@ var GroupRow = React.createClass({
                 <td><a href={this.props.group.url}>{this.props.group.name}</a></td>
                 <td>{this.props.group.description}</td>
                 <td>{"$"+this.props.group.cost}</td>
-                <td className="hidden-sm hidden-xs"><ArchiveButton group={this.props.group} archiveGroup={this.props.archiveGroup}/></td>
+                <td><ArchiveButton group={this.props.group} archiveGroup={this.props.archiveGroup}/></td>
             </tr>
         )
     }
@@ -63,23 +62,25 @@ var GroupTable = React.createClass({
     },
     render: function () {
         var that = this;
-        var groupNodes = this.state.data.map(function (group, index) {
+        var rows = this.state.data.map(function (group, index) {
                 return (<GroupRow group={group} key={index} archiveGroup={that.archiveGroup.bind(null, group)}/>)
         });
         return (
-            <table className="table table-condensed table-striped table-responsive" width="100%" style={{'tableLayout':'fixed', 'wordWrap':'break-word'}}>
+            <div className="table-responsive">
+            <table className="table table-sm table-striped" style={{'tableLayout':'fixed', 'wordWrap':'break-word'}}>
             <thead>
             <tr>
-            <th className="col-sm-1">Name</th>
-            <th className="col-sm-2">Description</th>
-            <th className="col-xs-1">Cost</th>
-            <th className="col-xs-1 hidden-sm hidden-xs"></th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Cost</th>
+            <th></th>
             </tr>
             </thead>
             <tbody className="searchable">
-            {groupNodes}
+            {rows}
             </tbody>
             </table>
+            </div>
         );
     }
 });

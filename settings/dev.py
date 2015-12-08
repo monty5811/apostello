@@ -18,8 +18,6 @@ DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3',
 # celery
 BROKER_URL = 'amqp://guest:guest@127.0.0.1:5672'
 
-# compress when debug is on:
-COMPRESS_ENABLED = True
 # overwrite static files
 STATIC_ROOT = BASE_DIR + '/static/'
 

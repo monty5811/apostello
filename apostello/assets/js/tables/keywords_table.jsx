@@ -8,7 +8,7 @@ var ArchiveButton = React.createClass({
             } else{
                 var txt = 'Archive';
             };
-        return(<a className='btn btn-default btn-xs' onClick={this.props.archiveKeyword}>{txt}</a>)
+        return(<a className='btn btn-secondary btn-sm' onClick={this.props.archiveKeyword}>{txt}</a>)
         }
     }
 });
@@ -78,7 +78,7 @@ var KeywordsTable = React.createClass({
     },
     render: function () {
         var that = this;
-        var groupNodes = this.state.data.map(function (keyword, index) {
+        var rows = this.state.data.map(function (keyword, index) {
                 return (
                         <KeywordRow
                         keyword={keyword}
@@ -87,21 +87,23 @@ var KeywordsTable = React.createClass({
                         />)
         });
         return (
-            <table className="table table-condensed table-striped table-responsive" width="100%" style={{'tableLayout':'fixed', 'wordWrap':'break-word'}}>
+            <div className="tabel-responsive">
+            <table className="table table-sm table-striped" style={{'tableLayout':'fixed', 'wordWrap':'break-word'}}>
             <thead>
             <tr>
-            <th className="col-sm-1">Keyword</th>
-            <th className="col-sm-3">Description</th>
-            <th className="col-sm-3">Auto Reply</th>
-            <th className="col-sm-1">Matches</th>
-            <th className="col-sm-1">Status</th>
-            <th className="col-sm-1 hidden-sm hidden-xs"></th>
+            <th>Keyword</th>
+            <th>Description</th>
+            <th>Auto Reply</th>
+            <th>Matches</th>
+            <th>Status</th>
+            <th></th>
             </tr>
             </thead>
             <tbody className="searchable">
-            {groupNodes}
+            {rows}
             </tbody>
             </table>
+            </div>
         );
     }
 });

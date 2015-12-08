@@ -505,13 +505,7 @@ class SmsInbound(models.Model):
 
     def save(self, *args, **kwargs):
         super(SmsInbound, self).save(*args, **kwargs)
-        keyword_ = Keyword.objects.filter(keyword=self.matched_keyword)
-        if keyword_.count() > 0:
-            cache.set('keyword_{}_only_live'.format(keyword_[0].pk), None, 0)
-            cache.set('keyword_{}_all'.format(keyword_[0].pk), None, 0)
-
-        cache.set('wall_only_live', None, 0)
-        cache.set('wall_all', None, 0)
+        cache.set('live_wall', None, 0)
 
     class Meta:
         ordering = ['-time_received']

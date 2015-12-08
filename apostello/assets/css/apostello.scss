@@ -1,12 +1,16 @@
-/* Sticky footer styles
--------------------------------------------------- */
+$enable-rounded: false;
+$enable-shadows: false;
+$brand-primary: #5b599c;
+
+@import "bootstrap";
+
 html {
   position: relative;
   min-height: 100%;
 }
 body {
-  /* Margin bottom by footer height */
   margin-bottom: 60px;
+  font-size: 14px;
 }
 .footer {
   position: absolute;
@@ -16,24 +20,25 @@ body {
   height: 60px;
   background-color: #f5f5f5;
 }
-
-
-/* Custom page CSS
--------------------------------------------------- */
-/* Not required for template or sticky footer method. */
-
 body > .container {
   padding: 60px 15px 0;
 }
 .container .text-muted {
   margin: 20px 0;
 }
-
 .footer > .container {
   padding-right: 15px;
   padding-left: 15px;
 }
-
-code {
-  font-size: 80%;
+.navbar-default {
+  background-color: #5c569c;
+}
+.navbar-default .navbar-brand {
+  color: #ffffff;
+}
+.nav-pills .nav-link {
+  color: #ffffff;
+}
+.navbar-default .navbar-link:hover {
+  color: #ffffff;
 }

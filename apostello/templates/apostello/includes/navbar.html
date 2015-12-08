@@ -1,54 +1,48 @@
-{% load staticfiles %}{% load compress %}{% load bootstrap3 %}{% load cache %}
-{% cache 1800 navbar request.user %}
+{% load staticfiles %}{% load cache %}
+{% cache 0 navbar request.user %}
 {% with profile=request.user.profile %}
 <nav class="navbar navbar-default" role="navigation">
-  <div class="container-fluid">
-    <!-- Brand and toggle get grouped for better mobile display -->
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="/">Apostello</a>
-    </div>
-    <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse navbar-collapse" id="navbar-collapse-1">
-      <ul class="nav navbar-nav">
-        {% if profile.can_send_sms or request.user.is_staff %}<li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Send To<span class="caret"></span></a>
-        <ul class="dropdown-menu" role="menu">
-          <li><a href="{% url 'send_group' %}">Group</a></li>
-          <li><a href="{% url 'send_adhoc' %}">Individuals</a></li>
-        </ul>
-        </li>{% endif %}
-        {% if profile.can_see_keywords or request.user.is_staff %}<li><a href="{% url 'keywords' %}">Keywords</a></li>{% endif %}
-        {% if profile.can_see_groups or request.user.is_staff %}<li><a href="{% url 'recipient_groups' %}">Groups</a></li>{% endif %}
-        {% if profile.can_see_contact_names or request.user.is_staff %}<li><a href="{% url 'recipients' %}">Contacts</a></li>{% endif %}
-        {% if profile.can_see_outgoing or request.user.is_staff %}<li><a href="{% url 'outgoing' %}">Outgoing</a></li>{% endif %}
-        {% if profile.can_see_incoming or request.user.is_staff %}<li><a href="{%  url 'incoming' %}">Incoming</a></li>{% endif %}
-        {% if profile.can_import or request.user.is_staff %}<li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Tools<span class="caret"></span></a>
-        <ul class="dropdown-menu" role="menu">
-          <li><a href="{% url 'import_recipients' %}">CSV Import</a></li>
-          <li><a href="{% url 'import_elvanto' %}">Elvanto Import</a></li>
-        </ul>
-        </li>{% endif %}
+  <button class="navbar-toggler hidden-sm-up" type="button" data-toggle="collapse" data-target="#exCollapsingNavbar2">
+    &#9776;
+  </button>
+  <div class="collapse navbar-toggleable-xs" id="exCollapsingNavbar2">
+      <ul class="nav nav-pills">
+      <li class="nav-item dropdown">
+      <a class="navbar-brand dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Apostello</a>
+        <div class="dropdown-menu">
+            <a class="dropdown-item" href="/">Home</a>
+            {% if request.user.is_staff %}<a class="dropdown-item" href="/admin/">Admin</a>{% endif %}
+            {% if request.user.socialaccount_set|length < 1 %}<a class="dropdown-item" href="/accounts/password/change">Change Password</a>{% endif %}
+            <a class="dropdown-item" href="/accounts/logout/">Logout</a>
+          </div>
+      </li>
       </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{{ user.email }}<span class="caret"></span></a>
-          <ul class="dropdown-menu" role="menu">
-          {% if request.user.is_staff %}<li><a href="/admin/">Admin</a></li>{% endif %}
-          {% if request.user.socialaccount_set|length < 1 %}<li><a href="/accounts/password/change">Change Password</a></li>{% endif %}
-          <li><a href="/accounts/logout/">Logout</a></li>
-        </ul>
+      <ul class="nav nav-pills">
+        {% if profile.can_send_sms or request.user.is_staff %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Send To</a>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="{% url 'send_group' %}">Group</a>
+            <a class="dropdown-item" href="{% url 'send_adhoc' %}">Individuals</a>
+          </div>
         </li>
+        {% endif %}
+        {% if profile.can_see_keywords or request.user.is_staff %}<li class="nav-item"><a class="nav-link" href="{% url 'keywords' %}">Keywords</a></li>{% endif %}
+        {% if profile.can_see_groups or request.user.is_staff %}<li class="nav-item"><a class="nav-link" href="{% url 'recipient_groups' %}">Groups</a></li>{% endif %}
+        {% if profile.can_see_contact_names or request.user.is_staff %}<li class="nav-item"><a class="nav-link" href="{% url 'recipients' %}">Contacts</a></li>{% endif %}
+        {% if profile.can_see_outgoing or request.user.is_staff %}<li class="nav-item"><a class="nav-link" href="{% url 'outgoing' %}">Outgoing</a></li>{% endif %}
+        {% if profile.can_see_incoming or request.user.is_staff %}<li class="nav-item"><a class="nav-link" href="{%  url 'incoming' %}">Incoming</a></li>{% endif %}
+        {% if profile.can_import or request.user.is_staff %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Tools</a>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="{% url 'import_recipients' %}">CSV Import</a>
+            <a class="dropdown-item" href="{% url 'import_elvanto' %}">Elvanto Import</a>
+          </div>
+        </li>
+        {% endif %}
       </ul>
     </div>
-    <!-- /.navbar-collapse -->
-  </div>
-  <!-- /.container-fluid -->
 </nav>
 {% endwith %}
 {% endcache %}

@@ -79,7 +79,6 @@ class TestNotLoggedIn:
     ('/api/v1/keywords/', 200),
     ('/api/v1/keywords/1', 200),
     ('/api/v1/sms/live_wall/in/', 200),
-    ('/api/v1/sms/live_wall/in/keyword/1/', 200),
 ])
 @pytest.mark.django_db
 class TestStaff:
@@ -128,10 +127,6 @@ class TestStaff:
     ('/api/v1/keywords/', 200),
     ('/api/v1/keywords/1', 200),
     ('/api/v1/sms/live_wall/in/', 200),
-    ('/api/v1/sms/live_wall/only_live/in/', 200),
-    ('/api/v1/sms/live_wall/in/keyword/1/', 403),
-    ('/api/v1/sms/live_wall/in/keyword/2/', 200),
-    ('/api/v1/sms/live_wall/only_live/in/keyword/2/', 200),
 ])
 @pytest.mark.django_db
 class TestNotStaff:

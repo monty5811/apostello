@@ -8,7 +8,7 @@ var ReprocessButton = React.createClass({
             } else{
                 var txt = 'Archive';
             };
-        return(<a className='btn btn-default btn-xs' onClick={this.props.archiveSms}>{txt}</a>)
+        return(<a className='btn btn-secondary btn-sm' onClick={this.props.archiveSms}>{txt}</a>)
         }
     }
 });
@@ -28,10 +28,10 @@ var ActionCell = React.createClass({
         }
         else {
             if (this.props.sms.dealt_with) {
-                return(<td><a className='btn btn-xs btn-success' onClick={this.props.dealtWithSms}>Completed</a></td>)
+                return(<td><a className='btn btn-sm btn-success' onClick={this.props.dealtWithSms}>Completed</a></td>)
                 }
             else{
-                return(<td><a className='btn btn-xs btn-danger' onClick={this.props.dealtWithSms}>Requires Action</a></td>)
+                return(<td><a className='btn btn-sm btn-danger' onClick={this.props.dealtWithSms}>Requires Action</a></td>)
                 };
         }
     }
@@ -101,7 +101,7 @@ var KeywordRespTables = React.createClass({
     },
     render: function () {
         var that = this;
-        var groupNodes = this.state.data.map(function (sms, index) {
+        var rows = this.state.data.map(function (sms, index) {
                 return (
                         <SmsInRow
                         sms={sms}
@@ -112,20 +112,22 @@ var KeywordRespTables = React.createClass({
                         />)
         });
         return (
-            <table className="table table-condensed table-striped table-responsive" width="100%" style={{'tableLayout':'fixed', 'wordWrap':'break-word'}}>
+            <div className="table-responsive">
+            <table className="table table-sm table-striped" style={{'tableLayout':'fixed', 'wordWrap':'break-word'}}>
             <thead>
             <tr>
-            <th className="col-sm-1">From</th>
-            <th className="col-sm-1">Time Received</th>
-            <th className="col-sm-4">Message</th>
-            <th className="col-sm-2">Requires Action?</th>
-            <th className="col-sm-1 hidden-sm hidden-xs"></th>
+            <th>From</th>
+            <th>Time Received</th>
+            <th>Message</th>
+            <th>Requires Action?</th>
+            <th></th>
             </tr>
             </thead>
             <tbody className="searchable">
-            {groupNodes}
+            {rows}
             </tbody>
             </table>
+            </div>
         );
     }
 });

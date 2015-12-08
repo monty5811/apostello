@@ -20,12 +20,12 @@ Total Active Contacts = {{total_contacts}}
 <script src="{%static 'js/tables/contacts_table.js'%}"></script>
 <script>
 {% if request.user.is_staff %}
-React.render(
+ReactDOM.render(
      React.createElement(ContactsTable, {url:"{%url 'api:recipients' %}", pollInterval: 20000, isStaff: true}),
      document.getElementById('contacts_table')
     );
 {% else %}
-React.render(
+ReactDOM.render(
      React.createElement(ContactsTable, {url:"{%url 'api:recipients' %}", pollInterval: 20000, isStaff: false}),
      document.getElementById('contacts_table')
     );

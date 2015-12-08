@@ -10,7 +10,7 @@
 {% if socialaccount_providers %}
 <a href="/accounts/google/login/?next=%2F&process=login"><img src="{% static 'images/goog_login.png' %}" height="46" alt="Google"></a>
 <p>or</p>
- <button class="btn btn-default" type="button" data-toggle="collapse" data-target="#emailLogin" aria-expanded="false" aria-controls="collapseExample">
+ <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#emailLogin" aria-expanded="false" aria-controls="collapseExample">
    Email >>
 </button>
 <div class="collapse" id="emailLogin">
@@ -24,7 +24,7 @@
   {% if redirect_field_value %}
   <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
   {% endif %}
-  <button class="btn btn-primary" type="submit">{% trans "Sign In" %}</button>
+  <button class="btn btn-secondary" type="submit">{% trans "Sign In" %}</button>
   <br><br>
   <p><a href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a></p>
 <p>{% blocktrans %}If you have not yet created an account, please

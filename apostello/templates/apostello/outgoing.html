@@ -8,7 +8,7 @@
 {% block morejs %}
 <script src="{%static 'js/tables/outgoing_table.js'%}"></script>
 <script>
-React.render(
+ReactDOM.render(
      React.createElement(OutTable, {url:"{%url 'api:out_log' %}", pollInterval: 20000}),
      document.getElementById('outgoing_table')
     );

@@ -1,16 +1,15 @@
-{% load compress %}
+{% load staticfiles %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
 {% include 'apostello/includes/head.html' %}
-{% compress css %}
 <style>
 body {
     color: #ffffff;
     background-color: #222222;
     padding: 50px;
 }
-a {
+ a {
     color: #ffffff;
     font-weight: bold;
 }
@@ -22,7 +21,6 @@ div {
     border-radius: 5px;
 }
 </style>
-{% endcompress %}
 </head>
 <body>
   <div class="container-fluid">
@@ -33,4 +31,5 @@ div {
       </div>
     </div>
   </div>
+<script src="{% static 'js/apostello.min.js' %}"></script>
 </body>

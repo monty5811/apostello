@@ -5,10 +5,10 @@ var ActionCell = React.createClass({
         }
         else {
             if (this.props.grp.sync) {
-                return(<td><a className='btn btn-xs btn-info' onClick={this.props.toggleSync}>Syncing</a></td>)
+                return(<td><a className='btn btn-sm btn-primary' onClick={this.props.toggleSync}>Syncing</a></td>)
                 }
             else{
-                return(<td><a className='btn btn-xs btn-warning' onClick={this.props.toggleSync}>Disabled</a></td>)
+                return(<td><a className='btn btn-sm btn-warning' onClick={this.props.toggleSync}>Disabled</a></td>)
                 };
         }
     }
@@ -61,7 +61,7 @@ var ElvantoTable = React.createClass({
     },
     render: function () {
         var that = this;
-        var groupNodes = this.state.data.map(function (grp, index) {
+        var rows = this.state.data.map(function (grp, index) {
                 return (
                         <GroupRow
                         grp={grp}
@@ -70,18 +70,20 @@ var ElvantoTable = React.createClass({
                         />)
         });
         return (
-            <table className="table table-condensed table-striped table-responsive" width="100%" style={{'tableLayout':'fixed', 'wordWrap':'break-word'}}>
+            <div table-responsive>
+            <table className="table table-sm table-striped" style={{'tableLayout':'fixed', 'wordWrap':'break-word'}}>
             <thead>
             <tr>
-            <th className="col-sm-2 col-md-6 col-lg-6">Group</th>
-            <th className="col-sm-2 col-md-5 col-lg-5">Last Synced</th>
-            <th className="col-sm-1 col-lg-2">Sync?</th>
+            <th>Group</th>
+            <th>Last Synced</th>
+            <th>Sync?</th>
             </tr>
             </thead>
             <tbody className="searchable">
-            {groupNodes}
+            {rows}
             </tbody>
             </table>
+            </div>
         );
     }
 });

@@ -1,6 +1,6 @@
 var ArchiveButton = React.createClass({
     render: function () {
-        return(<a className='btn btn-default btn-xs' onClick={this.props.archiveContact}>Archive</a>)
+        return(<a className='btn btn-secondary btn-sm' onClick={this.props.archiveContact}>Archive</a>)
     }
 });
 var ContactRow = React.createClass({
@@ -55,21 +55,23 @@ var ContactsTable = React.createClass({
     },
     render: function () {
         var that = this;
-        var groupNodes = this.state.data.map(function (contact, index) {
+        var rows = this.state.data.map(function (contact, index) {
                 return (<ContactRow contact={contact} key={index} archiveContact={that.archiveContact.bind(null, contact)}/>)
         });
         return (
-            <table className="table table-condensed table-striped table-responsive">
+            <div className="table-responsive">
+            <table className="table table-sm table-striped">
             <thead>
             <tr>
-            <th className="col-sm-4">Name</th>
-            <th className="col-sm-1"></th>
+            <th>Name</th>
+            <th></th>
             </tr>
             </thead>
             <tbody className="searchable">
-            {groupNodes}
+            {rows}
             </tbody>
             </table>
+            </div>
         );
     }
 });

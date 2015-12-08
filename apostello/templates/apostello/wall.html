@@ -1,5 +1,4 @@
 {% load staticfiles %}
-{% load compress %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,30 +6,27 @@
 </head>
 <body style="background-color: #5c569c">
 <div class="container-fluid">
-  <div class="col-md-10 col-md-offset-1">
   <br>
-    <div class="row">
-      <div id="content"></div>
-    </div>
-  </div>
+  <div class="col-md-10 col-md-offset-1">
+  <div id="wall"></div>
 </div>
-{% compress js %}
+</div>
+<script src="{% static 'js/apostello.min.js' %}"></script>
 <script src="{% static 'js/curate.js' %}"></script>
-{% endcompress %}
 {% if keyword %}
 <script>
-React.render(
-     React.createElement(ResponseWall,
-     {pollInterval: 500, curating:false, preview:false, url: "{%url 'api:keyword_live_wall_only_live' keyword.id %}"}),
-     document.getElementById('content')
+ReactDOM.render(
+     React.createElement(CurateContainer,
+     {curate: false, keyword:"{{keyword}}", pollInterval: 1000, url: "{%url 'api:live_wall' %}"}),
+     document.getElementById('wall')
 );
 </script>
 {% else %}
 <script>
-React.render(
-     React.createElement(ResponseWall,
-     {pollInterval: 500, curating:false, url: "{%url 'api:all_live_wall_only_live'%}", preview: false}),
-     document.getElementById('content')
+ReactDOM.render(
+     React.createElement(CurateContainer,
+     {curate: false, pollInterval: 1000, url: "{%url 'api:live_wall'%}"}),
+     document.getElementById('wall')
 );
 </script>
 {% endif %}

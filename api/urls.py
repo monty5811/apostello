@@ -8,9 +8,8 @@ from api.serializers import (ElvantoGroupSerializer, KeywordSerializer,
                              RecipientGroupSerializer, RecipientSerializer,
                              SmsInboundSerializer, SmsOutboundSerializer)
 from api.views import (ApiCollection, ApiCollectionAllWall,
-                       ApiCollectionKeywordSms, ApiCollectionKeywordWall,
-                       ApiCollectionRecentSms, ApiMember, ElvantoFetchButton,
-                       ElvantoPullButton)
+                       ApiCollectionKeywordSms, ApiCollectionRecentSms,
+                       ApiMember, ElvantoFetchButton, ElvantoPullButton)
 from apostello.models import (ElvantoGroup, Keyword, Recipient, RecipientGroup,
                               SmsInbound, SmsOutbound)
 
@@ -36,13 +35,7 @@ urlpatterns = [
         ApiCollectionAllWall.as_view(
             permission_classes=(IsAuthenticated, CanSeeIncoming)
         ),
-        name='all_live_wall'),
-    url(r'^v1/sms/live_wall/only_live/in/$',
-        ApiCollectionAllWall.as_view(
-            permission_classes=(IsAuthenticated, CanSeeIncoming),
-            only_live=True
-        ),
-        name='all_live_wall_only_live'),
+        name='live_wall'),
     url(r'^v1/sms/in/recpient/(?P<pk>\d+)/$',
         ApiCollectionRecentSms.as_view(
             permission_classes=(IsAuthenticated, CanSeeContactNames, CanSeeIncoming)),
@@ -53,17 +46,6 @@ urlpatterns = [
             archive=False
         ),
         name='keyword_sms'),
-    url(r'^v1/sms/live_wall/in/keyword/(?P<pk>\d+)/$',
-        ApiCollectionKeywordWall.as_view(
-            permission_classes=(IsAuthenticated, CanSeeKeywords, CanSeeKeyword, CanSeeIncoming),
-        ),
-        name='keyword_live_wall'),
-    url(r'^v1/sms/live_wall/only_live/in/keyword/(?P<pk>\d+)/$',
-        ApiCollectionKeywordWall.as_view(
-            permission_classes=(IsAuthenticated, CanSeeKeywords, CanSeeKeyword, CanSeeIncoming),
-            only_live=True,
-        ),
-        name='keyword_live_wall_only_live'),
     url(r'^v1/sms/in/keyword/(?P<pk>\d+)/archive/$',
         ApiCollectionKeywordSms.as_view(
             permission_classes=(IsAuthenticated, CanSeeKeywords, CanSeeKeyword, CanSeeIncoming),

@@ -1,5 +1,4 @@
 {% load staticfiles %}
-{% load compress %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,50 +6,27 @@
 </head>
 <body style="background-color: #5c569c">
 <div class="container-fluid">
-<div class="col-md-10 col-md-offset-1">
-  <div class="row">
-    <div class="col-sm-8">
-      <h4>Available Messages</h4>
-      <div id="curate"></div>
-    </div>
-    <div class="col-sm-3 col-sm-offset-1">
-      <h4>Live Preview</h4><p>(Click to remove.)</p>
-      <div id="wall"></div>
-    </div>
-  </div>
+  <br>
+  <div class="col-md-10 col-md-offset-1">
+  <div id="curator"></div>
 </div>
 </div>
-{% compress js %}
+<script src="{% static 'js/apostello.min.js' %}"></script>
 <script src="{% static 'js/curate.js' %}"></script>
-{% endcompress %}
 {% if keyword %}
 <script>
-React.render(
-     React.createElement(ResponseWall,
-     {title:"{{keyword.keyword}}", pollInterval: 5000, curating:true, url: "{%url 'api:keyword_live_wall' keyword.id %}"}),
-     document.getElementById('curate')
-);
-</script>
-<script>
-React.render(
-     React.createElement(ResponseWall,
-     {title:"{{keyword.keyword}}", pollInterval: 750, curating:false, preview: true, url: "{%url 'api:keyword_live_wall' keyword.id %}"}),
-     document.getElementById('wall')
+ReactDOM.render(
+     React.createElement(CurateContainer,
+     {curate: true, keyword:"{{keyword}}", pollInterval: 10000, url: "{%url 'api:live_wall' %}"}),
+     document.getElementById('curator')
 );
 </script>
 {% else %}
 <script>
-React.render(
-     React.createElement(ResponseWall,
-     {pollInterval: 5000, curating:true, url: "{%url 'api:in_log'%}"}),
-     document.getElementById('curate')
-);
-</script>
-<script>
-React.render(
-     React.createElement(ResponseWall,
-     {pollInterval: 750, curating:false, preview: true, url: "{%url 'api:in_log'%}"}),
-     document.getElementById('wall')
+ReactDOM.render(
+     React.createElement(CurateContainer,
+     {curate:true, pollInterval: 10000, url: "{%url 'api:live_wall'%}"}),
+     document.getElementById('curator')
 );
 </script>
 {% endif %}
