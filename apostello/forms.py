@@ -6,9 +6,7 @@ from apostello.validators import gsm_validator, less_than_sms_char_limit
 
 
 class SendAdhocRecipientsForm(forms.Form):
-    """
-    Sends an sms to ad-hoc groups.
-    """
+    """Send an sms to ad-hoc groups."""
     content = forms.CharField(
         validators=[gsm_validator, less_than_sms_char_limit],
         required=True,
@@ -32,9 +30,7 @@ class SendAdhocRecipientsForm(forms.Form):
 
 
 class SendRecipientGroupForm(forms.Form):
-    """
-    Sends an sms to pre-defined group.
-    """
+    """Send an sms to pre-defined group."""
     content = forms.CharField(
         validators=[gsm_validator, less_than_sms_char_limit],
         required=True,
@@ -61,7 +57,7 @@ class SendRecipientGroupForm(forms.Form):
 
 class ManageRecipientGroupForm(forms.ModelForm):
     """
-    Manages RecipientGroup updates and creation.
+    Manage RecipientGroup updates and creation.
 
     __init__ and save are overridden to pull in group members.
     """
@@ -86,16 +82,16 @@ class ManageRecipientGroupForm(forms.ModelForm):
     )
 
     def __init__(self, *args, **kwargs):
+        """Override init method to pull in existing group members."""
         if 'instance' in kwargs:
-            # We get the 'initial' keyword argument or initialize it as a dict if it didn't exist.
             initial = kwargs.setdefault('initial', {})
             # The widget for a ModelMultipleChoiceField expects a list of primary key for the selected data.
             initial['members'] = [t.pk for t in kwargs['instance'].recipient_set.all()]
 
         forms.ModelForm.__init__(self, *args, **kwargs)
 
-    # Overriding save allows us to process the value of 'people' field
     def save(self, *args, **kwargs):
+        """Override save method to update group members."""
         instance = forms.ModelForm.save(self)
         instance.recipient_set.clear()
         for recipient in self.cleaned_data['members']:
@@ -103,9 +99,7 @@ class ManageRecipientGroupForm(forms.ModelForm):
 
 
 class RecipientForm(forms.ModelForm):
-    """
-    Updates Recipients.
-    """
+    """Handle Recipients."""
 
     class Meta:
         model = Recipient
@@ -123,9 +117,7 @@ class RecipientForm(forms.ModelForm):
 
 
 class KeywordForm(forms.ModelForm):
-    """
-    Updates Keywords.
-    """
+    """Handle Keywords."""
 
     class Meta:
         model = Keyword
@@ -151,7 +143,7 @@ class KeywordForm(forms.ModelForm):
 
 class ArchiveKeywordResponses(forms.Form):
     """
-    Used on keyword log page to allow user to archive all matching messages.
+    Handle archiving all matching messages for a keyword.
 
     Single tick-box field for confirmation.
     """
@@ -159,9 +151,7 @@ class ArchiveKeywordResponses(forms.Form):
 
 
 class CsvImport(forms.Form):
-    """
-    Handles CSV imports.
-    """
+    """Handle CSV imports."""
     csv_data = forms.CharField(
         help_text='John, Calvin, +447095237960',
         widget=forms.Textarea

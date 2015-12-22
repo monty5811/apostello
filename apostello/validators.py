@@ -9,6 +9,7 @@ TWILIO_INFO_WORDS = ("help", "info")
 
 
 def validate_lower(value):
+    """Ensure value is all lowercase."""
     if value.lower() != value:
         raise ValidationError(
             '{0} must be all lower case.'.format(value)
@@ -16,6 +17,7 @@ def validate_lower(value):
 
 
 def not_twilio_num(value):
+    """Ensure value does not match the sending number."""
     if str(value) == str(settings.TWILIO_FROM_NUM):
         raise ValidationError(
             "You cannot add the number from which we send messages. Inception!"
@@ -23,6 +25,7 @@ def not_twilio_num(value):
 
 
 def twilio_reserved(value):
+    """Ensure value does not overlap a twilio reserverd keyword."""
     if value.lower() in TWILIO_INFO_WORDS + TWILIO_START_WORDS + TWILIO_STOP_WORDS + ('name',):
         raise ValidationError(
             '{0} is a reserved keyword, please choose another.'.format(
@@ -38,6 +41,7 @@ gsm_validator = RegexValidator(
 
 
 def no_overlap_keyword(value):
+    """Ensure value does not overlap an existing keyword."""
     from apostello.models import Keyword
     keywords = [str(x) for x in Keyword.objects.all()]
     if value in keywords:
@@ -54,6 +58,7 @@ def no_overlap_keyword(value):
 
 
 def less_than_sms_char_limit(value):
+    """Ensure message is less than the maximum character limit."""
     from apostello.models import SiteConfiguration
     s = SiteConfiguration.get_solo()
     sms_char_lim = s.sms_char_limit - settings.MAX_NAME_LENGTH + len('%name%')

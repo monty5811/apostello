@@ -97,8 +97,8 @@ urlpatterns += [
 # log urls
 urlpatterns += [
     url(r'^incoming/$', v.SimpleView.as_view(template_name='apostello/incoming.html', required_perms=['can_see_incoming']), name='incoming'),
-    url(r'^incoming/wall/$', v.wall, name='incoming_wall'),
-    url(r'^incoming/curate_wall/$', v.wall_curate, name='incoming_wall_curator'),
+    url(r'^incoming/wall/$', v.SimpleView.as_view(template_name='apostello/wall.html', required_perms=['can_see_incoming']), name='incoming_wall'),
+    url(r'^incoming/curate_wall/$', v.SimpleView.as_view(template_name='apostello/wall_curator.html', required_perms=['can_see_incoming']), name='incoming_wall_curator'),
     url(r'^outgoing/$', v.SimpleView.as_view(template_name='apostello/outgoing.html', required_perms=['can_see_outgoing']), name='outgoing')
 ]
 

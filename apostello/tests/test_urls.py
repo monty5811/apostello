@@ -205,7 +205,7 @@ class TestOthers:
                                                          description='t1')
         new_group.save()
         pk = new_group.pk
-        users['c_staff'].post(new_group.get_absolute_url(),
+        users['c_staff'].post(new_group.get_absolute_url,
                               {'name': 'test_group_changed',
                                'description': 'this is a test'})
         assert 'test_group_changed' == str(models.RecipientGroup.objects.get(pk=pk))
@@ -253,4 +253,4 @@ class TestOthers:
     def test_check_perms_not_staff(self, users, keywords, recipients):
         assert users['c_in'].get('/incoming/').status_code == 200
         assert users['c_in'].get('/elvanto/import/').status_code == 302
-        assert users['c_in'].get(recipients['calvin'].get_absolute_url()).status_code == 302
+        assert users['c_in'].get(recipients['calvin'].get_absolute_url).status_code == 302

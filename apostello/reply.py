@@ -10,6 +10,12 @@ from apostello.utils import fetch_default_reply
 
 
 def keyword_replier(k, person_from):
+    """
+    Construct reply to message.
+
+    Attempts to use the keyword's reply.
+    If not a valid keyword, then the no match reply is used.
+    """
     try:
         reply = k.construct_reply(person_from)
     except AttributeError:
@@ -20,6 +26,13 @@ def keyword_replier(k, person_from):
 
 
 def get_person_or_ask_for_name(from_, sms_body, keyword_obj):
+    """
+    Return the Recipient object for the sender of the message.
+
+    Perform a look up on the sender of the message.
+    If they exist in the system, they are returned.
+    Otherwise a message is queued to ask them for their name.
+    """
     try:
         person_from = Recipient.objects.get(number=from_)
     except Recipient.DoesNotExist:
@@ -49,6 +62,7 @@ def get_person_or_ask_for_name(from_, sms_body, keyword_obj):
 
 
 def reply_to_incoming(person_from, from_, sms_body, keyword):
+    """Construct appropriate reply."""
     # update outgoing log 1 minute from now:
     if not settings.TESTING:
         check_outgoing_log.apply_async(countdown=60)

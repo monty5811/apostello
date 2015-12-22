@@ -47,10 +47,10 @@ class TestKeywords():
         assert str(keywords['test'].fetch_archived_matches()[0]) == str(SmsInbound.objects.filter(content="archived message")[0])
 
     def test_num_matches(self, keywords, smsin):
-        assert keywords['test'].num_matches() == 2
+        assert keywords['test'].num_matches == 2
 
     def test_num_archived_matches(self, keywords, smsin):
-        assert keywords['test'].num_archived_matches() == 1
+        assert keywords['test'].num_archived_matches == 1
 
     def test_archiving(self, keywords, smsin):
         keywords['test'].archive()
@@ -58,8 +58,8 @@ class TestKeywords():
         assert len(keywords['test'].fetch_matches()) == 0
 
     def test_is_locked(self, keywords, users):
-        assert keywords['test'].is_locked()
-        assert keywords['test2'].is_locked() is False
+        assert keywords['test'].is_locked
+        assert keywords['test2'].is_locked is False
 
     def test_access(self, keywords, users):
         assert keywords['test'].can_user_access(users['notstaff2']) is False

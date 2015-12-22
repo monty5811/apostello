@@ -38,8 +38,5 @@ class TestSiteConfig:
 
 @pytest.mark.django_db
 class TestDefaultResponses:
-    def test_fetch_default_reply_length(self):
-        assert 160 == models.fetch_default_resp_length()
-
     def test_display(self):
         assert "Default Responses" == str(models.DefaultResponses.get_solo())

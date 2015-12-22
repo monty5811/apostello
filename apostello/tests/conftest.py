@@ -14,9 +14,7 @@ from apostello.models import *
 
 @pytest.fixture
 def recipients():
-    """
-    Create a bunch of recipients for testing.
-    """
+    """Create a bunch of recipients for testing."""
     calvin = Recipient.objects.create(first_name="John",
                                       last_name="Calvin",
                                       number='+447927401749')
@@ -51,9 +49,7 @@ def recipients():
 @pytest.mark.usefixtures("recipients")
 @pytest.fixture
 def groups(recipients):
-    """
-    Creates some groups with recipients.
-    """
+    """Create some groups with recipients."""
     test_group = RecipientGroup.objects.create(name="Test Group",
                                                description="This is a test group",
                                                )
@@ -78,11 +74,7 @@ def groups(recipients):
 
 @pytest.fixture
 def smsin():
-    """
-    Creates some messages.
-
-    Numbers match users.
-    """
+    """Create some messages."""
     sms1 = SmsInbound.objects.create(content='test message',
                                      time_received=timezone.now(),
                                      sender_name="John Calvin",
@@ -115,7 +107,7 @@ def smsin():
 @pytest.fixture
 @pytest.mark.usefixtures("recipients", "groups")
 def smsout(recipients, groups):
-    """Creates a single outbound message"""
+    """Create a single outbound message."""
     smsout = SmsOutbound.objects.create(sid='123456',
                                         content='test',
                                         sent_by='test',
@@ -128,7 +120,7 @@ def smsout(recipients, groups):
 
 @pytest.fixture
 def keywords():
-    """Creates various keywords for testing different options"""
+    """Create various keywords for testing different options."""
     # keywords:
     test = Keyword.objects.create(
         keyword="test",
@@ -252,7 +244,7 @@ def keywords():
 @pytest.mark.usefixtures("recipients", "keywords")
 @pytest.fixture()
 def users(recipients, keywords):
-    """Create apostello users"""
+    """Create apostello users."""
     user = User.objects.create_user(username='test',
                                     email='test@example.com',
                                     password='top_secret')

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Settings used for local development."""
 from .common import *
 
 DEBUG = True

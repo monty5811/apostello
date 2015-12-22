@@ -27,9 +27,7 @@ from apostello.validators import (TWILIO_INFO_WORDS, TWILIO_START_WORDS,
 
 
 class RecipientGroup(models.Model):
-    """
-    Stores groups of recipients.
-    """
+    """Stores groups of recipients."""
     is_archived = models.BooleanField("Archived", default=False)
     name = models.CharField(
         "Name of group",
@@ -43,34 +41,40 @@ class RecipientGroup(models.Model):
     )
 
     def send_message(self, content, sent_by, eta=None):
-        """Sends message to group"""
+        """Send message to group."""
         group_send_message_task.delay(content, self.name, sent_by, eta)
 
     def archive(self):
-        """Archives the group"""
+        """Archive the group."""
         self.is_archived = True
         self.save()
 
-    def all_recipients(self):
-        return self.recipient_set.all()
-
+    @property
     def all_recipients_names(self):
+        """List of the names of recipients."""
         return [str(x) for x in self.recipient_set.all()]
 
     def calculate_cost(self):
-        """Calculates cost of sending to this group"""
+        """Calculate the cost of sending to this group."""
         return settings.SENDING_COST * self.recipient_set.all().count()
 
+    @cached_property
     def get_absolute_url(self):
+        """Url for this group."""
         return reverse('group', args=[str(self.pk)])
 
+    @cached_property
     def get_api_url(self):
+        """Url for group list api end point."""
         return reverse('api:group', args=[str(self.pk)])
 
+    @cached_property
     def get_table_url(self):
+        """Url for group list page."""
         return reverse('recipient_groups')
 
     def __str__(self):
+        """Pretty representation."""
         return self.name
 
     class Meta:
@@ -78,9 +82,7 @@ class RecipientGroup(models.Model):
 
 
 class ElvantoGroup(models.Model):
-    """
-    Stores details of Elvanto Groups.
-    """
+    """Stores details of Elvanto Groups."""
     sync = models.BooleanField("Automatic Sync", default=False)
     name = models.CharField("Group Name", max_length=255)
     e_id = models.CharField("Elvanto ID", max_length=36, unique=True)
@@ -88,9 +90,9 @@ class ElvantoGroup(models.Model):
 
     def create_apostello_group(self):
         """
-        Returns the internal apostello group.
+        Return the internal apostello group.
 
-        Creates it if it does not already exist
+        Creates it if it does not already exist.
         """
         grp = RecipientGroup.objects.get_or_create(name=self.apostello_group_name)[0]
         grp.description = 'Imported from Elvanto'
@@ -98,7 +100,7 @@ class ElvantoGroup(models.Model):
         return grp
 
     def pull(self):
-        """Pulls group from Elvanto into related apostello group."""
+        """Pull group from Elvanto into related apostello group."""
         apostello_group = self.create_apostello_group()
         e_api = elvanto()
         data = e_api._Post("groups/getInfo", id=self.e_id, fields=['people'])
@@ -115,6 +117,7 @@ class ElvantoGroup(models.Model):
 
     @staticmethod
     def add_person(grp, prsn):
+        """Add person to group (and apostello if required)."""
         try:
             number = try_both_num_fields(prsn['mobile'], prsn['phone'])
         except NotValidPhoneNumber:
@@ -130,9 +133,7 @@ class ElvantoGroup(models.Model):
 
     @staticmethod
     def fetch_all_groups():
-        """
-        Pulls all group names and ids from Elvanto.
-        """
+        """Pull all group names and ids from Elvanto."""
         e_api = elvanto()
         data = e_api._Post("groups/getAll")
         if data['status'] != 'ok':
@@ -145,9 +146,7 @@ class ElvantoGroup(models.Model):
 
     @staticmethod
     def pull_all_groups():
-        """
-        Pulls people from groups and updates the related apostello group.
-        """
+        """Pull people from groups and updates the related apostello group."""
         for grp in ElvantoGroup.objects.all():
             if grp.sync:
                 try:
@@ -166,13 +165,12 @@ class ElvantoGroup(models.Model):
         return '[E] {0}'.format(self.name)
 
     def __str__(self):
+        """Pretty representation."""
         return self.apostello_group_name
 
 
 class Recipient(models.Model):
-    """
-    Stores the name and number of recipeints.
-    """
+    """Stores the name and number of recipients."""
     is_archived = models.BooleanField("Archived", default=False)
     is_blocking = models.BooleanField(
         "Blocking",
@@ -198,14 +196,19 @@ class Recipient(models.Model):
 
     def personalise(self, message):
         """
-        Personalises outgoing message:
-        any occurence of "%name" will be replaced with
-        the Recipient's first name
+        Personalise outgoing message.
+
+        Any occurence of "%name%" will be replaced with the Recipient's first
+        name.
         """
         return message.replace('%name%', self.first_name)
 
     def send_message(self, content='test message', group=None, sent_by='', eta=None):
-        """Sends message"""
+        """
+        Send SMS to an individual.
+
+        If the person is blocking us, we skip them.
+        """
         if self.is_blocking:
             return
         elif eta is None:
@@ -222,28 +225,36 @@ class Recipient(models.Model):
             )
 
     def archive(self):
-        """Archives recipient"""
+        """Archive the recipient and removes it from groups."""
         self.is_archived = True
         self.groups.clear()
         self.save()
 
+    @cached_property
     def get_absolute_url(self):
+        """Url for this recipient."""
         return reverse('recipient', args=[str(self.pk)])
 
+    @cached_property
     def get_api_url(self):
+        """Url for recipient list api end point."""
         return reverse('api:recipient', args=[str(self.pk)])
 
+    @cached_property
     def get_table_url(self):
+        """Url for recipient list page."""
         return reverse('recipients')
 
     @cached_property
     def full_name(self):
+        """Recipient's full name."""
         return u"{fn} {ln}".format(
             fn=self.first_name,
             ln=self.last_name
         )
 
     def __str__(self):
+        """Pretty representation."""
         return self.full_name
 
     class Meta:
@@ -251,9 +262,7 @@ class Recipient(models.Model):
 
 
 class Keyword(models.Model):
-    """
-    Stores a keyword with its related data.
-    """
+    """Stores a keyword with its related data."""
     is_archived = models.BooleanField("Archived", default=False)
     keyword = models.SlugField(
         "Keyword",
@@ -320,9 +329,9 @@ class Keyword(models.Model):
     )
 
     def construct_reply(self, sender):
-        """Makes reply to an incoming message"""
+        """Make reply to an incoming message."""
         # check if keyword is active
-        if not self.is_live():
+        if not self.is_live:
             if self.deactivated_response != '' and timezone.now() > self.deactivate_time:
                 reply = sender.personalise(self.deactivated_response)
             elif self.too_early_response != '' and timezone.now() < self.activate_time:
@@ -340,47 +349,50 @@ class Keyword(models.Model):
 
         return reply
 
+    @property
     def is_live(self):
-        """Determines if keyword is active"""
+        """Is keyword active."""
         started = timezone.now() > self.activate_time
         if self.deactivate_time is None:
             not_ended = True
         else:
             not_ended = timezone.now() < self.deactivate_time
         return started and not_ended
-    is_live.boolean = True
 
     def fetch_matches(self):
-        """Fetches un-archived messages that match keyword"""
+        """Fetch un-archived messages that match keyword."""
         return SmsInbound.objects.filter(
             matched_keyword=self.keyword,
             is_archived=False
         )
 
     def fetch_archived_matches(self):
-        """Fetches archived messages that match keyword"""
+        """Fetch archived messages that match keyword."""
         return SmsInbound.objects.filter(
             matched_keyword=self.keyword,
             is_archived=True
         )
 
+    @property
     def num_matches(self):
-        """Fetches number of un-archived messages that match keyword"""
+        """Fetch number of un-archived messages that match keyword."""
         return self.fetch_matches().count()
 
+    @property
     def num_archived_matches(self):
-        """Fetches number of archived messages that match keyword"""
+        """Fetch number of archived messages that match keyword."""
         return self.fetch_archived_matches().count()
 
+    @property
     def is_locked(self):
-        """Determines if keyword is locked"""
+        """Is keyword is locked."""
         if self.owners.all().count() > 0:
             return True
         else:
             return False
 
     def can_user_access(self, user):
-        """Checks if user is allowed to access this keyword"""
+        """Check if user is allowed to access this keyword."""
         if user in self.owners.all():
             return True
         elif user.is_staff:
@@ -389,39 +401,47 @@ class Keyword(models.Model):
             return False
 
     def archive(self):
-        """Archives this keyword"""
+        """Archive this keyword and all matches."""
         self.is_archived = True
         self.save()
         for sms in self.fetch_matches():
             sms.archive()
 
     def clean(self):
+        """Ensure we do not start before we finish."""
         if self.deactivate_time is None:
             return
         if self.activate_time > self.deactivate_time:
             raise ValidationError("The start time must be before the end time!")
 
     def save(self, force_insert=False, force_update=False, *args, **kwargs):
-        # force keywords to be lower case on save
+        """Force lower case keywords."""
         self.keyword = self.keyword.lower()
         super(Keyword, self).save(force_insert, force_update, *args, **kwargs)
 
+    @cached_property
     def get_absolute_url(self):
+        """Url for this group."""
         return reverse('keyword', kwargs={'pk': str(self.pk)})
 
+    @cached_property
     def get_api_url(self):
+        """Url for keyword list api end point."""
         return reverse('api:keyword', args=[str(self.pk)])
 
+    @cached_property
     def get_table_url(self):
+        """Url for keyword list page."""
         return reverse('keywords')
 
     @cached_property
     def get_responses_url(self):
+        """Url for keyword responses list page."""
         return reverse('keyword_responses', args=[str(self.pk)])
 
     @staticmethod
     def _match(sms):
-        """Matches keyword or raises exception"""
+        """Match keyword or raises exception."""
         if sms == "":
             raise NoKeywordMatchException
         if sms.lower().strip().startswith(TWILIO_STOP_WORDS):
@@ -443,7 +463,7 @@ class Keyword(models.Model):
 
     @staticmethod
     def match(sms):
-        """Matches keyword at start of sms"""
+        """Match keyword at start of sms."""
         try:
             return Keyword._match(sms)
         except NoKeywordMatchException:
@@ -451,7 +471,7 @@ class Keyword(models.Model):
 
     @staticmethod
     def lookup_colour(sms):
-        """Generates colour for sms"""
+        """Generate. colour for sms table."""
         keyword = Keyword.match(sms)
 
         if keyword == 'stop':
@@ -465,12 +485,17 @@ class Keyword(models.Model):
 
     @staticmethod
     def get_log_link(k):
+        """Retreive link to keyword log.
+
+        Static method as it may also be called with a "No Match" string.
+        """
         try:
             return k.get_responses_url
         except AttributeError:
             return '#'
 
     def __str__(self):
+        """Pretty representation."""
         return self.keyword
 
     class Meta:
@@ -505,19 +530,26 @@ class SmsInbound(models.Model):
     )
 
     def archive(self):
+        """Archive the SMS."""
         self.is_archived = True
         self.display_on_wall = False
         self.save()
 
     def __str__(self):
+        """Pretty representation."""
         return self.content
 
     @cached_property
     def sender_url(self):
-        return Recipient.objects.get(number=self.sender_num).get_absolute_url()
+        """Url for message sender."""
+        return Recipient.objects.get(number=self.sender_num).get_absolute_url
 
     def reimport(self):
-        """Allow manual retrieval of a message from twilio in case of server downtime"""
+        """
+        Manual retrieval of a message from twilio in case of server downtime.
+
+        Note that the message will not be replied to.
+        """
         matched_keyword = Keyword.match(self.content.strip())
         self.matched_keyword = str(matched_keyword)
         self.matched_colour = Keyword.lookup_colour(self.content.strip())
@@ -527,6 +559,7 @@ class SmsInbound(models.Model):
         self.save()
 
     def save(self, *args, **kwargs):
+        """Override save method to invalidate cache."""
         super(SmsInbound, self).save(*args, **kwargs)
         cache.set('live_wall', None, 0)
 
@@ -535,9 +568,7 @@ class SmsInbound(models.Model):
 
 
 class SmsOutbound(models.Model):
-    """
-    An SmsOutbound is an SMS that has been sent out by the app.
-    """
+    """An SmsOutbound is an SMS that has been sent out by the app."""
     sid = models.CharField(
         "SID",
         max_length=34,
@@ -568,11 +599,13 @@ class SmsOutbound(models.Model):
     )
 
     def __str__(self):
+        """Pretty representation."""
         return self.content
 
     @cached_property
     def recipient_url(self):
-        return self.recipient.get_absolute_url()
+        """Url for message recipient."""
+        return self.recipient.get_absolute_url
 
     class Meta:
         ordering = ['-time_sent']
@@ -605,7 +638,7 @@ class SiteConfiguration(SingletonModel):
         blank=True,
         help_text='Email to send emails from'
     )
-    slack_webhook = models.URLField(
+    slack_url = models.URLField(
         blank=True,
         help_text='Post all incoming messages to this slack hook. Leave blank to disable.'
     )
@@ -615,15 +648,11 @@ class SiteConfiguration(SingletonModel):
     )
 
     def __str__(self):
+        """Pretty representation."""
         return u"Site Configuration"
 
     class Meta:
         verbose_name = "Site Configuration"
-
-
-def fetch_default_resp_length():
-    config = SiteConfiguration.get_solo()
-    return config.sms_char_limit
 
 
 class DefaultResponses(SingletonModel):
@@ -677,6 +706,7 @@ class DefaultResponses(SingletonModel):
     )
 
     def __str__(self):
+        """Pretty representation."""
         return u"Default Responses"
 
     class Meta:
@@ -707,19 +737,21 @@ class UserProfile(models.Model):
     can_import = models.BooleanField(default=False)
 
     def __str__(self):
+        """Pretty representation."""
         return "Profile: " + str(self.user)
 
     def save(self, *args, **kwargs):
+        """Override save method to set approved status and invalidate navbar cache."""
         if self.pk is None:
+            # on first save, approve whitelisted domains
             try:
-                # on first save, approve whitelisted domains
                 email = self.user.email
                 email_domain = email.split('@')[1]
                 safe_domains = settings.WHITELISTED_LOGIN_DOMAINS
                 if email_domain in safe_domains:
                     self.approved = True
             except IndexError:
-                # no email adress
+                # no email adress, leave as unapproved
                 pass
         else:
             # any other save, we want to refresh navbar:

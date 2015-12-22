@@ -61,9 +61,9 @@ class TestApi:
         e_group = ElvantoGroup.objects.get(name='England')
         e_group.pull()
         a_group = RecipientGroup.objects.get(name='[E] England')
-        assert 'John Owen' in a_group.all_recipients_names()
-        assert str(a_group.all_recipients()[0]) == 'John Owen'
-        assert str(a_group.all_recipients()[0].number) == '+447902546589'
+        assert 'John Owen' in a_group.all_recipients_names
+        assert str(a_group.recipient_set.all()[0]) == 'John Owen'
+        assert str(a_group.recipient_set.all()[0].number) == '+447902546589'
 
     def test_pull_all_groups(self):
         ElvantoGroup.fetch_all_groups()
@@ -77,6 +77,6 @@ class TestApi:
         e_group = ElvantoGroup.objects.get(name='England')
         e_group.pull()
         a_group = RecipientGroup.objects.get(name='[E] England')
-        assert 'John Owen' in a_group.all_recipients_names()
-        assert str(a_group.all_recipients()[0]) == 'John Owen'
-        assert str(a_group.all_recipients()[0].number) == '+447902546589'
+        assert 'John Owen' in a_group.all_recipients_names
+        assert str(a_group.recipient_set.all()[0]) == 'John Owen'
+        assert str(a_group.recipient_set.all()[0].number) == '+447902546589'

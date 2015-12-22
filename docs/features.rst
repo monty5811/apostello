@@ -21,7 +21,7 @@ Special Keywords
 
 There is a small set of reserved keywords, some by Twilio and some by apostello.
 
-* Twilio's reserved keywords can be found here:
+* Twilio's reserved keywords can be found `here <https://www.twilio.com/help/faq/sms/does-twilio-support-stop-block-and-cancel-aka-sms-filtering>`_.
 * apostello also reserves the keyword **name**. Any SMS that matches **name** will be parsed for a name and used to update the name associated with that contact in the DB. If the parsing fails, then the contact is sent another message asking them to try again.
 
 Custom Keywords

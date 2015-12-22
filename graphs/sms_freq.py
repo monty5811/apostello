@@ -6,7 +6,8 @@ from apostello.models import SmsInbound, SmsOutbound
 
 def sms_graph_data(direction='in'):
     """
-    Calculates the SMS activity from the past 30 days.
+    Calculate the SMS activity from the past 30 days.
+
     Returns a list of ints - one for each day. Value is the number of messages.
     """
     if direction == 'in':

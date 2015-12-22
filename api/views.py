@@ -25,6 +25,7 @@ class ApiCollection(APIView):
     filters = {}
 
     def get(self, request, format=None):
+        """Handle get requests."""
         if self.related_field is None:
             objs = self.model_class.objects.all()
         else:
@@ -43,13 +44,13 @@ class ApiMember(APIView):
     serializer_class = None
 
     def get(self, request, format=None, **kwargs):
+        """Handle get requests."""
         obj = get_object_or_404(self.model_class, pk=kwargs['pk'])
-
         serializer = self.serializer_class(obj)
         return Response(serializer.data)
 
     def post(self, request, format=None, **kwargs):
-        """Handles all the toggle buttons."""
+        """Handle toggle buttons."""
         pk = kwargs['pk']
         reingest_sms = True if request.data.get('reingest', False) == 'true' else False
         deal_with_sms = request.data.get('deal_with')
@@ -87,19 +88,23 @@ class ApiMember(APIView):
 
 
 class ApiCollectionRecentSms(APIView):
+    """SMS collection for a single recipient."""
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None, **kwargs):
+        """Handle get requests."""
         objs = SmsInbound.objects.filter(sender_num=Recipient.objects.get(pk=kwargs['pk']).number)
         serializer = SmsInboundSerializer(objs, many=True)
         return Response(serializer.data)
 
 
 class ApiCollectionKeywordSms(APIView):
+    """SMS collection for a single keyword."""
     permission_classes = (IsAuthenticated,)
     archive = False
 
     def get(self, request, format=None, **kwargs):
+        """Handle get requests."""
         keyword_obj = Keyword.objects.get(pk=kwargs['pk'])
         self.check_object_permissions(request, keyword_obj)
         objs = SmsInbound.objects.filter(
@@ -114,9 +119,11 @@ class ApiCollectionKeywordSms(APIView):
 
 
 class ApiCollectionAllWall(APIView):
+    """SMS collection for a live wall."""
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None, **kwargs):
+        """Handle get requests."""
         cache_key = 'live_wall'
         data = cache.get(cache_key)
         if data is None:
@@ -131,16 +138,20 @@ class ApiCollectionAllWall(APIView):
 
 
 class ElvantoPullButton(LoginRequiredMixin, ProfilePermsMixin, View):
+    """View for elvanto pull button."""
     required_perms = ['can_see_groups']
 
     def post(self, request, format=None, **kwargs):
+        """Handle post requests."""
         pull_elvanto_groups.delay(force=True)
         return JsonResponse({'status': 'pulling'})
 
 
 class ElvantoFetchButton(LoginRequiredMixin, ProfilePermsMixin, View):
+    """View for elvanto fetch button."""
     required_perms = ['can_see_groups']
 
     def post(self, request, format=None, **kwargs):
+        """Handle post requests."""
         fetch_elvanto_groups.delay(force=True)
         return JsonResponse({'status': 'fetching'})

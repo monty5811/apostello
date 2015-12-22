@@ -13,6 +13,7 @@ admin.site.register(models.DefaultResponses, SingletonModelAdmin)
 
 @admin.register(models.SmsOutbound)
 class SmsOutboundAdmin(admin.ModelAdmin):
+    """Admin class for apostello.models.SmsOutbound."""
     list_display = (
         'content',
         'recipient',
@@ -24,6 +25,7 @@ class SmsOutboundAdmin(admin.ModelAdmin):
 
 @admin.register(models.SmsInbound)
 class SmsInboundAdmin(admin.ModelAdmin):
+    """Admin class for apostello.models.SmsInbound."""
     list_display = (
         'content',
         'sender_name',
@@ -35,6 +37,7 @@ class SmsInboundAdmin(admin.ModelAdmin):
 
 @admin.register(models.Keyword)
 class KeywordAdmin(admin.ModelAdmin):
+    """Admin class for apostello.models.Keyword."""
     list_display = (
         'keyword',
         'is_live',
@@ -50,6 +53,7 @@ class KeywordAdmin(admin.ModelAdmin):
 
 @admin.register(models.Recipient)
 class RecipientAdmin(admin.ModelAdmin):
+    """Admin class for apostello.models.Recipient."""
     list_display = (
         'full_name',
         'number',
@@ -60,6 +64,7 @@ class RecipientAdmin(admin.ModelAdmin):
 
 @admin.register(models.RecipientGroup)
 class RecipientGroupAdmin(admin.ModelAdmin):
+    """Admin class for apostello.models.RecipientGroup."""
     list_display = (
         'name',
         'description',
@@ -69,6 +74,7 @@ class RecipientGroupAdmin(admin.ModelAdmin):
 
 @admin.register(models.ElvantoGroup)
 class ElvantoGroupAdmin(admin.ModelAdmin):
+    """Admin class for apostello.models.ElvantoGroup."""
     list_display = (
         'name',
         'sync',
@@ -80,10 +86,12 @@ admin.site.unregister(User)
 
 
 class UserProfileInline(admin.StackedInline):
+    """Inline for apostello.models.UserProfile."""
     model = models.UserProfile
 
 
 class UserProfileAdmin(UserAdmin):
+    """Admin class for apostello.models.UserProfile."""
     inlines = [UserProfileInline, ]
 
 admin.site.register(User, UserProfileAdmin)

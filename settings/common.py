@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Common settings module."""
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 

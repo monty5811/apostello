@@ -11,8 +11,9 @@ non_gsm_regex = re.compile(r'[^\w@?£!1$"¥#è?¤é%ù&ì\\ò(Ç)*:Ø+;ÄäøÆ,
 
 def exists_and_archived(form, model_class, identifier):
     """
-    Checks if a user tries to create a Person, Group or Keyword
-    that existed in the past, but is now archived.
+    Check if a user tries to create an object is now archived.
+
+    Works for Groups, Recipients and Keywords.
     Returns the instance of the existing Person (etc) for editing if it exists,
     otherwise returns None.
     """
@@ -33,6 +34,7 @@ def exists_and_archived(form, model_class, identifier):
 
 
 def fetch_default_reply(msg=''):
+    """Fetch default reply from database."""
     from apostello.models import DefaultResponses
     replies = DefaultResponses.get_solo().__dict__
     return replies[msg]

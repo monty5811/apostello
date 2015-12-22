@@ -26,6 +26,8 @@ os.environ['TWILIO_ACCOUNT_SID'] = 'docs'
 os.environ['TWILIO_FROM_NUM'] = 'docs'
 os.environ['COUNTRY_CODE'] = '44'
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings.test'
+import django
+django.setup()
 
 import apostello
 

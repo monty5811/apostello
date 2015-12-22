@@ -16,7 +16,7 @@ from twilio.rest.exceptions import TwilioRestException
 
 @task()
 def group_send_message_task(body, group_name, sent_by, eta):
-    """Send message to all members of group"""
+    """Send message to all members of group."""
     from apostello.models import Recipient, RecipientGroup
     group = RecipientGroup.objects.filter(name=group_name, is_archived=False)
 
@@ -29,7 +29,7 @@ def group_send_message_task(body, group_name, sent_by, eta):
 
 @task()
 def recipient_send_message_task(recipient_pk, body, group, sent_by):
-    """Send a message asynchronously"""
+    """Send a message asynchronously."""
     from apostello.models import Recipient
     recipient = Recipient.objects.get(pk=recipient_pk)
     if recipient.is_archived:
@@ -67,18 +67,21 @@ def recipient_send_message_task(recipient_pk, body, group, sent_by):
 
 @task()
 def check_incoming_log(page_id=0, fetch_all=False):
+    """Update incoming log."""
     from apostello.logs import check_incoming_log
     check_incoming_log(page_id=page_id, fetch_all=fetch_all)
 
 
 @task()
 def check_outgoing_log(page_id=0, fetch_all=False):
+    """Update outgoing log."""
     from apostello.logs import check_outgoing_log
     check_outgoing_log(page_id=page_id, fetch_all=fetch_all)
 
 
 @task()
 def log_msg_in(p, t, from_pk):
+    """Log incoming message."""
     from apostello.models import Keyword, SmsInbound, Recipient
     from_ = Recipient.objects.get(pk=from_pk)
     matched_keyword = Keyword.match(p['Body'].strip())
@@ -96,6 +99,7 @@ def log_msg_in(p, t, from_pk):
 
 @task()
 def update_msgs_name(person_pk):
+    """Back date sender_name field on inbound sms."""
     from apostello.models import Recipient, SmsInbound
     person_ = Recipient.objects.get(pk=person_pk)
     name = str(person_)
@@ -109,6 +113,7 @@ def update_msgs_name(person_pk):
 
 @task()
 def send_async_mail(subject, body, to):
+    """Send email."""
     from apostello.models import SiteConfiguration
     from_ = SiteConfiguration.get_solo().from_email
     send_mail(subject, body, from_, to)
@@ -116,6 +121,7 @@ def send_async_mail(subject, body, to):
 
 @task()
 def notify_office_mail(subject, body):
+    """Send email to office."""
     from apostello.models import SiteConfiguration
     to_ = SiteConfiguration.get_solo().office_email
     send_async_mail(
@@ -127,6 +133,7 @@ def notify_office_mail(subject, body):
 
 @task()
 def warn_on_blacklist(recipient_pk):
+    """Send email to office when we discover we are blacklisted."""
     from apostello.models import Recipient
     recipient = Recipient.objects.get(pk=recipient_pk)
     notify_office_mail.delay(
@@ -140,6 +147,7 @@ def warn_on_blacklist(recipient_pk):
 
 @task()
 def warn_on_blacklist_receipt(recipient_pk, sms):
+    """Send email to office on reciept of message from a blacklister."""
     from apostello.models import Recipient
     recipient = Recipient.objects.get(pk=recipient_pk)
     if recipient.is_blocking:
@@ -157,6 +165,7 @@ def warn_on_blacklist_receipt(recipient_pk, sms):
 
 @periodic_task(run_every=(crontab(hour="21", minute="30", day_of_week="*")))
 def send_keyword_digest():
+    """Send daily digest email."""
     from apostello.models import Keyword
     # http://celery.readthedocs.org/en/latest/userguide/periodic-tasks.html
     for keyword in Keyword.objects.filter(is_archived=False):
@@ -183,6 +192,7 @@ def send_keyword_digest():
 
 @task()
 def post_to_slack(msg):
+    """Post message to slack webhook."""
     from apostello.models import SiteConfiguration
     config = SiteConfiguration.get_solo()
     url = config.slack_url
@@ -195,7 +205,7 @@ def post_to_slack(msg):
 # Elvanto import
 @periodic_task(run_every=(crontab(hour="2", minute="30", day_of_week="*")))
 def fetch_elvanto_groups(force=False):
-    """Fetches all Elvanto groups"""
+    """Fetch all Elvanto groups."""
     from apostello.models import SiteConfiguration
     config = SiteConfiguration.get_solo()
     if force or config.sync_elvanto:
@@ -205,7 +215,7 @@ def fetch_elvanto_groups(force=False):
 
 @periodic_task(run_every=(crontab(hour="3", minute="0", day_of_week="*")))
 def pull_elvanto_groups(force=False):
-    """Pulls all the Elvanto groups that are set to sync"""
+    """Pull all the Elvanto groups that are set to sync."""
     from apostello.models import SiteConfiguration
     config = SiteConfiguration.get_solo()
     if force or config.sync_elvanto:

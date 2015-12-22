@@ -6,6 +6,7 @@ from django.dispatch import receiver
 
 @receiver(user_signed_up)
 def email_admin_on_signup(request, user, **kwargs):
+    """Email office on new user sign up."""
     body = ("New User Signed Up: {}\n\n"
             "Please go to the admin page to approve their account.\n"
             "If you do not approve their account, they will be unable "

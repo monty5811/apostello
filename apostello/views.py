@@ -27,13 +27,12 @@ from apostello.utils import exists_and_archived
 
 
 class SimpleView(LoginRequiredMixin, ProfilePermsMixin, View):
-    """
-    Simple view that can ensures user is logged in and has permissions.
-    """
+    """Simple view that can ensures user is logged in and has permissions."""
     template_name = ''
     required_perms = []
 
     def get(self, request, *args, **kwargs):
+        """Handle get requests."""
         context = dict()
         if "recipients" in self.template_name:
             context['archived_contacts'] = Recipient.objects.filter(is_archived=True).count()
@@ -43,18 +42,18 @@ class SimpleView(LoginRequiredMixin, ProfilePermsMixin, View):
 
 
 class SendAdhoc(LoginRequiredMixin, ProfilePermsMixin, View):
-    """
-    Displays form for sending messages to individuals or ad-hoc groups.
-    """
+    """Display form for sending messages to individuals or ad-hoc groups."""
     required_perms = []
     context = {'hide_menu': True}
 
     def get(self, request, *args, **kwargs):
+        """Display sending form."""
         context = self.context
         context['form'] = SendAdhocRecipientsForm
         return render(request, "apostello/send_adhoc.html", context)
 
     def post(self, request, *args, **kwargs):
+        """Handle sending form submission."""
         context = self.context
         form = SendAdhocRecipientsForm(request.POST, ('recipients',))
         if form.is_valid():
@@ -85,19 +84,19 @@ class SendAdhoc(LoginRequiredMixin, ProfilePermsMixin, View):
 
 
 class SendGroup(LoginRequiredMixin, ProfilePermsMixin, View):
-    """
-    Displays form for sending messages to a group.
-    """
+    """Display form for sending messages to a group."""
     required_perms = []
     context = {'hide_menu': True}
 
     def get(self, request, *args, **kwargs):
+        """Display sending form."""
         context = self.context
         context['form'] = SendRecipientGroupForm
         context['group_nums'] = [(x.id, x.calculate_cost) for x in RecipientGroup.objects.all()]
         return render(request, "apostello/send_group.html", context)
 
     def post(self, request, *args, **kwargs):
+        """Handle sending form submission."""
         context = {'hide_menu': True}
         context['group_nums'] = [(x.id, x.calculate_cost) for x in RecipientGroup.objects.all()]
         form = SendRecipientGroupForm(request.POST)
@@ -129,6 +128,12 @@ class SendGroup(LoginRequiredMixin, ProfilePermsMixin, View):
 
 
 class ItemView(LoginRequiredMixin, ProfilePermsMixin, View):
+    """
+    Display item form.
+
+    Used to display the edit and create forms for Groups, Recipients and
+    Keywords.
+    """
     form_class = None
     redirect_url = ''
     identifier = ''
@@ -136,6 +141,7 @@ class ItemView(LoginRequiredMixin, ProfilePermsMixin, View):
     required_perms = []
 
     def get(self, request, *args, **kwargs):
+        """Display item forms."""
         context = dict()
         context['identifier'] = self.identifier
         try:
@@ -159,6 +165,13 @@ class ItemView(LoginRequiredMixin, ProfilePermsMixin, View):
         return render(request, "apostello/item.html", context)
 
     def post(self, request, *args, **kwargs):
+        """
+        Handle form post.
+
+        If an object is created that matches an existing, archived, object, the
+        user will be redirected to the existing object and told how to restore
+        the archived object.
+        """
         try:
             instance = self.model_class.objects.get(pk=kwargs['pk'])  # original instance
             form = self.form_class(request.POST, instance=instance)
@@ -180,7 +193,7 @@ class ItemView(LoginRequiredMixin, ProfilePermsMixin, View):
                         str(new_instance)
                     )
                 )
-                return redirect(new_instance.get_absolute_url())
+                return redirect(new_instance.get_absolute_url)
             except ArchivedItemException:
                 return render(request, "apostello/item.html",
                               dict(form=form,
@@ -194,9 +207,7 @@ class ItemView(LoginRequiredMixin, ProfilePermsMixin, View):
 @keyword_access_check
 @login_required
 def keyword_responses(request, pk, archive=False):
-    """
-    Displays the responses for a single keyword.
-    """
+    """Display the responses for a single keyword."""
     keyword = get_object_or_404(Keyword, pk=pk)
 
     if archive is False and request.method == 'POST':
@@ -217,9 +228,7 @@ def keyword_responses(request, pk, archive=False):
 @keyword_access_check
 @login_required
 def keyword_csv(request, pk):
-    """
-    Returns a CSV with the responses for a single keyword.
-    """
+    """Return a CSV with the responses for a single keyword."""
     keyword = get_object_or_404(Keyword, pk=pk)
     # Create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(content_type='text/csv')
@@ -238,45 +247,23 @@ def keyword_csv(request, pk):
 @keyword_access_check
 @login_required
 def keyword_wall(request, pk):
-    """
-    Displays the live wall for a single keyword.
-    """
+    """Display the live wall for a single keyword."""
     keyword = get_object_or_404(Keyword, pk=pk)
     return render(request, "apostello/wall.html", {'keyword': keyword})
-
-
-@login_required
-def wall(request):
-    """
-    Displays the live wall for the whole site.
-    """
-    return render(request, "apostello/wall.html", {})
 
 
 @keyword_access_check
 @login_required
 def keyword_wall_curate(request, pk):
-    """
-    Displays the live wall curating interface for a single keyword.
-    """
+    """Display the live wall curating interface for a single keyword."""
     keyword = get_object_or_404(Keyword, pk=pk)
     return render(request, "apostello/wall_curator.html", {'keyword': keyword})
-
-
-@login_required
-def wall_curate(request):
-    """
-    Displays the live wall curating interface for the whole site.
-    """
-    return render(request, "apostello/wall_curator.html", {})
 
 
 @check_user_perms
 @login_required
 def import_recipients(request):
-    """
-    Displays the CSV import form.
-    """
+    """Display the CSV import form."""
     context = {'hide_menu': True}
     if request.method == 'POST':
         form = CsvImport(request.POST)
@@ -320,9 +307,7 @@ def import_recipients(request):
 
 
 class ElvantoImportView(LoginRequiredMixin, ProfilePermsMixin, TemplateView):
-    """
-    Displays the Elvanto import form.
-    """
+    """Display the Elvanto import form."""
     required_perms = []
     template_name = 'apostello/elvanto.html'
 
@@ -330,7 +315,8 @@ class ElvantoImportView(LoginRequiredMixin, ProfilePermsMixin, TemplateView):
 @twilio_view
 def sms(request):
     """
-    Handles all incoming messages from Twilio.
+    Handle all incoming messages from Twilio.
+
     This is the start of the message processing pipeline.
     """
     r = twiml.Response()

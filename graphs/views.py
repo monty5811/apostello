@@ -8,7 +8,7 @@ from .sms_freq import sms_graph_data
 
 
 def recent(request):
-    """Displays the recent SMS activity graph on '/'"""
+    """Display the recent SMS activity graph on home page."""
     bar_chart = pygal.Bar(height=200,
                           style=CleanStyle,
                           margin=15,

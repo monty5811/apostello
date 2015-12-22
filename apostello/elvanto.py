@@ -8,15 +8,15 @@ from apostello.exceptions import NotValidPhoneNumber
 
 
 def elvanto():
-    """Shortcut to create Elvanto API instance"""
+    """Shortcut to create Elvanto API instance."""
     return ElvantoAPI.Connection(APIKey=settings.ELVANTO_KEY)
 
 
 def fix_elvanto_numbers(num_string):
     """
-    Checks if number starts with +447 or 077 and normalises
+    Check if number starts with +447 or 077 and normalises.
 
-    TODO: modify for other locales
+    TODO: modify for other locales.
     """
     number = re.sub("[^0-9]", "", num_string)
     if number.startswith(settings.COUNTRY_CODE + '7'):
@@ -30,10 +30,7 @@ def fix_elvanto_numbers(num_string):
 
 
 def try_both_num_fields(mobile, phone):
-    """
-    Returns a person's phone number by checking both the
-    'mobile' and 'phone' fields.
-    """
+    """Return a person's phone number by checking both the 'mobile' and 'phone' fields."""
     try:
         number = fix_elvanto_numbers(mobile)
     except NotValidPhoneNumber:

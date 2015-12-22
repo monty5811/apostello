@@ -8,6 +8,7 @@ from apostello.models import Keyword, Recipient, SmsInbound, SmsOutbound
 
 
 def handle_incoming_sms(msg):
+    """Add incoming sms to log."""
     sms, created = SmsInbound.objects.get_or_create(sid=msg.sid)
     if created:
         check_next_page = True
@@ -33,6 +34,7 @@ def handle_incoming_sms(msg):
 
 
 def handle_outgoing_sms(msg):
+    """Add outgoing sms to log."""
     try:
         sms, created = SmsOutbound.objects.get_or_create(sid=msg.sid)
         if created:
@@ -57,6 +59,7 @@ def handle_outgoing_sms(msg):
 
 
 def fetch_generator(direction):
+    """Fetch generator from twilio."""
     if direction == 'in':
         return twilio_client.messages.iter(
             to_=settings.TWILIO_FROM_NUM
@@ -69,6 +72,7 @@ def fetch_generator(direction):
 
 
 def fetch_list(direction, page_id):
+    """Fetch list from twilio."""
     if direction == 'in':
         return twilio_client.messages.list(
             page=page_id,
@@ -85,6 +89,7 @@ def fetch_list(direction, page_id):
 
 
 def check_log(direction, sms_handler, page_id, fetch_all):
+    """Abstract check log function."""
     check_next_page = False
     if fetch_all:
         # we want to iterate over all the incoming messages
@@ -113,7 +118,7 @@ def check_log(direction, sms_handler, page_id, fetch_all):
 
 def check_incoming_log(page_id=0, fetch_all=False):
     """
-    Checks Twilio's logs for messages that have been sent to our number.
+    Check Twilio's logs for messages that have been sent to our number.
 
     page_id: Twilio log page to start with.
     fetch_all: If set to True, all messages on Twilio will be checked. If False,
@@ -125,7 +130,7 @@ def check_incoming_log(page_id=0, fetch_all=False):
 
 def check_outgoing_log(page_id=0, fetch_all=False):
     """
-    Checks Twilio's logs for messages that we have sent.
+    Check Twilio's logs for messages that we have sent.
 
     page_id: Twilio log page to start with.
     fetch_all: If set to True, all messages on Twilio will be checked. If False,

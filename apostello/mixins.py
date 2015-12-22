@@ -4,7 +4,8 @@ from apostello.decorators import check_user_perms
 
 class ProfilePermsMixin(object):
     """
-    Checks if a user is staff or has permission.
+    Check if a user is staff or has permission.
+
     Redirects to '/' otherwise.
     """
     @classmethod
