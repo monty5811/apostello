@@ -64,6 +64,12 @@ class RecipientGroup(models.Model):
     def get_absolute_url(self):
         return reverse('group', args=[str(self.pk)])
 
+    def get_api_url(self):
+        return reverse('api:group', args=[str(self.pk)])
+
+    def get_table_url(self):
+        return reverse('recipient_groups')
+
     def __str__(self):
         return self.name
 
@@ -144,7 +150,11 @@ class ElvantoGroup(models.Model):
         """
         for grp in ElvantoGroup.objects.all():
             if grp.sync:
-                grp.pull()
+                try:
+                    grp.pull()
+                except ElvantoException:
+                    # TODO add loggin
+                    pass
 
     @property
     def apostello_group_name(self):
@@ -182,7 +192,7 @@ class Recipient(models.Model):
     number = PhoneNumberField(
         unique=True,
         validators=[not_twilio_num],
-        help_text="Cannot be our number, or we get a SMS loop."
+        help_text="Cannot be our number, or we get an SMS loop."
     )
     groups = models.ManyToManyField(RecipientGroup, blank=True)
 
@@ -219,6 +229,12 @@ class Recipient(models.Model):
 
     def get_absolute_url(self):
         return reverse('recipient', args=[str(self.pk)])
+
+    def get_api_url(self):
+        return reverse('api:recipient', args=[str(self.pk)])
+
+    def get_table_url(self):
+        return reverse('recipients')
 
     @cached_property
     def full_name(self):
@@ -277,7 +293,6 @@ class Keyword(models.Model):
         "Activation Time",
         default=timezone.now,
         help_text='The keyword will not be active before this time and so no messages will be able to match it. Leave blank to activate now.'
-
     )
     deactivate_time = models.DateTimeField(
         "Deactivation Time",
@@ -381,6 +396,8 @@ class Keyword(models.Model):
             sms.archive()
 
     def clean(self):
+        if self.deactivate_time is None:
+            return
         if self.activate_time > self.deactivate_time:
             raise ValidationError("The start time must be before the end time!")
 
@@ -391,6 +408,12 @@ class Keyword(models.Model):
 
     def get_absolute_url(self):
         return reverse('keyword', kwargs={'pk': str(self.pk)})
+
+    def get_api_url(self):
+        return reverse('api:keyword', args=[str(self.pk)])
+
+    def get_table_url(self):
+        return reverse('keywords')
 
     @cached_property
     def get_responses_url(self):

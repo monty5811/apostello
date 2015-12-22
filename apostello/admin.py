@@ -66,6 +66,16 @@ class RecipientGroupAdmin(admin.ModelAdmin):
         'is_archived',
     )
 
+
+@admin.register(models.ElvantoGroup)
+class ElvantoGroupAdmin(admin.ModelAdmin):
+    list_display = (
+        'name',
+        'sync',
+        'e_id',
+        'last_synced',
+    )
+
 admin.site.unregister(User)
 
 

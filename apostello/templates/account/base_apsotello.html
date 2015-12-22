@@ -20,16 +20,17 @@ a:hover {
 div {
     border-radius: 5px;
 }
+.column {
+      max-width: 450px;
+}
 </style>
 </head>
 <body>
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-sm-4 col-sm-offset-4" style="background-color: #5c569c; padding: 10px">
+<div class="ui middle aligned center aligned grid">
+      <div class="left aligned column" style="background-color: #5c569c; padding: 10px">
         {% block content %}
         {% endblock %}
       </div>
-    </div>
   </div>
 <script src="{% static 'js/apostello.min.js' %}"></script>
 </body>

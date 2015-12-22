@@ -1,55 +1,47 @@
 {% extends "apostello/base.html" %}
 {% load staticfiles %}
-{% load bootstrap3 %}
+{% load semanticui %}
 {% block side_bar %}
-<p><a class="btn btn-secondary" href="{% url 'keyword' keyword.id %}">Edit</a></p>
+<a class="item" href="{% url 'keyword' keyword.id %}">Edit</a>
+<div class="divider"></div>
 {%if archive%}
-<p><a class="btn btn-secondary" href="{% url 'keyword_responses' keyword.id %}">Replies ({{ keyword.fetch_matches|length }})</a><p>
+<a class="item" href="{% url 'keyword_responses' keyword.id %}">Replies ({{ keyword.fetch_matches|length }})</a>
 {%else%}
-<p><a class="btn btn-secondary" href="{% url 'keyword_responses_archive' keyword.id %}">Archived Replies ({{ keyword.num_archived_matches }})</a></p>
+<a class="item" href="{% url 'keyword_responses_archive' keyword.id %}">Archived Replies ({{ keyword.num_archived_matches }})</a>
 {%endif%}
-<p><a class="btn btn-secondary" href="{% url 'keyword_csv' keyword.id %}">Export "{{ keyword.keyword }}" responses</a></p>
-<p><a class="btn btn-secondary" href="{% url 'keyword_wall' keyword.id %}">Live Updates</a></p>
-<p><a class="btn btn-secondary" href="{% url 'keyword_wall_curator' keyword.id %}">Live Curator</a></p>
+<div class="divider"></div>
+<a class="item" href="{% url 'keyword_wall' keyword.id %}">Live Updates</a>
+<a class="item" href="{% url 'keyword_wall_curator' keyword.id %}">Live Curator</a>
+<div class="divider"></div>
+<a class="item" href="{% url 'keyword_csv' keyword.id %}">Export "{{ keyword.keyword }}" responses</a>
 {% endblock %}
 {% block content %}
 <h2>{{keyword}} {%if archive%}(Archived){%endif%}</h2>
 
-<div class="input-group"> <span class="input-group-addon">Filter</span>
-    <input id="filter" type="text" class="form-control" placeholder="Type here...">
-</div>
+{% include 'apostello/includes/table_filter.html' %}
 <div id="incoming_keyword_table"></div>
 
 {%if form%}
+<br>
+
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 <form method="post" >
     {% csrf_token %}
-    {% bootstrap_form form  %}
-    {% buttons %}
-        <button type="submit" class="btn btn-danger">
-             Archive all!
-        </button>
-    {% endbuttons %}
+    {{ form|semanticui }}
+    <br>
+    <button type="submit" class="ui red button">Archive all!</button>
 </form>
 {%endif%}
 {% endblock %}
 {% block morejs %}
-{{form.media}}
-<script src="{%static 'js/tables/keyword_resp_table.js'%}"></script>
-{%if archive%}
 <script>
-ReactDOM.render(
-     React.createElement(KeywordRespTables, {url:"{%url 'api:keyword_sms_archive' keyword.id %}", pollInterval: 20000}, viewingArchive=true),
-     document.getElementById('incoming_keyword_table')
-    );
+    {% if archive %}
+    var _url = "{%url 'api:keyword_sms_archive' keyword.id %}",
+        _viewingArchive = true;
+    {% else %}
+    var _url = "{%url 'api:keyword_sms' keyword.id %}",
+        _viewingArchive = false;
+    {% endif %}
 </script>
-{%else%}
-<script>
-ReactDOM.render(
-     React.createElement(KeywordRespTables, {url:"{%url 'api:keyword_sms' keyword.id %}", pollInterval: 20000}, viewingArchive=false),
-     document.getElementById('incoming_keyword_table')
-    );
-</script>
-{%endif%}
-
+<script src="{%static 'js/keyword_resp_table.js'%}"></script>
 {% endblock %}

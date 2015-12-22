@@ -1,17 +1,9 @@
 {% extends "apostello/base.html" %}
 {% load staticfiles %}
 {% block content %}
-<div class="input-group"> <span class="input-group-addon">Filter</span>
-    <input id="filter" type="text" class="form-control" placeholder="Type here...">
-</div>
+{% include 'apostello/includes/table_filter.html' %}
 <div id="outgoing_table"></div>
 {% block morejs %}
-<script src="{%static 'js/tables/outgoing_table.js'%}"></script>
-<script>
-ReactDOM.render(
-     React.createElement(OutTable, {url:"{%url 'api:out_log' %}", pollInterval: 20000}),
-     document.getElementById('outgoing_table')
-    );
-</script>
+<script src="{%static 'js/outgoing_table.js'%}"></script>
 {% endblock %}
 {% endblock %}

@@ -1,48 +1,56 @@
 {% load staticfiles %}{% load cache %}
-{% cache 0 navbar request.user %}
+{% cache 1800 navbar request.user %}
 {% with profile=request.user.profile %}
-<nav class="navbar navbar-default" role="navigation">
-  <button class="navbar-toggler hidden-sm-up" type="button" data-toggle="collapse" data-target="#exCollapsingNavbar2">
-    &#9776;
-  </button>
-  <div class="collapse navbar-toggleable-xs" id="exCollapsingNavbar2">
-      <ul class="nav nav-pills">
-      <li class="nav-item dropdown">
-      <a class="navbar-brand dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Apostello</a>
-        <div class="dropdown-menu">
-            <a class="dropdown-item" href="/">Home</a>
-            {% if request.user.is_staff %}<a class="dropdown-item" href="/admin/">Admin</a>{% endif %}
-            {% if request.user.socialaccount_set|length < 1 %}<a class="dropdown-item" href="/accounts/password/change">Change Password</a>{% endif %}
-            <a class="dropdown-item" href="/accounts/logout/">Logout</a>
-          </div>
-      </li>
-      </ul>
-      <ul class="nav nav-pills">
-        {% if profile.can_send_sms or request.user.is_staff %}
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Send To</a>
-          <div class="dropdown-menu">
-            <a class="dropdown-item" href="{% url 'send_group' %}">Group</a>
-            <a class="dropdown-item" href="{% url 'send_adhoc' %}">Individuals</a>
-          </div>
-        </li>
-        {% endif %}
-        {% if profile.can_see_keywords or request.user.is_staff %}<li class="nav-item"><a class="nav-link" href="{% url 'keywords' %}">Keywords</a></li>{% endif %}
-        {% if profile.can_see_groups or request.user.is_staff %}<li class="nav-item"><a class="nav-link" href="{% url 'recipient_groups' %}">Groups</a></li>{% endif %}
-        {% if profile.can_see_contact_names or request.user.is_staff %}<li class="nav-item"><a class="nav-link" href="{% url 'recipients' %}">Contacts</a></li>{% endif %}
-        {% if profile.can_see_outgoing or request.user.is_staff %}<li class="nav-item"><a class="nav-link" href="{% url 'outgoing' %}">Outgoing</a></li>{% endif %}
-        {% if profile.can_see_incoming or request.user.is_staff %}<li class="nav-item"><a class="nav-link" href="{%  url 'incoming' %}">Incoming</a></li>{% endif %}
-        {% if profile.can_import or request.user.is_staff %}
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Tools</a>
-          <div class="dropdown-menu">
-            <a class="dropdown-item" href="{% url 'import_recipients' %}">CSV Import</a>
-            <a class="dropdown-item" href="{% url 'import_elvanto' %}">Elvanto Import</a>
-          </div>
-        </li>
-        {% endif %}
-      </ul>
+<div class="ui stackable inverted violet borderless menu">
+  <div class="ui container">
+    <a href="/" class="header item">
+      Apostello
+    </a>
+    {% if profile.can_send_sms or request.user.is_staff %}
+    <div class="ui simple dropdown item">
+      Send<i class="dropdown icon"></i>
+      <div class="menu">
+        <a class="item" href="{% url 'send_adhoc' %}">Individuals</a>
+        <a class="item" href="{% url 'send_group' %}">Group</a>
+      </div>
     </div>
-</nav>
+    {% endif %}
+    <div class="ui simple dropdown item">
+      Phonebook<i class="dropdown icon"></i>
+      <div class="menu">
+      {% if profile.can_see_contact_names or request.user.is_staff %}<a class="item" href="{% url 'recipients' %}">Contacts</a>{% endif %}
+      {% if profile.can_see_groups or request.user.is_staff %}<a class="item" href="{% url 'recipient_groups' %}">Groups</a>{% endif %}
+      </div>
+    </div>
+    {% if profile.can_see_keywords or request.user.is_staff %}<a class="item" href="{% url 'keywords' %}">Keywords</a>{% endif %}
+    <div class="ui simple dropdown item">
+      Logs<i class="dropdown icon"></i>
+      <div class="menu">
+      {% if profile.can_see_incoming or request.user.is_staff %}<a class="item" href="{%  url 'incoming' %}">Incoming</a>{% endif %}
+      {% if profile.can_see_outgoing or request.user.is_staff %}<a class="item" href="{% url 'outgoing' %}">Outgoing</a>{% endif %}
+      </div>
+    </div>
+    {% if profile.can_import or request.user.is_staff %}
+    <div class="ui simple dropdown item">
+      Tools <i class="dropdown icon"></i>
+      <div class="menu">
+        <div class="header">Import</div>
+        <a class="item" href="{% url 'import_recipients' %}">CSV</a>
+        <a class="item" href="{% url 'import_elvanto' %}">Elvanto</a>
+      </div>
+    </div>
+    {% endif %}
+    <div class="ui simple dropdown float right item">
+      {{user.email}} <i class="dropdown icon"></i>
+      <div class="menu">
+        <div class="header">{{ TWILIO_FROM_NUM }}</div>
+        <div class="divider"></div>
+        {% if request.user.is_staff %}<a class="item" href="/admin/">Admin</a>{% endif %}
+        {% if request.user.socialaccount_set|length < 1 %}<a class="item" href="/accounts/password/change">Change Password</a>{% endif %}
+        <a class="item" href="/accounts/logout/">Logout</a>
+      </div>
+    </div>
+  </div>
+</div>
 {% endwith %}
 {% endcache %}

@@ -1,22 +1,13 @@
 {% extends "apostello/base.html" %}
 {% load staticfiles %}
 {% block side_bar %}
-<p><a class="btn btn-primary" href="{% url 'incoming_wall' %}">Live Updates</a></p>
-<p><a class="btn btn-primary" href="{% url 'incoming_wall_curator' %}">Live Curator</a></p>
+<a class="item" href="{% url 'incoming_wall' %}">Live Updates</a>
+<a class="item" href="{% url 'incoming_wall_curator' %}">Live Curator</a>
 {% endblock %}
 {% block content %}
-<div class="input-group"> <span class="input-group-addon">Filter</span>
-    <input id="filter" type="text" class="form-control" placeholder="Type here...">
-</div>
-
+{% include 'apostello/includes/table_filter.html' %}
 <div id="incoming_table"></div>
 {% endblock %}
 {% block morejs %}
-<script src="{%static 'js/tables/incoming_table.js'%}"></script>
-<script>
-ReactDOM.render(
-     React.createElement(InTable, {url:"{%url 'api:in_log' %}", pollInterval: 20000}),
-     document.getElementById('incoming_table')
-    );
-</script>
+<script src="{% static 'js/incoming_table.js' %}"></script>
 {% endblock %}

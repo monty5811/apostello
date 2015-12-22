@@ -5,8 +5,13 @@ apostello/static/CACHE
 static/CACHE
 
 # front end
-bower_components/
+dist/
 node_modules/
+apostello/assets/semantic/src/themes/
+apostello/assets/semantic/src/definitions/
+apostello/assets/semantic/src/semantic.less
+apostello/assets/semantic/tasks
+apostello/assets/semantic/gulpfile.js
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,24 +1,23 @@
 {% extends "apostello/base.html" %}
-{% load bootstrap3 %}{% load cache %}
+{% load cache %}
 {% block side_bar%}
 {% cache 1800 index_side_bar request.user %}
 {% with profile=request.user.profile %}
-        {% if profile.can_see_keywords or request.user.is_staff %}
-<p><a class="btn btn-success" href="{% url 'keyword' %}">New Keyword</a></p>
-        {% endif %}
-        {% if profile.can_see_contact_names or request.user.is_staff %}
-<p><a class="btn btn-success" href="{% url 'recipient' %}">New Contact</a></p>
-        {% endif %}
-        {% if profile.can_see_groups or request.user.is_staff %}
-<p><a class="btn btn-success" href="{% url 'group' %}">New Group</a></p>
-        {% endif %}
-        {% endwith %}
-        {% endcache %}
+{% if profile.can_see_keywords or request.user.is_staff %}
+<a class="item" href="{% url 'keyword' %}">New Keyword</a>
+{% endif %}
+{% if profile.can_see_contact_names or request.user.is_staff %}
+<a class="item" href="{% url 'recipient' %}">New Contact</a>
+{% endif %}
+{% if profile.can_see_groups or request.user.is_staff %}
+<a class="item" href="{% url 'group' %}">New Group</a>
+{% endif %}
+{% endwith %}
+{% endcache %}
 {% endblock %}
 {% block content %}
-<h1 id="apostello">Apostello</h1>
 
-<p>Welcome to St. Columba's SMS platform.</p>
+<p>Welcome to apostello.</p>
 
 <p>Please bear in mind that each message you send costs <a href="https://www.twilio.com/sms/pricing">money</a>, so please do not send frivolous messages.</p>
 

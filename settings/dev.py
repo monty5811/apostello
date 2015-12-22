@@ -5,7 +5,6 @@ DEBUG = True
 
 TEMPLATES[0]['OPTIONS']['debug'] = True
 
-INSTALLED_APPS += ('debug_toolbar',)
 INTERNAL_IPS = ['*']
 
 ALLOWED_HOSTS = ['*']

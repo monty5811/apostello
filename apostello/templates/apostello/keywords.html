@@ -1,20 +1,12 @@
 {% extends "apostello/base.html" %}
 {% load staticfiles %}
 {% block side_bar %}
-<p><a class="btn btn-success" href="{% url 'keyword' %}">New Keyword</a></p>
+<a class="item" href="{% url 'keyword' %}">New Keyword</a>
 {% endblock %}
 {% block content %}
-<div class="input-group"> <span class="input-group-addon">Filter</span>
-    <input id="filter" type="text" class="form-control" placeholder="Type here...">
-</div>
+{% include 'apostello/includes/table_filter.html' %}
 <div id="keywords_table"></div>
 {%endblock%}
 {% block morejs %}
-<script src="{%static 'js/tables/keywords_table.js'%}"></script>
-<script>
-ReactDOM.render(
-     React.createElement(KeywordsTable, {url:"{%url 'api:keywords' %}", pollInterval: 20000}),
-     document.getElementById('keywords_table')
-    );
-</script>
+<script src="{%static 'js/keywords_table.js'%}"></script>
 {% endblock %}

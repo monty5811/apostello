@@ -1,0 +1,6 @@
+/*******************************
+     User Global Variables
+*******************************/
+@primaryColor       : #5b599c;
+@violet             : #5b599c;
+@defaultBorderRadius: 0em;

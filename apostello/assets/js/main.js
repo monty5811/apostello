@@ -1,3 +1,7 @@
+var jQuery = require('jquery');
+var moment = require('moment');
+var semantic = require('./../semantic/dist/semantic.js');
+
 function getCookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -13,6 +17,7 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
 function csrfSafeMethod(method) {
     // these HTTP methods do not require CSRF protection
     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
@@ -49,4 +54,41 @@ $(document).ready(function() {
             }).show();
         });
     }(jQuery));
+});
+
+$(document).ready(function() {
+    $('input[name$="_time"]').daterangepicker({
+        autoApply: true,
+        autoUpdateInput: true,
+        format: 'YYYY-MM-DD hh:ss',
+        timePicker: true,
+        singleDatePicker: true,
+        timePickerIncrement: 5
+    });
+});
+$(document).ready(function() {
+    $('.dropdown').dropdown({
+        debug: true,
+        label: {
+            transition: 'horizontal flip',
+            duration: 0,
+            variation: false
+        }
+    });
+});
+$(document).ready(function() {
+    console.log('setup checkbox')
+    $('.ui.checkbox')
+        .checkbox({
+            onChecked: function() {
+                var options = $('#members_dropdown > option').toArray().map(function(obj) {
+                    return obj.value
+                });
+                $('#members_dropdown').dropdown('set exactly', options);
+            },
+            onUnchecked: function() {
+                $('#members_dropdown').dropdown('clear')
+            }
+        });
+    console.log('checkbox done')
 });

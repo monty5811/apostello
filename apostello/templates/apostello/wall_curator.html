@@ -5,29 +5,19 @@
 {% include 'apostello/includes/head.html' %}
 </head>
 <body style="background-color: #5c569c">
-<div class="container-fluid">
-  <br>
-  <div class="col-md-10 col-md-offset-1">
-  <div id="curator"></div>
-</div>
-</div>
-<script src="{% static 'js/apostello.min.js' %}"></script>
-<script src="{% static 'js/curate.js' %}"></script>
+<div id="wall"></div>
+<script src="{% static 'js/vendor.bundle.js' %}"></script>
+<script src="{% static 'js/daterangepicker.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
+<script>
+var wall_curate = true,
+     wall_poll_interval = 10000,
 {% if keyword %}
-<script>
-ReactDOM.render(
-     React.createElement(CurateContainer,
-     {curate: true, keyword:"{{keyword}}", pollInterval: 10000, url: "{%url 'api:live_wall' %}"}),
-     document.getElementById('curator')
-);
-</script>
+     wall_keyword = "{{keyword}}",
 {% else %}
-<script>
-ReactDOM.render(
-     React.createElement(CurateContainer,
-     {curate:true, pollInterval: 10000, url: "{%url 'api:live_wall'%}"}),
-     document.getElementById('curator')
-);
-</script>
+     wall_keyword = null,
 {% endif %}
+     wall_url = "{%url 'api:live_wall' %}";
+</script>
+<script src="{% static 'js/curate_container.js' %}"></script>
 </body>

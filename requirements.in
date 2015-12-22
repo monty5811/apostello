@@ -5,14 +5,11 @@ celery
 Django
 django-allauth
 django-appconf
-django-bootstrap3
 django-celery
-django-compressor
-django-datetime-widget
-django-debug-toolbar
 django-extensions
 django-phonenumber-field
-#django-solo
+#django-semanticui-form # replace with - git+git://github.com/monty5811/django-semanticui-form.git@323b0bacce84a3f12301a34113f5555ec3cb4f7a
+django-solo #git+git://github.com/monty5811/django-solo.git@6497f86800084008febbe0f2247d7aa6be4e0d96
 django-twilio
 djangorestframework
 docutils
@@ -37,3 +34,4 @@ python3-memcached
 requests
 selenium
 twilio
+Werkzeug

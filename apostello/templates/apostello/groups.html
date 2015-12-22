@@ -1,22 +1,14 @@
 {% extends "apostello/base.html" %}
 {% load staticfiles %}
 {% block side_bar %}
-<p><a class="btn btn-success" href="{% url 'group' %}">New Group</a></p>
+<a class="item" href="{% url 'group' %}">New Group</a>
 {% endblock %}
 {% block content %}
-<div class="col-sm-8">
-<div class="input-group"> <span class="input-group-addon">Filter</span>
-    <input id="filter" type="text" class="form-control" placeholder="Type here...">
-</div>
+<div class="ten wide column">
+{% include 'apostello/includes/table_filter.html' %}
 <div id="groups_table"></div>
 </div>
 {% endblock %}
 {% block morejs %}
-<script src="{%static 'js/tables/groups_table.js'%}"></script>
-<script>
-ReactDOM.render(
-     React.createElement(GroupTable, {url:"{%url 'api:recipient_groups' %}", pollInterval: 20000}),
-     document.getElementById('groups_table')
-    );
-</script>
+<script src="{%static 'js/groups_table.js'%}"></script>
 {% endblock %}

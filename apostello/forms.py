@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from datetimewidget.widgets import DateTimeWidget
 from django import forms
 
 from apostello.models import Keyword, Recipient, RecipientGroup
@@ -18,11 +17,16 @@ class SendAdhocRecipientsForm(forms.Form):
     recipients = forms.ModelMultipleChoiceField(
         queryset=Recipient.objects.filter(is_archived=False),
         required=True,
-        help_text=''
+        help_text='',
+        widget=forms.SelectMultiple(
+            attrs={
+                "class": "ui compact search dropdown",
+                "multiple": "",
+            }
+        ),
     )
     scheduled_time = forms.DateTimeField(
         required=False,
-        widget=DateTimeWidget(bootstrap_version=3, options={'format': 'yyyy-mm-dd hh:ii'}),
         help_text='Leave this blank to send your message immediately, otherwise select a date and time to schedule your message'
     )
 
@@ -41,11 +45,16 @@ class SendRecipientGroupForm(forms.Form):
             is_archived=False
         ),
         required=True,
-        empty_label='Choose a group...'
+        empty_label='Choose a group...',
+        widget=forms.Select(
+            attrs={
+                "class": "ui fluid dropdown",
+                "id": "id_recipient_group",
+            }
+        ),
     )
     scheduled_time = forms.DateTimeField(
         required=False,
-        widget=DateTimeWidget(bootstrap_version=3, options={'format': 'yyyy-mm-dd hh:ii'}),
         help_text='Leave this blank to send your message immediately, otherwise select a date and time to schedule your message'
     )
 
@@ -66,7 +75,14 @@ class ManageRecipientGroupForm(forms.ModelForm):
         queryset=Recipient.objects.filter(
             is_archived=False
         ),
-        required=False
+        required=False,
+        widget=forms.SelectMultiple(
+            attrs={
+                "class": "ui fluid search dropdown",
+                "multiple": "",
+                "id": "members_dropdown",
+            }
+        ),
     )
 
     def __init__(self, *args, **kwargs):
@@ -95,7 +111,14 @@ class RecipientForm(forms.ModelForm):
         model = Recipient
         exclude = ['is_archived', 'is_blocking']
         widgets = {
-            'number': forms.TextInput(attrs={'placeholder': '+447259006790'})
+            'number': forms.TextInput(attrs={'placeholder': '+447259006790'}),
+            'groups': forms.SelectMultiple(
+                attrs={
+                    "class": "ui fluid search dropdown",
+                    "multiple": "",
+                    "id": "groups_dropdown",
+                }
+            ),
         }
 
 
@@ -107,13 +130,22 @@ class KeywordForm(forms.ModelForm):
     class Meta:
         model = Keyword
         exclude = ['is_archived', 'last_email_sent_time']
-        dt_options = {'format': 'yyyy-mm-dd hh:ii'}
         widgets = {
             'keyword': forms.TextInput(attrs={'placeholder': '(No spaces allowed)'}),
             'description': forms.TextInput(attrs={'placeholder': 'Please provide a description of your keyword.'}),
             'custom_response': forms.TextInput(attrs={'placeholder': 'eg: Thanks %name%, you have sucessfully signed up.'}),
-            'deactivate_time': DateTimeWidget(bootstrap_version=3, options=dt_options),
-            'activate_time': DateTimeWidget(bootstrap_version=3, options=dt_options)
+            'owners': forms.SelectMultiple(attrs={
+                "class": "ui fluid search dropdown",
+                "multiple": "",
+                "id": "owners_dropdown",
+            }
+            ),
+            'subscribed_to_digest': forms.SelectMultiple(attrs={
+                "class": "ui fluid search dropdown",
+                "multiple": "",
+                "id": "digest_dropdown",
+            }
+            ),
         }
 
 

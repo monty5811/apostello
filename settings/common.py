@@ -29,8 +29,7 @@ INSTALLED_APPS = [
     # third party apps
     'rest_framework',
     'djcelery',
-    'bootstrap3',
-    'datetimewidget',
+    'semanticuiform',
     'django_extensions',
     'solo',
     'django_twilio',
@@ -80,9 +79,6 @@ STATICFILES_FINDERS = [
 STATIC_URL = '/static/'
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'apostello', 'assets', 'dist'),
-]
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -99,6 +95,7 @@ USE_TZ = True
 
 # session settings
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 # Celery settings
 CELERY_DISABLE_RATE_LIMITS = True

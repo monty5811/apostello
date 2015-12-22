@@ -47,11 +47,15 @@ class SendAdhoc(LoginRequiredMixin, ProfilePermsMixin, View):
     Displays form for sending messages to individuals or ad-hoc groups.
     """
     required_perms = []
+    context = {'hide_menu': True}
 
     def get(self, request, *args, **kwargs):
-        return render(request, "apostello/send_adhoc.html", {'form': SendAdhocRecipientsForm})
+        context = self.context
+        context['form'] = SendAdhocRecipientsForm
+        return render(request, "apostello/send_adhoc.html", context)
 
     def post(self, request, *args, **kwargs):
+        context = self.context
         form = SendAdhocRecipientsForm(request.POST, ('recipients',))
         if form.is_valid():
             for recipient in form.cleaned_data['recipients']:
@@ -76,7 +80,8 @@ class SendAdhoc(LoginRequiredMixin, ProfilePermsMixin, View):
                 )
             return redirect(reverse("send_adhoc"))
         else:
-            return render(request, "apostello/send_adhoc.html", {'form': form})
+            context['form'] = form
+            return render(request, "apostello/send_adhoc.html", context)
 
 
 class SendGroup(LoginRequiredMixin, ProfilePermsMixin, View):
@@ -84,15 +89,17 @@ class SendGroup(LoginRequiredMixin, ProfilePermsMixin, View):
     Displays form for sending messages to a group.
     """
     required_perms = []
+    context = {'hide_menu': True}
 
     def get(self, request, *args, **kwargs):
-        context = {
-            'form': SendRecipientGroupForm,
-            'group_nums': [(x.id, x.calculate_cost) for x in RecipientGroup.objects.all()]}
+        context = self.context
+        context['form'] = SendRecipientGroupForm
+        context['group_nums'] = [(x.id, x.calculate_cost) for x in RecipientGroup.objects.all()]
         return render(request, "apostello/send_group.html", context)
 
     def post(self, request, *args, **kwargs):
-        context = {'group_nums': [(x.id, x.calculate_cost) for x in RecipientGroup.objects.all()]}
+        context = {'hide_menu': True}
+        context['group_nums'] = [(x.id, x.calculate_cost) for x in RecipientGroup.objects.all()]
         form = SendRecipientGroupForm(request.POST)
         if form.is_valid():
             form.cleaned_data['recipient_group'].send_message(
@@ -169,7 +176,7 @@ class ItemView(LoginRequiredMixin, ProfilePermsMixin, View):
                 new_instance = exists_and_archived(form, self.model_class, self.identifier)
                 messages.info(
                     request,
-                    "'{0}' already exists. Click the button to bring it back from the archive.".format(
+                    "'{0}' already exists. You can open the menu to restore it.".format(
                         str(new_instance)
                     )
                 )
@@ -270,6 +277,7 @@ def import_recipients(request):
     """
     Displays the CSV import form.
     """
+    context = {'hide_menu': True}
     if request.method == 'POST':
         form = CsvImport(request.POST)
         if form.is_valid():
@@ -293,7 +301,9 @@ def import_recipients(request):
                     request,
                     "Uh oh, something went wrong with these imports!"
                 )
-                return render(request, "apostello/importer.html", {'form': CsvImport(), 'bad_rows': bad_rows})
+                context['form'] = CsvImport()
+                context['bad_rows'] = bad_rows
+                return render(request, "apostello/importer.html", context)
             else:
                 messages.success(
                     request,
@@ -301,11 +311,11 @@ def import_recipients(request):
                 )
                 return redirect('/')
 
-        context = {'form': form}
+        context['form'] = form
         return render(request, 'apostello/importer.html', context)
 
     else:
-        context = {'form': CsvImport()}
+        context['form'] = CsvImport()
         return render(request, 'apostello/importer.html', context)
 
 

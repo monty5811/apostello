@@ -22,3 +22,35 @@ Getting a local instance running is pretty simple:
   ./manage.py runserver 0.0.0.0:8000
 
 TODO: add Twilio and Google info
+
+Front End
+---------
+
+The front end uses the `Semantic UI <http://semantic-ui.com/>`_ framework.
+Assets are compiled with Gulp and webpack.
+
+Assets are stored in ``apostello/assets`` and moved to ``apostello/static/`` on
+compilation.
+
+Setup
+~~~~~
+
+Install `node <https://nodejs.org>`_ and `gulp <http://gulpjs.com/>`_.
+
+.. code-block:: bash
+
+  # assuming you are in the apostello repo
+  cd apostello/assets
+  npm install  # this may take a couple of minutes
+  npm install semantic-ui
+
+Building the Assets
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: bash
+
+  # assuming you are in the apostello repo
+  cd apostello/assets
+  gulp css  # recompile css
+  gulp webpack  # recompile js
+  gulp  # recompile everything

@@ -1,31 +1,23 @@
 {% extends "apostello/base.html" %}
-{% load bootstrap3 %}
-{% block morejs %}
-{{form.media}}
-{% endblock %}
+{% load semanticui %}
 {% block content %}
 {% if bad_rows %}
 <p>The following inputs failed, please re-add them to the input box and correct them. Or manually add them to diagnose the issue.
-<div class="well">
+<div class="ui segment">
   {% for row in bad_rows %}
   <p>{{row.first_name}}, {{row.last_name}}, {{row.number}}
   {% endfor %}
 </div>
 
 {% else %}
-<p>Here you can import any number of recipients.<br>
-<p>Just paste a csv into the box below, there should be no header row and there should be three columns: First Name, Last Name, Number<br>
-<p>Upon successful import you should see a message, otherwise a list of failed items will appear.<br>
-<p>Try inputting failed items manually to see what went wrong.
+<p>Here you can import any number of recipients.</p>
+<p>Just paste a csv into the box below, there should be no header row and there should be three columns: First Name, Last Name, Number</p>
+<p>Upon successful import you should see a message, otherwise a list of failed items will appear.</p>
+<p>Try inputting failed items manually to see what went wrong.</p>
 {% endif %}
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-<form method="post" action="">
+<form class="ui {%if not form.is_valid %}error {% endif %}form" method="post">
     {% csrf_token %}
-    {% bootstrap_form form  %}
-    {% buttons %}
-        <button type="submit" class="btn btn-primary">
-             Import
-        </button>
-    {% endbuttons %}
+    {{ form|semanticui }}
+    <button class="ui button" type="submit">Import</button>
 </form>
 {% endblock %}

@@ -38,3 +38,4 @@ MIDDLEWARE_CLASSES = [
 ] + MIDDLEWARE_CLASSES
 
 STATIC_ROOT = '/webapps/apostello/static/'
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
