@@ -24,18 +24,55 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
     ]),
 ]
 
-# Only run Opbeat in production
-INSTALLED_APPS += (
-    'opbeat.contrib.django',
-)
+INSTALLED_APPS += ['opbeat.contrib.django', ]
+MIDDLEWARE_CLASSES = [
+    'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
+].extend(MIDDLEWARE_CLASSES)
+
 OPBEAT = {
     'ORGANIZATION_ID': os.environ.get('OPBEAT_ORG_ID', ''),
     'APP_ID': os.environ.get('OPBEAT_APP_ID', ''),
     'SECRET_TOKEN': os.environ.get('OPBEAT_SECRET_TOKEN', ''),
 }
-MIDDLEWARE_CLASSES = [
-    'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
-] + MIDDLEWARE_CLASSES
 
 STATIC_ROOT = '/webapps/apostello/static/'
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+    },
+    'handlers': {
+        'opbeat': {
+            'level': 'WARNING',
+            'class': 'opbeat.contrib.django.handlers.OpbeatHandler',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        }
+    },
+    'loggers': {
+        'django.db.backends': {
+            'level': 'ERROR',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+        'apostello': {
+            'level': 'WARNING',
+            'handlers': ['opbeat'],
+            'propagate': False,
+        },
+        # Log errors from the Opbeat module to the console (recommended)
+        'opbeat.errors': {
+            'level': 'ERROR',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+    },
+}
