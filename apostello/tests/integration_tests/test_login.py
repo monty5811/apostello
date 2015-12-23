@@ -4,18 +4,14 @@ import pytest
 @pytest.mark.django_db
 @pytest.mark.slow
 class TestLogin:
-    @pytest.mark.parametrize("uri", [
-        '/',
-    ])
+    @pytest.mark.parametrize("uri", ['/', ])
     def test_not_logged_in(self, uri, live_server, browser, users):
         browser.get(live_server + uri)
         assert len(browser.find_elements_by_name('login')) == 1
         assert len(browser.find_elements_by_name('password')) == 1
         assert len(browser.find_elements_by_name('remember')) == 1
 
-    @pytest.mark.parametrize("uri", [
-        '/',
-    ])
+    @pytest.mark.parametrize("uri", ['/', ])
     def test_log_in(self, uri, live_server, browser, users):
         # login
         browser.get(live_server + uri)

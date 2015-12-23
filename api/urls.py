@@ -16,50 +16,73 @@ from apostello.models import (ElvantoGroup, Keyword, Recipient, RecipientGroup,
 # api
 urlpatterns = [
     # sms views
-    url(r'^v1/sms/in/$',
+    url(
+        r'^v1/sms/in/$',
         ApiCollection.as_view(
             model_class=SmsInbound,
             serializer_class=SmsInboundSerializer,
             permission_classes=(IsAuthenticated, CanSeeIncoming)
         ),
-        name='in_log'),
-    url(r'^v1/sms/out/$',
+        name='in_log'
+    ),
+    url(
+        r'^v1/sms/out/$',
         ApiCollection.as_view(
             model_class=SmsOutbound,
             serializer_class=SmsOutboundSerializer,
             permission_classes=(IsAuthenticated, CanSeeOutgoing),
             related_field='recipient',
         ),
-        name='out_log'),
-    url(r'^v1/sms/live_wall/in/$',
+        name='out_log'
+    ),
+    url(
+        r'^v1/sms/live_wall/in/$',
         ApiCollectionAllWall.as_view(
             permission_classes=(IsAuthenticated, CanSeeIncoming)
         ),
-        name='live_wall'),
-    url(r'^v1/sms/in/recpient/(?P<pk>\d+)/$',
+        name='live_wall'
+    ),
+    url(
+        r'^v1/sms/in/recpient/(?P<pk>\d+)/$',
         ApiCollectionRecentSms.as_view(
-            permission_classes=(IsAuthenticated, CanSeeContactNames, CanSeeIncoming)),
-        name='contact_recent_sms'),
-    url(r'^v1/sms/in/keyword/(?P<pk>\d+)/$',
+            permission_classes=(
+                IsAuthenticated, CanSeeContactNames, CanSeeIncoming
+            )
+        ),
+        name='contact_recent_sms'
+    ),
+    url(
+        r'^v1/sms/in/keyword/(?P<pk>\d+)/$',
         ApiCollectionKeywordSms.as_view(
-            permission_classes=(IsAuthenticated, CanSeeKeywords, CanSeeKeyword, CanSeeIncoming),
+            permission_classes=(
+                IsAuthenticated, CanSeeKeywords, CanSeeKeyword, CanSeeIncoming
+            ),
             archive=False
         ),
-        name='keyword_sms'),
-    url(r'^v1/sms/in/keyword/(?P<pk>\d+)/archive/$',
+        name='keyword_sms'
+    ),
+    url(
+        r'^v1/sms/in/keyword/(?P<pk>\d+)/archive/$',
         ApiCollectionKeywordSms.as_view(
-            permission_classes=(IsAuthenticated, CanSeeKeywords, CanSeeKeyword, CanSeeIncoming),
-            archive=True),
-        name='keyword_sms_archive'),
-    url(r'^v1/sms/in/(?P<pk>[0-9]+)$',
+            permission_classes=(
+                IsAuthenticated, CanSeeKeywords, CanSeeKeyword, CanSeeIncoming
+            ),
+            archive=True
+        ),
+        name='keyword_sms_archive'
+    ),
+    url(
+        r'^v1/sms/in/(?P<pk>[0-9]+)$',
         ApiMember.as_view(
             model_class=SmsInbound,
             serializer_class=SmsInboundSerializer,
             permission_classes=(IsAuthenticated, CanSeeIncoming),
         ),
-        name='sms_in_member'),
+        name='sms_in_member'
+    ),
     # recipient views
-    url(r'^v1/recipients/$',
+    url(
+        r'^v1/recipients/$',
         ApiCollection.as_view(
             model_class=Recipient,
             serializer_class=RecipientSerializer,
@@ -67,16 +90,20 @@ urlpatterns = [
             filters={'is_archived': False},
             permission_classes=(IsAuthenticated, CanSeeContactNames)
         ),
-        name='recipients'),
-    url(r'^v1/recipients/(?P<pk>[0-9]+)$',
+        name='recipients'
+    ),
+    url(
+        r'^v1/recipients/(?P<pk>[0-9]+)$',
         ApiMember.as_view(
             model_class=Recipient,
             serializer_class=RecipientSerializer,
             permission_classes=(IsAuthenticated, CanSeeContactNames)
         ),
-        name='recipient'),
+        name='recipient'
+    ),
     # group views
-    url(r'^v1/groups/$',
+    url(
+        r'^v1/groups/$',
         ApiCollection.as_view(
             model_class=RecipientGroup,
             serializer_class=RecipientGroupSerializer,
@@ -84,38 +111,50 @@ urlpatterns = [
             filters={'is_archived': False},
             permission_classes=(IsAuthenticated, CanSeeGroups)
         ),
-        name='recipient_groups'),
-    url(r'^v1/groups/(?P<pk>[0-9]+)$',
+        name='recipient_groups'
+    ),
+    url(
+        r'^v1/groups/(?P<pk>[0-9]+)$',
         ApiMember.as_view(
             model_class=RecipientGroup,
             serializer_class=RecipientGroupSerializer,
             permission_classes=(IsAuthenticated, CanSeeGroups)
         ),
-        name='group'),
+        name='group'
+    ),
     # Elvanto groups
-    url(r'^v1/elvanto/groups/$',
+    url(
+        r'^v1/elvanto/groups/$',
         ApiCollection.as_view(
             model_class=ElvantoGroup,
             serializer_class=ElvantoGroupSerializer,
             permission_classes=(IsAuthenticated, CanSeeGroups)
         ),
-        name='elvanto_groups'),
-    url(r'^v1/elvanto/group/(?P<pk>[0-9]+)$',
+        name='elvanto_groups'
+    ),
+    url(
+        r'^v1/elvanto/group/(?P<pk>[0-9]+)$',
         ApiMember.as_view(
             model_class=ElvantoGroup,
             serializer_class=ElvantoGroupSerializer,
             permission_classes=(IsAuthenticated, CanSeeGroups)
         ),
-        name='elvanto_group'),
+        name='elvanto_group'
+    ),
     # Elvanto group buttons
-    url(r'^v1/elvanto/group_fetch/$',
+    url(
+        r'^v1/elvanto/group_fetch/$',
         ElvantoFetchButton.as_view(),
-        name='fetch_elvanto_groups'),
-    url(r'^v1/elvanto/group_pull/$',
+        name='fetch_elvanto_groups'
+    ),
+    url(
+        r'^v1/elvanto/group_pull/$',
         ElvantoPullButton.as_view(),
-        name='pull_elvanto_groups'),
+        name='pull_elvanto_groups'
+    ),
     # keyword views
-    url(r'^v1/keywords/$',
+    url(
+        r'^v1/keywords/$',
         ApiCollection.as_view(
             model_class=Keyword,
             serializer_class=KeywordSerializer,
@@ -123,12 +162,15 @@ urlpatterns = [
             filters={'is_archived': False},
             permission_classes=(IsAuthenticated, CanSeeKeywords)
         ),
-        name='keywords'),
-    url(r'^v1/keywords/(?P<pk>[0-9]+)$',
+        name='keywords'
+    ),
+    url(
+        r'^v1/keywords/(?P<pk>[0-9]+)$',
         ApiMember.as_view(
             model_class=Keyword,
             serializer_class=KeywordSerializer,
             permission_classes=(IsAuthenticated, CanSeeKeyword)
         ),
-        name='keyword'),
+        name='keyword'
+    ),
 ]

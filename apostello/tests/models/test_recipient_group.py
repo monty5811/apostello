@@ -8,12 +8,8 @@ class TestRecipientGroup:
         assert str(groups['test_group']) == "Test Group"
 
     def test_sending(self, groups):
-        groups['test_group'].send_message(content='test content',
-                                          sent_by="user"
-                                          )
-        groups['empty_group'].send_message(content='test content',
-                                           sent_by="user"
-                                           )
+        groups['test_group'].send_message(content='test content', sent_by="user")
+        groups['empty_group'].send_message(content='test content', sent_by="user")
 
     def test_all_recipients_names(self, groups):
         assert ['John Calvin', 'Johannes Oecolampadius'] == groups['test_group'].all_recipients_names

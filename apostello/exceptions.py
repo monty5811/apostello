@@ -1,5 +1,3 @@
-
-
 class ApostelloException(Exception):
     """apostello base exception class."""
     pass

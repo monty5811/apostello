@@ -17,7 +17,7 @@ from .serializers import SmsInboundSerializer, SmsInboundSimpleSerializer
 
 class ApiCollection(APIView):
     """Basic collection view. Check user is authenticated by default."""
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, )
     model_class = None
     serializer_class = None
     related_field = None
@@ -29,8 +29,7 @@ class ApiCollection(APIView):
         if self.related_field is None:
             objs = self.model_class.objects.all()
         else:
-            objs = self.model_class.objects.all(
-            ).select_related(self.related_field)
+            objs = self.model_class.objects.all().select_related(self.related_field)
         if self.filter_list:
             objs = objs.filter(**self.filters)
         serializer = self.serializer_class(objs, many=True)
@@ -39,7 +38,7 @@ class ApiCollection(APIView):
 
 class ApiMember(APIView):
     """Basic member view. Check user is authenticated by default."""
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, )
     model_class = None
     serializer_class = None
 
@@ -89,7 +88,7 @@ class ApiMember(APIView):
 
 class ApiCollectionRecentSms(APIView):
     """SMS collection for a single recipient."""
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, )
 
     def get(self, request, format=None, **kwargs):
         """Handle get requests."""
@@ -100,16 +99,14 @@ class ApiCollectionRecentSms(APIView):
 
 class ApiCollectionKeywordSms(APIView):
     """SMS collection for a single keyword."""
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, )
     archive = False
 
     def get(self, request, format=None, **kwargs):
         """Handle get requests."""
         keyword_obj = Keyword.objects.get(pk=kwargs['pk'])
         self.check_object_permissions(request, keyword_obj)
-        objs = SmsInbound.objects.filter(
-            matched_keyword=str(keyword_obj)
-        )
+        objs = SmsInbound.objects.filter(matched_keyword=str(keyword_obj))
         if self.archive:
             objs = objs.filter(is_archived=True)
         else:
@@ -120,16 +117,14 @@ class ApiCollectionKeywordSms(APIView):
 
 class ApiCollectionAllWall(APIView):
     """SMS collection for a live wall."""
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, )
 
     def get(self, request, format=None, **kwargs):
         """Handle get requests."""
         cache_key = 'live_wall'
         data = cache.get(cache_key)
         if data is None:
-            objs = SmsInbound.objects.filter(
-                is_archived=False
-            )[0:100]
+            objs = SmsInbound.objects.filter(is_archived=False)[0:100]
             serializer = SmsInboundSimpleSerializer(objs, many=True)
             data = serializer.data
             cache.set(cache_key, data, 120)

@@ -12,7 +12,13 @@ class TestKeywordReplier:
     """Tests apostello.reply.keyword_replier function."""
 
     def test_no_existing_keyword(self, recipients):
-        assert keyword_replier(None, recipients['calvin']) == fetch_default_reply('keyword_no_match').replace("%name%", "John")
+        assert keyword_replier(
+            None, recipients[
+                'calvin'
+            ]
+        ) == fetch_default_reply('keyword_no_match').replace(
+            "%name%", "John"
+        )
 
     def test_existing_keyword(self, recipients, keywords):
         assert keyword_replier(keywords['test'], recipients['calvin']) == "Test custom response with John"

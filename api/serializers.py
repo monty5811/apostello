@@ -11,12 +11,7 @@ class RecipientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipient
-        fields = ('first_name', 'last_name',
-                  'pk',
-                  'url',
-                  'full_name',
-                  'is_archived', 'is_blocking'
-                  )
+        fields = ('first_name', 'last_name', 'pk', 'url', 'full_name', 'is_archived', 'is_blocking')
 
 
 class RecipientGroupSerializer(serializers.ModelSerializer):
@@ -27,12 +22,7 @@ class RecipientGroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RecipientGroup
-        fields = ('name',
-                  'pk',
-                  'description',
-                  'members',
-                  'cost',
-                  'url')
+        fields = ('name', 'pk', 'description', 'members', 'cost', 'url')
 
 
 class ElvantoGroupSerializer(serializers.ModelSerializer):
@@ -41,12 +31,7 @@ class ElvantoGroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ElvantoGroup
-        fields = (
-            'name',
-            'pk',
-            'sync',
-            'last_synced',
-        )
+        fields = ('name', 'pk', 'sync', 'last_synced', )
 
 
 class KeywordSerializer(serializers.ModelSerializer):
@@ -59,13 +44,10 @@ class KeywordSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Keyword
-        fields = ('keyword',
-                  'pk',
-                  'description',
-                  'custom_response',
-                  'is_live',
-                  'url', 'responses_url',
-                  'num_replies', 'num_archived_replies')
+        fields = (
+            'keyword', 'pk', 'description', 'custom_response', 'is_live', 'url', 'responses_url', 'num_replies',
+            'num_archived_replies'
+        )
 
 
 class SmsInboundSerializer(serializers.ModelSerializer):
@@ -74,14 +56,21 @@ class SmsInboundSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SmsInbound
-        fields = ('sid', 'pk',
-                  'sender_name', 'sender_num',
-                  'content',
-                  'time_received',
-                  'dealt_with', 'is_archived', 'display_on_wall',
-                  'matched_keyword', 'matched_colour', 'matched_link',
-                  'sender_url',
-                  )
+        fields = (
+            'sid',
+            'pk',
+            'sender_name',
+            'sender_num',
+            'content',
+            'time_received',
+            'dealt_with',
+            'is_archived',
+            'display_on_wall',
+            'matched_keyword',
+            'matched_colour',
+            'matched_link',
+            'sender_url',
+        )
 
 
 class SmsInboundSimpleSerializer(serializers.ModelSerializer):
@@ -90,12 +79,7 @@ class SmsInboundSimpleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SmsInbound
-        fields = ('pk',
-                  'content',
-                  'time_received',
-                  'is_archived', 'display_on_wall',
-                  'matched_keyword',
-                  )
+        fields = ('pk', 'content', 'time_received', 'is_archived', 'display_on_wall', 'matched_keyword', )
 
 
 class SmsOutboundSerializer(serializers.ModelSerializer):
@@ -105,10 +89,4 @@ class SmsOutboundSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SmsOutbound
-        fields = ('content',
-                  'pk',
-                  'time_sent',
-                  'sent_by',
-                  'recipient',
-                  'recipient_url',
-                  )
+        fields = ('content', 'pk', 'time_sent', 'sent_by', 'recipient', 'recipient_url', )

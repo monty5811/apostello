@@ -17,9 +17,7 @@ def exists_and_archived(form, model_class, identifier):
     Returns the instance of the existing Person (etc) for editing if it exists,
     otherwise returns None.
     """
-    unique_fields = {'keyword': 'keyword',
-                     'group': 'name',
-                     'recipient': 'number'}
+    unique_fields = {'keyword': 'keyword', 'group': 'name', 'recipient': 'number'}
 
     all_errors = [form.errors.as_data()[x][0].code for x in form.errors.as_data()]
     try:

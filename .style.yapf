@@ -1,0 +1,5 @@
+[style]
+based_on_style = pep8
+DEDENT_CLOSING_BRACKETS = True
+SPLIT_BEFORE_NAMED_ASSIGNS = True
+COLUMN_LIMIT = 120

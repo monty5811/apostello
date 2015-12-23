@@ -14,25 +14,13 @@ admin.site.register(models.DefaultResponses, SingletonModelAdmin)
 @admin.register(models.SmsOutbound)
 class SmsOutboundAdmin(admin.ModelAdmin):
     """Admin class for apostello.models.SmsOutbound."""
-    list_display = (
-        'content',
-        'recipient',
-        'time_sent',
-        'sent_by',
-        'sid',
-    )
+    list_display = ('content', 'recipient', 'time_sent', 'sent_by', 'sid', )
 
 
 @admin.register(models.SmsInbound)
 class SmsInboundAdmin(admin.ModelAdmin):
     """Admin class for apostello.models.SmsInbound."""
-    list_display = (
-        'content',
-        'sender_name',
-        'matched_keyword',
-        'time_received',
-        'sid',
-    )
+    list_display = ('content', 'sender_name', 'matched_keyword', 'time_received', 'sid', )
 
 
 @admin.register(models.Keyword)
@@ -54,33 +42,20 @@ class KeywordAdmin(admin.ModelAdmin):
 @admin.register(models.Recipient)
 class RecipientAdmin(admin.ModelAdmin):
     """Admin class for apostello.models.Recipient."""
-    list_display = (
-        'full_name',
-        'number',
-        'is_blocking',
-        'is_archived',
-    )
+    list_display = ('full_name', 'number', 'is_blocking', 'is_archived', )
 
 
 @admin.register(models.RecipientGroup)
 class RecipientGroupAdmin(admin.ModelAdmin):
     """Admin class for apostello.models.RecipientGroup."""
-    list_display = (
-        'name',
-        'description',
-        'is_archived',
-    )
+    list_display = ('name', 'description', 'is_archived', )
 
 
 @admin.register(models.ElvantoGroup)
 class ElvantoGroupAdmin(admin.ModelAdmin):
     """Admin class for apostello.models.ElvantoGroup."""
-    list_display = (
-        'name',
-        'sync',
-        'e_id',
-        'last_synced',
-    )
+    list_display = ('name', 'sync', 'e_id', 'last_synced', )
+
 
 admin.site.unregister(User)
 
@@ -93,5 +68,6 @@ class UserProfileInline(admin.StackedInline):
 class UserProfileAdmin(UserAdmin):
     """Admin class for apostello.models.UserProfile."""
     inlines = [UserProfileInline, ]
+
 
 admin.site.register(User, UserProfileAdmin)

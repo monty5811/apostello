@@ -14,6 +14,7 @@ from twilio.rest.exceptions import TwilioRestException
 
 # sending messages
 
+
 @task()
 def group_send_message_task(body, group_name, sent_by, eta):
     """Send message to all members of group."""
@@ -21,10 +22,7 @@ def group_send_message_task(body, group_name, sent_by, eta):
     group = RecipientGroup.objects.filter(name=group_name, is_archived=False)
 
     for recipient in Recipient.objects.filter(groups__in=group):
-        recipient.send_message(content=body,
-                               group=group_name,
-                               sent_by=sent_by,
-                               eta=eta)
+        recipient.send_message(content=body, group=group_name, sent_by=sent_by, eta=eta)
 
 
 @task()
@@ -41,16 +39,9 @@ def recipient_send_message_task(recipient_pk, body, group, sent_by):
     body = recipient.personalise(body)
     # send twilio message
     try:
-        message = twilio_client.messages.create(
-            body=body,
-            to=str(recipient.number),
-            from_=settings.TWILIO_FROM_NUM)
+        message = twilio_client.messages.create(body=body, to=str(recipient.number), from_=settings.TWILIO_FROM_NUM)
         # add to sms out table
-        sms = SmsOutbound(sid=message.sid,
-                          content=body,
-                          time_sent=timezone.now(),
-                          recipient=recipient,
-                          sent_by=sent_by)
+        sms = SmsOutbound(sid=message.sid, content=body, time_sent=timezone.now(), recipient=recipient, sent_by=sent_by)
         if group is not None:
             sms.recipient_group = RecipientGroup.objects.filter(name=group)[0]
         sms.save()
@@ -62,8 +53,8 @@ def recipient_send_message_task(recipient_pk, body, group, sent_by):
         else:
             raise e
 
-
 # SMS logging and consistency checks
+
 
 @task()
 def check_incoming_log(page_id=0, fetch_all=False):
@@ -85,14 +76,16 @@ def log_msg_in(p, t, from_pk):
     from apostello.models import Keyword, SmsInbound, Recipient
     from_ = Recipient.objects.get(pk=from_pk)
     matched_keyword = Keyword.match(p['Body'].strip())
-    SmsInbound.objects.create(sid=p['MessageSid'],
-                              content=p['Body'],
-                              time_received=t,
-                              sender_name=str(from_),
-                              sender_num=p['From'],
-                              matched_keyword=str(matched_keyword),
-                              matched_link=Keyword.get_log_link(matched_keyword),
-                              matched_colour=Keyword.lookup_colour(p['Body'].strip()))
+    SmsInbound.objects.create(
+        sid=p['MessageSid'],
+        content=p['Body'],
+        time_received=t,
+        sender_name=str(from_),
+        sender_num=p['From'],
+        matched_keyword=str(matched_keyword),
+        matched_link=Keyword.get_log_link(matched_keyword),
+        matched_colour=Keyword.lookup_colour(p['Body'].strip())
+    )
     # check log is consistent:
     check_incoming_log.delay()
 
@@ -108,8 +101,8 @@ def update_msgs_name(person_pk):
         sms.sender_name = name
         sms.save()
 
-
 # notifications, email, slack etc
+
 
 @task()
 def send_async_mail(subject, body, to):
@@ -124,11 +117,7 @@ def notify_office_mail(subject, body):
     """Send email to office."""
     from apostello.models import SiteConfiguration
     to_ = SiteConfiguration.get_solo().office_email
-    send_async_mail(
-        subject,
-        body,
-        [to_]
-    )
+    send_async_mail(subject, body, [to_])
 
 
 @task()
@@ -151,16 +140,9 @@ def warn_on_blacklist_receipt(recipient_pk, sms):
     from apostello.models import Recipient
     recipient = Recipient.objects.get(pk=recipient_pk)
     if recipient.is_blocking:
-        email_body = "{0} has blacklisted us in the past but has just sent this message:".format(
-            str(recipient)
-        )
-        email_body += "\n\n\t{0}\n\nYou may need to email them as we cannot currently reply to them.".format(
-            sms
-        )
-        notify_office_mail.delay(
-            '[Apostello] Blacklist Receipt Notice',
-            email_body,
-        )
+        email_body = "{0} has blacklisted us in the past but has just sent this message:".format(str(recipient))
+        email_body += "\n\n\t{0}\n\nYou may need to email them as we cannot currently reply to them.".format(sms)
+        notify_office_mail.delay('[Apostello] Blacklist Receipt Notice', email_body, )
 
 
 @periodic_task(run_every=(crontab(hour="21", minute="30", day_of_week="*")))
@@ -179,11 +161,9 @@ def send_keyword_digest():
                 send_async_mail.delay(
                     'Daily update for "{0}" responses'.format(
                         str(keyword)
-                    ),
-                    "The following text messages have been received today:\n\n{0}".format(
+                    ), "The following text messages have been received today:\n\n{0}".format(
                         "\n".join([str(x) for x in new_responses])
-                    ),
-                    [subscriber.email]
+                    ), [subscriber.email]
                 )
 
         keyword.last_email_sent_time = checked_time

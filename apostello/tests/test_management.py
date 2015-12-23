@@ -6,7 +6,6 @@ from twilio.rest.exceptions import TwilioRestException
 
 @pytest.mark.django_db
 class TestManagementCommands():
-
     def test_update_sms_name_fields(self, recipients, smsin):
         call_command('update_sms_name_fields')
 

@@ -8,27 +8,30 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']  # must define this
 
-DATABASES = {'default': {'ENGINE': 'django.db.backends.postgresql_psycopg2',
-                         'NAME': os.environ['DATABASE_NAME'],
-                         'USER': os.environ['DATABASE_USER'],
-                         'PASSWORD': os.environ['DATABASE_PASSWORD'],
-                         'HOST': 'localhost',
-                         'PORT': '',
-                         }
-             }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.environ['DATABASE_NAME'],
+        'USER': os.environ['DATABASE_USER'],
+        'PASSWORD': os.environ['DATABASE_PASSWORD'],
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
 
 # cache templates in production
 TEMPLATES[0]['OPTIONS']['loaders'] = [
-    ('django.template.loaders.cached.Loader', [
-        'django.template.loaders.filesystem.Loader',
-        'django.template.loaders.app_directories.Loader',
-    ]),
+    (
+        'django.template.loaders.cached.Loader', [
+            'django.template.loaders.filesystem.Loader',
+            'django.template.loaders.app_directories.Loader',
+        ]
+    ),
 ]
 
 INSTALLED_APPS += ['opbeat.contrib.django', ]
-MIDDLEWARE_CLASSES = [
-    'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
-].extend(MIDDLEWARE_CLASSES)
+
+MIDDLEWARE_CLASSES = ['opbeat.contrib.django.middleware.OpbeatAPMMiddleware', ].extend(MIDDLEWARE_CLASSES)
 
 OPBEAT = {
     'ORGANIZATION_ID': os.environ.get('OPBEAT_ORG_ID', ''),

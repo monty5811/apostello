@@ -33,9 +33,7 @@ import apostello
 
 # -- General configuration ------------------------------------------------
 # needs_sphinx = '1.0'
-extensions = [
-    'sphinx.ext.autodoc',
-]
+extensions = ['sphinx.ext.autodoc', ]
 templates_path = ['_templates']
 source_suffix = '.rst'
 # source_encoding = 'utf-8-sig'
@@ -97,8 +95,10 @@ latex_elements = {
     'figure_align': 'htbp',
 }
 latex_documents = [
-    (master_doc, 'apostello.tex', 'apostello Documentation',
-     'Dean Montgomery', 'manual'),
+    (
+        master_doc, 'apostello.tex', 'apostello Documentation',
+        'Dean Montgomery', 'manual'
+    ),
 ]
 # latex_logo = None
 # latex_use_parts = False
@@ -109,19 +109,18 @@ latex_documents = [
 
 # -- Options for manual page output ---------------------------------------
 
-man_pages = [
-    (master_doc, 'apostello', 'apostello Documentation',
-     [author], 1)
-]
+man_pages = [(master_doc, 'apostello', 'apostello Documentation', [author], 1)]
 # man_show_urls = False
 
 # -- Options for Texinfo output -------------------------------------------
 
 texinfo_documents = [
-    (master_doc, 'apostello', 'apostello Documentation',
-     author, 'apostello', 'One line description of project.',
-     'Miscellaneous'),
+    (
+        master_doc, 'apostello', 'apostello Documentation', author,
+        'apostello', 'One line description of project.', 'Miscellaneous'
+    ),
 ]
+
 # texinfo_appendices = []
 # texinfo_domain_indices = True
 # texinfo_show_urls = 'footnote'
@@ -158,7 +157,8 @@ def process_docstring(app, what, name, obj, options, lines):
                 lines.append(u':param %s: %s' % (field.attname, verbose_name))
 
             # Add the field's type to the docstring
-            lines.append(u':type %s: %s' % (field.attname, type(field).__name__))
+            lines.append(u':type %s: %s' %
+                         (field.attname, type(field).__name__))
 
     # Return the extended docstring
     return lines

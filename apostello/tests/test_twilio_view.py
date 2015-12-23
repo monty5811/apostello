@@ -16,16 +16,13 @@ else:
 
 
 class TwilioRequestFactory(RequestFactory):
-
     def __init__(self, token, **defaults):
         super(TwilioRequestFactory, self).__init__(**defaults)
         self.base_url = 'http://testserver/'
         self.twilio_auth_token = token
 
     def _compute_signature(self, path, params):
-        return RequestValidator(
-            self.twilio_auth_token
-        ).compute_signature(urljoin(self.base_url, path), params=params)
+        return RequestValidator(self.twilio_auth_token).compute_signature(urljoin(self.base_url, path), params=params)
 
     def get(self, path, data=None, **extra):
         if data is None:
@@ -43,6 +40,7 @@ class TwilioRequestFactory(RequestFactory):
             return super(TwilioRequestFactory, self).post(path, data, **extra)
         else:
             return super(TwilioRequestFactory, self).post(path, data, content_type, **extra)
+
 
 uri = '/sms/'
 
@@ -71,13 +69,15 @@ def test_request_data():
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize("msg,reply", [
-    (u"Test", u"Test custom response"),
-    (u"2testing", u"your message has been received"),
-    (u"name John", u"Something went wrong"),
-    (u"name John Calvin", u"John"),
-    (u"start", u"Thanks for signing up"),
-])
+@pytest.mark.parametrize(
+    "msg,reply", [
+        (u"Test", u"Test custom response"),
+        (u"2testing", u"your message has been received"),
+        (u"name John", u"Something went wrong"),
+        (u"name John Calvin", u"John"),
+        (u"start", u"Thanks for signing up"),
+    ]
+)
 @pytest.mark.django_db
 class TestTwilioView:
     def test_not_logged_in(self, msg, reply, keywords):
@@ -90,13 +90,15 @@ class TestTwilioView:
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize("msg,reply", [
-    (u"Test", u"Test custom response"),
-    (u"2testing", u"your message has been received"),
-    (u"name John", u"Something went wrong"),
-    (u"name John Calvin", u"John"),
-    (u"start", u"Thanks for signing up"),
-])
+@pytest.mark.parametrize(
+    "msg,reply", [
+        (u"Test", u"Test custom response"),
+        (u"2testing", u"your message has been received"),
+        (u"name John", u"Something went wrong"),
+        (u"name John Calvin", u"John"),
+        (u"start", u"Thanks for signing up"),
+    ]
+)
 @pytest.mark.django_db
 class TestTwilioViewNoReplies:
     def test_not_logged_in(self, msg, reply, keywords):

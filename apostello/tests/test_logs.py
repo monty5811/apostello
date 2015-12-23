@@ -26,6 +26,7 @@ class TestImportLogs:
     Unable to test this properly as Twilio raises an exception when test
     credentials are used.
     """
+
     def test_all_incoming(self):
         # TODO mock response from Twilio so we can test this
         with pytest.raises(TwilioRestException):

@@ -36,9 +36,7 @@ def get_person_or_ask_for_name(from_, sms_body, keyword_obj):
     try:
         person_from = Recipient.objects.get(number=from_)
     except Recipient.DoesNotExist:
-        person_from = Recipient.objects.create(number=from_,
-                                               first_name='Unknown',
-                                               last_name='Person')
+        person_from = Recipient.objects.create(number=from_, first_name='Unknown', last_name='Person')
         person_from.save()
         if keyword_obj == "name":
             pass
@@ -46,15 +44,11 @@ def get_person_or_ask_for_name(from_, sms_body, keyword_obj):
             from apostello.models import SiteConfiguration
             config = SiteConfiguration.get_solo()
             if not config.disable_all_replies:
-                person_from.send_message(
-                    content=fetch_default_reply('auto_name_request'),
-                    sent_by="auto name request"
-                )
+                person_from.send_message(content=fetch_default_reply('auto_name_request'), sent_by="auto name request")
                 notify_office_mail.delay(
                     '[Apostello] Unknown Contact!',
                     'SMS: {0}\nFrom: {1}\n\n\nThis person is unknown and has been asked for their name.'.format(
-                        sms_body,
-                        from_
+                        sms_body, from_
                     ),
                 )
 
@@ -101,8 +95,7 @@ def reply_to_incoming(person_from, from_, sms_body, keyword):
             notify_office_mail.delay(
                 '[Apostello] New Signup - FAILED!',
                 'SMS:\n\t{0}\nFrom:\n\t{1}\n'.format(
-                    sms_body,
-                    from_
+                    sms_body, from_
                 ),
             )
             return fetch_default_reply('name_failure_reply')

@@ -8,6 +8,7 @@ class ProfilePermsMixin(object):
 
     Redirects to '/' otherwise.
     """
+
     @classmethod
     def as_view(cls, **initkwargs):
         view = super(ProfilePermsMixin, cls).as_view(**initkwargs)

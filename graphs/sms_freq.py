@@ -26,9 +26,17 @@ def sms_graph_data(direction='in'):
             delta = timezone.timedelta(days=x)
             today = td + delta
             if cache_id == 'ogd':
-                num_of_sms = sms_list.filter(time_sent__year=today.year, time_sent__month=today.month, time_sent__day=today.day).count()
+                num_of_sms = sms_list.filter(
+                    time_sent__year=today.year,
+                    time_sent__month=today.month,
+                    time_sent__day=today.day
+                ).count()
             elif cache_id == 'igd':
-                num_of_sms = sms_list.filter(time_received__year=today.year, time_received__month=today.month, time_received__day=today.day).count()
+                num_of_sms = sms_list.filter(
+                    time_received__year=today.year,
+                    time_received__month=today.month,
+                    time_received__day=today.day
+                ).count()
             smsdata.append(num_of_sms)
         cache.set(cache_id, smsdata, 5 * 60)
 

@@ -7,11 +7,7 @@ from apostello.validators import gsm_validator, less_than_sms_char_limit
 
 class SendAdhocRecipientsForm(forms.Form):
     """Send an sms to ad-hoc groups."""
-    content = forms.CharField(
-        validators=[gsm_validator, less_than_sms_char_limit],
-        required=True,
-        min_length=1
-    )
+    content = forms.CharField(validators=[gsm_validator, less_than_sms_char_limit], required=True, min_length=1)
     recipients = forms.ModelMultipleChoiceField(
         queryset=Recipient.objects.filter(is_archived=False),
         required=True,
@@ -25,17 +21,14 @@ class SendAdhocRecipientsForm(forms.Form):
     )
     scheduled_time = forms.DateTimeField(
         required=False,
-        help_text='Leave this blank to send your message immediately, otherwise select a date and time to schedule your message'
+        help_text='Leave this blank to send your message immediately, '
+        'otherwise select a date and time to schedule your message'
     )
 
 
 class SendRecipientGroupForm(forms.Form):
     """Send an sms to pre-defined group."""
-    content = forms.CharField(
-        validators=[gsm_validator, less_than_sms_char_limit],
-        required=True,
-        min_length=1
-    )
+    content = forms.CharField(validators=[gsm_validator, less_than_sms_char_limit], required=True, min_length=1)
     recipient_group = forms.ModelChoiceField(
         queryset=RecipientGroup.objects.filter(
             is_archived=False
@@ -51,7 +44,8 @@ class SendRecipientGroupForm(forms.Form):
     )
     scheduled_time = forms.DateTimeField(
         required=False,
-        help_text='Leave this blank to send your message immediately, otherwise select a date and time to schedule your message'
+        help_text='Leave this blank to send your message immediately, '
+        'otherwise select a date and time to schedule your message'
     )
 
 
@@ -124,19 +118,29 @@ class KeywordForm(forms.ModelForm):
         exclude = ['is_archived', 'last_email_sent_time']
         widgets = {
             'keyword': forms.TextInput(attrs={'placeholder': '(No spaces allowed)'}),
-            'description': forms.TextInput(attrs={'placeholder': 'Please provide a description of your keyword.'}),
-            'custom_response': forms.TextInput(attrs={'placeholder': 'eg: Thanks %name%, you have sucessfully signed up.'}),
-            'owners': forms.SelectMultiple(attrs={
-                "class": "ui fluid search dropdown",
-                "multiple": "",
-                "id": "owners_dropdown",
-            }
+            'description': forms.TextInput(
+                attrs={
+                    'placeholder': 'Please provide a description of your keyword.'
+                }
             ),
-            'subscribed_to_digest': forms.SelectMultiple(attrs={
-                "class": "ui fluid search dropdown",
-                "multiple": "",
-                "id": "digest_dropdown",
-            }
+            'custom_response': forms.TextInput(
+                attrs={
+                    'placeholder': 'eg: Thanks %name%, you have sucessfully signed up.'
+                }
+            ),
+            'owners': forms.SelectMultiple(
+                attrs={
+                    "class": "ui fluid search dropdown",
+                    "multiple": "",
+                    "id": "owners_dropdown",
+                }
+            ),
+            'subscribed_to_digest': forms.SelectMultiple(
+                attrs={
+                    "class": "ui fluid search dropdown",
+                    "multiple": "",
+                    "id": "digest_dropdown",
+                }
             ),
         }
 
@@ -152,7 +156,4 @@ class ArchiveKeywordResponses(forms.Form):
 
 class CsvImport(forms.Form):
     """Handle CSV imports."""
-    csv_data = forms.CharField(
-        help_text='John, Calvin, +447095237960',
-        widget=forms.Textarea
-    )
+    csv_data = forms.CharField(help_text='John, Calvin, +447095237960', widget=forms.Textarea)

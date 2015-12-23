@@ -29,16 +29,8 @@ from apostello.validators import (TWILIO_INFO_WORDS, TWILIO_START_WORDS,
 class RecipientGroup(models.Model):
     """Stores groups of recipients."""
     is_archived = models.BooleanField("Archived", default=False)
-    name = models.CharField(
-        "Name of group",
-        max_length=30,
-        unique=True,
-        validators=[gsm_validator],
-    )
-    description = models.CharField(
-        "Group description",
-        max_length=200,
-    )
+    name = models.CharField("Name of group", max_length=30, unique=True, validators=[gsm_validator], )
+    description = models.CharField("Group description", max_length=200, )
 
     def send_message(self, content, sent_by, eta=None):
         """Send message to group."""
@@ -175,18 +167,11 @@ class Recipient(models.Model):
     is_blocking = models.BooleanField(
         "Blocking",
         default=False,
-        help_text="If our number has received on of Twilio's stop words, we are now blocked."
+        help_text="If our number has received on of Twilio's stop words, "
+        "we are now blocked."
     )
-    first_name = models.CharField(
-        "First Name",
-        max_length=settings.MAX_NAME_LENGTH,
-        validators=[gsm_validator],
-    )
-    last_name = models.CharField(
-        "Last Name",
-        max_length=40,
-        validators=[gsm_validator],
-    )
+    first_name = models.CharField("First Name", max_length=settings.MAX_NAME_LENGTH, validators=[gsm_validator], )
+    last_name = models.CharField("Last Name", max_length=40, validators=[gsm_validator], )
     number = PhoneNumberField(
         unique=True,
         validators=[not_twilio_num],
@@ -212,17 +197,9 @@ class Recipient(models.Model):
         if self.is_blocking:
             return
         elif eta is None:
-            recipient_send_message_task.delay(
-                self.pk,
-                content,
-                group,
-                sent_by
-            )
+            recipient_send_message_task.delay(self.pk, content, group, sent_by)
         else:
-            recipient_send_message_task.apply_async(
-                args=[self.pk, content, group, sent_by],
-                eta=eta
-            )
+            recipient_send_message_task.apply_async(args=[self.pk, content, group, sent_by], eta=eta)
 
     def archive(self):
         """Archive the recipient and removes it from groups."""
@@ -248,10 +225,7 @@ class Recipient(models.Model):
     @cached_property
     def full_name(self):
         """Recipient's full name."""
-        return u"{fn} {ln}".format(
-            fn=self.first_name,
-            ln=self.last_name
-        )
+        return u"{fn} {ln}".format(fn=self.first_name, ln=self.last_name)
 
     def __str__(self):
         """Pretty representation."""
@@ -268,65 +242,65 @@ class Keyword(models.Model):
         "Keyword",
         max_length=12,
         unique=True,
-        validators=[validate_lower,
-                    gsm_validator,
-                    twilio_reserved,
-                    no_overlap_keyword]
+        validators=[
+            validate_lower, gsm_validator, twilio_reserved, no_overlap_keyword
+        ]
     )
-    description = models.CharField(
-        "Keyword Description",
-        max_length=200,
-    )
+    description = models.CharField("Keyword Description", max_length=200, )
     custom_response = models.CharField(
         "Auto response",
         max_length=100,
         blank=True,
         validators=[gsm_validator, less_than_sms_char_limit],
-        help_text='This text will be sent back as a reply when any incoming message matches this keyword. If empty, the site wide response will be used.'
+        help_text='This text will be sent back as a reply when any incoming '
+        'message matches this keyword. '
+        'If empty, the site wide response will be used.'
     )
     deactivated_response = models.CharField(
         "Deactivated response",
         max_length=100,
         blank=True,
         validators=[gsm_validator, less_than_sms_char_limit],
-        help_text="Use this if you want a custom response after deactivation. e.g. 'You are too late for this event, sorry!'"
+        help_text="Use this if you want a custom response after deactivation. "
+        "e.g. 'You are too late for this event, sorry!'"
     )
     too_early_response = models.CharField(
         "Not yet activated response",
         max_length=1000,
         blank=True,
         validators=[gsm_validator, less_than_sms_char_limit],
-        help_text="Use this if you want a custom response before. e.g. 'You are too early for this event, please try agian on Monday!'"
+        help_text="Use this if you want a custom response before. "
+        "e.g. 'You are too early for this event, please try agian on Monday!'"
     )
     activate_time = models.DateTimeField(
         "Activation Time",
         default=timezone.now,
-        help_text='The keyword will not be active before this time and so no messages will be able to match it. Leave blank to activate now.'
+        help_text='The keyword will not be active before this time and so no '
+        'messages will be able to match it. Leave blank to activate now.'
     )
     deactivate_time = models.DateTimeField(
         "Deactivation Time",
         blank=True,
         null=True,
-        help_text='The keyword will not be active after this time and so no messages will be able to match it. Leave blank to never deactivate.'
+        help_text='The keyword will not be active after this time and so no '
+        'messages will be able to match it. Leave blank to never deactivate.'
     )
     owners = models.ManyToManyField(
         User,
         blank=True,
         verbose_name='Limit viewing to only these people',
-        help_text='If this field is empty, any user can see this keyword. If populated, then only the named users and staff will have access.'
+        help_text='If this field is empty, any user can see this keyword. '
+        'If populated, then only the named users and staff will have access.'
     )
     subscribed_to_digest = models.ManyToManyField(
         User,
         blank=True,
         verbose_name='Subscribed to daily emails.',
         related_name='subscribers',
-        help_text='Choose users that will receive daily updates of matched messages.'
+        help_text='Choose users that will receive daily updates of matched '
+        'messages.'
     )
-    last_email_sent_time = models.DateTimeField(
-        "Time of last sent email",
-        blank=True,
-        null=True
-    )
+    last_email_sent_time = models.DateTimeField("Time of last sent email", blank=True, null=True)
 
     def construct_reply(self, sender):
         """Make reply to an incoming message."""
@@ -337,7 +311,13 @@ class Keyword(models.Model):
             elif self.too_early_response != '' and timezone.now() < self.activate_time:
                 reply = sender.personalise(self.too_early_response)
             else:
-                reply = sender.personalise(fetch_default_reply('default_no_keyword_not_live')).replace("%keyword%", self.keyword)
+                reply = sender.personalise(
+                    fetch_default_reply(
+                        'default_no_keyword_not_live'
+                    )
+                ).replace(
+                    "%keyword%", self.keyword
+                )
         else:
             # keyword is active
             if self.custom_response == '':
@@ -361,17 +341,11 @@ class Keyword(models.Model):
 
     def fetch_matches(self):
         """Fetch un-archived messages that match keyword."""
-        return SmsInbound.objects.filter(
-            matched_keyword=self.keyword,
-            is_archived=False
-        )
+        return SmsInbound.objects.filter(matched_keyword=self.keyword, is_archived=False)
 
     def fetch_archived_matches(self):
         """Fetch archived messages that match keyword."""
-        return SmsInbound.objects.filter(
-            matched_keyword=self.keyword,
-            is_archived=True
-        )
+        return SmsInbound.objects.filter(matched_keyword=self.keyword, is_archived=True)
 
     @property
     def num_matches(self):
@@ -504,17 +478,13 @@ class Keyword(models.Model):
 
 class SmsInbound(models.Model):
     """A SmsInbound is a message that was sent to the twilio number."""
-    sid = models.CharField(
-        "SID",
-        max_length=34,
-        unique=True,
-        help_text="Twilio's unique ID for this SMS"
-    )
+    sid = models.CharField("SID", max_length=34, unique=True, help_text="Twilio's unique ID for this SMS")
     is_archived = models.BooleanField("Is Archived", default=False)
     dealt_with = models.BooleanField(
         "Dealt With?",
         default=False,
-        help_text='Used, for example, to mark people as registered for an event.'
+        help_text='Used, for example, '
+        'to mark people as registered for an event.'
     )
     content = models.CharField("Message body", blank=True, max_length=1600)
     time_received = models.DateTimeField(blank=True, null=True)
@@ -569,17 +539,8 @@ class SmsInbound(models.Model):
 
 class SmsOutbound(models.Model):
     """An SmsOutbound is an SMS that has been sent out by the app."""
-    sid = models.CharField(
-        "SID",
-        max_length=34,
-        unique=True,
-        help_text="Twilio's unique ID for this SMS"
-    )
-    content = models.CharField(
-        "Message",
-        max_length=1600,
-        validators=[gsm_validator],
-    )
+    sid = models.CharField("SID", max_length=34, unique=True, help_text="Twilio's unique ID for this SMS")
+    content = models.CharField("Message", max_length=1600, validators=[gsm_validator], )
     time_sent = models.DateTimeField(default=timezone.now)
     sent_by = models.CharField(
         "Sender",
@@ -592,11 +553,7 @@ class SmsOutbound(models.Model):
         blank=True,
         help_text="Group (if any) that message was sent to"
     )
-    recipient = models.ForeignKey(
-        Recipient,
-        blank=True,
-        null=True
-    )
+    recipient = models.ForeignKey(Recipient, blank=True, null=True)
 
     def __str__(self):
         """Pretty representation."""
@@ -618,33 +575,20 @@ class SiteConfiguration(SingletonModel):
     This is a singleton object, there should only be a single instance
     of this model.
     """
-    site_name = models.CharField(
-        max_length=255,
-        default='apostello'
-    )
-    sms_char_limit = models.PositiveSmallIntegerField(
-        default=160,
-        help_text='SMS length limit.'
-    )
-    disable_all_replies = models.BooleanField(
-        default=False,
-        help_text='Tick this box to disable all automated replies'
-    )
-    office_email = models.EmailField(
-        blank=True,
-        help_text='Email to send information emails to'
-    )
-    from_email = models.EmailField(
-        blank=True,
-        help_text='Email to send emails from'
-    )
+    site_name = models.CharField(max_length=255, default='apostello')
+    sms_char_limit = models.PositiveSmallIntegerField(default=160, help_text='SMS length limit.')
+    disable_all_replies = models.BooleanField(default=False, help_text='Tick this box to disable all automated replies')
+    office_email = models.EmailField(blank=True, help_text='Email to send information emails to')
+    from_email = models.EmailField(blank=True, help_text='Email to send emails from')
     slack_url = models.URLField(
         blank=True,
-        help_text='Post all incoming messages to this slack hook. Leave blank to disable.'
+        help_text='Post all incoming messages to this slack hook. '
+        'Leave blank to disable.'
     )
     sync_elvanto = models.BooleanField(
         default=False,
-        help_text='Toggle automatic syncing of Elvanto groups. Sync will be done overnight',
+        help_text='Toggle automatic syncing of Elvanto groups. '
+        'Sync will be done overnight',
     )
 
     def __str__(self):
@@ -666,17 +610,20 @@ class DefaultResponses(SingletonModel):
         max_length=1000,
         default='Thank you, %name%, your message has been received.',
         validators=[less_than_sms_char_limit],
-        help_text='This message will be sent when a SMS matched a keyword, but that keyword has no reply set'
+        help_text='This message will be sent when a SMS matched a keyword, '
+        'but that keyword has no reply set'
     )
     default_no_keyword_not_live = models.TextField(
         max_length=1000,
-        default='Thank you, %name%, for your text. But "%keyword%" is not active..',
+        default='Thank you, %name%, for your text. '
+        'But "%keyword%" is not active..',
         validators=[less_than_sms_char_limit],
         help_text='Default message for when a keyword is not currently active.'
     )
     keyword_no_match = models.TextField(
         max_length=1000,
-        default='Thank you, %name%, your message has not matched any of our keywords. Please correct your message and try again.',
+        default='Thank you, %name%, your message has not matched any of our '
+        'keywords. Please correct your message and try again.',
         validators=[less_than_sms_char_limit],
         help_text='Reply to use when an SMS does not match any keywords'
     )
@@ -694,15 +641,20 @@ class DefaultResponses(SingletonModel):
     )
     name_failure_reply = models.TextField(
         max_length=1000,
-        default="Something went wrong, sorry, please try again with the format 'name John Smith'.",
+        default="Something went wrong, sorry, "
+        "please try again with the format 'name John Smith'.",
         validators=[less_than_sms_char_limit],
-        help_text='Reply to use when someone matches "name" with bad formatting.'
+        help_text='Reply to use when someone matches "name"'
+        'with bad formatting.'
     )
     auto_name_request = models.TextField(
         max_length=1000,
-        default="Hi there, I'm afraid we currently don't have your number in our address book. Could you please reply in the format\n'name John Smith'",
+        default="Hi there, I'm afraid we currently don't have your number in"
+        "our address book. Could you please reply in the format"
+        "\n'name John Smith'",
         validators=[less_than_sms_char_limit],
-        help_text='Message to send when we first receive a message from someone not in the contacts list.'
+        help_text='Message to send when we first receive a message from '
+        'someone not in the contacts list.'
     )
 
     def __str__(self):
@@ -721,10 +673,7 @@ class UserProfile(models.Model):
     """
     user = models.OneToOneField(User, unique=True)
 
-    approved = models.BooleanField(
-        default=False,
-        help_text='This must be true to grant users access to the site.'
-    )
+    approved = models.BooleanField(default=False, help_text='This must be true to grant users access to the site.')
 
     can_see_groups = models.BooleanField(default=True)
     can_see_contact_names = models.BooleanField(default=True)

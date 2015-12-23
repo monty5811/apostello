@@ -11,6 +11,7 @@ from apostello.models import Keyword
 
 def keyword_access_check(method):
     """Check a user can access a specific keyword."""
+
     @wraps(method)
     def wrapper(request, *args, **kwargs):
         if request.user.is_staff:

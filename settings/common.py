@@ -8,10 +8,7 @@ import djcelery
 # Django settings
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-SECRET_KEY = os.environ.get(
-    'DJANGO_SECRET_KEY',
-    'w;ioufpwqofjpwoifwpa09fuq039uq3u4uepoivqnwjdfvlwdv'
-)
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'w;ioufpwqofjpwoifwpa09fuq039uq3u4uepoivqnwjdfvlwdv')
 
 INSTALLED_APPS = [
     # built in apps
@@ -110,7 +107,8 @@ djcelery.setup_loader()
 BROKER_URL = 'amqp://{user}:{password}@127.0.0.1:5672/{vhost}'.format(
     user=os.environ.get('RABBITMQ_APPLICATION_USER'),
     password=os.environ.get('RABBITMQ_APPLICATION_PASSWORD'),
-    vhost=os.environ.get('RABBITMQ_APPLICATION_VHOST'))
+    vhost=os.environ.get('RABBITMQ_APPLICATION_VHOST')
+)
 
 # Cache settings
 CACHES = {
@@ -161,7 +159,8 @@ SENDING_COST = 0.04  # cost in USD
 # https://www.twilio.com/help/faq/voice/what-are-global-permissions-and-why-do-they-exist
 COUNTRY_CODE = os.environ['COUNTRY_CODE']
 
-NO_ACCESS_WARNING = 'You do not have access to this page. If you believe you are seeing it in error please contact the office'
+NO_ACCESS_WARNING = 'You do not have access to this page. '
+'If you believe you are seeing it in error please contact the office'
 
 # Notification settings
 SLACK_URL = os.environ.get('SLACK_URL', '')

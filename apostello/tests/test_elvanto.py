@@ -48,6 +48,7 @@ class TestApi:
 
     Note - this calls the Elvanto api and will hit their site.
     """
+
     def test_fetch_elvanto_groups(self):
         ElvantoGroup.fetch_all_groups()
         assert ElvantoGroup.objects.get(e_id='41dd51d9-d3c5-11e4-95ba-068b656294b7').name == 'Geneva'
