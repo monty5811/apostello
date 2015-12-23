@@ -2,14 +2,16 @@ amqp
 anyjson
 billiard
 celery
+dj-database-url
 Django
 django-allauth
 django-appconf
 django-celery
 django-extensions
 django-phonenumber-field
+django-redis
 #django-semanticui-form # replace with - git+git://github.com/monty5811/django-semanticui-form.git@323b0bacce84a3f12301a34113f5555ec3cb4f7a
-django-solo #git+git://github.com/monty5811/django-solo.git@6497f86800084008febbe0f2247d7aa6be4e0d96
+django-solo
 django-twilio
 djangorestframework
 docutils
@@ -35,4 +37,5 @@ requests
 selenium
 twilio
 Werkzeug
+whitenoise
 yapf

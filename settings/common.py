@@ -143,7 +143,7 @@ WHITELISTED_LOGIN_DOMAINS = os.environ.get('WHITELISTED_LOGIN_DOMAINS', '').spli
 LOGIN_REDIRECT_URL = '/'
 
 # Elvanto credentials
-ELVANTO_KEY = os.environ['ELVANTO_KEY']
+ELVANTO_KEY = os.environ.get('ELVANTO_KEY', '')
 
 # Twilio credentials
 TWILIO_ACCOUNT_SID = os.environ['TWILIO_ACCOUNT_SID']
@@ -161,9 +161,6 @@ COUNTRY_CODE = os.environ['COUNTRY_CODE']
 
 NO_ACCESS_WARNING = 'You do not have access to this page. '
 'If you believe you are seeing it in error please contact the office'
-
-# Notification settings
-SLACK_URL = os.environ.get('SLACK_URL', '')
 
 # Testing
 TESTING = False

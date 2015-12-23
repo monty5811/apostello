@@ -1,0 +1,78 @@
+{
+  "name": "apostello",
+  "description": "SMS communication software for your church",
+  "keywords": [
+    "sms",
+    "twilio",
+    "django"
+  ],
+  "website": "https://github.com/monty5811/apostello",
+  "repository": "https://github.com/monty5811/apostello",
+  "success_url": "/",
+  "scripts": {
+    "postdeploy": "./manage.py migrate"
+  },
+  "env": {
+    "DJANGO_SETTINGS_MODULE": "settings.heroku",
+    "DJANGO_SECRET_KEY": {
+      "generator": "secret"
+    },
+    "TWILIO_ACCOUNT_SID": {
+      "description": "Your Twilio account SID",
+      "value": "",
+    }
+    "TWILIO_AUTH_TOKEN": {
+      "description": "Your Twilio account Auth Token",
+      "value": "",
+    }
+    "TWILIO_FROM_NUM": {
+      "description": "The Twilio number you want to send from",
+      "value": "",
+    }
+    "COUNTRY_CODE": {
+      "description": "County code (used in Elvanto import)",
+      "value": "",
+    }
+    "EMAIL_HOST": {
+      "description": "Email host (required for user sign ups)",
+      "value": "",
+    }
+    "EMAIL_HOST_USER": {
+      "description": "Email host user",
+      "value": "",
+    }
+    "EMAIL_HOST_PASSWORD": {
+      "description": "Email host password",
+      "value": "",
+    }
+    "WHITELISTED_LOGIN_DOMAINS": {
+      "description": "Automatically approve verified emails from this domain",
+      "value": "",
+      "required": false
+    }
+    "ELVANTO_KEY": {
+      "description": "Elvanto API Key",
+      "value": "",
+      "required": false
+    },
+    "OPBEAT_APP_ID": {
+      "value": "",
+      "required": false
+    },
+    "OPBEAT_ORG_ID": {
+      "value": "",
+      "required": false
+    },
+    "OPBEAT_SECRET_TOKEN": {
+      "value": "",
+      "required": false
+    }
+  },
+  "addons": [
+    "heroku-postgresql:hobby-dev",
+    "heroku-redis",
+    "cloudamqp:little-lemur"
+    "papertrail:choklad",
+    "scheduler:standard"
+  ]
+}

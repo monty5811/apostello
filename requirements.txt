@@ -16,11 +16,13 @@ colorama==0.3.5           # via pytest-watch
 coverage==3.7.1           # via pytest-cov, pytest-testmon
 decorator==4.0.6          # via ipython, traitlets
 defusedxml==0.4.1         # via python3-openid
+dj-database-url==0.3.0
 django-allauth==0.24.1
 django-appconf==1.0.1
 django-celery==3.1.17
 django-extensions==1.6.1
 django-phonenumber-field==1.0.0
+django-redis==4.3.0
 git+git://github.com/monty5811/django-semanticui-form.git@9fc509ef7d8e03341899e6a6e987f37bd598f5c2
 django-solo==1.1.1
 django-twilio==0.8.0
@@ -67,8 +69,9 @@ python3-memcached==1.51
 python3-openid==3.0.9     # via django-allauth
 pytz==2015.7              # via babel, celery, twilio
 pyyaml==3.11              # via watchdog
+redis==2.10.5             # via django-redis
 requests-oauthlib==0.6.0  # via django-allauth
-requests==2.9.0
+requests==2.9.1
 selenium==2.48.0
 simplegeneric==0.8.1      # via ipython
 six==1.10.0               # via django-appconf, django-extensions, twilio
@@ -76,4 +79,5 @@ traitlets==4.0.0          # via ipython
 twilio==5.2.0
 watchdog==0.8.3           # via pytest-watch
 werkzeug==0.11.3
-yapf
+whitenoise==2.0.6
+yapf==0.6.2
