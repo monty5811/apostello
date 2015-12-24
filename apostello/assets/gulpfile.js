@@ -21,7 +21,14 @@ gulp.task('copyThemeFonts', function() {
     .pipe(gulp.dest('./../static/css/themes/default/assets/fonts'));
 });
 
-gulp.task('css', ['uiBuildCss', 'copyThemeFonts'], function() {
+gulp.task('copyThemeImages', function() {
+  gulp.src([
+      './semantic/src/themes/default/assets/images/*.*',
+    ])
+    .pipe(gulp.dest('./../static/css/themes/default/assets/images'));
+});
+
+gulp.task('css', ['uiBuildCss', 'copyThemeFonts', 'copyThemeImages'], function() {
   gulp.src([
       './css/**/*.scss',
     ])

@@ -10,11 +10,12 @@ https://docs.djangoproject.com/en/1.7/howto/deployment/wsgi/
 import os
 
 from django.core.wsgi import get_wsgi_application
-from django.conf import settings
 
 from apostello.loaddotenv import loaddotenv
 
-loaddotenv()
+if os.environ.get('DYNO_RAM') is None:
+    loaddotenv()
+
 application = get_wsgi_application()
 
 if os.environ.get('DYNO_RAM') is not None:
