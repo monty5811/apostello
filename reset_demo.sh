@@ -1,0 +1,1 @@
+./manage.py flush --noinput && ./manage.py loaddata demo_data.json

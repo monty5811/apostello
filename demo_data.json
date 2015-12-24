@@ -1,0 +1,305 @@
+[{
+    "model": "sites.site",
+    "pk": 1,
+    "fields": {
+        "domain": "example.com",
+        "name": "apostello demo"
+    }
+}, {
+    "model": "apostello.recipientgroup",
+    "pk": 1,
+    "fields": {
+        "is_archived": false,
+        "name": "[E] Geneva",
+        "description": "Imported from Elvanto"
+    }
+}, {
+    "model": "apostello.recipientgroup",
+    "pk": 2,
+    "fields": {
+        "is_archived": false,
+        "name": "[E] England",
+        "description": "Imported from Elvanto"
+    }
+}, {
+    "model": "apostello.recipientgroup",
+    "pk": 3,
+    "fields": {
+        "is_archived": false,
+        "name": "[E] Scotland",
+        "description": "Imported from Elvanto"
+    }
+}, {
+    "model": "apostello.recipientgroup",
+    "pk": 4,
+    "fields": {
+        "is_archived": false,
+        "name": "[E] Empty",
+        "description": "Imported from Elvanto"
+    }
+}, {
+    "model": "apostello.recipientgroup",
+    "pk": 5,
+    "fields": {
+        "is_archived": false,
+        "name": "[E] All",
+        "description": "Imported from Elvanto"
+    }
+}, {
+    "model": "apostello.elvantogroup",
+    "pk": 66,
+    "fields": {
+        "sync": true,
+        "name": "Geneva",
+        "e_id": "41dd51d9-d3c5-11e4-95ba-068b656294b7",
+        "last_synced": "2015-12-23T14:39:27.183Z"
+    }
+}, {
+    "model": "apostello.elvantogroup",
+    "pk": 67,
+    "fields": {
+        "sync": true,
+        "name": "England",
+        "e_id": "4ad1c22b-d3c5-11e4-95ba-068b656294b7",
+        "last_synced": "2015-12-23T14:39:29.710Z"
+    }
+}, {
+    "model": "apostello.elvantogroup",
+    "pk": 68,
+    "fields": {
+        "sync": true,
+        "name": "Scotland",
+        "e_id": "50343ad0-d3c5-11e4-95ba-068b656294b7",
+        "last_synced": "2015-12-23T14:39:32.237Z"
+    }
+}, {
+    "model": "apostello.elvantogroup",
+    "pk": 69,
+    "fields": {
+        "sync": false,
+        "name": "Empty",
+        "e_id": "549f2473-d3c5-11e4-95ba-068b656294b7",
+        "last_synced": "2015-12-23T14:39:34.852Z"
+    }
+}, {
+    "model": "apostello.elvantogroup",
+    "pk": 70,
+    "fields": {
+        "sync": true,
+        "name": "All",
+        "e_id": "7ebd2605-d3c7-11e4-95ba-068b656294b7",
+        "last_synced": "2015-12-23T14:39:37.418Z"
+    }
+}, {
+    "model": "apostello.recipient",
+    "pk": 1,
+    "fields": {
+        "is_archived": false,
+        "is_blocking": false,
+        "first_name": "John",
+        "last_name": "Calvin",
+        "number": "+447902537509",
+        "groups": [5, 1]
+    }
+}, {
+    "model": "apostello.recipient",
+    "pk": 2,
+    "fields": {
+        "is_archived": false,
+        "is_blocking": false,
+        "first_name": "John",
+        "last_name": "Owen",
+        "number": "+447902546589",
+        "groups": [5, 2]
+    }
+}, {
+    "model": "apostello.smsinbound",
+    "pk": 1,
+    "fields": {
+        "sid": "test1",
+        "is_archived": false,
+        "dealt_with": false,
+        "content": "test Hi there!",
+        "time_received": "2015-12-22T20:42:01Z",
+        "sender_name": "John Calvin",
+        "sender_num": "+447902537509",
+        "matched_keyword": "test",
+        "matched_colour": "#098f6b",
+        "matched_link": "/keyword/responses/1/",
+        "display_on_wall": true
+    }
+}, {
+    "model": "apostello.smsinbound",
+    "pk": 2,
+    "fields": {
+        "sid": "test2",
+        "is_archived": false,
+        "dealt_with": true,
+        "content": "testing a silly match",
+        "time_received": "2015-12-22T21:44:40Z",
+        "sender_name": "John Calvin",
+        "sender_num": "+447902537509",
+        "matched_keyword": "test",
+        "matched_colour": "#098f6b",
+        "matched_link": "/keyword/responses/1/",
+        "display_on_wall": false
+    }
+}, {
+    "model": "apostello.smsinbound",
+    "pk": 3,
+    "fields": {
+        "sid": "test3",
+        "is_archived": false,
+        "dealt_with": false,
+        "content": "this doesn't match?",
+        "time_received": "2015-12-23T20:46:00Z",
+        "sender_name": "John Calvin",
+        "sender_num": "+447902537509",
+        "matched_keyword": "No Match",
+        "matched_colour": "#B6B6B6",
+        "matched_link": "#",
+        "display_on_wall": false
+    }
+}, {
+    "model": "apostello.smsinbound",
+    "pk": 4,
+    "fields": {
+        "sid": "test4",
+        "is_archived": false,
+        "dealt_with": false,
+        "content": "connect",
+        "time_received": "1683-08-24T12:00:00Z",
+        "sender_name": "John Owen",
+        "sender_num": "+447902546589",
+        "matched_keyword": "connect",
+        "matched_colour": "#b640a0",
+        "matched_link": "/keyword/responses/2/",
+        "display_on_wall": true
+    }
+}, {
+    "model": "apostello.siteconfiguration",
+    "pk": 1,
+    "fields": {
+        "site_name": "apostello",
+        "sms_char_limit": 160,
+        "disable_all_replies": false,
+        "office_email": "",
+        "from_email": "",
+        "slack_url": "",
+        "sync_elvanto": true
+    }
+}, {
+    "model": "account.emailconfirmation",
+    "pk": 1,
+    "fields": {
+        "email_address": 1,
+        "created": "2015-12-23T15:04:32.774Z",
+        "sent": "2015-12-23T15:04:32.812Z",
+        "key": "hgxbixiiax15xvy3xnfh2bvoqnrsq33bbdh4dod9nncvqqeop077ysljrgotchgk"
+    }
+}, {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+        "password": "pbkdf2_sha256$24000$TDDWg92rFyf1$gczAEPhTA3uHYn72XLrFp6MOI3ZYT+GIYZebkjChyqs=",
+        "last_login": "2015-12-23T15:09:16.706Z",
+        "is_superuser": true,
+        "username": "admin",
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2015-12-23T14:31:32.436Z",
+        "groups": [],
+        "user_permissions": []
+    }
+}, {
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+        "password": "pbkdf2_sha256$24000$JdMCAuyO9gQS$PzLzxL1lGb9Moojg81I/eH4zSj30nFfzjitWclmtglk=",
+        "last_login": "2015-12-23T15:10:01.000Z",
+        "is_superuser": false,
+        "username": "test",
+        "first_name": "",
+        "last_name": "",
+        "email": "test@example.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2015-12-23T15:04:32Z",
+        "groups": [],
+        "user_permissions": []
+    }
+}, {
+    "model": "apostello.keyword",
+    "pk": 1,
+    "fields": {
+        "is_archived": false,
+        "keyword": "test",
+        "description": "Test keyword",
+        "custom_response": "Thanks for testing!",
+        "deactivated_response": "You are far too late for testing",
+        "too_early_response": "You can't test yet!",
+        "activate_time": "2016-01-01T06:00:00Z",
+        "deactivate_time": "2025-12-23T14:35:03Z",
+        "last_email_sent_time": null,
+        "owners": [],
+        "subscribed_to_digest": []
+    }
+}, {
+    "model": "apostello.keyword",
+    "pk": 2,
+    "fields": {
+        "is_archived": false,
+        "keyword": "connect",
+        "description": "Connect sign up",
+        "custom_response": "Thanks for signing up :-)",
+        "deactivated_response": "",
+        "too_early_response": "",
+        "activate_time": "2015-12-23T14:33:49Z",
+        "deactivate_time": null,
+        "last_email_sent_time": null,
+        "owners": [],
+        "subscribed_to_digest": []
+    }
+}, {
+    "model": "apostello.userprofile",
+    "pk": 1,
+    "fields": {
+        "user": 1,
+        "approved": false,
+        "can_see_groups": true,
+        "can_see_contact_names": true,
+        "can_see_keywords": true,
+        "can_see_outgoing": true,
+        "can_see_incoming": true,
+        "can_send_sms": false,
+        "can_see_contact_nums": false,
+        "can_import": false
+    }
+}, {
+    "model": "apostello.userprofile",
+    "pk": 2,
+    "fields": {
+        "user": 2,
+        "approved": true,
+        "can_see_groups": true,
+        "can_see_contact_names": true,
+        "can_see_keywords": true,
+        "can_see_outgoing": true,
+        "can_see_incoming": true,
+        "can_send_sms": true,
+        "can_see_contact_nums": true,
+        "can_import": true
+    }
+}, {
+    "model": "account.emailaddress",
+    "pk": 1,
+    "fields": {
+        "user": 2,
+        "email": "test@example.com",
+        "verified": true,
+        "primary": true
+    }
+}]
