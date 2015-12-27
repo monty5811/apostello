@@ -10,7 +10,7 @@ apostello is a web app designed to allow a church to communicate with its congre
 
 apostello was written for use at St Columba's Free Church as we couldn't find a cheap SMS solution that fit all our needs and has been running in production since early 2015.
 
-
+Try out the :ref:`demo site <demo_site>`.
 
 .. toctree::
    :maxdepth: 2
@@ -18,6 +18,7 @@ apostello was written for use at St Columba's Free Church as we couldn't find a 
 
    features
    getting_started
+   demo_site
    development
    api
 
