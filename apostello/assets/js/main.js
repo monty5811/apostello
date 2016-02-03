@@ -68,7 +68,6 @@ $(document).ready(function() {
 });
 $(document).ready(function() {
     $('.dropdown').dropdown({
-        debug: true,
         label: {
             transition: 'horizontal flip',
             duration: 0,
@@ -77,7 +76,6 @@ $(document).ready(function() {
     });
 });
 $(document).ready(function() {
-    console.log('setup checkbox')
     $('.ui.checkbox')
         .checkbox({
             onChecked: function() {
@@ -90,5 +88,9 @@ $(document).ready(function() {
                 $('#members_dropdown').dropdown('clear')
             }
         });
-    console.log('checkbox done')
 });
+$(document).ready(function() {
+    $('.ui.sidebar')
+    .sidebar()
+    .sidebar('attach events', '#togglesidebar');
+})
