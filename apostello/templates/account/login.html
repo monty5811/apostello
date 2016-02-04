@@ -9,6 +9,9 @@
 <h3>{% trans "Sign In" %}</h3>
 {% if socialaccount_providers %}
 <a href="/accounts/google/login/?next=%2F&process=login"><img src="{% static 'images/goog_login.png' %}" height="46" alt="Google"></a>
+{% endif %}
+{% if not CONFIG.disable_email_login_form %}
+{% if socialaccount_providers %}
 <p>or</p>
 {% endif %}
 <form class="ui form login" method="POST" action="{% url 'account_login' %}">
@@ -23,4 +26,5 @@
 <p>{% blocktrans %}If you have not yet created an account, please
 <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
 </form>
+{% endif %}
 {% endblock %}

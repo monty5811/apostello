@@ -576,6 +576,7 @@ class SiteConfiguration(SingletonModel):
     of this model.
     """
     site_name = models.CharField(max_length=255, default='apostello')
+    disable_email_login_form = models.BooleanField(default=False, help_text='Tick this to hide the login with email form. Note, you will need to have setup login with Google, or users will have no way into the site.')
     sms_char_limit = models.PositiveSmallIntegerField(default=160, help_text='SMS length limit.')
     disable_all_replies = models.BooleanField(default=False, help_text='Tick this box to disable all automated replies')
     office_email = models.EmailField(blank=True, help_text='Email to send information emails to')
