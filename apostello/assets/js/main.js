@@ -91,6 +91,11 @@ $(document).ready(function() {
 });
 $(document).ready(function() {
     $('.ui.sidebar')
-    .sidebar()
+    .sidebar({
+        context: $('#sidebarcontext'),
+        dimPage: false
+    })
+    .sidebar('setting', 'transition', 'overlay')
+    .sidebar('setting', 'mobileTransition', 'overlay')
     .sidebar('attach events', '#togglesidebar');
 })
