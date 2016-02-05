@@ -22,7 +22,7 @@ Special Keywords
 There is a small set of reserved keywords, some by Twilio and some by apostello.
 
 * Twilio's reserved keywords can be found `here <https://www.twilio.com/help/faq/sms/does-twilio-support-stop-block-and-cancel-aka-sms-filtering>`_.
-* apostello also reserves the keyword **name**. Any SMS that matches **name** will be parsed for a name and used to update the name associated with that contact in the DB. If the parsing fails, then the contact is sent another message asking them to try again.
+* apostello also reserves the keyword **name**. Any SMS that matches **name** will be parsed for a name and used to update the name associated with that contact. If the parsing fails, then the contact is sent another message asking them to try again.
 
 Custom Keywords
 ~~~~~~~~~~~~~~~
@@ -43,9 +43,11 @@ You can create as many keywords as you like, and each keyword comes with the fol
 Keyword Matching
 ~~~~~~~~~~~~~~~~
 
-TODO: describe keyword matching process
+A case insensitive greedy match is performed on the start of every incoming
+message up to the first space in the message. For example, the messages
+`connect John Calvin` and `connected John Calvin` would both match the keyword
+`connect`, but only the second message would match the keyword `connected`.
 
-Sending Messages
-----------------
-
-
+There is an additional check when creating new keywords - you cannot create a
+keyword that cause a match collision. For example, if `connect` is a keyword,
+you will be unable to create `con`, `conn` or `connected`, etc.
