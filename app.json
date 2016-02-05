@@ -71,7 +71,7 @@
   "addons": [
     "heroku-postgresql:hobby-dev",
     "heroku-redis",
-    "cloudamqp:little-lemur",
+    "cloudamqp:lemur",
     "papertrail:choklad",
     "scheduler:standard"
   ]
