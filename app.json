@@ -19,37 +19,37 @@
     },
     "TWILIO_ACCOUNT_SID": {
       "description": "Your Twilio account SID",
-      "value": "",
-    }
+      "value": ""
+    },
     "TWILIO_AUTH_TOKEN": {
       "description": "Your Twilio account Auth Token",
-      "value": "",
-    }
+      "value": ""    
+    },
     "TWILIO_FROM_NUM": {
       "description": "The Twilio number you want to send from",
-      "value": "",
-    }
+      "value": ""
+    },
     "COUNTRY_CODE": {
       "description": "County code (used in Elvanto import)",
-      "value": "",
-    }
+      "value": ""
+    },
     "EMAIL_HOST": {
       "description": "Email host (required for user sign ups)",
-      "value": "",
-    }
+      "value": ""
+    },
     "EMAIL_HOST_USER": {
       "description": "Email host user",
-      "value": "",
-    }
+      "value": ""
+    },
     "EMAIL_HOST_PASSWORD": {
       "description": "Email host password",
-      "value": "",
-    }
+      "value": ""
+    },
     "WHITELISTED_LOGIN_DOMAINS": {
       "description": "Automatically approve verified emails from this domain",
       "value": "",
       "required": false
-    }
+    },
     "ELVANTO_KEY": {
       "description": "Elvanto API Key",
       "value": "",
@@ -71,7 +71,7 @@
   "addons": [
     "heroku-postgresql:hobby-dev",
     "heroku-redis",
-    "cloudamqp:little-lemur"
+    "cloudamqp:little-lemur",
     "papertrail:choklad",
     "scheduler:standard"
   ]
