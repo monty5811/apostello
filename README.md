@@ -9,3 +9,5 @@
 For more info, please see the [documentation](https://apostello.readthedocs.org/)
 
 Note that apostello is pre-release quality software. Everything should work as intended, but there may be backwards incompatible changes before version 1.0.
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
