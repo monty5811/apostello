@@ -1,44 +1,50 @@
+.. _getting_started:
+
 Getting Started
 ===============
 
-Getting an instance of apostello running is fairly simple if you have deployed a Django application before. If not, this guide should help.
+Getting an instance of apostello running is fairly simple if you have deployed a
+Django application before.
+If not, this guide should help.
 
-TODO: release ansible playbook for deployment and add instructions
+There are a number of ways you can deploy apostello:
+
+* On your server using the :ref:`ansible playbook <deploy-ansible>`
+included in the repo
+* One click digital ocean installer (*coming soon*)
+* Manually on your own server, you will need to setup a message broker, a
+database, a web server and the django app and celery background worker.
+* :ref:`Heroku <deploy-heroku>`
 
 Prerequisites
 -------------
 
 * *Required*: Twilio account with a purchased number
-* *Required*: An SMTP server or Mailgun, Madrill, etc account for sending email notifications
+* *Required*: An SMTP server or Mailgun, Madrill, etc account for sending email
+notifications
 * *Optional*: A web app registered for authentication with a Google account
 * *Optional*: An Elvanto API Key for importing Elvanto groups
-
-
-Server Setup
-------------
-
-Ubuntu is recommended (Debian should work too) for this setup guide.
-
-The ansible playbook in the repo is the recommended deployment method - you can simply point the playbook at a server and then skip to the first run section.
-
-If you would rather proceed manually, then you will need to
-
-TODO: add manual deploy script/instructions
+* *Optional*: An opbeat account for error logging
 
 First Run
 ---------
 
-After you have successfully set up your copy of apostello you should create a superuser:
+After you have successfully set up your copy of apostello you should create a
+superuser. Assuming you have used the ansible playbook:
 
 .. code-block:: bash
 
   # ssh into your machine
-  # cd to the apostello directory
-  # activate virtualenv, etc
+  cd /webapps/apostello
+  . venv/bin/activate # activate virtualenv, etc
   export DJANGO_SETTINGS_MODULE=settings.production
+  cd apostello
   ./manage.py createsuperuser
 
-* Now visit the admin site, if your instance of apostello is at example.com, go to `example.com/admin`
+  # if using heroku:
+  heroku run ./manage.py createsuperuser
+
+* Now visit the admin site: if your instance of apostello is at example.com, go to `example.com/admin`
 * Sign in with your super user account
 * Edit any settings and default responses you wish by clicking on the Site Configuration and Default Responses links TODO: link to docs
 * You can also set up authenitcation with Google now TODO: link to instructions
@@ -55,7 +61,9 @@ After you have successfully set up your copy of apostello you should create a su
   * *Optional:* delete the admin user you created with `createsuperuser`
 * Log out of the admin panel and return the normal site
 * Log in with your user account again
+* TODO add Twilio instructions
 * Now you can continue to set up apostello: import contacts, start sending messages, publicise your number, etc
+* Any future users will be able to use the sign up page. If you do not whitelist any domains, you will need to approve new users before they can do anything
 
 
 Google Authentication
