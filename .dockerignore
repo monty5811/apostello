@@ -1,0 +1,8 @@
+.cache
+.coverage
+db.sqlite3
+.git
+.gitignore
+.testmondata
+.tmontmp
+.tox
