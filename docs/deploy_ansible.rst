@@ -1,4 +1,5 @@
-.. _deploy_ansible:
+.. _deploy-ansible:
+
 
 Deploying with Ansible
 ======================
@@ -13,7 +14,7 @@ you point it at. For example, the playbook may overwrite you nginx config.
 Instructions
 ~~~~~~~~~~~~
 
-To run the playbook::
+To run the playbook
 
 .. code-block:: bash
 

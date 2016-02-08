@@ -1,4 +1,4 @@
-.. _getting_started:
+.. _getting-started:
 
 Getting Started
 ===============
@@ -12,7 +12,7 @@ There are a number of ways you can deploy apostello:
 * On your server using the :ref:`ansible playbook <deploy-ansible>` included in the repo
 * One click digital ocean installer (*coming soon*)
 * Manually on your own server, you will need to setup a message broker, a database, a web server and the django app and celery background worker.
-* :ref:`Heroku <deploy-heroku>`
+* One click :ref:`Heroku <deploy-heroku>` deploy
 
 Prerequisites
 -------------

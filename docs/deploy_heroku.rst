@@ -1,4 +1,4 @@
-.. _deploy_heroku:
+.. _deploy-heroku:
 
 Deploying to Heroku
 ===================
@@ -12,9 +12,8 @@ This may mean you miss some incoming messages from Twilio.
 You can either upgrade to a paid plan or use the ansible playbook or digital
 ocean installer instead.
 
-<a href="https://heroku.com/deploy">
-  <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy">
-</a>
+.. image:: https://www.herokucdn.com/deploy/button.png
+    :target: https://heroku.com/deploy?template=https://github.com/monty5811/apostello/tree/master
 
 Despite the limitations above, Heroku can be a quick and easy way to evaluate if
 you want to invest the time into setting up and using apostello at your church.
