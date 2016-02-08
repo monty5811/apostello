@@ -1,0 +1,24 @@
+---
+
+- name: Provision a {{ application_name }} server
+  hosts: all
+  sudo: yes
+  sudo_user: root
+  remote_user: root
+  vars:
+    - setup_git_repo: yes
+    - update_apt_cache: yes
+    - setup_ufw: yes
+    - create_swap_file: yes
+    - run_django_migrate: yes
+    - run_django_collectstatic: yes
+  vars_files:
+    - env_vars/base.yml
+    - env_vars/example.yml # you need to change this!
+  roles:
+    - base
+    - db
+    - web
+    - rabbitmq
+    - celery
+    - memcached

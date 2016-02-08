@@ -1,0 +1,9 @@
+---
+
+- name: Create .env file
+  template: src=dotenv.j2
+            dest={{application_path}}/.env
+            owner={{ gunicorn_user }}
+            group={{ gunicorn_group }}
+            mode=0640
+            backup=yes

@@ -1,0 +1,17 @@
+---
+
+- name: Install ufw
+  apt: name=ufw update_cache={{ update_apt_cache }} state=installed
+  tags: packages
+
+- name: set default policy
+  ufw: state=enabled policy=reject direction=incoming
+
+- name: allow ssh
+  ufw: rule=allow port=22
+
+- name: allow nginx http
+  ufw: rule=allow port=80
+
+- name: allow nginx https
+  ufw: rule=allow port=443

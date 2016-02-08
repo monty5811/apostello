@@ -1,0 +1,33 @@
+---
+# SSL
+ssl_crt:
+ssl_key:
+# Database settings
+db_password:
+# Nginx settings
+nginx_server_name:
+# RabbitMQ settings:
+rabbitmq_admin_user:
+rabbitmq_admin_password:
+rabbitmq_application_password:
+# Application Settings
+django_secret_key: 'this should be a very long string'
+# Twilio Credentials
+twilio_account_sid:
+twilio_auth_token:
+twilio_from_num:
+# Whitelisted domains
+whitelisted_login_domains:
+# Email
+django_email_host:
+django_email_host_user:
+django_email_host_password:
+# Elvanto
+elvanto_key:
+country_code:
+# Slack
+slack_url:
+# Opbeat
+opbeat_org_id:
+opbeat_app_id:
+opbeat_secret_token:
