@@ -10,6 +10,6 @@ env:
     - DJANGO_EMAIL_HOST_PASSWORD=not_used_in_tests
     - SLACK_URL=''
     - FROM_EMAIL=noreply@example.com
-install: "pip install -r requirements.txt"
+install: "pip install -r requirements_test.txt"
 script: xvfb-run -a py.test . --nomigrations -n 2 --cov="." --cov-report="term-missing" --isort
 after_script: pip install coveralls && coveralls
