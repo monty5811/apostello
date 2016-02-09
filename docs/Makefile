@@ -49,7 +49,10 @@ help:
 	@echo "  coverage   to run coverage check of the documentation (if enabled)"
 
 clean:
-	rm -rf $(BUILDDIR)/*
+	rm -rf $(BUILDDIR)/* screenshots/
+
+screenshots:
+	xvfb-run -a python demo_screenshots.py
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
