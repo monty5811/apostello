@@ -1,7 +1,6 @@
 ---
-# SSL
-ssl_crt:
-ssl_key:
+# Let's Encrypt (free SSL):
+le_email: "dean.montgomery@stcolumbas.freechurch.org"
 # Database settings
 db_password:
 # Nginx settings

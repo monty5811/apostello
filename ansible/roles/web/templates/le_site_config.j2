@@ -1,0 +1,13 @@
+# the domain we want to get the cert for
+domains = {{ nginx_server_name }}
+
+# increase key size
+rsa-key-size = 4096
+
+# this address will receive renewal reminders, IIRC
+email = {{ le_email }}
+# turn off the ncurses UI, we want this to be run as a cronjob
+text = True
+
+authenticator = webroot
+webroot-path = /tmp/letsencrypt-auto

@@ -1,0 +1,29 @@
+---
+
+- name: Setup the le repo
+  git: repo=https://github.com/letsencrypt/letsencrypt dest={{ le_repo_path }} accept_hostkey=yes version=master
+  tags: git
+
+- name: Create le config dir
+  file: path=/etc/letsencrypt state=directory
+
+- name: Create the le configuration file
+  template: src=le_site_config.j2
+            dest=/etc/letsencrypt/{{ nginx_server_name }}.ini
+            backup=yes
+
+- name: Create le cert dir
+  file: path=/tmp/letsencrypt-auto state=directory
+
+- name: Fetch certificate
+  command: "./letsencrypt-auto certonly --agree-tos --renew-by-default --config /etc/letsencrypt/{{ nginx_server_name }}.ini"
+  args:  
+    chdir: "{{ le_repo_path }}"
+    creates: /etc/letsencrypt/live/{{ nginx_server_name }}/fullchain.pem
+  notify: reload nginx
+
+- name: Setup renewal cronjob
+  cron: name="renew le cert" 
+        day="1" 
+        user="root"
+        job="cd {{le_repo_path}} && ./letsencrypt-auto certonly --agree-tos --renew-by-default --config /etc/letsencrypt/{{ nginx_server_name }}.ini && service nginx reload"

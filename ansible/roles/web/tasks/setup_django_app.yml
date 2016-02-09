@@ -4,11 +4,6 @@
   pip: virtualenv={{ virtualenv_path }} requirements={{ requirements_file }}
 
 - name: Run the Django migrate command
-  command: '{{virtualenv_path}}/bin/python {{ application_path}}/manage.py migrate sites --settings={{ django_settings_file}}'
-  when: run_django_migrate
-  tags: django
-
-- name: Run the Django migrate command for real
   command: '{{virtualenv_path}}/bin/python {{ application_path}}/manage.py migrate --settings={{ django_settings_file}}'
   when: run_django_migrate
   tags: django

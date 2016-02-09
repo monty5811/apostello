@@ -6,7 +6,11 @@ Deploying with Ansible
 
 Ansible is a tool to automate deployments.
 An ansible playbook to deploy apostello is bundled in the git repo.
+
 In order to use the playbook, you need a server to point it towards.
+Additionally, if you want to use Let's Encrypt to obtain an SSL certificate
+(enabled by default), you will need a domina that points to your server.
+
 If you do not want to customise the playbook, you should point it at a dedicated
 server as it may delete or mess up other configured applications on any server
 you point it at. For example, the playbook may overwrite you nginx config.

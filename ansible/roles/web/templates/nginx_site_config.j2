@@ -7,22 +7,25 @@ upstream wsgi_server {
 }
 
 server {
-    listen      80;
-    server_name {{ nginx_server_name }};
-    rewrite     ^ https://$server_name$request_uri? permanent;
-}
-
-server {
-    listen              443;
+    listen              80;
+    {% if setup_lets_encrypt %}
+    listen              443 ssl;
+    {% endif %}
     server_name         {{ nginx_server_name }};
-	ssl on;
-	ssl_certificate     {{ ssl_dest_dir }}/{{ application_name }}.crt;
-	ssl_certificate_key {{ ssl_dest_dir }}/{{ application_name }}.key;
+    {% if setup_lets_encrypt %}
+    ssl_certificate /etc/letsencrypt/live/{{ nginx_server_name}}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ nginx_server_name }}/privkey.pem;
+    {% endif %}
 
     client_max_body_size 4G;
 
     access_log {{ nginx_access_log_file }};
     error_log {{ nginx_error_log_file }};
+
+    location /.well-known/acme-challenge {
+      default_type  "text/plain";
+      root          /tmp/letsencrypt-auto;
+    }
 
     location /static/ {
         alias   {{ nginx_static_dir }};
