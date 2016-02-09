@@ -160,6 +160,9 @@ class ElvantoGroup(models.Model):
         """Pretty representation."""
         return self.apostello_group_name
 
+    class Meta:
+        ordering = ['name']
+
 
 class Recipient(models.Model):
     """Stores the name and number of recipients."""
