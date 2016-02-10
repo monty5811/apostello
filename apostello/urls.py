@@ -216,11 +216,16 @@ urlpatterns += [
         v.import_recipients,
         name='import_recipients'
     ),
+
+]
+urlpatterns += [
     url(
-        r'^elvanto/import/$',
-        v.ElvantoImportView.as_view(required_perms=['can_import']),
-        name='import_elvanto'
-    ),
+        r'^elvanto/',
+        include(
+            'elvanto.urls',
+            namespace='elvanto'
+        )
+    )
 ]
 
 # twilio api url

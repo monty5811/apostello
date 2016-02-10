@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from allauth.account.signals import user_signed_up
 from django.core.mail import send_mail
 from django.dispatch import receiver
@@ -14,6 +13,6 @@ def email_admin_on_signup(request, user, **kwargs):
         "to access apostello."
     )
     body = body.format(str(user))
-    from apostello.models import SiteConfiguration
+    from site_config.models import SiteConfiguration
     to_ = [SiteConfiguration.get_solo().office_email]
     send_mail("[apostello] New User", body, '', to_, )

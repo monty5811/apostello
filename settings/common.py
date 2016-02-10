@@ -23,7 +23,9 @@ INSTALLED_APPS = [
     # apostello
     'apostello.apps.ApostelloConfig',
     'api',
+    'elvanto',
     'graphs',
+    'site_config',
     # third party apps
     'rest_framework',
     'djcelery',

@@ -1,14 +1,8 @@
-# -*- coding: utf-8 -*-
-
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from solo.admin import SingletonModelAdmin
 
 from apostello import models
-
-admin.site.register(models.SiteConfiguration, SingletonModelAdmin)
-admin.site.register(models.DefaultResponses, SingletonModelAdmin)
 
 
 @admin.register(models.SmsOutbound)
@@ -49,12 +43,6 @@ class RecipientAdmin(admin.ModelAdmin):
 class RecipientGroupAdmin(admin.ModelAdmin):
     """Admin class for apostello.models.RecipientGroup."""
     list_display = ('name', 'description', 'is_archived', )
-
-
-@admin.register(models.ElvantoGroup)
-class ElvantoGroupAdmin(admin.ModelAdmin):
-    """Admin class for apostello.models.ElvantoGroup."""
-    list_display = ('name', 'sync', 'e_id', 'last_synced', )
 
 
 admin.site.unregister(User)

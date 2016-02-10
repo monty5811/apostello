@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import hashlib
 
 from django.conf import settings
@@ -11,11 +10,8 @@ from django.db import models
 from django.utils import timezone
 from django.utils.functional import cached_property
 from phonenumber_field.modelfields import PhoneNumberField
-from solo.models import SingletonModel
 
-from apostello.elvanto import elvanto, try_both_num_fields
-from apostello.exceptions import (ElvantoException, NoKeywordMatchException,
-                                  NotValidPhoneNumber)
+from apostello.exceptions import NoKeywordMatchException
 from apostello.tasks import (group_send_message_task,
                              recipient_send_message_task)
 from apostello.utils import fetch_default_reply
@@ -68,97 +64,6 @@ class RecipientGroup(models.Model):
     def __str__(self):
         """Pretty representation."""
         return self.name
-
-    class Meta:
-        ordering = ['name']
-
-
-class ElvantoGroup(models.Model):
-    """Stores details of Elvanto Groups."""
-    sync = models.BooleanField("Automatic Sync", default=False)
-    name = models.CharField("Group Name", max_length=255)
-    e_id = models.CharField("Elvanto ID", max_length=36, unique=True)
-    last_synced = models.DateTimeField(blank=True, null=True)
-
-    def create_apostello_group(self):
-        """
-        Return the internal apostello group.
-
-        Creates it if it does not already exist.
-        """
-        grp = RecipientGroup.objects.get_or_create(name=self.apostello_group_name)[0]
-        grp.description = 'Imported from Elvanto'
-        grp.save()
-        return grp
-
-    def pull(self):
-        """Pull group from Elvanto into related apostello group."""
-        apostello_group = self.create_apostello_group()
-        e_api = elvanto()
-        data = e_api._Post("groups/getInfo", id=self.e_id, fields=['people'])
-        if data['status'] != 'ok':
-            raise ElvantoException
-
-        if data['group'][0]['people']:
-            for prsn in data['group'][0]['people']['person']:
-                ElvantoGroup.add_person(apostello_group, prsn)
-
-        apostello_group.save()
-        self.last_synced = timezone.now()
-        self.save()
-
-    @staticmethod
-    def add_person(grp, prsn):
-        """Add person to group (and apostello if required)."""
-        try:
-            number = try_both_num_fields(prsn['mobile'], prsn['phone'])
-        except NotValidPhoneNumber:
-            print('Adding {0} {1} failed'.format(prsn['firstname'], prsn['lastname']))
-            return
-        # create person
-        prsn_obj = Recipient.objects.get_or_create(number=number)[0]
-        prsn_obj.first_name = prsn['firstname'] if not prsn['preferred_name'] else prsn['preferred_name']
-        prsn_obj.last_name = prsn['lastname']
-        prsn_obj.save()
-        # add person to group
-        grp.recipient_set.add(prsn_obj)
-
-    @staticmethod
-    def fetch_all_groups():
-        """Pull all group names and ids from Elvanto."""
-        e_api = elvanto()
-        data = e_api._Post("groups/getAll")
-        if data['status'] != 'ok':
-            raise ElvantoException
-
-        for grp in data['groups']['group']:
-            grp_obj = ElvantoGroup.objects.get_or_create(e_id=grp['id'])[0]
-            grp_obj.name = grp['name']
-            grp_obj.save()
-
-    @staticmethod
-    def pull_all_groups():
-        """Pull people from groups and updates the related apostello group."""
-        for grp in ElvantoGroup.objects.all():
-            if grp.sync:
-                try:
-                    grp.pull()
-                except ElvantoException:
-                    # TODO add loggin
-                    pass
-
-    @property
-    def apostello_group_name(self):
-        """
-        Name of internal group.
-
-        Just preprend an [E] before the group name.
-        """
-        return '[E] {0}'.format(self.name)
-
-    def __str__(self):
-        """Pretty representation."""
-        return self.apostello_group_name
 
     class Meta:
         ordering = ['name']
@@ -569,104 +474,6 @@ class SmsOutbound(models.Model):
 
     class Meta:
         ordering = ['-time_sent']
-
-
-class SiteConfiguration(SingletonModel):
-    """
-    Stores site wide configuration options.
-
-    This is a singleton object, there should only be a single instance
-    of this model.
-    """
-    site_name = models.CharField(max_length=255, default='apostello')
-    disable_email_login_form = models.BooleanField(default=False, help_text='Tick this to hide the login with email form. Note, you will need to have setup login with Google, or users will have no way into the site.')
-    sms_char_limit = models.PositiveSmallIntegerField(default=160, help_text='SMS length limit.')
-    disable_all_replies = models.BooleanField(default=False, help_text='Tick this box to disable all automated replies')
-    office_email = models.EmailField(blank=True, help_text='Email to send information emails to')
-    from_email = models.EmailField(blank=True, help_text='Email to send emails from')
-    slack_url = models.URLField(
-        blank=True,
-        help_text='Post all incoming messages to this slack hook. '
-        'Leave blank to disable.'
-    )
-    sync_elvanto = models.BooleanField(
-        default=False,
-        help_text='Toggle automatic syncing of Elvanto groups. '
-        'Sync will be done overnight',
-    )
-
-    def __str__(self):
-        """Pretty representation."""
-        return u"Site Configuration"
-
-    class Meta:
-        verbose_name = "Site Configuration"
-
-
-class DefaultResponses(SingletonModel):
-    """
-    Stores the site wide default responses.
-
-    This is a singleton object, there should only be a single instance
-    of this model.
-    """
-    default_no_keyword_auto_reply = models.TextField(
-        max_length=1000,
-        default='Thank you, %name%, your message has been received.',
-        validators=[less_than_sms_char_limit],
-        help_text='This message will be sent when a SMS matched a keyword, '
-        'but that keyword has no reply set'
-    )
-    default_no_keyword_not_live = models.TextField(
-        max_length=1000,
-        default='Thank you, %name%, for your text. '
-        'But "%keyword%" is not active..',
-        validators=[less_than_sms_char_limit],
-        help_text='Default message for when a keyword is not currently active.'
-    )
-    keyword_no_match = models.TextField(
-        max_length=1000,
-        default='Thank you, %name%, your message has not matched any of our '
-        'keywords. Please correct your message and try again.',
-        validators=[less_than_sms_char_limit],
-        help_text='Reply to use when an SMS does not match any keywords'
-    )
-    start_reply = models.TextField(
-        max_length=1000,
-        default="Thanks for signing up!",
-        validators=[less_than_sms_char_limit],
-        help_text='Reply to use when someone matches "start"'
-    )
-    name_update_reply = models.TextField(
-        max_length=1000,
-        default="Thanks %s!",
-        validators=[less_than_sms_char_limit],
-        help_text='Reply to use when someone matches "name".'
-    )
-    name_failure_reply = models.TextField(
-        max_length=1000,
-        default="Something went wrong, sorry, "
-        "please try again with the format 'name John Smith'.",
-        validators=[less_than_sms_char_limit],
-        help_text='Reply to use when someone matches "name"'
-        'with bad formatting.'
-    )
-    auto_name_request = models.TextField(
-        max_length=1000,
-        default="Hi there, I'm afraid we currently don't have your number in"
-        "our address book. Could you please reply in the format"
-        "\n'name John Smith'",
-        validators=[less_than_sms_char_limit],
-        help_text='Message to send when we first receive a message from '
-        'someone not in the contacts list.'
-    )
-
-    def __str__(self):
-        """Pretty representation."""
-        return u"Default Responses"
-
-    class Meta:
-        verbose_name = "Default Responses"
 
 
 class UserProfile(models.Model):

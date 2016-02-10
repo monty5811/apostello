@@ -10,8 +10,9 @@ from api.serializers import (ElvantoGroupSerializer, KeywordSerializer,
 from api.views import (ApiCollection, ApiCollectionAllWall,
                        ApiCollectionKeywordSms, ApiCollectionRecentSms,
                        ApiMember, ElvantoFetchButton, ElvantoPullButton)
-from apostello.models import (ElvantoGroup, Keyword, Recipient, RecipientGroup,
-                              SmsInbound, SmsOutbound)
+from apostello.models import (Keyword, Recipient, RecipientGroup, SmsInbound,
+                              SmsOutbound)
+from elvanto.models import ElvantoGroup
 
 # api
 urlpatterns = [

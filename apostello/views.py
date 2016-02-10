@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import csv
 import io
 
@@ -9,7 +8,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from django.views.generic import TemplateView, View
+from django.views.generic import View
 from django_twilio.decorators import twilio_view
 from phonenumber_field.validators import validate_international_phonenumber
 from twilio import twiml
@@ -19,11 +18,11 @@ from apostello.exceptions import ArchivedItemException
 from apostello.forms import (ArchiveKeywordResponses, CsvImport,
                              SendAdhocRecipientsForm, SendRecipientGroupForm)
 from apostello.mixins import ProfilePermsMixin
-from apostello.models import (Keyword, Recipient, RecipientGroup,
-                              SiteConfiguration)
+from apostello.models import Keyword, Recipient, RecipientGroup
 from apostello.reply import get_person_or_ask_for_name, reply_to_incoming
 from apostello.tasks import log_msg_in, post_to_slack
 from apostello.utils import exists_and_archived
+from site_config.models import SiteConfiguration
 
 
 class SimpleView(LoginRequiredMixin, ProfilePermsMixin, View):
@@ -300,12 +299,6 @@ def import_recipients(request):
     else:
         context['form'] = CsvImport()
         return render(request, 'apostello/importer.html', context)
-
-
-class ElvantoImportView(LoginRequiredMixin, ProfilePermsMixin, TemplateView):
-    """Display the Elvanto import form."""
-    required_perms = []
-    template_name = 'apostello/elvanto.html'
 
 
 @twilio_view

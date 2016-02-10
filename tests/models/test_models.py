@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 from apostello import models
+from site_config import models as smodels
 
 
 @pytest.mark.django_db
@@ -37,10 +38,10 @@ class TestUserProfile:
 @pytest.mark.django_db
 class TestSiteConfig:
     def test_display(self):
-        assert "Site Configuration" == str(models.SiteConfiguration.get_solo())
+        assert "Site Configuration" == str(smodels.SiteConfiguration.get_solo())
 
 
 @pytest.mark.django_db
 class TestDefaultResponses:
     def test_display(self):
-        assert "Default Responses" == str(models.DefaultResponses.get_solo())
+        assert "Default Responses" == str(smodels.DefaultResponses.get_solo())

@@ -11,13 +11,3 @@ class NoKeywordMatchException(ApostelloException):
 class ArchivedItemException(ApostelloException):
     """Item already exists in the archive."""
     pass
-
-
-class ElvantoException(ApostelloException):
-    """Elvanto API issue."""
-    pass
-
-
-class NotValidPhoneNumber(ApostelloException):
-    """Not a valid phone number."""
-    pass

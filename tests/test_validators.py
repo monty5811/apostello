@@ -3,8 +3,9 @@ import pytest
 from django.conf import settings
 from django.core.exceptions import ValidationError
 
-from ..validators import (gsm_validator, no_overlap_keyword, not_twilio_num,
-                          twilio_reserved, validate_lower)
+from apostello.validators import (gsm_validator, no_overlap_keyword,
+                                  not_twilio_num, twilio_reserved,
+                                  validate_lower)
 
 
 class TestLower:

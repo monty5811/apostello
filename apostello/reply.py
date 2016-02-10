@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.conf import settings
 from django.core.exceptions import ValidationError
 
@@ -41,7 +40,7 @@ def get_person_or_ask_for_name(from_, sms_body, keyword_obj):
         if keyword_obj == "name":
             pass
         else:
-            from apostello.models import SiteConfiguration
+            from site_config.models import SiteConfiguration
             config = SiteConfiguration.get_solo()
             if not config.disable_all_replies:
                 person_from.send_message(content=fetch_default_reply('auto_name_request'), sent_by="auto name request")

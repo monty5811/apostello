@@ -47,7 +47,7 @@ def no_overlap_keyword(value):
 
 def less_than_sms_char_limit(value):
     """Ensure message is less than the maximum character limit."""
-    from apostello.models import SiteConfiguration
+    from site_config.models import SiteConfiguration
     s = SiteConfiguration.get_solo()
     sms_char_lim = s.sms_char_limit - settings.MAX_NAME_LENGTH + len('%name%')
     if len(value) > sms_char_lim:

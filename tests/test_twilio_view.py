@@ -6,8 +6,8 @@ from django.conf import settings
 from django.test import RequestFactory
 from twilio.util import RequestValidator
 
-from ..models import *
-from ..views import *
+from apostello.models import *
+from apostello.views import *
 
 if sys.version_info[0] == 3:
     from urllib.parse import urljoin
@@ -107,7 +107,7 @@ class TestTwilioViewNoReplies:
         data['Body'] = msg
         request = factory.post(uri, data=data)
         # turn off responses
-        from apostello.models import SiteConfiguration
+        from site_config.models import SiteConfiguration
         config = SiteConfiguration.get_solo()
         config.disable_all_replies = True
         config.save()

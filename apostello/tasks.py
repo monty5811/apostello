@@ -186,18 +186,18 @@ def post_to_slack(msg):
 @periodic_task(run_every=(crontab(hour="2", minute="30", day_of_week="*")))
 def fetch_elvanto_groups(force=False):
     """Fetch all Elvanto groups."""
-    from apostello.models import SiteConfiguration
+    from site_config.models import SiteConfiguration
     config = SiteConfiguration.get_solo()
     if force or config.sync_elvanto:
-        from apostello.models import ElvantoGroup
+        from elvanto.models import ElvantoGroup
         ElvantoGroup.fetch_all_groups()
 
 
 @periodic_task(run_every=(crontab(hour="3", minute="0", day_of_week="*")))
 def pull_elvanto_groups(force=False):
     """Pull all the Elvanto groups that are set to sync."""
-    from apostello.models import SiteConfiguration
+    from site_config.models import SiteConfiguration
     config = SiteConfiguration.get_solo()
     if force or config.sync_elvanto:
-        from apostello.models import ElvantoGroup
+        from elvanto.models import ElvantoGroup
         ElvantoGroup.pull_all_groups()

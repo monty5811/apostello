@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 from django.conf import settings
 
-from apostello.models import SiteConfiguration
+from site_config.models import SiteConfiguration
 
 
 def global_settings(request):

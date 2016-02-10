@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from apostello.elvanto import fix_elvanto_numbers, try_both_num_fields
-from apostello.exceptions import NotValidPhoneNumber
-from apostello.models import ElvantoGroup, RecipientGroup
+from apostello.models import RecipientGroup
+from elvanto.elvanto import fix_elvanto_numbers, try_both_num_fields
+from elvanto.exceptions import NotValidPhoneNumber
+from elvanto.models import ElvantoGroup
 
 
 class TestElvantoNumbers:

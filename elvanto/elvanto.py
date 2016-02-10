@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 import re
 
 import ElvantoAPI
 from django.conf import settings
 
-from apostello.exceptions import NotValidPhoneNumber
+from elvanto.exceptions import NotValidPhoneNumber
 
 
 def elvanto():

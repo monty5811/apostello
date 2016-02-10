@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
 from rest_framework import serializers
 
-from apostello.models import (ElvantoGroup, Keyword, Recipient, RecipientGroup,
-                              SmsInbound, SmsOutbound)
+from apostello.models import (Keyword, Recipient, RecipientGroup, SmsInbound,
+                              SmsOutbound)
+from elvanto.models import ElvantoGroup
 
 
 class RecipientSerializer(serializers.ModelSerializer):

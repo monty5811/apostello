@@ -33,6 +33,6 @@ def exists_and_archived(form, model_class, identifier):
 
 def fetch_default_reply(msg=''):
     """Fetch default reply from database."""
-    from apostello.models import DefaultResponses
+    from site_config.models import DefaultResponses
     replies = DefaultResponses.get_solo().__dict__
     return replies[msg]
