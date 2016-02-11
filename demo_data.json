@@ -46,7 +46,7 @@
         "description": "Imported from Elvanto"
     }
 }, {
-    "model": "apostello.elvantogroup",
+    "model": "elvanto.elvantogroup",
     "pk": 66,
     "fields": {
         "sync": true,
@@ -55,7 +55,7 @@
         "last_synced": "2015-12-23T14:39:27.183Z"
     }
 }, {
-    "model": "apostello.elvantogroup",
+    "model": "elvanto.elvantogroup",
     "pk": 67,
     "fields": {
         "sync": true,
@@ -64,7 +64,7 @@
         "last_synced": "2015-12-23T14:39:29.710Z"
     }
 }, {
-    "model": "apostello.elvantogroup",
+    "model": "elvanto.elvantogroup",
     "pk": 68,
     "fields": {
         "sync": true,
@@ -73,7 +73,7 @@
         "last_synced": "2015-12-23T14:39:32.237Z"
     }
 }, {
-    "model": "apostello.elvantogroup",
+    "model": "elvanto.elvantogroup",
     "pk": 69,
     "fields": {
         "sync": false,
@@ -82,7 +82,7 @@
         "last_synced": "2015-12-23T14:39:34.852Z"
     }
 }, {
-    "model": "apostello.elvantogroup",
+    "model": "elvanto.elvantogroup",
     "pk": 70,
     "fields": {
         "sync": true,
@@ -177,7 +177,7 @@
         "display_on_wall": true
     }
 }, {
-    "model": "apostello.siteconfiguration",
+    "model": "site_config.siteconfiguration",
     "pk": 1,
     "fields": {
         "site_name": "apostello",
