@@ -12,7 +12,8 @@ from apostello.tasks import *
 class TestTasks:
     def test_send_recipient_ok(self, recipients):
         # test sending via recipient
-        recipient_send_message_task(recipients['calvin'].id, "This is a test", None, 'test')
+        recipient_send_message_task(recipients['calvin'].id, "This is a test",
+                                    None, 'test')
 
     def test_send_recipient_blacklist(self, recipients):
         recipient_send_message_task(
@@ -27,12 +28,16 @@ class TestTasks:
     def test_send_fail_number(self, recipients):
         with pytest.raises(TwilioRestException):
             recipient_send_message_task(
-                recipients['thomas_chalmers'].id, "This is a test to a number that will fail", None, 'test'
+                recipients['thomas_chalmers'].id,
+                "This is a test to a number that will fail", None, 'test'
             )
 
     def test_send_group(self):
         # test sending via group
-        group_send_message_task("This is another test", "Test group", 'test', eta=None)
+        group_send_message_task("This is another test",
+                                "Test group",
+                                'test',
+                                eta=None)
 
     def test_check_log_consistent(self):
         # TODO mock response from Twilio so we can test this
@@ -50,7 +55,8 @@ class TestTasks:
 
     def test_send_keyword_digest(self, keywords, smsin, users):
         send_keyword_digest()
-        assert Keyword.objects.get(keyword='test').last_email_sent_time is not None
+        assert Keyword.objects.get(
+            keyword='test').last_email_sent_time is not None
         send_keyword_digest()
         # add a new sms:
         sms = SmsInbound.objects.create(
@@ -68,10 +74,15 @@ class TestTasks:
 
     def test_log_msg_in(self, recipients):
         calvin = recipients['calvin']
-        p = {'Body': 'New test message', 'MessageSid': 'thisisreallyauuid', 'From': calvin.number}
+        p = {
+            'Body': 'New test message',
+            'MessageSid': 'thisisreallyauuid',
+            'From': calvin.number
+        }
         log_msg_in(p, datetime.now(), calvin.pk)
 
-        assert SmsInbound.objects.filter(content="New test message").count() == 1
+        assert SmsInbound.objects.filter(
+            content="New test message").count() == 1
 
     def test_warn_on_blacklist_receipt(self, recipients):
         warn_on_blacklist_receipt(recipients['wesley'].pk, 'stop')

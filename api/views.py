@@ -29,7 +29,8 @@ class ApiCollection(APIView):
         if self.related_field is None:
             objs = self.model_class.objects.all()
         else:
-            objs = self.model_class.objects.all().select_related(self.related_field)
+            objs = self.model_class.objects.all().select_related(
+                self.related_field)
         if self.filter_list:
             objs = objs.filter(**self.filters)
         serializer = self.serializer_class(objs, many=True)
@@ -51,7 +52,8 @@ class ApiMember(APIView):
     def post(self, request, format=None, **kwargs):
         """Handle toggle buttons."""
         pk = kwargs['pk']
-        reingest_sms = True if request.data.get('reingest', False) == 'true' else False
+        reingest_sms = True if request.data.get('reingest',
+                                                False) == 'true' else False
         deal_with_sms = request.data.get('deal_with')
         archive = request.data.get('archive')
         display_on_wall = request.data.get('display_on_wall')
@@ -92,7 +94,8 @@ class ApiCollectionRecentSms(APIView):
 
     def get(self, request, format=None, **kwargs):
         """Handle get requests."""
-        objs = SmsInbound.objects.filter(sender_num=Recipient.objects.get(pk=kwargs['pk']).number)
+        objs = SmsInbound.objects.filter(
+            sender_num=Recipient.objects.get(pk=kwargs['pk']).number)
         serializer = SmsInboundSerializer(objs, many=True)
         return Response(serializer.data)
 

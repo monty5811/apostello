@@ -15,8 +15,10 @@ from twilio import twiml
 
 from apostello.decorators import check_user_perms, keyword_access_check
 from apostello.exceptions import ArchivedItemException
-from apostello.forms import (ArchiveKeywordResponses, CsvImport,
-                             SendAdhocRecipientsForm, SendRecipientGroupForm)
+from apostello.forms import (
+    ArchiveKeywordResponses, CsvImport, SendAdhocRecipientsForm,
+    SendRecipientGroupForm
+)
 from apostello.mixins import ProfilePermsMixin
 from apostello.models import Keyword, Recipient, RecipientGroup
 from apostello.reply import get_person_or_ask_for_name, reply_to_incoming
@@ -34,8 +36,12 @@ class SimpleView(LoginRequiredMixin, ProfilePermsMixin, View):
         """Handle get requests."""
         context = dict()
         if "recipients" in self.template_name:
-            context['archived_contacts'] = Recipient.objects.filter(is_archived=True).count()
-            context['blacklisted_contacts'] = Recipient.objects.filter(is_blocking=True).count()
+            context['archived_contacts'] = Recipient.objects.filter(
+                is_archived=True
+            ).count()
+            context['blacklisted_contacts'] = Recipient.objects.filter(
+                is_blocking=True
+            ).count()
             context['total_contacts'] = Recipient.objects.count() - context[
                 'archived_contacts'
             ] - context['blacklisted_contacts']
@@ -68,12 +74,17 @@ class SendAdhoc(LoginRequiredMixin, ProfilePermsMixin, View):
 
             if form.cleaned_data['scheduled_time'] is None:
                 messages.info(
-                    request, "Sending \"{0}\"...\nPlease check the logs for verification...".format(
+                    request,
+                    "Sending \"{0}\"...\nPlease check the logs for verification...".format(
                         form.cleaned_data['content']
                     )
                 )
             else:
-                messages.info(request, "'{0}' has been successfully queued.".format(form.cleaned_data['content']))
+                messages.info(
+                    request, "'{0}' has been successfully queued.".format(
+                        form.cleaned_data['content']
+                    )
+                )
             return redirect(reverse("send_adhoc"))
         else:
             context['form'] = form
@@ -89,13 +100,17 @@ class SendGroup(LoginRequiredMixin, ProfilePermsMixin, View):
         """Display sending form."""
         context = self.context
         context['form'] = SendRecipientGroupForm
-        context['group_nums'] = [(x.id, x.calculate_cost) for x in RecipientGroup.objects.all()]
+        context['group_nums'] = [
+            (x.id, x.calculate_cost) for x in RecipientGroup.objects.all()
+        ]
         return render(request, "apostello/send_group.html", context)
 
     def post(self, request, *args, **kwargs):
         """Handle sending form submission."""
         context = {'hide_menu': True}
-        context['group_nums'] = [(x.id, x.calculate_cost) for x in RecipientGroup.objects.all()]
+        context['group_nums'] = [
+            (x.id, x.calculate_cost) for x in RecipientGroup.objects.all()
+        ]
         form = SendRecipientGroupForm(request.POST)
         if form.is_valid():
             form.cleaned_data['recipient_group'].send_message(
@@ -105,12 +120,18 @@ class SendGroup(LoginRequiredMixin, ProfilePermsMixin, View):
             )
             if form.cleaned_data['scheduled_time'] is None:
                 messages.info(
-                    request, "Sending '{0}' to '{1}'...\nPlease check the logs for verification...".format(
-                        form.cleaned_data['content'], form.cleaned_data['recipient_group']
+                    request,
+                    "Sending '{0}' to '{1}'...\nPlease check the logs for verification...".format(
+                        form.cleaned_data['content'],
+                        form.cleaned_data['recipient_group']
                     )
                 )
             else:
-                messages.info(request, "'{0}' has been successfully queued.".format(form.cleaned_data['content']))
+                messages.info(
+                    request, "'{0}' has been successfully queued.".format(
+                        form.cleaned_data['content']
+                    )
+                )
             return redirect(reverse('send_group'))
         else:
             context['form'] = form
@@ -163,7 +184,9 @@ class ItemView(LoginRequiredMixin, ProfilePermsMixin, View):
         the archived object.
         """
         try:
-            instance = self.model_class.objects.get(pk=kwargs['pk'])  # original instance
+            instance = self.model_class.objects.get(
+                pk=kwargs['pk']
+            )  # original instance
             form = self.form_class(request.POST, instance=instance)
         except KeyError:
             form = self.form_class(request.POST)
@@ -176,9 +199,12 @@ class ItemView(LoginRequiredMixin, ProfilePermsMixin, View):
             try:
                 # if we have a clash with existing object and it is archived,
                 # redirect there, otherwise return form with errors
-                new_instance = exists_and_archived(form, self.model_class, self.identifier)
+                new_instance = exists_and_archived(
+                    form, self.model_class, self.identifier
+                )
                 messages.info(
-                    request, "'{0}' already exists. You can open the menu to restore it.".format(
+                    request,
+                    "'{0}' already exists. You can open the menu to restore it.".format(
                         str(new_instance)
                     )
                 )
@@ -205,7 +231,9 @@ def keyword_responses(request, pk, archive=False):
 
     if archive is False and request.method == 'POST':
         form = ArchiveKeywordResponses(request.POST)
-        if form.is_valid() and form.cleaned_data['tick_to_archive_all_responses']:
+        if form.is_valid() and form.cleaned_data[
+            'tick_to_archive_all_responses'
+        ]:
             for sms in keyword.fetch_matches():
                 sms.is_archived = True
                 sms.save()
@@ -225,7 +253,9 @@ def keyword_csv(request, pk):
     keyword = get_object_or_404(Keyword, pk=pk)
     # Create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="' + keyword.keyword + '.csv"'
+    response[
+        'Content-Disposition'
+    ] = 'attachment; filename="' + keyword.keyword + '.csv"'
 
     writer = csv.writer(response)
     writer.writerow(['From', 'Time', 'Keyword', 'Message'])
@@ -269,13 +299,17 @@ def import_recipients(request):
     if request.method == 'POST':
         form = CsvImport(request.POST)
         if form.is_valid():
-            csv_string = u"first_name,last_name,number\n" + form.cleaned_data['csv_data']
+            csv_string = u"first_name,last_name,number\n" + form.cleaned_data[
+                'csv_data'
+            ]
             data = [x for x in csv.DictReader(io.StringIO(csv_string))]
             bad_rows = list()
             for row in data:
                 try:
                     validate_international_phonenumber(row['number'])
-                    obj = Recipient.objects.get_or_create(number=row['number'])[0]
+                    obj = Recipient.objects.get_or_create(
+                        number=row['number']
+                    )[0]
                     obj.first_name = row['first_name'].strip()
                     obj.last_name = row['last_name'].strip()
                     obj.is_archived = False
@@ -285,7 +319,9 @@ def import_recipients(request):
                     # catch bad rows and display to the user
                     bad_rows.append(row)
             if bad_rows:
-                messages.warning(request, "Uh oh, something went wrong with these imports!")
+                messages.warning(
+                    request, "Uh oh, something went wrong with these imports!"
+                )
                 context['form'] = CsvImport()
                 context['bad_rows'] = bad_rows
                 return render(request, "apostello/importer.html", context)
@@ -316,7 +352,11 @@ def sms(request):
     # get person object and optionally ask for their name
     person_from = get_person_or_ask_for_name(from_, sms_body, keyword_obj)
     log_msg_in.delay(params, timezone.now(), person_from.pk)
-    post_to_slack.delay("{0}\nFrom: {1}\n(matched: {2})".format(sms_body, str(person_from), str(keyword_obj)))
+    post_to_slack.delay(
+        "{0}\nFrom: {1}\n(matched: {2})".format(
+            sms_body, str(person_from), str(keyword_obj)
+        )
+    )
 
     reply = reply_to_incoming(person_from, from_, sms_body, keyword_obj)
 

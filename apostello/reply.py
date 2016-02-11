@@ -2,9 +2,10 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 
 from apostello.models import Recipient
-from apostello.tasks import (check_outgoing_log, notify_office_mail,
-                             update_msgs_name, warn_on_blacklist,
-                             warn_on_blacklist_receipt)
+from apostello.tasks import (
+    check_outgoing_log, notify_office_mail, update_msgs_name,
+    warn_on_blacklist, warn_on_blacklist_receipt
+)
 from apostello.utils import fetch_default_reply
 
 
@@ -35,7 +36,11 @@ def get_person_or_ask_for_name(from_, sms_body, keyword_obj):
     try:
         person_from = Recipient.objects.get(number=from_)
     except Recipient.DoesNotExist:
-        person_from = Recipient.objects.create(number=from_, first_name='Unknown', last_name='Person')
+        person_from = Recipient.objects.create(
+            number=from_,
+            first_name='Unknown',
+            last_name='Person'
+        )
         person_from.save()
         if keyword_obj == "name":
             pass
@@ -43,7 +48,10 @@ def get_person_or_ask_for_name(from_, sms_body, keyword_obj):
             from site_config.models import SiteConfiguration
             config = SiteConfiguration.get_solo()
             if not config.disable_all_replies:
-                person_from.send_message(content=fetch_default_reply('auto_name_request'), sent_by="auto name request")
+                person_from.send_message(
+                    content=fetch_default_reply('auto_name_request'),
+                    sent_by="auto name request"
+                )
                 notify_office_mail.delay(
                     '[Apostello] Unknown Contact!',
                     'SMS: {0}\nFrom: {1}\n\n\nThis person is unknown and has been asked for their name.'.format(
@@ -89,7 +97,9 @@ def reply_to_incoming(person_from, from_, sms_body, keyword):
                 ),
             )
             # TODO update to use .format() and add help text to model
-            return fetch_default_reply('name_update_reply') % person_from.first_name
+            return fetch_default_reply(
+                'name_update_reply'
+            ) % person_from.first_name
         except (ValidationError, IndexError):
             notify_office_mail.delay(
                 '[Apostello] New Signup - FAILED!',

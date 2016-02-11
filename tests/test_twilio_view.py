@@ -22,24 +22,31 @@ class TwilioRequestFactory(RequestFactory):
         self.twilio_auth_token = token
 
     def _compute_signature(self, path, params):
-        return RequestValidator(self.twilio_auth_token).compute_signature(urljoin(self.base_url, path), params=params)
+        return RequestValidator(self.twilio_auth_token).compute_signature(
+            urljoin(self.base_url, path),
+            params=params)
 
     def get(self, path, data=None, **extra):
         if data is None:
             data = {}
         if 'HTTP_X_TWILIO_SIGNATURE' not in extra:
-            extra.update({'HTTP_X_TWILIO_SIGNATURE': self._compute_signature(path, params=data)})
+            extra.update({'HTTP_X_TWILIO_SIGNATURE':
+                          self._compute_signature(path,
+                                                  params=data)})
         return super(TwilioRequestFactory, self).get(path, data, **extra)
 
     def post(self, path, data=None, content_type=None, **extra):
         if data is None:
             data = {}
         if 'HTTP_X_TWILIO_SIGNATURE' not in extra:
-            extra.update({'HTTP_X_TWILIO_SIGNATURE': self._compute_signature(path, params=data)})
+            extra.update({'HTTP_X_TWILIO_SIGNATURE':
+                          self._compute_signature(path,
+                                                  params=data)})
         if content_type is None:
             return super(TwilioRequestFactory, self).post(path, data, **extra)
         else:
-            return super(TwilioRequestFactory, self).post(path, data, content_type, **extra)
+            return super(TwilioRequestFactory, self).post(
+                path, data, content_type, **extra)
 
 
 uri = '/sms/'

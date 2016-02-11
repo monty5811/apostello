@@ -5,8 +5,12 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from apostello.exceptions import ArchivedItemException
 
-gsm_regex = re.compile(r'^[\w@?£!1$"¥#è?¤é%ù&ì\\ò(Ç)*:Ø+;ÄäøÆ,<LÖlöæ\-=ÑñÅß.>ÜüåÉ/§à¡¿\']+$')
-non_gsm_regex = re.compile(r'[^\w@?£!1$"¥#è?¤é%ù&ì\\ò(Ç)*:Ø+;ÄäøÆ,<LÖlöæ\-=ÑñÅß.>ÜüåÉ/§à¡¿\'\s]')
+gsm_regex = re.compile(
+    r'^[\w@?£!1$"¥#è?¤é%ù&ì\\ò(Ç)*:Ø+;ÄäøÆ,<LÖlöæ\-=ÑñÅß.>ÜüåÉ/§à¡¿\']+$'
+)
+non_gsm_regex = re.compile(
+    r'[^\w@?£!1$"¥#è?¤é%ù&ì\\ò(Ç)*:Ø+;ÄäøÆ,<LÖlöæ\-=ÑñÅß.>ÜüåÉ/§à¡¿\'\s]'
+)
 
 
 def exists_and_archived(form, model_class, identifier):
@@ -17,11 +21,21 @@ def exists_and_archived(form, model_class, identifier):
     Returns the instance of the existing Person (etc) for editing if it exists,
     otherwise returns None.
     """
-    unique_fields = {'keyword': 'keyword', 'group': 'name', 'recipient': 'number'}
+    unique_fields = {
+        'keyword': 'keyword',
+        'group': 'name',
+        'recipient': 'number'
+    }
 
-    all_errors = [form.errors.as_data()[x][0].code for x in form.errors.as_data()]
+    all_errors = [
+        form.errors.as_data()[x][0].code for x in form.errors.as_data()
+    ]
     try:
-        instance = model_class.objects.get(**{unique_fields[identifier]: form.data[unique_fields[identifier]]})
+        instance = model_class.objects.get(
+            **{
+                unique_fields[identifier]: form.data[unique_fields[identifier]]
+            }
+        )
     except ObjectDoesNotExist:
         raise ArchivedItemException
 

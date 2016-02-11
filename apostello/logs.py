@@ -19,7 +19,9 @@ def handle_incoming_sms(msg):
             sender.save()
 
         sms.content = msg.body
-        sms.time_received = timezone.make_aware(msg.date_created, timezone.get_current_timezone())
+        sms.time_received = timezone.make_aware(
+            msg.date_created, timezone.get_current_timezone()
+        )
         sms.sender_name = str(sender)
         sms.sender_num = msg.from_
         matched_keyword = Keyword.match(msg.body)
@@ -43,7 +45,9 @@ def handle_outgoing_sms(msg):
                 recip.save()
 
             sms.content = msg.body
-            sms.time_sent = timezone.make_aware(msg.date_sent, timezone.get_current_timezone())
+            sms.time_sent = timezone.make_aware(
+                msg.date_sent, timezone.get_current_timezone()
+            )
             sms.sent_by = "[Imported]"
             sms.recipient = recip
             sms.save()
@@ -64,9 +68,17 @@ def fetch_generator(direction):
 def fetch_list(direction, page_id):
     """Fetch list from twilio."""
     if direction == 'in':
-        return twilio_client.messages.list(page=page_id, page_size=50, to=settings.TWILIO_FROM_NUM)
+        return twilio_client.messages.list(
+            page=page_id,
+            page_size=50,
+            to=settings.TWILIO_FROM_NUM
+        )
     if direction == 'out':
-        return twilio_client.messages.list(page=page_id, page_size=50, from_=settings.TWILIO_FROM_NUM)
+        return twilio_client.messages.list(
+            page=page_id,
+            page_size=50,
+            from_=settings.TWILIO_FROM_NUM
+        )
     return []
 
 

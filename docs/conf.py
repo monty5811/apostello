@@ -157,8 +157,9 @@ def process_docstring(app, what, name, obj, options, lines):
                 lines.append(u':param %s: %s' % (field.attname, verbose_name))
 
             # Add the field's type to the docstring
-            lines.append(u':type %s: %s' %
-                         (field.attname, type(field).__name__))
+            lines.append(
+                u':type %s: %s' % (field.attname, type(field).__name__)
+            )
 
     # Return the extended docstring
     return lines

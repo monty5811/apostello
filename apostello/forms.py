@@ -7,7 +7,11 @@ from apostello.validators import gsm_validator, less_than_sms_char_limit
 
 class SendAdhocRecipientsForm(forms.Form):
     """Send an sms to ad-hoc groups."""
-    content = forms.CharField(validators=[gsm_validator, less_than_sms_char_limit], required=True, min_length=1)
+    content = forms.CharField(
+        validators=[gsm_validator, less_than_sms_char_limit],
+        required=True,
+        min_length=1
+    )
     recipients = forms.ModelMultipleChoiceField(
         queryset=Recipient.objects.filter(is_archived=False),
         required=True,
@@ -28,7 +32,11 @@ class SendAdhocRecipientsForm(forms.Form):
 
 class SendRecipientGroupForm(forms.Form):
     """Send an sms to pre-defined group."""
-    content = forms.CharField(validators=[gsm_validator, less_than_sms_char_limit], required=True, min_length=1)
+    content = forms.CharField(
+        validators=[gsm_validator, less_than_sms_char_limit],
+        required=True,
+        min_length=1
+    )
     recipient_group = forms.ModelChoiceField(
         queryset=RecipientGroup.objects.filter(
             is_archived=False
@@ -80,7 +88,9 @@ class ManageRecipientGroupForm(forms.ModelForm):
         if 'instance' in kwargs:
             initial = kwargs.setdefault('initial', {})
             # The widget for a ModelMultipleChoiceField expects a list of primary key for the selected data.
-            initial['members'] = [t.pk for t in kwargs['instance'].recipient_set.all()]
+            initial['members'] = [
+                t.pk for t in kwargs['instance'].recipient_set.all()
+            ]
 
         forms.ModelForm.__init__(self, *args, **kwargs)
 
@@ -117,15 +127,18 @@ class KeywordForm(forms.ModelForm):
         model = Keyword
         exclude = ['is_archived', 'last_email_sent_time']
         widgets = {
-            'keyword': forms.TextInput(attrs={'placeholder': '(No spaces allowed)'}),
+            'keyword':
+            forms.TextInput(attrs={'placeholder': '(No spaces allowed)'}),
             'description': forms.TextInput(
                 attrs={
-                    'placeholder': 'Please provide a description of your keyword.'
+                    'placeholder':
+                    'Please provide a description of your keyword.'
                 }
             ),
             'custom_response': forms.TextInput(
                 attrs={
-                    'placeholder': 'eg: Thanks %name%, you have sucessfully signed up.'
+                    'placeholder':
+                    'eg: Thanks %name%, you have sucessfully signed up.'
                 }
             ),
             'owners': forms.SelectMultiple(
@@ -156,4 +169,7 @@ class ArchiveKeywordResponses(forms.Form):
 
 class CsvImport(forms.Form):
     """Handle CSV imports."""
-    csv_data = forms.CharField(help_text='John, Calvin, +447095237960', widget=forms.Textarea)
+    csv_data = forms.CharField(
+        help_text='John, Calvin, +447095237960',
+        widget=forms.Textarea
+    )

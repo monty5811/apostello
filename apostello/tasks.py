@@ -11,7 +11,6 @@ from django.utils import timezone
 from django_twilio.client import twilio_client
 from twilio.rest.exceptions import TwilioRestException
 
-
 # sending messages
 
 
@@ -22,7 +21,12 @@ def group_send_message_task(body, group_name, sent_by, eta):
     group = RecipientGroup.objects.filter(name=group_name, is_archived=False)
 
     for recipient in Recipient.objects.filter(groups__in=group):
-        recipient.send_message(content=body, group=group_name, sent_by=sent_by, eta=eta)
+        recipient.send_message(
+            content=body,
+            group=group_name,
+            sent_by=sent_by,
+            eta=eta
+        )
 
 
 @task()
@@ -39,9 +43,19 @@ def recipient_send_message_task(recipient_pk, body, group, sent_by):
     body = recipient.personalise(body)
     # send twilio message
     try:
-        message = twilio_client.messages.create(body=body, to=str(recipient.number), from_=settings.TWILIO_FROM_NUM)
+        message = twilio_client.messages.create(
+            body=body,
+            to=str(recipient.number),
+            from_=settings.TWILIO_FROM_NUM
+        )
         # add to sms out table
-        sms = SmsOutbound(sid=message.sid, content=body, time_sent=timezone.now(), recipient=recipient, sent_by=sent_by)
+        sms = SmsOutbound(
+            sid=message.sid,
+            content=body,
+            time_sent=timezone.now(),
+            recipient=recipient,
+            sent_by=sent_by
+        )
         if group is not None:
             sms.recipient_group = RecipientGroup.objects.filter(name=group)[0]
         sms.save()
@@ -140,9 +154,16 @@ def warn_on_blacklist_receipt(recipient_pk, sms):
     from apostello.models import Recipient
     recipient = Recipient.objects.get(pk=recipient_pk)
     if recipient.is_blocking:
-        email_body = "{0} has blacklisted us in the past but has just sent this message:".format(str(recipient))
-        email_body += "\n\n\t{0}\n\nYou may need to email them as we cannot currently reply to them.".format(sms)
-        notify_office_mail.delay('[Apostello] Blacklist Receipt Notice', email_body, )
+        email_body = "{0} has blacklisted us in the past but has just sent this message:".format(
+            str(recipient)
+        )
+        email_body += "\n\n\t{0}\n\nYou may need to email them as we cannot currently reply to them.".format(
+            sms
+        )
+        notify_office_mail.delay(
+            '[Apostello] Blacklist Receipt Notice',
+            email_body,
+        )
 
 
 @periodic_task(run_every=(crontab(hour="21", minute="30", day_of_week="*")))
@@ -154,14 +175,17 @@ def send_keyword_digest():
         checked_time = timezone.now()
         new_responses = keyword.fetch_matches()
         if keyword.last_email_sent_time is not None:
-            new_responses = new_responses.filter(time_received__gt=keyword.last_email_sent_time)
+            new_responses = new_responses.filter(
+                time_received__gt=keyword.last_email_sent_time
+            )
         # if any, loop over subscribers and send email
         if new_responses.count() > 0:
             for subscriber in keyword.subscribed_to_digest.all():
                 send_async_mail.delay(
                     'Daily update for "{0}" responses'.format(
                         str(keyword)
-                    ), "The following text messages have been received today:\n\n{0}".format(
+                    ),
+                    "The following text messages have been received today:\n\n{0}".format(
                         "\n".join([str(x) for x in new_responses])
                     ), [subscriber.email]
                 )
@@ -177,7 +201,11 @@ def post_to_slack(msg):
     config = SiteConfiguration.get_solo()
     url = config.slack_url
     if url:
-        data = {'text': msg, 'username': 'apostello', "icon_emoji": ":speech_balloon:"}
+        data = {
+            'text': msg,
+            'username': 'apostello',
+            "icon_emoji": ":speech_balloon:"
+        }
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         requests.post(url, data=json.dumps(data), headers=headers)
 

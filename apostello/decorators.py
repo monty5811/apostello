@@ -54,7 +54,9 @@ def check_user_perms(view=None, require=None):
             if not request.user.profile.approved:
                 return redirect(reverse('not_approved'))
             # check user has required permissions
-            tested_perms = [request.user.profile.__getattribute__(x) for x in require]
+            tested_perms = [
+                request.user.profile.__getattribute__(x) for x in require
+            ]
             if all(tested_perms):
                 return view(*args, **kwargs)
 

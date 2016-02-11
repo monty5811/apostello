@@ -15,10 +15,22 @@ from apostello.models import *
 @pytest.fixture
 def recipients():
     """Create a bunch of recipients for testing."""
-    calvin = Recipient.objects.create(first_name="John", last_name="Calvin", number='+447927401749')
-    house_lamp = Recipient.objects.create(first_name="Johannes", last_name="Oecolampadius", number='+447927401740')
-    knox = Recipient.objects.create(first_name="John", last_name="Knox", number='+447928401745', is_archived=True)
-    wesley = Recipient.objects.create(first_name="John", last_name="Wesley", number='+447927401745', is_blocking=True)
+    calvin = Recipient.objects.create(first_name="John",
+                                      last_name="Calvin",
+                                      number='+447927401749')
+    house_lamp = Recipient.objects.create(first_name="Johannes",
+                                          last_name="Oecolampadius",
+                                          number='+447927401740')
+    knox = Recipient.objects.create(first_name="John",
+                                    last_name="Knox",
+                                    number='+447928401745',
+                                    is_archived=True)
+    wesley = Recipient.objects.create(
+        first_name="John",
+        last_name="Wesley",
+        number='+447927401745',
+        is_blocking=True
+    )
     john_owen = Recipient.objects.create(
         first_name="John",
         last_name="Owen",
@@ -45,20 +57,28 @@ def recipients():
 @pytest.fixture
 def groups(recipients):
     """Create some groups with recipients."""
-    test_group = RecipientGroup.objects.create(name="Test Group", description="This is a test group", )
+    test_group = RecipientGroup.objects.create(
+        name="Test Group",
+        description="This is a test group", )
     archived_group = RecipientGroup.objects.create(
         name="Archived Group",
         description="This is a test group",
         is_archived=True
     )
     archived_group.save()
-    empty_group = RecipientGroup.objects.create(name="Empty Group", description="This is an empty group")
+    empty_group = RecipientGroup.objects.create(
+        name="Empty Group",
+        description="This is an empty group")
     empty_group.save()
 
     test_group.recipient_set.add(recipients['calvin'])
     test_group.recipient_set.add(recipients['house_lamp'])
     test_group.save()
-    objs = {'test_group': test_group, 'empty_group': empty_group, 'archived_group': archived_group, }
+    objs = {
+        'test_group': test_group,
+        'empty_group': empty_group,
+        'archived_group': archived_group,
+    }
     return objs
 
 
@@ -258,11 +278,16 @@ def keywords():
 @pytest.fixture()
 def users(recipients, keywords):
     """Create apostello users."""
-    user = User.objects.create_user(username='test', email='test@example.com', password='top_secret')
+    user = User.objects.create_user(username='test',
+                                    email='test@example.com',
+                                    password='top_secret')
     user.profile.save()
     user.is_staff = True
     user.save()
-    allauth_email = EmailAddress.objects.create(user=user, email=user.email, primary=True, verified=True)
+    allauth_email = EmailAddress.objects.create(user=user,
+                                                email=user.email,
+                                                primary=True,
+                                                verified=True)
     allauth_email.save()
     p = UserProfile.objects.get(user=user)
     p.approved = True
@@ -271,17 +296,24 @@ def users(recipients, keywords):
     p.can_import = True
     p.save()
 
-    user2 = User.objects.create_user(username='test2', email='test2@example.com', password='top2_secret')
+    user2 = User.objects.create_user(username='test2',
+                                     email='test2@example.com',
+                                     password='top2_secret')
     user2.save()
     user2.profile.save()
     p = UserProfile.objects.get(user=user2)
     p.approved = True
     p.save()
-    allauth_email = EmailAddress.objects.create(user=user2, email=user2.email, primary=True, verified=True)
+    allauth_email = EmailAddress.objects.create(user=user2,
+                                                email=user2.email,
+                                                primary=True,
+                                                verified=True)
     allauth_email.save()
     keywords['test'].owners.add(user2)
 
-    user3 = User.objects.create_user(username='test3', email='test3@example.com', password='top2_secret')
+    user3 = User.objects.create_user(username='test3',
+                                     email='test3@example.com',
+                                     password='top2_secret')
     user3.save()
     user3.profile.save()
     p = UserProfile.objects.get(user=user3)
@@ -289,7 +321,10 @@ def users(recipients, keywords):
     p.save()
     user3.profile.approved = True
     user3.profile.save()
-    allauth_email = EmailAddress.objects.create(user=user3, email=user3.email, primary=True, verified=True)
+    allauth_email = EmailAddress.objects.create(user=user3,
+                                                email=user3.email,
+                                                primary=True,
+                                                verified=True)
     allauth_email.save()
 
     c = Client()
@@ -298,7 +333,14 @@ def users(recipients, keywords):
     c2.login(username='test3', password='top2_secret')
     c_out = Client()
 
-    objs = {'staff': user, 'notstaff': user2, 'notstaff2': user3, 'c_staff': c, 'c_in': c2, 'c_out': c_out}
+    objs = {
+        'staff': user,
+        'notstaff': user2,
+        'notstaff2': user3,
+        'c_staff': c,
+        'c_in': c2,
+        'c_out': c_out
+    }
 
     return objs
 

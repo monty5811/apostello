@@ -14,7 +14,13 @@ class SmsOutboundAdmin(admin.ModelAdmin):
 @admin.register(models.SmsInbound)
 class SmsInboundAdmin(admin.ModelAdmin):
     """Admin class for apostello.models.SmsInbound."""
-    list_display = ('content', 'sender_name', 'matched_keyword', 'time_received', 'sid', )
+    list_display = (
+        'content',
+        'sender_name',
+        'matched_keyword',
+        'time_received',
+        'sid',
+    )
 
 
 @admin.register(models.Keyword)

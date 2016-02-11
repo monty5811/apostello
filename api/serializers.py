@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
-from apostello.models import (Keyword, Recipient, RecipientGroup, SmsInbound,
-                              SmsOutbound)
+from apostello.models import (
+    Keyword, Recipient, RecipientGroup, SmsInbound, SmsOutbound
+)
 from elvanto.models import ElvantoGroup
 
 
@@ -11,7 +12,10 @@ class RecipientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipient
-        fields = ('first_name', 'last_name', 'pk', 'url', 'full_name', 'is_archived', 'is_blocking')
+        fields = (
+            'first_name', 'last_name', 'pk', 'url', 'full_name', 'is_archived',
+            'is_blocking'
+        )
 
 
 class RecipientGroupSerializer(serializers.ModelSerializer):
@@ -45,8 +49,8 @@ class KeywordSerializer(serializers.ModelSerializer):
     class Meta:
         model = Keyword
         fields = (
-            'keyword', 'pk', 'description', 'custom_response', 'is_live', 'url', 'responses_url', 'num_replies',
-            'num_archived_replies'
+            'keyword', 'pk', 'description', 'custom_response', 'is_live',
+            'url', 'responses_url', 'num_replies', 'num_archived_replies'
         )
 
 
@@ -79,7 +83,14 @@ class SmsInboundSimpleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SmsInbound
-        fields = ('pk', 'content', 'time_received', 'is_archived', 'display_on_wall', 'matched_keyword', )
+        fields = (
+            'pk',
+            'content',
+            'time_received',
+            'is_archived',
+            'display_on_wall',
+            'matched_keyword',
+        )
 
 
 class SmsOutboundSerializer(serializers.ModelSerializer):
@@ -89,4 +100,9 @@ class SmsOutboundSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SmsOutbound
-        fields = ('content', 'pk', 'time_sent', 'sent_by', 'recipient', 'recipient_url', )
+        fields = ('content',
+                  'pk',
+                  'time_sent',
+                  'sent_by',
+                  'recipient',
+                  'recipient_url', )
