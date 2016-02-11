@@ -1,17 +1,5 @@
 -r requirements.txt
-apipkg==1.4               # via execnet
-argh==0.26.1              # via watchdog
-colorama==0.3.5           # via pytest-watch
-coverage==3.7.1           # via pytest-cov, pytest-testmon
-docopt==0.6.2             # via pytest-watch
-execnet==1.4.1            # via pytest-cache, pytest-xdist
-isort==4.2.2              # via pytest-isort
-pathtools==0.1.2          # via watchdog
-pep8==1.6.2               # via pytest-pep8
-py==1.4.31                # via pytest, pytest-xdist
-pyflakes==1.0.0           # via pytest-flakes
-pytest-cache==1.0         # via pytest-flakes, pytest-isort, pytest-pep8
-pytest-cov==2.2.0
+#pytest-cov==2.2.1
 pytest-django==2.9.1
 pytest-env==0.6.0
 pytest-flakes==1.0.1
@@ -19,8 +7,7 @@ pytest-isort==0.1.0
 pytest-pep8==1.0.6
 pytest-testmon==0.7
 pytest-watch==3.8.0
-pytest-xdist==1.13.1
-pytest==2.8.5
-pyyaml==3.11              # via watchdog
-selenium==2.48.0
-watchdog==0.8.3           # via pytest-watch
+pytest-xdist==1.14
+pytest==2.8.7
+scandir==1.2
+selenium==2.51.1
