@@ -16,8 +16,8 @@ django<1.10
 djangorestframework==3.3.2
 docutils==0.12
 elvantoapi==1.4.0.0
-gunicorn==19.4.1
-ipython==4.0.1
+gunicorn==19.4.5
+ipython==4.1.1
 opbeat==3.2.1
 psycopg2==2.6.1
 pygal==2.1.1
