@@ -9,7 +9,8 @@ import djcelery
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 SECRET_KEY = os.environ.get(
-    'DJANGO_SECRET_KEY', 'w;ioufpwqofjpwoifwpa09fuq039uq3u4uepoivqnwjdfvlwdv')
+    'DJANGO_SECRET_KEY', 'w;ioufpwqofjpwoifwpa09fuq039uq3u4uepoivqnwjdfvlwdv'
+)
 
 INSTALLED_APPS = [
     # built in apps
@@ -141,8 +142,9 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_USERNAME_REQUIRED = False
-WHITELISTED_LOGIN_DOMAINS = os.environ.get('WHITELISTED_LOGIN_DOMAINS',
-                                           '').split(',')
+WHITELISTED_LOGIN_DOMAINS = os.environ.get(
+    'WHITELISTED_LOGIN_DOMAINS', ''
+).split(',')
 
 LOGIN_REDIRECT_URL = '/'
 

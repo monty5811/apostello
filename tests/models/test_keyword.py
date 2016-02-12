@@ -37,12 +37,18 @@ class TestKeywords():
         )
 
     def test_no_end(self, recipients, keywords):
-        assert keywords['test_no_end'].construct_reply(recipients[
-            'calvin']) == "Will always reply"
+        assert keywords['test_no_end'].construct_reply(
+            recipients[
+                'calvin'
+            ]
+        ) == "Will always reply"
 
     def test_custom_reply(self, recipients, keywords):
-        assert keywords['test'].construct_reply(recipients[
-            'calvin']) == "Test custom response with John"
+        assert keywords['test'].construct_reply(
+            recipients[
+                'calvin'
+            ]
+        ) == "Test custom response with John"
 
     def test_no_custom_reply(self, recipients, keywords):
         assert keywords['test2'].construct_reply(
@@ -56,21 +62,31 @@ class TestKeywords():
         )
 
     def test_deactivated_custom_reply(self, recipients, keywords):
-        assert keywords['test_deac_resp'].construct_reply(recipients[
-            'calvin']) == "Too slow, Joe!"
+        assert keywords['test_deac_resp'].construct_reply(
+            recipients[
+                'calvin'
+            ]
+        ) == "Too slow, Joe!"
 
     def test_deactivated_custom_reply_no_deac_time(self, recipients, keywords):
-        assert keywords['test_deac_resp_fail'].construct_reply(recipients[
-            'calvin']) == "Hi!"
+        assert keywords['test_deac_resp_fail'].construct_reply(
+            recipients[
+                'calvin'
+            ]
+        ) == "Hi!"
 
     def test_too_early_custom_reply(self, recipients, keywords):
-        assert keywords['test_early_with_response'].construct_reply(recipients[
-            'calvin']) == "This is far too early"
+        assert keywords['test_early_with_response'].construct_reply(
+            recipients[
+                'calvin'
+            ]
+        ) == "This is far too early"
 
     def test_fetch_matched_responses(self, keywords, smsin):
         assert len(keywords['test'].fetch_matches()) == 2
         assert str(keywords['test'].fetch_matches()[0]) == str(
-            SmsInbound.objects.filter(content="test message")[0])
+            SmsInbound.objects.filter(content="test message")[0]
+        )
 
     def test_fetch_archived_matched_responses(self, keywords, smsin):
         assert len(keywords['test'].fetch_archived_matches()) == 1
@@ -107,8 +123,11 @@ class TestKeywords():
         assert Keyword.match("nope") == 'No Match'
 
     def test_get_log_link_keyword(self, keywords):
-        assert Keyword.get_log_link(keywords[
-            'test']) == '/keyword/responses/{0}/'.format(keywords['test'].pk)
+        assert Keyword.get_log_link(
+            keywords[
+                'test'
+            ]
+        ) == '/keyword/responses/{0}/'.format(keywords['test'].pk)
 
     def test_lookup_colour_test(self, keywords):
         assert Keyword.lookup_colour('test') == '#098f6b'

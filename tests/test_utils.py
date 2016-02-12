@@ -17,8 +17,9 @@ class TestExistsAndArchived:
         }
         form = ManageRecipientGroupForm(data=form_data)
         form.is_valid()
-        assert exists_and_archived(form, RecipientGroup,
-                                   'group').name == 'Archived Group'
+        assert exists_and_archived(
+            form, RecipientGroup, 'group'
+        ).name == 'Archived Group'
 
     def test_invalid_form(self, groups):
         form_data = {

@@ -20,7 +20,8 @@ class TestSignup:
         password_box2 = browser.find_elements_by_name('password2')[0]
         password_box2.send_keys('top_secret')
         login_button = browser.find_elements_by_xpath(
-            'html/body/div/div/form/button')[0]
+            'html/body/div/div/form/button'
+        )[0]
         login_button.click()
         # check we have been redirected
         assert '/accounts/confirm-email/' in browser.current_url

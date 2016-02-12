@@ -26,16 +26,20 @@ class TestManageGroups():
         assert form.is_valid() is False
 
     def test_no_members(self):
-        form_data = {'name': 'test_new_group',
-                     'description': 'not very interesting',
-                     'members': []}
+        form_data = {
+            'name': 'test_new_group',
+            'description': 'not very interesting',
+            'members': []
+        }
         form = ManageRecipientGroupForm(data=form_data)
         assert form.is_valid()
 
     def test_duplicate_group(self, recipients, groups):
-        form_data = {'name': 'Test Group',
-                     'description': 'not very interesting',
-                     'members': ['1']}
+        form_data = {
+            'name': 'Test Group',
+            'description': 'not very interesting',
+            'members': ['1']
+        }
         form = ManageRecipientGroupForm(data=form_data)
         assert form.is_valid() is False
 

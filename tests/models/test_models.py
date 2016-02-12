@@ -38,8 +38,10 @@ class TestUserProfile:
 @pytest.mark.django_db
 class TestSiteConfig:
     def test_display(self):
-        assert "Site Configuration" == str(smodels.SiteConfiguration.get_solo(
-        ))
+        assert "Site Configuration" == str(
+            smodels.SiteConfiguration.get_solo(
+            )
+        )
 
 
 @pytest.mark.django_db

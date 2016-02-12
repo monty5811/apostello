@@ -158,6 +158,20 @@ class Recipient(models.Model):
         """Recipient's full name."""
         return u"{fn} {ln}".format(fn=self.first_name, ln=self.last_name)
 
+    @property
+    def last_sms(self):
+        """Last message sent to this person"""
+        msg = cache.get('last_msg__{0}'.format(self.number))
+        if msg is None:
+            msg = SmsInbound.objects.filter(sender_num=str(self.number))
+            try:
+                msg = msg[0]  # sms are already sorted in time
+            except IndexError:
+                msg = None
+            cache.set('last_msg__{0}'.format(self.number.replace), msg, 600)
+
+        return msg
+
     def __str__(self):
         """Pretty representation."""
         return self.full_name
@@ -486,7 +500,10 @@ class SmsInbound(models.Model):
     def save(self, *args, **kwargs):
         """Override save method to invalidate cache."""
         super(SmsInbound, self).save(*args, **kwargs)
+        # invalidate live wall cache
         cache.set('live_wall', None, 0)
+        # invalidate per person last sms cache
+        cache.set('last_msg__{0}'.format(self.sender_num), None, 0)
 
     class Meta:
         ordering = ['-time_received']

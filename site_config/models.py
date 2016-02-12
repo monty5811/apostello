@@ -19,15 +19,20 @@ class SiteConfiguration(SingletonModel):
     )
     sms_char_limit = models.PositiveSmallIntegerField(
         default=160,
-        help_text='SMS length limit.')
+        help_text='SMS length limit.'
+    )
     disable_all_replies = models.BooleanField(
         default=False,
-        help_text='Tick this box to disable all automated replies')
+        help_text='Tick this box to disable all automated replies'
+    )
     office_email = models.EmailField(
         blank=True,
-        help_text='Email to send information emails to')
-    from_email = models.EmailField(blank=True,
-                                   help_text='Email to send emails from')
+        help_text='Email to send information emails to'
+    )
+    from_email = models.EmailField(
+        blank=True,
+        help_text='Email to send emails from'
+    )
     slack_url = models.URLField(
         blank=True,
         help_text='Post all incoming messages to this slack hook. '

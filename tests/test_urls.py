@@ -43,8 +43,9 @@ from site_config import models as smodels
 class TestNotLoggedIn:
     """Test site urls when not logged in."""
 
-    def test_not_logged_in(self, url, status_code, recipients, groups, smsin,
-                           smsout, users):
+    def test_not_logged_in(
+        self, url, status_code, recipients, groups, smsin, smsout, users
+    ):
         assert users['c_out'].get(url).status_code == status_code
 
 
@@ -91,8 +92,10 @@ class TestNotLoggedIn:
 class TestStaff:
     """Test site urls when logged in as staff"""
 
-    def test_staff(self, url, status_code, recipients, groups, smsin, smsout,
-                   keywords, users):
+    def test_staff(
+        self, url, status_code, recipients, groups, smsin, smsout, keywords,
+        users
+    ):
         assert users['c_staff'].get(url).status_code == status_code
 
 
@@ -142,8 +145,10 @@ class TestStaff:
 class TestNotStaff:
     """Test site urls when logged in a normal user"""
 
-    def test_in(self, url, status_code, recipients, groups, smsin, smsout,
-                keywords, users):
+    def test_in(
+        self, url, status_code, recipients, groups, smsin, smsout, keywords,
+        users
+    ):
         assert users['c_in'].get(url).status_code == status_code
 
 
@@ -152,14 +157,17 @@ class TestNotStaff:
 class TestOthers:
     """Test posting as a user"""
 
-    def test_api_posts(self, recipients, groups, smsin, smsout, keywords,
-                       users):
+    def test_api_posts(
+        self, recipients, groups, smsin, smsout, keywords, users
+    ):
         for endpoint in ['sms']:
-            for param in ['reingest', 'deal_with', 'archive', 'display_on_wall'
-                          ]:
+            for param in [
+                'reingest', 'deal_with', 'archive', 'display_on_wall'
+            ]:
                 for value in ['true', 'false']:
-                    users['c_staff'].post('/api/v1/' + endpoint + '/in/1',
-                                          {param: value})
+                    users['c_staff'].post(
+                        '/api/v1/' + endpoint + '/in/1', {param: value}
+                    )
 
     def test_api_elvanto_posts(self, users):
         # turn on
@@ -181,8 +189,12 @@ class TestOthers:
         assert emodels.ElvantoGroup.objects.get(pk=1).sync is False
 
     def test_send_adhoc_now(self, recipients, users):
-        users['c_staff'].post('/send/adhoc/', {'content': 'test',
-                                               'recipients': ['1']})
+        users['c_staff'].post(
+            '/send/adhoc/', {
+                'content': 'test',
+                'recipients': ['1']
+            }
+        )
 
     def test_send_adhoc_later(self, recipients, users):
         users['c_staff'].post(
@@ -198,8 +210,12 @@ class TestOthers:
         assert 'This field is required.' in str(resp.content)
 
     def test_send_group_now(self, groups, users):
-        users['c_staff'].post('/send/group/', {'content': 'test',
-                                               'recipient_group': '1'})
+        users['c_staff'].post(
+            '/send/group/', {
+                'content': 'test',
+                'recipient_group': '1'
+            }
+        )
 
     def test_send_group_later(self, groups, users):
         users['c_staff'].post(
@@ -214,18 +230,28 @@ class TestOthers:
         users['c_staff'].post('/send/group/', {'content': ''})
 
     def test_new_group(self, users):
-        users['c_staff'].post('/group/new/', {'name': 'test_group',
-                                              'description': 'this is a test'})
+        users['c_staff'].post(
+            '/group/new/', {
+                'name': 'test_group',
+                'description': 'this is a test'
+            }
+        )
         test_group = models.RecipientGroup.objects.get(name='test_group')
         assert 'test_group' == str(test_group)
 
     def test_bring_group_from_archive(self, groups, users):
-        users['c_staff'].post('/group/new/', {'name': 'Archived Group',
-                                              'description': 'this is a test'})
+        users['c_staff'].post(
+            '/group/new/', {
+                'name': 'Archived Group',
+                'description': 'this is a test'
+            }
+        )
 
     def test_edit_group(self, users):
-        new_group = models.RecipientGroup.objects.create(name='t1',
-                                                         description='t1')
+        new_group = models.RecipientGroup.objects.create(
+            name='t1',
+            description='t1'
+        )
         new_group.save()
         pk = new_group.pk
         users['c_staff'].post(
@@ -234,25 +260,34 @@ class TestOthers:
                 'description': 'this is a test'
             }
         )
-        assert 'test_group_changed' == str(models.RecipientGroup.objects.get(
-            pk=pk))
+        assert 'test_group_changed' == str(
+            models.RecipientGroup.objects.get(
+                pk=pk
+            )
+        )
 
     def test_invalid_group_form(self, users):
-        resp = users['c_staff'].post('/group/new/',
-                                     {'name': '',
-                                      'description': 'this is a test'})
+        resp = users['c_staff'].post(
+            '/group/new/', {
+                'name': '',
+                'description': 'this is a test'
+            }
+        )
         assert 'This field is required.' in str(resp.content)
 
     def test_keyword_responses_404(self, keywords, users):
         assert users['c_staff'].post(
-            '/keyword/responses/51234/').status_code == 404
+            '/keyword/responses/51234/'
+        ).status_code == 404
 
     def test_keyword_responses_archive_all_not_ticked(self, keywords, users):
-        users['c_staff'].post('/keyword/responses/1/',
-                              {'tick_to_archive_all_responses': False})
+        users['c_staff'].post(
+            '/keyword/responses/1/', {'tick_to_archive_all_responses': False}
+        )
 
-    def test_keyword_responses_archive_all_ticked(self, keywords, smsin,
-                                                  users):
+    def test_keyword_responses_archive_all_ticked(
+        self, keywords, smsin, users
+    ):
         users['c_staff'].post(
             '/keyword/responses/{}/'.format(keywords['test'].pk),
             {'tick_to_archive_all_responses': True}
@@ -277,18 +312,28 @@ class TestOthers:
 
     def test_no_csv(self, users):
         assert users['c_in'].get(
-            '/keyword/responses/csv/500/').status_code == 404
+            '/keyword/responses/csv/500/'
+        ).status_code == 404
 
     def test_keyword_access_check(self, keywords, users):
         keywords['test'].owners.add(users['staff'])
         keywords['test'].save()
-        assert users['c_staff'].get(keywords[
-            'test'].get_responses_url).status_code == 200
-        assert users['c_in'].get(keywords[
-            'test'].get_responses_url).status_code == 302
+        assert users['c_staff'].get(
+            keywords[
+                'test'
+            ].get_responses_url
+        ).status_code == 200
+        assert users['c_in'].get(
+            keywords[
+                'test'
+            ].get_responses_url
+        ).status_code == 302
 
     def test_check_perms_not_staff(self, users, keywords, recipients):
         assert users['c_in'].get('/incoming/').status_code == 200
         assert users['c_in'].get('/elvanto/import/').status_code == 302
-        assert users['c_in'].get(recipients[
-            'calvin'].get_absolute_url).status_code == 302
+        assert users['c_in'].get(
+            recipients[
+                'calvin'
+            ].get_absolute_url
+        ).status_code == 302

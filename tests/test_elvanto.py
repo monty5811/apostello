@@ -31,12 +31,14 @@ class TestTryBothFields:
         assert try_both_num_fields('+447902537905', '') == '+447902537905'
 
     def test_phone_good(self):
-        assert try_both_num_fields('+457902537905',
-                                   '07902537905') == '+447902537905'
+        assert try_both_num_fields(
+            '+457902537905', '07902537905'
+        ) == '+447902537905'
 
     def test_both_good(self):
-        assert try_both_num_fields('+447902537905',
-                                   '+447666666666') == '+447902537905'
+        assert try_both_num_fields(
+            '+447902537905', '+447666666666'
+        ) == '+447902537905'
 
     def test_neither_good(self):
         with pytest.raises(NotValidPhoneNumber):
@@ -55,15 +57,20 @@ class TestApi:
     def test_fetch_elvanto_groups(self):
         ElvantoGroup.fetch_all_groups()
         assert ElvantoGroup.objects.get(
-            e_id='41dd51d9-d3c5-11e4-95ba-068b656294b7').name == 'Geneva'
+            e_id='41dd51d9-d3c5-11e4-95ba-068b656294b7'
+        ).name == 'Geneva'
         assert ElvantoGroup.objects.get(
-            e_id='4ad1c22b-d3c5-11e4-95ba-068b656294b7').name == 'England'
+            e_id='4ad1c22b-d3c5-11e4-95ba-068b656294b7'
+        ).name == 'England'
         assert ElvantoGroup.objects.get(
-            e_id='50343ad0-d3c5-11e4-95ba-068b656294b7').name == 'Scotland'
+            e_id='50343ad0-d3c5-11e4-95ba-068b656294b7'
+        ).name == 'Scotland'
         assert ElvantoGroup.objects.get(
-            e_id='549f2473-d3c5-11e4-95ba-068b656294b7').name == 'Empty'
+            e_id='549f2473-d3c5-11e4-95ba-068b656294b7'
+        ).name == 'Empty'
         assert ElvantoGroup.objects.get(
-            e_id='7ebd2605-d3c7-11e4-95ba-068b656294b7').name == 'All'
+            e_id='7ebd2605-d3c7-11e4-95ba-068b656294b7'
+        ).name == 'All'
 
     def test_pull_elvanto_group(self):
         ElvantoGroup.fetch_all_groups()
