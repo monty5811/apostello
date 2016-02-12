@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/monty5811/apostello.png?label=ready&title=Ready)](https://waffle.io/monty5811/apostello)
 # apostello
 
 [![Chat with us](https://img.shields.io/badge/chat-slack-e01563.svg)](http://chat.church.io/)
