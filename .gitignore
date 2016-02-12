@@ -12,6 +12,7 @@ apostello/assets/semantic/src/definitions/
 apostello/assets/semantic/src/semantic.less
 apostello/assets/semantic/tasks
 apostello/assets/semantic/gulpfile.js
+vendor.bundle.js.map
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

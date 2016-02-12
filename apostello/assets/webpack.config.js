@@ -80,6 +80,7 @@ module.exports = {
     modulesDirectories: ['node_modules'],
     extensions: ['', '.js', '.jsx']
   },
+  devtool: 'source-map',
   watchOptions: {
     poll: 500
   }

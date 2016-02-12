@@ -42,17 +42,20 @@ module.exports = React.createClass({
             return (<ContactRow contact={contact} key={index} archiveContact={that.archiveContact.bind(null, contact)}/>)
         });
         return (
-            <table className="ui compact table">
+            <table className="ui padded table">
             <thead>
             <tr>
             <th>Name</th>
+            <th>Last Message</th>
+            <th>Received</th>
+            <th></th>
             <th></th>
             </tr>
             </thead>
             <tbody className="searchable">
             {rows}
             </tbody>
-            </table>
+          </table>
         );
     }
 });
