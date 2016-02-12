@@ -14,8 +14,7 @@ Prerequisites
 
 * *Required*: A domain name and a server (or you can use Heroku instead)
 * *Required*: A `Twilio <https://www.twilio.com/>`_ account with a purchased number
-* *Required*: An SMTP server or `Mailgun <https://www.mailgun.com/>`_, `Mandrill <https://mandrillapp.com/>`_, etc account for sending email
-notifications
+* *Required*: An SMTP server or `Mailgun <https://www.mailgun.com/>`_, `Mandrill <https://mandrillapp.com/>`_, etc account for sending email notifications
 * *Optional*: A web app registered for authentication with a Google account
 * *Optional*: An `Elvanto <https://www.elvanto.com/r_Y7HXKNE6>`_ API Key for importing Elvanto groups
 * *Optional*: An `opbeat <https://opbeat.com/>`_ account for error logging
@@ -50,12 +49,12 @@ First, setup a superuser in apostello:
 * You should receive a verification email in your inbox
 * Verify your email to gain access
 * Once you are in, you may see the not approved screen if you have not whitelisted any domains, you will have to return to the admin panel to authorise your email:
-  * Sign out of your new account (menu on the top right of the screen)
-  * Return to the admin panel and log in with the superuser account
-  * Click on `Users`
-  * Click on the user account you created through the site
-  * Tick the `Staff Status` and `Superuser Status` boxes to give your account access to everything, including the admin interface. Scroll down and save your changes.
-  * *Optional:* delete the admin user you created with `createsuperuser`. You should no longer need this account, so you can delete it. (you can always create a new one later if neccessary)
+    * Sign out of your new account (menu on the top right of the screen)
+    * Return to the admin panel and log in with the superuser account
+    * Click on `Users`
+    * Click on the user account you created through the site
+    * Tick the `Staff Status` and `Superuser Status` boxes to give your account access to everything, including the admin interface. Scroll down and save your changes.
+    * *Optional:* delete the admin user you created with `createsuperuser`. You should no longer need this account, so you can delete it. (you can always create a new one later if neccessary)
 * Log out of the admin panel and return the normal site
 * Log in with your user account again
 * Now you need to :ref:`setup Twilio <setup-twilio>`
@@ -79,4 +78,4 @@ it receives an SMS:
 * In the "Request URL field" add the url to your server, followed by "/sms/". If you are using Heroku it may look like `https://apostello-demo.herokuapp.com/sms/` or if your site is hosted at `https://sms.example.com`, your URL would be `https://sms.example.com/sms`.
 * Click save
 
-Now you should be able to test your setup - send a message to your number and you should receive an automated reply. If not, raise an `issue <https://github.com/monty5811/apostello/issues/new?title=[Setup%20Help]>`_ or get in touch on `slack <http://chat.church.io>`_.
+Now you should be able to test your setup - send a message to your number and you should receive an automated reply. If not, raise an `issue <https://github.com/monty5811/apostello/issues/new?title=[Setup%20Help]>`_ or get in touch on `slack <http://chat.church.io>`_
