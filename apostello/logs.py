@@ -1,10 +1,13 @@
-# -*- coding: utf-8 -*-
+import logging
+
 from django.conf import settings
 from django.utils import timezone
 from django_twilio.client import twilio_client
 from twilio.rest.exceptions import TwilioRestException
 
 from apostello.models import Keyword, Recipient, SmsInbound, SmsOutbound
+
+logger = logging.getLogger('apostello')
 
 
 def handle_incoming_sms(msg):
@@ -52,8 +55,14 @@ def handle_outgoing_sms(msg):
             sms.recipient = recip
             sms.save()
             return check_next_page
-    except Exception as e:
-        print(e)
+    except Exception:
+        logger.error(
+            'Could not import sms.',
+            exc_info=True,
+            extra={
+                'msg': msg
+            }
+        )
 
 
 def fetch_generator(direction):
@@ -82,8 +91,13 @@ def fetch_list(direction, page_id):
     return []
 
 
-def check_log(direction, sms_handler, page_id, fetch_all):
+def check_log(direction, page_id, fetch_all):
     """Abstract check log function."""
+    if direction == 'in':
+        sms_handler = handle_incoming_sms
+    elif direction == 'out':
+        sms_handler = handle_outgoing_sms
+
     check_next_page = False
     if fetch_all:
         # we want to iterate over all the incoming messages
@@ -107,7 +121,7 @@ def check_log(direction, sms_handler, page_id, fetch_all):
         return
 
     if check_next_page:
-        check_log(direction, sms_handler, page_id + 1, fetch_all)
+        check_log(direction, page_id + 1, fetch_all)
 
 
 def check_incoming_log(page_id=0, fetch_all=False):
@@ -119,7 +133,7 @@ def check_incoming_log(page_id=0, fetch_all=False):
     only the first 50 messages will be checked. If a missing message is found in
     these 50, the next 50 will also be checked.
     """
-    check_log('in', handle_incoming_sms, page_id, fetch_all)
+    check_log('in', page_id, fetch_all)
 
 
 def check_outgoing_log(page_id=0, fetch_all=False):
@@ -131,4 +145,4 @@ def check_outgoing_log(page_id=0, fetch_all=False):
     only the first 50 messages will be checked. If a missing message is found in
     these 50, the next 50 will also be checked.
     """
-    check_log('out', handle_outgoing_sms, page_id, fetch_all)
+    check_log('out', page_id, fetch_all)
