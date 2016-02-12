@@ -8,6 +8,7 @@ omit =
     *manage.py*
     venv*
     docs*
+    run_yapf.py
 source =
     .
 [html]
