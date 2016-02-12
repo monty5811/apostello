@@ -168,7 +168,7 @@ class Recipient(models.Model):
                 msg = msg[0]  # sms are already sorted in time
             except IndexError:
                 msg = None
-            cache.set('last_msg__{0}'.format(self.number.replace), msg, 600)
+            cache.set('last_msg__{0}'.format(self.number), msg, 600)
 
         return msg
 
