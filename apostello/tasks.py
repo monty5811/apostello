@@ -195,19 +195,47 @@ def send_keyword_digest():
 
 
 @task()
-def post_to_slack(msg):
+def post_to_slack(attachments):
     """Post message to slack webhook."""
-    from apostello.models import SiteConfiguration
+    from site_config.models import SiteConfiguration
     config = SiteConfiguration.get_solo()
     url = config.slack_url
     if url:
         data = {
-            'text': msg,
             'username': 'apostello',
-            "icon_emoji": ":speech_balloon:"
+            'icon_emoji': ':speech_balloon:',
+            'attachments': attachments
         }
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-        requests.post(url, data=json.dumps(data), headers=headers)
+        r = requests.post(url, data=json.dumps(data), headers=headers)
+        print(r)
+
+
+@task()
+def sms_to_slack(sms_body, person, keyword):
+    """Post message to slack webhook."""
+    fallback = "{0}\nFrom: {1}\n(matched: {2})".format(
+        sms_body, str(person), str(keyword)
+    )
+    attachments = [
+        {
+            'fallback': fallback,
+            'color': '#5b599c',
+            'text': sms_body,
+            'fields': [
+                {
+                    'title': 'From',
+                    'value': str(person),
+                    'short': True
+                }, {
+                    'title': 'Matched',
+                    'value': str(keyword),
+                    'short': True
+                }
+            ],
+        },
+    ]
+    post_to_slack(attachments)
 
 
 # Elvanto import
