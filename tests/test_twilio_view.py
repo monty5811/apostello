@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json
+import os
 import sys
 
 import pytest
@@ -133,3 +135,24 @@ class TestTwilioViewNoReplies:
         # run test
         resp = sms(request)
         assert reply not in str(resp.content)
+
+
+with open(os.path.abspath(os.path.join('tests', 'naughty_strings.json')), 'r') as f:
+    # https://raw.githubusercontent.com/minimaxir/big-list-of-naughty-strings/master/blns.json
+    naughty_strings = json.loads(f.read())
+
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize(
+    "msg", naughty_strings
+)
+@pytest.mark.django_db
+class TestTwilioViewNaughtyStrings:
+    def test_not_logged_in(self, msg):
+        factory = TwilioRequestFactory(token=settings.TWILIO_AUTH_TOKEN)
+        data = test_request_data()
+        data['Body'] = msg
+        request = factory.post(uri, data=data)
+        resp = sms(request)
+        assert resp.status_code == 200
