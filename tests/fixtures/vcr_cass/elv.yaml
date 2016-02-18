@@ -1,0 +1,107 @@
+interactions:
+- request:
+    body: !!binary |
+      e30=
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['2']
+      Content-Type: [application/json]
+      User-Agent: [python-requests/2.9.1]
+    method: POST
+    uri: https://api.elvanto.com/v1/groups/getAll.json
+  response:
+    body: {string: '{"generated_in":"0.016","status":"ok","groups":{"on_this_page":5,"page":1,"per_page":1000,"total":5,"group":[{"id":"41dd51d9-d3c5-11e4-95ba-068b656294b7","date_added":"2015-03-26
+        14:34:49","date_modified":"","name":"Geneva","status":"Active","meeting_address":"","meeting_city":"","meeting_state":"","meeting_postcode":"","meeting_country":"","meeting_day":"","meeting_time":"2:00
+        AM","meeting_frequency":""},{"id":"4ad1c22b-d3c5-11e4-95ba-068b656294b7","date_added":"2015-03-26
+        14:35:04","date_modified":"","name":"England","status":"Active","meeting_address":"","meeting_city":"","meeting_state":"","meeting_postcode":"","meeting_country":"","meeting_day":"","meeting_time":"2:00
+        AM","meeting_frequency":""},{"id":"50343ad0-d3c5-11e4-95ba-068b656294b7","date_added":"2015-03-26
+        14:35:13","date_modified":"","name":"Scotland","status":"Active","meeting_address":"","meeting_city":"","meeting_state":"","meeting_postcode":"","meeting_country":"","meeting_day":"","meeting_time":"2:00
+        AM","meeting_frequency":""},{"id":"549f2473-d3c5-11e4-95ba-068b656294b7","date_added":"2015-03-26
+        14:35:20","date_modified":"","name":"Empty","status":"Active","meeting_address":"","meeting_city":"","meeting_state":"","meeting_postcode":"","meeting_country":"","meeting_day":"","meeting_time":"2:00
+        AM","meeting_frequency":""},{"id":"7ebd2605-d3c7-11e4-95ba-068b656294b7","date_added":"2015-03-26
+        14:50:50","date_modified":"","name":"All","status":"Active","meeting_address":"","meeting_city":"","meeting_state":"","meeting_postcode":"","meeting_country":"","meeting_day":"","meeting_time":"2:00
+        AM","meeting_frequency":""}]}}'}
+    headers:
+      Connection: [keep-alive]
+      Content-Length: ['1610']
+      Content-Type: [text/html; charset=UTF-8]
+      Date: ['Thu, 18 Feb 2016 12:10:16 GMT']
+      Server: [Apache]
+    status: {code: 200, message: OK}
+- request:
+    body: !!binary |
+      eyJpZCI6ICI0YWQxYzIyYi1kM2M1LTExZTQtOTViYS0wNjhiNjU2Mjk0YjciLCAiZmllbGRzIjog
+      WyJwZW9wbGUiXX0=
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['68']
+      Content-Type: [application/json]
+      User-Agent: [python-requests/2.9.1]
+    method: POST
+    uri: https://api.elvanto.com/v1/groups/getInfo.json
+  response:
+    body: {string: '{"generated_in":"0.041","status":"ok","group":[{"id":"4ad1c22b-d3c5-11e4-95ba-068b656294b7","date_added":"2015-03-26
+        14:35:04","date_modified":"","name":"England","status":"Active","meeting_address":"","meeting_city":"","meeting_state":"","meeting_postcode":"","meeting_country":"","meeting_day":"","meeting_time":"2:00
+        AM","meeting_frequency":"","people":{"person":[{"id":"48366137-d3c7-11e4-95ba-068b656294b7","firstname":"John","preferred_name":"","lastname":"Owen","email":"john.owen@cambridge.com","mobile":"","phone":"(+079)
+        0254 6589","picture":"https:\/\/secure.gravatar.com\/avatar\/8a4f3da028ea04715162ac984204695e\/?default=https%3A%2F%2Fd20ugzcazvq246.cloudfront.net%2Fimg%2Fdefault-avatar.png&size=200&rating=G"}]}}]}'}
+    headers:
+      Connection: [keep-alive]
+      Content-Length: ['730']
+      Content-Type: [text/html; charset=UTF-8]
+      Date: ['Thu, 18 Feb 2016 12:10:38 GMT']
+      Server: [Apache]
+    status: {code: 200, message: OK}
+- request:
+    body: !!binary |
+      eyJpZCI6ICI0MWRkNTFkOS1kM2M1LTExZTQtOTViYS0wNjhiNjU2Mjk0YjciLCAiZmllbGRzIjog
+      WyJwZW9wbGUiXX0=
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['68']
+      Content-Type: [application/json]
+      User-Agent: [python-requests/2.9.1]
+    method: POST
+    uri: https://api.elvanto.com/v1/groups/getInfo.json
+  response:
+    body: {string: '{"generated_in":"0.015","status":"ok","group":[{"id":"41dd51d9-d3c5-11e4-95ba-068b656294b7","date_added":"2015-03-26
+        14:34:49","date_modified":"","name":"Geneva","status":"Active","meeting_address":"","meeting_city":"","meeting_state":"","meeting_postcode":"","meeting_country":"","meeting_day":"","meeting_time":"2:00
+        AM","meeting_frequency":"","people":{"person":[{"id":"f7cfa258-d3c6-11e4-95ba-068b656294b7","firstname":"John","preferred_name":"","lastname":"Calvin","email":"john.calvin@geneva.com","mobile":"447902537509","phone":"","picture":"https:\/\/secure.gravatar.com\/avatar\/2e8b7f0ae1a165857255022c32e3e061\/?default=https%3A%2F%2Fd20ugzcazvq246.cloudfront.net%2Fimg%2Fdefault-avatar.png&size=200&rating=G"}]}}]}'}
+    headers:
+      Connection: [keep-alive]
+      Content-Length: ['726']
+      Content-Type: [text/html; charset=UTF-8]
+      Date: ['Thu, 18 Feb 2016 12:10:40 GMT']
+      Server: [Apache]
+    status: {code: 200, message: OK}
+- request:
+    body: !!binary |
+      eyJmaWVsZHMiOiBbInBlb3BsZSJdLCAiaWQiOiAiNGFkMWMyMmItZDNjNS0xMWU0LTk1YmEtMDY4
+      YjY1NjI5NGI3In0=
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['68']
+      Content-Type: [application/json]
+      User-Agent: [python-requests/2.9.1]
+    method: POST
+    uri: https://api.elvanto.com/v1/groups/getInfo.json
+  response:
+    body: {string: '{"generated_in":"0.028","status":"ok","group":[{"id":"4ad1c22b-d3c5-11e4-95ba-068b656294b7","date_added":"2015-03-26
+        14:35:04","date_modified":"","name":"England","status":"Active","meeting_address":"","meeting_city":"","meeting_state":"","meeting_postcode":"","meeting_country":"","meeting_day":"","meeting_time":"2:00
+        AM","meeting_frequency":"","people":{"person":[{"id":"48366137-d3c7-11e4-95ba-068b656294b7","firstname":"John","preferred_name":"","lastname":"Owen","email":"john.owen@cambridge.com","mobile":"","phone":"(+079)
+        0254 6589","picture":"https:\/\/secure.gravatar.com\/avatar\/8a4f3da028ea04715162ac984204695e\/?default=https%3A%2F%2Fd20ugzcazvq246.cloudfront.net%2Fimg%2Fdefault-avatar.png&size=200&rating=G"}]}}]}'}
+    headers:
+      Connection: [keep-alive]
+      Content-Length: ['730']
+      Content-Type: [text/html; charset=UTF-8]
+      Date: ['Thu, 18 Feb 2016 13:41:54 GMT']
+      Server: [Apache]
+    status: {code: 200, message: OK}
+version: 1

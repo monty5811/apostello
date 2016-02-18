@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 import pytest
+import vcr
 
 from apostello.models import RecipientGroup
 from elvanto.elvanto import fix_elvanto_numbers, try_both_num_fields
 from elvanto.exceptions import NotValidPhoneNumber
 from elvanto.models import ElvantoGroup
+
+my_vcr = vcr.VCR(record_mode='none', )
 
 
 class TestElvantoNumbers:
@@ -45,7 +48,7 @@ class TestTryBothFields:
             try_both_num_fields('+448902537905', '+457902537905')
 
 
-@pytest.mark.slow
+@pytest.mark.elvanto_api
 @pytest.mark.django_db
 class TestApi:
     """
@@ -54,6 +57,10 @@ class TestApi:
     Note - this calls the Elvanto api and will hit their site.
     """
 
+    @my_vcr.use_cassette(
+        'tests/fixtures/vcr_cass/elv.yaml',
+        filter_headers=['authorization']
+    )
     def test_fetch_elvanto_groups(self):
         ElvantoGroup.fetch_all_groups()
         assert ElvantoGroup.objects.get(
@@ -72,6 +79,10 @@ class TestApi:
             e_id='7ebd2605-d3c7-11e4-95ba-068b656294b7'
         ).name == 'All'
 
+    @my_vcr.use_cassette(
+        'tests/fixtures/vcr_cass/elv.yaml',
+        filter_headers=['authorization']
+    )
     def test_pull_elvanto_group(self):
         ElvantoGroup.fetch_all_groups()
         e_group = ElvantoGroup.objects.get(name='England')
@@ -81,6 +92,10 @@ class TestApi:
         assert str(a_group.recipient_set.all()[0]) == 'John Owen'
         assert str(a_group.recipient_set.all()[0].number) == '+447902546589'
 
+    @my_vcr.use_cassette(
+        'tests/fixtures/vcr_cass/elv.yaml',
+        filter_headers=['authorization']
+    )
     def test_pull_all_groups(self):
         ElvantoGroup.fetch_all_groups()
         england = ElvantoGroup.objects.get(name='England')
