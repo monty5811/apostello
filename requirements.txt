@@ -9,7 +9,7 @@ django-celery==3.1.17
 django-extensions==1.6.1
 django-phonenumber-field==1.0.0
 django-redis==4.3.0
-git+git://github.com/monty5811/django-semanticui-form.git@9fc509ef7d8e03341899e6a6e987f37bd598f5c2
+git+git://github.com/monty5811/django-semanticui-form.git@0a5d180395a8ffb1227791c311f51c46ea113778
 django-solo==1.1.2
 django-twilio==0.8.0
 django<1.10

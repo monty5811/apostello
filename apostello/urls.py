@@ -246,6 +246,13 @@ urlpatterns += [
 # apps etc
 urlpatterns += [
     url(
+        r'^config/',
+        include(
+            'site_config.urls',
+            namespace='site_config'
+        )
+    ),
+    url(
         r'^graphs/',
         include(
             'graphs.urls',
