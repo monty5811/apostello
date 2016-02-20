@@ -1,105 +1,47 @@
 {% load staticfiles %}{% load cache %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-{% include 'apostello/includes/head.html' %}
-{% block morehead %}
-{% endblock %}
-</head>
-<body>
-{% cache 1800 navbar request.user %}
-{% with profile=request.user.profile %}
-<div class="ui top attached inverted violet menu">
-  <a class="item" id="togglesidebar">
-    <i class="sidebar icon"></i>
-    Menu
-  </a>
-  <div class="ui simple dropdown float right item">
-      {{user.email}} <i class="dropdown icon"></i>
-      <div class="menu">
-        <div class="header">{{ TWILIO_FROM_NUM }}</div>
-        <div class="divider"></div>
-        {% if request.user.is_staff %}<a class="item" href="/admin/">Admin</a>{% endif %}
-        {% if request.user.socialaccount_set|length < 1 %}<a class="item" href="/accounts/password/change">Change Password</a>{% endif %}
-        <a class="item" href="/accounts/logout/">Logout</a>
-      </div>
-    </div>
-</div>
-<div class="ui pushable" id="sidebarcontext">
-  <div class="ui inverted violet left inline vertical thin sidebar menu">
-    <a href="/" class="header item">
-      Apostello
-    </a>
-    {% if profile.can_send_sms or request.user.is_staff %}
-    <div class="item">
-      <div class="header">Send</div>
-      <div class="menu">
-        <a class="item" href="{% url 'send_adhoc' %}">Individuals</a>
-        <a class="item" href="{% url 'send_group' %}">Group</a>
-      </div>
-    </div>
-    {% endif %}
-    <div class="item">
-      <div class="header">Phonebook</div>
-      <div class="menu">
-        {% if profile.can_see_contact_names or request.user.is_staff %}<a class="item" href="{% url 'recipients' %}">Contacts</a>{% endif %}
-        {% if profile.can_see_groups or request.user.is_staff %}<a class="item" href="{% url 'recipient_groups' %}">Groups</a>{% endif %}
-      </div>
-    </div>
-    {% if profile.can_see_keywords or request.user.is_staff %}<a class="item" href="{% url 'keywords' %}">Keywords</a>{% endif %}
-
-    <div class="item">
-      <div class="header">Logs</div>
-      <div class="menu">
-        {% if profile.can_see_incoming or request.user.is_staff %}<a class="item" href="{%  url 'incoming' %}">Incoming</a>{% endif %}
-        {% if profile.can_see_outgoing or request.user.is_staff %}<a class="item" href="{% url 'outgoing' %}">Outgoing</a>{% endif %}
-      </div>
-    </div>
-    {% if profile.can_import or request.user.is_staff %}
-    <div class="item">
-      <div class="header">Tools</div>
-      <div class="menu">
-        <a class="item" href="{% url 'import_recipients' %}">CSV</a>
-        <a class="item" href="{% url 'elvanto:import' %}">Elvanto</a>
-      </div>
-    </div>
-    {% endif %}
-  </div>
-  {% endwith %}
-  {% endcache %}
-  <div class="pusher">
-    <div class="ui hidden divider"></div>
-    <div class="ui stackable grid container">
-      <div class="one wide column">
-        {% if not hide_menu %}
-          <div class="ui simple dropdown icon item">
-            <i class="violet very large wrench icon"></i>
-            <div class="menu">
-              {% block side_bar %} {% endblock %}
-            </div>
-          </div>
-          {% endif %}
-      </div>
-      <div class="fifteen wide column">
-        <div class="ui stackable grid container">
-          <div class="sixteen wide column">
-            {% if messages %}
-              {% for message in messages %}
-              <div class="ui {{ message.tags }} message">
-                {{ message }}
-              </div>
-              {% endfor %}
-            {% endif %}
-            {% block content %} {% endblock %}
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<script src="{% static 'js/vendor.bundle.js' %}"></script>
-<script src="{% static 'js/daterangepicker.js' %}"></script>
-<script src="{% static 'js/main.js' %}"></script>
-{% block morejs %}{% endblock %}
-</body>
+	<head>
+		{% include 'apostello/includes/head.html' %}
+		{% block morehead %}
+		{% endblock %}
+	</head>
+	<body>
+		<div class="ui top attached inverted violet menu">
+			{% if not hide_menu %}
+			<div class="ui simple dropdown icon item">
+				<i class="wrench icon"></i>
+				<div class="menu">
+					{% block side_bar %} {% endblock %}
+				</div>
+			</div>
+			{% endif %}
+			{% cache 1800 topbar request.user %}
+			{% include 'apostello/top_menu.html' %}
+			{% endcache %}
+		</div>
+		<div class="ui hidden divider"></div>
+		<div class="ui stackable centered grid container">
+			<div class="fourteen wide column">
+				<div class="ui stackable grid container">
+					<div class="sixteen wide column">
+						{% if messages %}
+						{% for message in messages %}
+						<div class="ui {{ message.tags }} message">
+							{{ message }}
+						</div>
+						{% endfor %}
+						{% endif %}
+						{% block content %} {% endblock %}
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="ui hidden divider"></div>
+		</div>
+		<script src="{% static 'js/vendor.bundle.js' %}"></script>
+		<script src="{% static 'js/daterangepicker.js' %}"></script>
+		<script src="{% static 'js/main.js' %}"></script>
+		{% block morejs %}{% endblock %}
+	</body>
 </html>

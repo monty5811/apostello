@@ -1,0 +1,43 @@
+{% with profile=request.user.profile %}
+<div class="ui dropdown item">
+  Menu <i class="dropdown icon"></i>
+  <div class="ui vertical menu">
+    <a href="/" class="item">Home</a>
+    <div class="divider"></div>
+    {% if profile.can_see_keywords or request.user.is_staff %}
+    <a class="item" href="{% url 'keywords' %}">Keywords</a>
+    {% endif %}
+    <div class="divider"></div>
+    {% if profile.can_send_sms or request.user.is_staff %}
+    <a class="item" href="{% url 'send_adhoc' %}">Send to Individuals</a>
+    <a class="item" href="{% url 'send_group' %}">Send to a Group</a>
+    <div class="divider"></div>
+    {% endif %}
+    {% if profile.can_see_contact_names or request.user.is_staff %}<a class="item" href="{% url 'recipients' %}">Contacts</a>{% endif %}
+    {% if profile.can_see_groups or request.user.is_staff %}<a class="item" href="{% url 'recipient_groups' %}">Groups</a>{% endif %}
+    <div class="divider"></div>
+    {% if profile.can_see_incoming or request.user.is_staff %}<a class="item" href="{%  url 'incoming' %}">Incoming SMS</a>{% endif %}
+    {% if profile.can_see_outgoing or request.user.is_staff %}<a class="item" href="{% url 'outgoing' %}">Outgoing SMS</a>{% endif %}
+    <div class="divider"></div>
+    {% if request.user.socialaccount_set|length < 1 %}<a class="item" href="/accounts/password/change">Change Password</a>{% endif %}
+    <a class="item" href="/accounts/logout/">Logout</a>
+    <div class="divider"></div>
+    <div class="header">{{ TWILIO_FROM_NUM }}</div>
+  </div>
+</div>
+{% if profile.can_import or request.user.is_staff %}
+<div class="ui dropdown item">
+  Tools <i class="dropdown icon"></i>
+  <div class="menu">
+    <a class="item" href="{% url 'site_config:site' %}">Site Configuration</a>
+    <a class="item" href="{% url 'site_config:responses' %}">Default Responses</a>
+    <a class="item" href="/admin/">Admin</a>
+    <div class="divider"></div>
+    <div class="header">Import</div>
+    <a class="item" href="{% url 'import_recipients' %}">CSV</a>
+    <a class="item" href="{% url 'elvanto:import' %}">Elvanto</a>
+  </div>
+</div>
+{% endif %}
+{% endwith %}
+</div>

@@ -215,7 +215,7 @@ class Keyword(models.Model):
         blank=True,
         validators=[gsm_validator, less_than_sms_char_limit],
         help_text="Use this if you want a custom response before. "
-        "e.g. 'You are too early for this event, please try agian on Monday!'"
+        "e.g. 'You are too early for this event, please try again on Monday!'"
     )
     activate_time = models.DateTimeField(
         "Activation Time",
