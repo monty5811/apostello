@@ -25,6 +25,7 @@ class TestSignup:
         login_button.click()
         # check we have been redirected
         assert '/accounts/confirm-email/' in browser.current_url
-        assert len(mail.outbox) == 2
-        assert '[apostello] New User' in mail.outbox[0].subject
+        assert len(mail.outbox) == 1
+        # assert '[apostello] New User' in mail.outbox[0].subject # not sent
+        # when we have no office email set
         assert 'Please Confirm Your E-mail Address' in mail.outbox[1].subject
