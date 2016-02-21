@@ -12,7 +12,7 @@
     - create_swap_file: yes
     - run_django_migrate: yes
     - run_django_collectstatic: yes
-    - setup_lets_encrypt: yes
+    - setup_lets_encrypt: no
   vars_files:
     - env_vars/base.yml
     - env_vars/example.yml # you need to change this!

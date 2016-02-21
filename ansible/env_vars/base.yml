@@ -6,8 +6,6 @@ git_version: master
 project_name: apostello
 application_name: apostello
 
-ssl_dest_dir: /etc/ssl
-
 # Database settings.
 db_user: "{{ application_name }}"
 db_name: "{{ application_name }}"

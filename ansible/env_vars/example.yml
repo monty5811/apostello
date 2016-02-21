@@ -11,6 +11,8 @@ rabbitmq_admin_password:
 rabbitmq_application_password:
 # Application Settings
 django_secret_key: 'this should be a very long string'
+# this is used in the account related emails and should match your server settings
+account_default_http_protocol: 'https'
 # Twilio Credentials
 twilio_account_sid:
 twilio_auth_token:

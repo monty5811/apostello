@@ -1,7 +1,7 @@
 ---
 
 - name: Setup the le repo
-  git: repo=https://github.com/letsencrypt/letsencrypt dest={{ le_repo_path }} accept_hostkey=yes version=master
+  git: repo=https://github.com/letsencrypt/letsencrypt dest={{ le_repo_path }} accept_hostkey=yes version=master force=yes
   tags: git
 
 - name: Create le config dir

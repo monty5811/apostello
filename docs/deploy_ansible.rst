@@ -9,11 +9,11 @@ An ansible playbook to deploy apostello is bundled in the git repo.
 
 In order to use the playbook, you need a server to point it towards.
 Additionally, if you want to use Let's Encrypt to obtain an SSL certificate
-(enabled by default), you will need a domina that points to your server.
+(enabled by default), you will need a domain that points to your server.
 
 If you do not want to customise the playbook, you should point it at a dedicated
 server as it may delete or mess up other configured applications on any server
-you point it at. For example, the playbook may overwrite you nginx config.
+you point it at. For example, the playbook may overwrite your nginx config.
 
 Instructions
 ~~~~~~~~~~~~
@@ -37,3 +37,11 @@ To run the playbook
 After the playbook finishes you should have your own apostello server - follow
 the first run steps on the :ref:`Getting Started <getting-started>` page to
 finish.
+
+
+Let's Encrypt
+~~~~~~~~~~~~~
+
+An SSL certificate can be setup by setting `setup_lets_encrypt` to `yes` in the file `production.yml`.
+This is disabled by default as it seems to fail on brand new setups.
+If you want enable this, run the playbook without lets encrypt, then turn the setting on and run the playbook again.
