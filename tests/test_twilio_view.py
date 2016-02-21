@@ -137,7 +137,8 @@ class TestTwilioViewNoReplies:
         assert reply not in str(resp.content)
 
 with open(
-    os.path.abspath(os.path.join('tests', 'naughty_strings.json')), 'r') as f:
+    os.path.abspath(os.path.join('tests', 'naughty_strings.json')), 'r'
+) as f:
     # https://raw.githubusercontent.com/minimaxir/big-list-of-naughty-strings/master/blns.json
     naughty_strings = json.loads(f.read())
 
