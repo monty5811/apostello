@@ -591,7 +591,7 @@ class UserProfile(models.Model):
                 pass
         else:
             # any other save, we want to refresh navbar:
-            key = make_template_fragment_key('navbar', [self.user])
+            key = make_template_fragment_key('topbar', [self.user])
             cache.delete(key)
         super(UserProfile, self).save(*args, **kwargs)
 

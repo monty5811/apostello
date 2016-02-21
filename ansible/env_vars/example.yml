@@ -21,6 +21,7 @@ whitelisted_login_domains:
 django_email_host:
 django_email_host_user:
 django_email_host_password:
+django_from_email:
 # Elvanto
 elvanto_key:
 country_code:

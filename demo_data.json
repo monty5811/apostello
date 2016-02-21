@@ -184,7 +184,6 @@
         "sms_char_limit": 160,
         "disable_all_replies": false,
         "office_email": "",
-        "from_email": "",
         "slack_url": "",
         "sync_elvanto": true
     }

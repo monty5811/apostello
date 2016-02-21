@@ -121,8 +121,7 @@ def update_msgs_name(person_pk):
 @task()
 def send_async_mail(subject, body, to):
     """Send email."""
-    from apostello.models import SiteConfiguration
-    from_ = SiteConfiguration.get_solo().from_email
+    from_ = settings.FROM_EMAIL
     send_mail(subject, body, from_, to)
 
 

@@ -28,10 +28,6 @@ class SiteConfiguration(SingletonModel):
         ' Note, you will need to have setup login with Google, or users will'
         ' have no way into the site.'
     )
-    from_email = models.EmailField(
-        blank=True,
-        help_text='Emails sent by apostello will come from this address.'
-    )
     office_email = models.EmailField(
         blank=True,
         help_text='Email address that receives important notifications.'
