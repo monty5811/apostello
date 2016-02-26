@@ -38,7 +38,6 @@ You can create as many keywords as you like, and each keyword comes with the fol
 * Ability to lock a keyword to certain users (staff can see all)
 * Daily email digests - send digest of today's responses every night
 * CSV export of messages
-* Live wall - a curatable live wall to display incoming messages at a Q&A
 
 Keyword Matching
 ~~~~~~~~~~~~~~~~

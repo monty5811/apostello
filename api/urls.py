@@ -1,5 +1,4 @@
 from django.conf.urls import url
-from rest_framework.permissions import IsAuthenticated
 
 from api.drf_permissions import (
     CanSeeContactNames, CanSeeGroups, CanSeeIncoming, CanSeeKeyword,
@@ -17,6 +16,7 @@ from apostello.models import (
     Keyword, Recipient, RecipientGroup, SmsInbound, SmsOutbound
 )
 from elvanto.models import ElvantoGroup
+from rest_framework.permissions import IsAuthenticated
 
 # api
 urlpatterns = [
@@ -41,11 +41,11 @@ urlpatterns = [
         name='out_log'
     ),
     url(
-        r'^v1/sms/live_wall/in/$',
+        r'^v1/sms/live_wall/all/$',
         ApiCollectionAllWall.as_view(
             permission_classes=(IsAuthenticated, CanSeeIncoming)
         ),
-        name='live_wall'
+        name='live_wall_all'
     ),
     url(
         r'^v1/sms/in/recpient/(?P<pk>\d+)/$',

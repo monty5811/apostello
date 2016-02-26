@@ -69,8 +69,6 @@ class TestNotLoggedIn:
         ('/keyword/responses/csv/1/', 200),
         ('/recipient/import/', 200),
         ('/elvanto/import/', 200),
-        ('/keyword/responses/wall/1/', 200),
-        ('/keyword/responses/curate_wall/1/', 200),
         ('/incoming/wall/', 200),
         ('/incoming/curate_wall/', 200),
         ('/api/v1/sms/in/', 200),
@@ -85,7 +83,7 @@ class TestNotLoggedIn:
         ('/api/v1/groups/1', 200),
         ('/api/v1/keywords/', 200),
         ('/api/v1/keywords/1', 200),
-        ('/api/v1/sms/live_wall/in/', 200),
+        ('/api/v1/sms/live_wall/all/', 200),
     ]
 )
 @pytest.mark.django_db
@@ -119,8 +117,6 @@ class TestStaff:
         ('/keyword/responses/csv/1/', 302),
         ('/recipient/import/', 302),
         ('/elvanto/import/', 302),
-        ('/keyword/responses/wall/1/', 302),
-        ('/keyword/responses/curate_wall/1/', 302),
         ('/incoming/wall/', 200),
         ('/incoming/curate_wall/', 200),
         ('/incoming/', 200),
@@ -138,7 +134,7 @@ class TestStaff:
         ('/api/v1/groups/1', 200),
         ('/api/v1/keywords/', 200),
         ('/api/v1/keywords/1', 200),
-        ('/api/v1/sms/live_wall/in/', 200),
+        ('/api/v1/sms/live_wall/all/', 200),
     ]
 )
 @pytest.mark.django_db
@@ -177,7 +173,7 @@ class TestOthers:
         r = users['c_staff'].post('/api/v1/elvanto/group_fetch/', {})
         users['c_staff'].post('/api/v1/elvanto/group_pull/', {})
         r = users['c_staff'].get('/api/v1/elvanto/groups/')
-        assert len(r.data) == 5
+        assert len(r.data) == 4
         r = users['c_staff'].get('/api/v1/elvanto/group/1')
         assert r.data['name'] == 'Geneva'
         assert r.data['pk'] == 1

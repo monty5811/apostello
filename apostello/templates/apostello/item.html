@@ -28,7 +28,6 @@
 {% if user.profile.can_see_incoming %}
 <br>
 <h4>Recent Incoming History</h4>
-{% include 'apostello/includes/table_filter.html' %}
 <div id="incoming_table" name={{object.pk}}></div>
 {%endif%}
 {%endif%}

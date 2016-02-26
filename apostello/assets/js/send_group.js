@@ -1,11 +1,15 @@
-var jQuery = require('jquery');
-var semantic = require('./../semantic/dist/semantic.js');
+import $ from 'jquery';
+// const semantic = require('./../semantic/dist/semantic.js');
 
-$(document).ready(function() {
-$('.dropdown')
+/* global group_costs */
+
+$(document).ready(() => {
+  $('.dropdown')
   .dropdown({
-    onChange: function(text, value) {
-      if (text==="") {var cost = "$0"} else {var cost = "$" + group_costs[text]};
-      document.getElementById("#send").innerHTML = "Send (" + cost + ")"
-    }});
+    onChange(text, value) {
+      let cost = `\$${group_costs[text]}`;
+      if (text === '') {cost = '$0';}
+      document.getElementById('#send').innerHTML = `Send (${cost})`;
+    },
+  });
 });

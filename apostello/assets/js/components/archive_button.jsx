@@ -1,12 +1,24 @@
-const React = require('react')
+import React, { Component } from 'react';
 
-module.exports = React.createClass({
-    render: function () {
-            if (this.props.item.is_archived) {
-                var txt = 'UnArchive';
-            } else{
-                var txt = 'Archive';
-            };
-        return(<a className='ui tiny grey button' onClick={this.props.archiveFn}>{txt}</a>)
-        }
-});
+class ArchiveButton extends Component {
+  constructor() {
+    super();
+    this._onClick = this._onClick.bind(this);
+  }
+  _onClick() {
+    this.props.archiveFn(this.props.item);
+  }
+  render() {
+    let txt = 'Archive';
+    if (this.props.item.is_archived) {
+      txt = 'UnArchive';
+    }
+    return (
+      <a className="ui tiny grey button" onClick={this._onClick}>
+        {txt}
+      </a>
+    );
+  }
+}
+
+export default ArchiveButton;

@@ -1,28 +1,29 @@
-const React = require('react');
+import React, { Component } from 'react';
 
-var Card = React.createClass({
-    render: function () {
-        var first_word = this.props.content.split(" ")[0];
-        var rest_of_message = this.props.content.split(" ").splice(1).join(" ");
-        return (
-            <div className="card" onClick={this.props.toggleCard} style={this.props.styles}>
-                <div className="content">
-                    <p><span style={{"color": "#D3D3D3"}}>{first_word}</span> {rest_of_message}</p>
-                </div>
-            </div>
-        )
-    }
-});
-module.exports = React.createClass({
-    render: function() {
-        if (this.props.curating || this.props.display_on_wall) {
-            var styles = {};
-            styles.backgroundColor = this.props.display_on_wall ? "#ffffff" : "#616161"
-            styles.fontSize = !this.props.preview && !this.props.curating ? "200%" : "100%"
-            return <Card toggleCard={this.props.toggleCard} styles={styles} content={this.props.content}/>
-        }
-        else {
-            return null
-        }
-    }
-});
+class ResponseCard extends Component {
+  constructor() {
+    super();
+    this._onClick = this._onClick.bind(this);
+  }
+  _onClick() {
+    this.props.toggleCard(this.props.response);
+  }
+  render() {
+    const resp = this.props.response;
+    const firstWord = resp.content.split(' ')[0];
+    const restOfMessage = resp.content.split(' ').splice(1).join(' ');
+    const styles = {
+      backgroundColor: resp.display_on_wall ? '#ffffff' : '#616161',
+      fontSize: !this.props.preview && !this.props.curating ? '200%' : '100%',
+    };
+    return (
+      <div className="card" onClick={this._onClick} style={styles}>
+        <div className="content">
+          <p><span style={ { color: '#D3D3D3' } }>{firstWord}</span> {restOfMessage}</p>
+        </div>
+      </div>
+    );
+  }
+}
+
+export default ResponseCard;

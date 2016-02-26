@@ -9,15 +9,5 @@
 <script src="{% static 'js/vendor.bundle.js' %}"></script>
 <script src="{% static 'js/daterangepicker.js' %}"></script>
 <script src="{% static 'js/main.js' %}"></script>
-<script>
-var wall_curate = false,
-     wall_poll_interval = 1000,
-{% if keyword %}
-     wall_keyword = "{{keyword}}",
-{% else %}
-     wall_keyword = null,
-{% endif %}
-     wall_url = "{%url 'api:live_wall' %}";
-</script>
-<script src="{% static 'js/curate_container.js' %}"></script>
+<script src="{% static 'js/live_wall.js' %}"></script>
 </body>

@@ -39,9 +39,6 @@ Incoming Log
 Incoming Wall
 ~~~~~~~~~~~~~
 .. image:: screenshots/IncomingWall.png
-Curate Wall
-~~~~~~~~~~~
-.. image:: screenshots/CurateWall.png
 Outgoing Log
 ~~~~~~~~~~~~
 .. image:: screenshots/OutgoingLog.png

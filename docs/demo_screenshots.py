@@ -55,10 +55,6 @@ PAGES = [
         'IncomingWall',
     ),
     (
-        '/incoming/curate_wall/',
-        'CurateWall',
-    ),
-    (
         '/outgoing/',
         'OutgoingLog',
     ),

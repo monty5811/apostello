@@ -17,15 +17,17 @@ module.exports = {
     keywords_table: './js/keywords_table',
     keyword_resp_table: './js/keyword_resp_table',
     elvanto: './js/elvanto',
-    curate_container: './js/curate_container',
+    live_curate: './js/live_curate',
+    live_wall: './js/live_wall',
     item_remove_button: './js/item_remove_button',
 
     daterangepicker: './js/daterangepicker',
-    vendor: ['jquery',
+    vendor: [
+      'jquery',
       'moment',
       'react',
       'react-dom',
-      './semantic/dist/semantic.js'
+      './semantic/dist/semantic.js',
     ]
   },
 
@@ -63,6 +65,13 @@ module.exports = {
   ],
 
   module: {
+    preLoaders: [
+      {
+        test: /\.jsx?$/,
+        loader: "eslint-loader"
+      }
+    ],
+
     loaders: [{
         test: /\.jsx?$/,
         exclude: /node_modules/,

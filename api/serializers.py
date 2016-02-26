@@ -14,7 +14,15 @@ class RecipientGroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RecipientGroup
-        fields = ('name', 'pk', 'description', 'members', 'cost', 'url')
+        fields = (
+            'name',
+            'pk',
+            'description',
+            'members',
+            'cost',
+            'url',
+            'is_archived',
+        )
 
 
 class ElvantoGroupSerializer(serializers.ModelSerializer):
@@ -37,8 +45,16 @@ class KeywordSerializer(serializers.ModelSerializer):
     class Meta:
         model = Keyword
         fields = (
-            'keyword', 'pk', 'description', 'custom_response', 'is_live',
-            'url', 'responses_url', 'num_replies', 'num_archived_replies'
+            'keyword',
+            'pk',
+            'description',
+            'custom_response',
+            'is_live',
+            'url',
+            'responses_url',
+            'num_replies',
+            'num_archived_replies',
+            'is_archived',
         )
 
 
@@ -52,7 +68,6 @@ class SmsInboundSerializer(serializers.ModelSerializer):
             'sid',
             'pk',
             'sender_name',
-            'sender_num',
             'content',
             'time_received',
             'dealt_with',

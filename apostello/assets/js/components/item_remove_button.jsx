@@ -1,31 +1,28 @@
-const React = require('react')
+import React, { Component } from 'react';
+import post from './../ajax_post';
 
-module.exports = React.createClass({
-    archiveItem: function() {
-        var that = this;
-        $.ajax({
-            url: this.props.url,
-            type: "POST",
-            data: {
-                'archive': !this.props.is_archived
-            },
-            success: function(json) {
-                window.location.href = that.props.redirect_url;
-            },
-            error: function(xhr, errmsg, err) {
-                window.alert("uh, oh. That didn't work.")
-                console.log(xhr.status + ": " + xhr.responseText);
-            }
-        });
-    },
-    render: function () {
-            if (this.props.is_archived) {
-                var txt = 'Restore';
-                var className = 'ui positive button';
-            } else{
-                var txt = 'Remove';
-                var className = 'ui negative button';
-            };
-        return(<div className={className} onClick={this.archiveItem}>{txt}</div>)
-        }
-});
+class ItemRemoveButton extends Component {
+  constructor() {
+    super();
+    this.archiveItem = this.archiveItem.bind(this);
+  }
+  archiveItem() {
+    const success = () => {window.location.href = this.props.redirect_url;};
+    post(
+      this.props.url,
+      { archive: !this.props.is_archived },
+      success
+    );
+  }
+  render() {
+    let txt = 'Remove';
+    let className = 'ui negative button';
+    if (this.props.is_archived) {
+      txt = 'Restore';
+      className = 'ui positive button';
+    }
+    return (<div className={className} onClick={this.archiveItem}>{txt}</div>);
+  }
+}
+
+export default ItemRemoveButton;

@@ -1,68 +1,45 @@
-const React = require('react')
-const GroupRow = require('./elvanto_group_row');
+import React, { Component } from 'react';
+import { LoadingComponent } from './reloading_component';
+import { FilteringComponent } from './filtering_component';
+import ElvantoGroupRow from './elvanto_group_row';
+import post from './../ajax_post';
 
-module.exports = React.createClass({
-    toggleSync: function(grp) {
-        var that = this;
-        $.ajax({
-            url: '/api/v1/elvanto/group/' + grp.pk,
-            type: "POST",
-            data: {
-                'sync': grp.sync
-            },
-            success: function(json) {
-                that.loadResponsesFromServer()
-            },
-            error: function(xhr, errmsg, err) {
-                window.alert("uh, oh. That didn't work.")
-                console.log(xhr.status + ": " + xhr.responseText);
-            }
-        });
-    },
-    loadResponsesFromServer: function() {
-        $.ajax({
-            url: this.props.url,
-            dataType: 'json',
-            success: function(data) {
-                this.setState({
-                    data: data
-                });
-            }.bind(this),
-            error: function(xhr, status, err) {
-                console.error(this.props.url, status, err.toString());
-            }.bind(this)
-        });
-    },
-    getInitialState: function() {
-        return {data: []};
-    },
-    componentDidMount: function() {
-        this.loadResponsesFromServer();
-        setInterval(this.loadResponsesFromServer, this.props.pollInterval);
-    },
-    render: function() {
-        var that = this;
-        var rows = this.state.data.map(function(grp, index) {
-            return (
-                <GroupRow
-                        grp={grp}
-                        key={index}
-                        toggleSync={that.toggleSync.bind(null, grp)}
-                        />)
-        });
-        return (
-            <table className="ui striped compact definition table">
-            <thead>
-            <tr>
+class ElvantoTable extends Component {
+  constructor() {
+    super();
+    this.toggleSync = this.toggleSync.bind(this);
+  }
+  toggleSync(grp) {
+    post(
+      `/api/v1/elvanto/group/${grp.pk}`,
+      { sync: grp.sync },
+      this.props.loadfromserver
+    );
+  }
+  render() {
+    const that = this;
+    const rows = this.props.data.map(
+      (grp, index) => <ElvantoGroupRow
+        grp={grp}
+        key={index}
+        toggleSync={that.toggleSync}
+      />
+    );
+    return (
+      <table className="ui striped compact definition table">
+        <thead>
+          <tr>
             <th></th>
             <th>Last Synced</th>
             <th>Sync?</th>
-            </tr>
-            </thead>
-            <tbody className="searchable">
-            {rows}
-            </tbody>
-            </table>
-        );
-    }
-});
+          </tr>
+        </thead>
+        <tbody>
+          {rows}
+        </tbody>
+      </table>
+    );
+  }
+}
+
+export default LoadingComponent(FilteringComponent(ElvantoTable));

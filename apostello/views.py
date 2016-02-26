@@ -275,22 +275,6 @@ def keyword_csv(request, pk):
     return response
 
 
-@keyword_access_check
-@login_required
-def keyword_wall(request, pk):
-    """Display the live wall for a single keyword."""
-    keyword = get_object_or_404(Keyword, pk=pk)
-    return render(request, "apostello/wall.html", {'keyword': keyword})
-
-
-@keyword_access_check
-@login_required
-def keyword_wall_curate(request, pk):
-    """Display the live wall curating interface for a single keyword."""
-    keyword = get_object_or_404(Keyword, pk=pk)
-    return render(request, "apostello/wall_curator.html", {'keyword': keyword})
-
-
 @check_user_perms
 @login_required
 def import_recipients(request):

@@ -1,16 +1,27 @@
-const React = require('react');
+import React, { Component } from 'react';
 
-module.exports = React.createClass({
-    render: function () {
-            if (this.props.sms.dealt_with) {
-                return (<button className="ui tiny positive icon button" onClick={this.props.dealtWithSms}>
-                    <i className="checkmark icon" /> Dealt With
-                    </button>)
-                }
-            else{
-                return (<button className="ui tiny orange icon button" onClick={this.props.dealtWithSms}>
-                    <i className="attention icon" /> Requires Action
-                    </button>)
-                };
-        }
-});
+class DealWithButton extends Component {
+  constructor() {
+    super();
+    this._onClick = this._onClick.bind(this);
+  }
+  _onClick() {
+    this.props.dealWithSms(this.props.sms);
+  }
+  render() {
+    if (this.props.sms.dealt_with) {
+      return (
+        <button className="ui tiny positive icon button" onClick={this._onClick}>
+          <i className="checkmark icon" /> Dealt With
+        </button>
+      );
+    }
+    return (
+      <button className="ui tiny orange icon button" onClick={this._onClick}>
+        <i className="attention icon" /> Requires Action
+      </button>
+    );
+  }
+}
+
+export default DealWithButton;

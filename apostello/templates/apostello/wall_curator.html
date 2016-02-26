@@ -1,23 +1,11 @@
+{% extends "apostello/base.html" %}
 {% load staticfiles %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-{% include 'apostello/includes/head.html' %}
-</head>
-<body style="background-color: #5c569c">
+{% block side_bar %}
+<a class="item" href="{% url 'incoming_wall' %}">Live Updates</a>
+{% endblock %}
+{% block content %}
 <div id="wall"></div>
-<script src="{% static 'js/vendor.bundle.js' %}"></script>
-<script src="{% static 'js/daterangepicker.js' %}"></script>
-<script src="{% static 'js/main.js' %}"></script>
-<script>
-var wall_curate = true,
-     wall_poll_interval = 10000,
-{% if keyword %}
-     wall_keyword = "{{keyword}}",
-{% else %}
-     wall_keyword = null,
-{% endif %}
-     wall_url = "{%url 'api:live_wall' %}";
-</script>
-<script src="{% static 'js/curate_container.js' %}"></script>
-</body>
+{% endblock %}
+{% block morejs %}
+<script src="{% static 'js/live_curate.js' %}"></script>
+{% endblock %}

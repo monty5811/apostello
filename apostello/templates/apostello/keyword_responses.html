@@ -10,15 +10,11 @@
 <a class="item" href="{% url 'keyword_responses_archive' keyword.id %}">Archived Replies ({{ keyword.num_archived_matches }})</a>
 {%endif%}
 <div class="divider"></div>
-<a class="item" href="{% url 'keyword_wall' keyword.id %}">Live Updates</a>
-<a class="item" href="{% url 'keyword_wall_curator' keyword.id %}">Live Curator</a>
-<div class="divider"></div>
 <a class="item" href="{% url 'keyword_csv' keyword.id %}">Export "{{ keyword.keyword }}" responses</a>
 {% endblock %}
 {% block content %}
 <h2>{{keyword}} {%if archive%}(Archived){%endif%}</h2>
 
-{% include 'apostello/includes/table_filter.html' %}
 <div id="incoming_keyword_table"></div>
 
 {%if form%}

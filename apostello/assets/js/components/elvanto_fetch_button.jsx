@@ -1,25 +1,25 @@
-const React = require('react')
+import React, { Component } from 'react';
+import post from './../ajax_post';
 
-module.exports = React.createClass({
-    fetchGroups: function() {
-        var that = this;
-        $.ajax({
-            url: '/api/v1/elvanto/group_fetch/',
-            type: "POST",
-            data: {},
-            success: function(json) {
-                window.alert("Groups are being fetched, it may take a couple of minutes")
-            },
-            error: function(xhr, errmsg, err) {
-                window.alert("uh, oh. That didn't work.")
-                console.log(xhr.status + ": " + xhr.responseText);
-            }
-        });
-    },
-    render: function() {
-        var that = this;
-        return (
-            <button className="ui green fluid button" onClick={this.fetchGroups}>Fetch Groups</button>
-        );
-    }
-});
+class ElvantoFetchButton extends Component {
+  constructor() {
+    super();
+    this.fetchGroups = this.fetchGroups.bind(this);
+  }
+  fetchGroups() {
+    post(
+      '/api/v1/elvanto/group_fetch/',
+      {},
+      window.alert('Groups are being fetched, it may take a couple of minutes')
+    );
+  }
+  render() {
+    return (
+      <button className="ui green fluid button" onClick={this.fetchGroups}>
+        Fetch Groups
+      </button>
+    );
+  }
+}
+
+export default ElvantoFetchButton;

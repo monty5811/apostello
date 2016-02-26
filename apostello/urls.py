@@ -165,16 +165,6 @@ urlpatterns += [
         v.keyword_csv,
         name='keyword_csv'
     ),
-    url(
-        r'^keyword/responses/wall/(?P<pk>\d+)/$',
-        v.keyword_wall,
-        name='keyword_wall'
-    ),
-    url(
-        r'^keyword/responses/curate_wall/(?P<pk>\d+)/$',
-        v.keyword_wall_curate,
-        name='keyword_wall_curator'
-    ),
 ]
 
 # log urls

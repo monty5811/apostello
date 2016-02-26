@@ -7,6 +7,8 @@ from django.views.generic import View
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import generics
+from rest_framework.pagination import PageNumberPagination
 
 from apostello.mixins import ProfilePermsMixin
 from apostello.models import Keyword, Recipient, SmsInbound
@@ -15,7 +17,13 @@ from apostello.tasks import fetch_elvanto_groups, pull_elvanto_groups
 from .serializers import SmsInboundSerializer, SmsInboundSimpleSerializer
 
 
-class ApiCollection(APIView):
+class StandardPagination(PageNumberPagination):
+    page_size = 100
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
+
+
+class ApiCollection(generics.ListAPIView):
     """Basic collection view. Check user is authenticated by default."""
     permission_classes = (IsAuthenticated, )
     model_class = None
@@ -23,8 +31,9 @@ class ApiCollection(APIView):
     related_field = None
     filter_list = False
     filters = {}
+    pagination_class = StandardPagination
 
-    def get(self, request, format=None):
+    def get_queryset(self):
         """Handle get requests."""
         if self.related_field is None:
             objs = self.model_class.objects.all()
@@ -34,8 +43,7 @@ class ApiCollection(APIView):
             )
         if self.filter_list:
             objs = objs.filter(**self.filters)
-        serializer = self.serializer_class(objs, many=True)
-        return Response(serializer.data)
+        return objs
 
 
 class ApiMember(APIView):
@@ -90,52 +98,55 @@ class ApiMember(APIView):
         return Response(serializer.data)
 
 
-class ApiCollectionRecentSms(APIView):
+class ApiCollectionRecentSms(generics.ListAPIView):
     """SMS collection for a single recipient."""
     permission_classes = (IsAuthenticated, )
+    pagination_class = StandardPagination
+    serializer_class = SmsInboundSerializer
 
-    def get(self, request, format=None, **kwargs):
+    def get_queryset(self):
         """Handle get requests."""
         objs = SmsInbound.objects.filter(
-            sender_num=Recipient.objects.get(pk=kwargs['pk']).number
+            sender_num=Recipient.objects.get(pk=self.kwargs['pk']).number
         )
-        serializer = SmsInboundSerializer(objs, many=True)
-        return Response(serializer.data)
+        return objs
 
 
-class ApiCollectionKeywordSms(APIView):
+class ApiCollectionKeywordSms(generics.ListAPIView):
     """SMS collection for a single keyword."""
     permission_classes = (IsAuthenticated, )
+    pagination_class = StandardPagination
+    serializer_class = SmsInboundSerializer
+    pk = None
     archive = False
 
-    def get(self, request, format=None, **kwargs):
+    def get_queryset(self):
         """Handle get requests."""
-        keyword_obj = Keyword.objects.get(pk=kwargs['pk'])
-        self.check_object_permissions(request, keyword_obj)
+        keyword_obj = Keyword.objects.get(pk=self.kwargs['pk'])
+        self.check_object_permissions(self.request, keyword_obj)
         objs = SmsInbound.objects.filter(matched_keyword=str(keyword_obj))
         if self.archive:
             objs = objs.filter(is_archived=True)
         else:
             objs = objs.filter(is_archived=False)
-        serializer = SmsInboundSerializer(objs, many=True)
-        return Response(serializer.data)
+        return objs
 
 
-class ApiCollectionAllWall(APIView):
-    """SMS collection for a live wall."""
+class ApiCollectionAllWall(generics.ListAPIView):
+    """SMS collection for the curating wall."""
     permission_classes = (IsAuthenticated, )
+    pagination_class = StandardPagination
+    serializer_class = SmsInboundSimpleSerializer
 
-    def get(self, request, format=None, **kwargs):
+    def get_queryset(self):
         """Handle get requests."""
-        cache_key = 'live_wall'
-        data = cache.get(cache_key)
-        if data is None:
-            objs = SmsInbound.objects.filter(is_archived=False)[0:100]
-            serializer = SmsInboundSimpleSerializer(objs, many=True)
-            data = serializer.data
-            cache.set(cache_key, data, 120)
+        cache_key = 'live_wall_all'
+        objs = cache.get(cache_key)
+        if objs is None:
+            objs = SmsInbound.objects.filter(is_archived=False)
+            cache.set(cache_key, objs, 120)
 
-        return Response(data)
+        return objs
 
 
 class ElvantoPullButton(LoginRequiredMixin, ProfilePermsMixin, View):
