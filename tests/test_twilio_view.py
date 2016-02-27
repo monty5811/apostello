@@ -144,6 +144,7 @@ with open(
 
 
 @pytest.mark.slow
+@pytest.mark.veryslow
 @pytest.mark.parametrize("msg", naughty_strings)
 @pytest.mark.django_db
 class TestTwilioViewNaughtyStrings:

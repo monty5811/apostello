@@ -29,10 +29,14 @@
 <div class="ui dropdown item">
   Tools <i class="dropdown icon"></i>
   <div class="menu">
+    {% if request.user.is_staff %}
     <a class="item" href="{% url 'site_config:site' %}">Site Configuration</a>
     <a class="item" href="{% url 'site_config:responses' %}">Default Responses</a>
+    <div class="divider"></div>
+    <a class="item" href="{% url 'user_profile_table' %}">User Permissions</a>
     <a class="item" href="/admin/">Admin</a>
     <div class="divider"></div>
+    {% endif %}
     <div class="header">Import</div>
     <a class="item" href="{% url 'import_recipients' %}">CSV</a>
     <a class="item" href="{% url 'elvanto:import' %}">Elvanto</a>

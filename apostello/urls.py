@@ -225,6 +225,14 @@ urlpatterns += [url(r'^sms/$', v.sms)]
 urlpatterns += [
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', include(admin.site.urls)),
+    # edit user profiles
+    url(
+        r'^users/profiles/$',
+        v.SimpleView.as_view(
+            template_name='apostello/users.html',
+        ),
+        name='user_profile_table'
+    ),
     # over ride success url:
     url(
         r"^accounts/password/change/$",

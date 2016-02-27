@@ -2,24 +2,44 @@ from django.conf.urls import url
 
 from api.drf_permissions import (
     CanSeeContactNames, CanSeeGroups, CanSeeIncoming, CanSeeKeyword,
-    CanSeeKeywords, CanSeeOutgoing
+    CanSeeKeywords, CanSeeOutgoing, IsStaff
 )
 from api.serializers import (
     ElvantoGroupSerializer, KeywordSerializer, RecipientGroupSerializer,
-    RecipientSerializer, SmsInboundSerializer, SmsOutboundSerializer
+    RecipientSerializer, SmsInboundSerializer, SmsOutboundSerializer,
+    UserProfileSerializer,
 )
 from api.views import (
     ApiCollection, ApiCollectionAllWall, ApiCollectionKeywordSms,
     ApiCollectionRecentSms, ApiMember, ElvantoFetchButton, ElvantoPullButton
 )
 from apostello.models import (
-    Keyword, Recipient, RecipientGroup, SmsInbound, SmsOutbound
+    Keyword, Recipient, RecipientGroup, SmsInbound, SmsOutbound, UserProfile
 )
 from elvanto.models import ElvantoGroup
 from rest_framework.permissions import IsAuthenticated
 
 # api
 urlpatterns = [
+    # user profiles
+    url(
+        r'^v1/users/profiles/$',
+        ApiCollection.as_view(
+            model_class=UserProfile,
+            serializer_class=UserProfileSerializer,
+            permission_classes=(IsAuthenticated, IsStaff),
+        ),
+        name='user_profiles'
+    ),
+    url(
+        r'^v1/users/profiles/(?P<pk>[0-9]+)$',
+        ApiMember.as_view(
+            model_class=UserProfile,
+            serializer_class=UserProfileSerializer,
+            permission_classes=(IsAuthenticated, IsStaff),
+        ),
+        name='user_profiles_member'
+    ),
     # sms views
     url(
         r'^v1/sms/in/$',

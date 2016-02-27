@@ -1,7 +1,8 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from apostello.models import (
-    Keyword, Recipient, RecipientGroup, SmsInbound, SmsOutbound
+    Keyword, Recipient, RecipientGroup, SmsInbound, SmsOutbound, UserProfile
 )
 from elvanto.models import ElvantoGroup
 
@@ -129,4 +130,36 @@ class RecipientSerializer(serializers.ModelSerializer):
             'is_archived',
             'is_blocking',
             'last_sms',
+        )
+
+
+class UserSerializer(serializers.ModelSerializer):
+    """Serialize user model"""
+
+    class Meta:
+        model = User
+        fields = (
+            'email',
+            'username',
+        )
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    """Serialize apostello.models.UserProfile for use in table."""
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = UserProfile
+        fields = (
+            'pk',
+            'user',
+            'approved',
+            'can_see_groups',
+            'can_see_contact_names',
+            'can_see_keywords',
+            'can_see_outgoing',
+            'can_see_incoming',
+            'can_send_sms',
+            'can_see_contact_nums',
+            'can_import',
         )

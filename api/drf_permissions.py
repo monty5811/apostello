@@ -44,3 +44,10 @@ class CanSeeKeyword(permissions.BasePermission):
             return True
 
         return obj.can_user_access(request.user)
+
+
+class IsStaff(permissions.BasePermission):
+    """Check if a user has staff privileges."""
+
+    def has_permission(self, request, view):
+        return request.user.is_staff or request.user.is_superuser

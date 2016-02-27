@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+import json
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
 from django.http import JsonResponse
@@ -68,6 +69,7 @@ class ApiMember(APIView):
         archive = request.data.get('archive')
         display_on_wall = request.data.get('display_on_wall')
         e_sync = request.data.get('sync')
+        user_profile = request.data.get('user_profile')
 
         obj = get_object_or_404(self.model_class, pk=pk)
         if archive is not None:
@@ -92,6 +94,12 @@ class ApiMember(APIView):
                 obj.sync = False
             else:
                 obj.sync = True
+        if user_profile is not None:
+            user_profile = json.loads(user_profile)
+            user_profile.pop('user')
+            user_profile.pop('pk')
+            for x in user_profile:
+                setattr(obj, x, user_profile[x])
 
         obj.save()
         serializer = self.serializer_class(obj)

@@ -20,6 +20,7 @@ module.exports = {
     live_curate: './js/live_curate',
     live_wall: './js/live_wall',
     item_remove_button: './js/item_remove_button',
+    user_profiles: './js/user_profiles',
 
     daterangepicker: './js/daterangepicker',
     vendor: [
