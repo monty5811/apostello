@@ -5,8 +5,12 @@ from api.drf_permissions import (
     CanSeeKeywords, CanSeeOutgoing, IsStaff
 )
 from api.serializers import (
-    ElvantoGroupSerializer, KeywordSerializer, RecipientGroupSerializer,
-    RecipientSerializer, SmsInboundSerializer, SmsOutboundSerializer,
+    ElvantoGroupSerializer,
+    KeywordSerializer,
+    RecipientGroupSerializer,
+    RecipientSerializer,
+    SmsInboundSerializer,
+    SmsOutboundSerializer,
     UserProfileSerializer,
 )
 from api.views import (
