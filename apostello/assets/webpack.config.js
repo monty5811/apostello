@@ -23,10 +23,9 @@ module.exports = {
     item_remove_button: './js/item_remove_button',
     user_profiles: './js/user_profiles',
 
-    daterangepicker: './js/daterangepicker',
     vendor: [
       'jquery',
-      'moment',
+      'datetimepicker',
       'react',
       'react-dom',
       './semantic/dist/semantic.js',

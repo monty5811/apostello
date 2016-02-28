@@ -4,6 +4,7 @@
   "description": "",
   "main": "gulpfile.js",
   "dependencies": {
+    "datetimepicker": "^0.1.26",
     "opbeat-js": "^1.2.11",
     "sizzle": "^2.3.0"
   },
@@ -26,7 +27,6 @@
     "gulp-rename": "1.2.2",
     "gulp-sass": "2.2.0",
     "jquery": "2.2.0",
-    "moment": "2.11.2",
     "react": "0.14.7",
     "react-dom": "0.14.7",
     "semantic-ui": "2.1.7",
