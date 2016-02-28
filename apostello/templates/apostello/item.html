@@ -13,6 +13,7 @@
 <form class="ui {%if not form.is_valid %}error {% endif %}form" method="post">
     {% csrf_token %}
     {{ form|semanticui }}
+    <div id="dtBox"></div>
     {% if identifier == 'group' %}
     <!--disabled due to very poor performance-->
     <!--<div class="ui toggle checkbox">-->
@@ -48,6 +49,5 @@
 <script src="{%static 'js/contacts_recent_sms_table.js'%}"></script>
 {% endif %}
 {% endif %}
-<script src="{% static 'js/daterangepicker.js' %}"></script>
 <script src="{% static 'js/date_picker.js' %}"></script>
 {% endblock %}

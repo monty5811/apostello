@@ -26,7 +26,13 @@ class SendAdhocRecipientsForm(forms.Form):
     scheduled_time = forms.DateTimeField(
         required=False,
         help_text='Leave this blank to send your message immediately, '
-        'otherwise select a date and time to schedule your message'
+        'otherwise select a date and time to schedule your message',
+        widget=forms.TextInput(
+            attrs={
+                'data-field': 'datetime',
+                'readonly': True,
+            },
+        ),
     )
 
 
@@ -53,7 +59,13 @@ class SendRecipientGroupForm(forms.Form):
     scheduled_time = forms.DateTimeField(
         required=False,
         help_text='Leave this blank to send your message immediately, '
-        'otherwise select a date and time to schedule your message'
+        'otherwise select a date and time to schedule your message',
+        widget=forms.TextInput(
+            attrs={
+                'data-field': 'datetime',
+                'readonly': True,
+            },
+        ),
     )
 
 
@@ -140,6 +152,18 @@ class KeywordForm(forms.ModelForm):
                     'placeholder':
                     'eg: Thanks %name%, you have sucessfully signed up.'
                 }
+            ),
+            'activate_time': forms.TextInput(
+                attrs={
+                    'data-field': 'datetime',
+                    'readonly': True,
+                },
+            ),
+            'deactivate_time': forms.TextInput(
+                attrs={
+                    'data-field': 'datetime',
+                    'readonly': True,
+                },
             ),
             'owners': forms.SelectMultiple(
                 attrs={

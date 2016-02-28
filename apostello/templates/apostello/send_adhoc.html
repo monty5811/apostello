@@ -10,11 +10,11 @@
 <form class="ui {%if not form.is_valid %}error {% endif %}form" method="post" action="send/adhoc/">
     {% csrf_token %}
     {{ form|semanticui }}
+    <div id="dtBox"></div>
     <button type="submit" class="ui primary button" id='#send'>Send ($0)</button>
 </form>
 {% endblock %}
 {% block morejs %}
 <script src="{%static 'js/send_adhoc.js'%}"></script>
-<script src="{% static 'js/daterangepicker.js' %}"></script>
 <script src="{% static 'js/date_picker.js' %}"></script>
 {% endblock %}
