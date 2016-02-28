@@ -1,6 +1,9 @@
 {% extends "apostello/base.html" %}
 {% load staticfiles %}
 {% load semanticui %}
+{% block side_bar %}
+{% include 'apostello/includes/default_sidebar.html' %}
+{% endblock %}
 {% block content %}
 <h3 class="ui header">Site Configuration</h3>
 

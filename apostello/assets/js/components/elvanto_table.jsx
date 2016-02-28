@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { LoadingComponent } from './reloading_component';
-import { FilteringComponent } from './filtering_component';
 import ElvantoGroupRow from './elvanto_group_row';
 import post from './../ajax_post';
 
@@ -42,4 +41,4 @@ class ElvantoTable extends Component {
   }
 }
 
-export default LoadingComponent(FilteringComponent(ElvantoTable));
+export default LoadingComponent(ElvantoTable);

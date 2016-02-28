@@ -7,6 +7,7 @@ module.exports = {
 
   entry: {
     main: './js/main',
+    date_picker: './js/date_picker',
     send_adhoc: './js/send_adhoc',
     send_group: './js/send_group',
     incoming_table: './js/incoming_table',

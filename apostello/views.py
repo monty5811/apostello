@@ -51,7 +51,7 @@ class SimpleView(LoginRequiredMixin, ProfilePermsMixin, View):
 class SendAdhoc(LoginRequiredMixin, ProfilePermsMixin, View):
     """Display form for sending messages to individuals or ad-hoc groups."""
     required_perms = []
-    context = {'hide_menu': True}
+    context = {}
 
     def get(self, request, *args, **kwargs):
         """Display sending form."""
@@ -94,7 +94,7 @@ class SendAdhoc(LoginRequiredMixin, ProfilePermsMixin, View):
 class SendGroup(LoginRequiredMixin, ProfilePermsMixin, View):
     """Display form for sending messages to a group."""
     required_perms = []
-    context = {'hide_menu': True}
+    context = {}
 
     def get(self, request, *args, **kwargs):
         """Display sending form."""

@@ -43,21 +43,6 @@ $.ajaxSetup({
 });
 
 $(document).ready(() => {
-  try {
-    $('input[name$="_time"]').daterangepicker({
-      autoApply: true,
-      autoUpdateInput: true,
-      format: 'YYYY-MM-DD hh:ss',
-      timePicker: true,
-      singleDatePicker: true,
-      timePickerIncrement: 5,
-    });
-  } catch (e) {
-    console.log(e);
-  }
-});
-
-$(document).ready(() => {
   $('.dropdown').dropdown({
     label: {
       transition: 'horizontal flip',

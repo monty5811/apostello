@@ -1,5 +1,8 @@
 {% extends "apostello/base.html" %}
 {% load staticfiles %}
+{% block side_bar %}
+{% include 'apostello/includes/default_sidebar.html' %}
+{% endblock %}
 {% block content %}
 <div id="outgoing_table"></div>
 {% block morejs %}

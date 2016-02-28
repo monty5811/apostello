@@ -8,7 +8,6 @@ class BooleanButton extends Component {
   _onClick() {
     const user = this.props.user;
     user[this.props.field] = !user[this.props.field];
-    console.log(user)
     this.props.postUpdate(user);
   }
   render() {

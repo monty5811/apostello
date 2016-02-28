@@ -8,14 +8,12 @@
 	</head>
 	<body>
 		<div class="ui top attached inverted violet menu">
-			{% if not hide_menu %}
 			<div class="ui simple dropdown icon item">
 				<i class="wrench icon"></i>
 				<div class="menu">
 					{% block side_bar %} {% endblock %}
 				</div>
 			</div>
-			{% endif %}
 			{% cache 1800 topbar request.user %}
 			{% include 'apostello/top_menu.html' %}
 			{% endcache %}
@@ -40,7 +38,6 @@
 		<div class="ui hidden divider"></div>
 		</div>
 		<script src="{% static 'js/vendor.bundle.js' %}"></script>
-		<script src="{% static 'js/daterangepicker.js' %}"></script>
 		<script src="{% static 'js/main.js' %}"></script>
 		{% block morejs %}{% endblock %}
 	</body>

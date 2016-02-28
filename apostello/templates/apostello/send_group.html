@@ -1,9 +1,12 @@
 {% extends "apostello/base.html" %}
 {% load semanticui %}
 {% load staticfiles %}
+{% block side_bar %}
+{% include 'apostello/includes/default_sidebar.html' %}
+{% endblock %}
 {% block content %}
-Send a message to a group:<br>
-
+<br>
+<p>Send a message to a group:</p>
 <form class="ui {%if not form.is_valid %}error {% endif %}form" method="post" action="send/group/">
     {% csrf_token %}
     {{ form|semanticui }}
@@ -18,4 +21,6 @@ Send a message to a group:<br>
     {%endfor%}
 </script>
 <script src="{%static 'js/send_group.js'%}"></script>
+<script src="{% static 'js/daterangepicker.js' %}"></script>
+<script src="{% static 'js/date_picker.js' %}"></script>
 {% endblock %}

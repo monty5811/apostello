@@ -29,8 +29,8 @@
 <br>
 <h4>Recent Incoming History</h4>
 <div id="incoming_table" name={{object.pk}}></div>
-{%endif%}
-{%endif%}
+{% endif %}
+{% endif %}
 {% endblock %}
 {% block morejs %}
 <script>
@@ -46,6 +46,8 @@
 {% if sms_history %}
 {% if user.profile.can_see_incoming %}
 <script src="{%static 'js/contacts_recent_sms_table.js'%}"></script>
-{%endif%}
-{%endif%}
+{% endif %}
+{% endif %}
+<script src="{% static 'js/daterangepicker.js' %}"></script>
+<script src="{% static 'js/date_picker.js' %}"></script>
 {% endblock %}
