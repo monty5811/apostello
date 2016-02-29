@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 
 function obj2str(obj) {
+  if (obj === null) {
+    return '';
+  }
   const vals = Object.keys(obj).map(
     key => {
       let val = obj[key];
