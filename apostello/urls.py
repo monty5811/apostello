@@ -46,6 +46,13 @@ urlpatterns = [
         v.SendGroup.as_view(required_perms=['can_send_sms']),
         name='send_group'
     ),
+    url(
+        r'^usage/',
+        v.SimpleView.as_view(
+            template_name='apostello/usage_dashboard.html',
+        ),
+        name='usage_summary',
+    ),
 ]
 # recipient group urls
 urlpatterns += [

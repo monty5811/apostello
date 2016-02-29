@@ -4,11 +4,6 @@
 <a class="item" href="{% url 'recipient' %}">New Contact</a>
 {% endblock %}
 {% block content %}
-{%if user.is_staff%}
-Archived Contacts = {{archived_contacts}}<br>
-Blacklisted Contacts = {{blacklisted_contacts}}<br>
-Total Active Contacts = {{total_contacts}}<br>
-{%endif%}
 <div id="contacts_table"></div>
 {% block morejs %}
 <script src="{%static 'js/contacts_table.js'%}"></script>

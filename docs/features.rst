@@ -9,6 +9,7 @@ Features
 * Live "wall" - curate and display incoming messages on a big screen. Great for a Q&A.
 * Post all messages to a slack channel.
 * Import contacts (CSV or `Elvanto <https://www.elvanto.com/r_Y7HXKNE6>`_).
+* Usage overview dashboard
 
 
 Keywords

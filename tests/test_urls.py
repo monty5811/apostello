@@ -39,7 +39,13 @@ from site_config import models as smodels
         ('/api/v1/groups/1', 403),
         ('/api/v1/keywords/', 403),
         ('/api/v1/keywords/1', 403),
-        ('/graphs/recent/', 200),
+        ('/graphs/recent/', 302),
+        ('/graphs/contacts/', 302),
+        ('/graphs/groups/', 302),
+        ('/graphs/keywords/', 302),
+        ('/graphs/sms/totals/', 302),
+        ('/graphs/sms/in/bycontact/', 302),
+        ('/graphs/sms/out/bycontact/', 302),
     ]
 )
 @pytest.mark.django_db
@@ -90,6 +96,13 @@ class TestNotLoggedIn:
         ('/api/v1/keywords/', 200),
         ('/api/v1/keywords/1', 200),
         ('/api/v1/sms/live_wall/all/', 200),
+        ('/graphs/recent/', 200),
+        ('/graphs/contacts/', 200),
+        ('/graphs/groups/', 200),
+        ('/graphs/keywords/', 200),
+        ('/graphs/sms/totals/', 200),
+        ('/graphs/sms/in/bycontact/', 200),
+        ('/graphs/sms/out/bycontact/', 200),
     ]
 )
 @pytest.mark.django_db
@@ -144,6 +157,13 @@ class TestStaff:
         ('/api/v1/keywords/', 200),
         ('/api/v1/keywords/1', 200),
         ('/api/v1/sms/live_wall/all/', 200),
+        ('/graphs/recent/', 200),
+        ('/graphs/contacts/', 302),
+        ('/graphs/groups/', 302),
+        ('/graphs/keywords/', 302),
+        ('/graphs/sms/totals/', 302),
+        ('/graphs/sms/in/bycontact/', 302),
+        ('/graphs/sms/out/bycontact/', 302),
     ]
 )
 @pytest.mark.django_db

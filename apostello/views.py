@@ -28,24 +28,13 @@ from site_config.models import SiteConfiguration
 
 
 class SimpleView(LoginRequiredMixin, ProfilePermsMixin, View):
-    """Simple view that can ensures user is logged in and has permissions."""
+    """Simple view that can ensure user is logged in and has permissions."""
     template_name = ''
     required_perms = []
 
     def get(self, request, *args, **kwargs):
         """Handle get requests."""
-        context = dict()
-        if "recipients" in self.template_name:
-            context['archived_contacts'] = Recipient.objects.filter(
-                is_archived=True
-            ).count()
-            context['blacklisted_contacts'] = Recipient.objects.filter(
-                is_blocking=True
-            ).count()
-            context['total_contacts'] = Recipient.objects.count() - context[
-                'archived_contacts'
-            ] - context['blacklisted_contacts']
-        return render(request, self.template_name, context)
+        return render(request, self.template_name, {})
 
 
 class SendAdhoc(LoginRequiredMixin, ProfilePermsMixin, View):
