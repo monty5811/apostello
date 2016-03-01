@@ -46,6 +46,8 @@ from site_config import models as smodels
         ('/graphs/sms/totals/', 302),
         ('/graphs/sms/in/bycontact/', 302),
         ('/graphs/sms/out/bycontact/', 302),
+        ('/config/site/', 302),
+        ('/config/responses/', 302),
     ]
 )
 @pytest.mark.django_db
@@ -103,6 +105,8 @@ class TestNotLoggedIn:
         ('/graphs/sms/totals/', 200),
         ('/graphs/sms/in/bycontact/', 200),
         ('/graphs/sms/out/bycontact/', 200),
+        ('/config/site/', 200),
+        ('/config/responses/', 200),
     ]
 )
 @pytest.mark.django_db
@@ -164,6 +168,8 @@ class TestStaff:
         ('/graphs/sms/totals/', 302),
         ('/graphs/sms/in/bycontact/', 302),
         ('/graphs/sms/out/bycontact/', 302),
+        ('/config/site/', 302),
+        ('/config/responses/', 302),
     ]
 )
 @pytest.mark.django_db
