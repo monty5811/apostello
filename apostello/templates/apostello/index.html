@@ -1,4 +1,5 @@
 {% extends "apostello/base.html" %}
+{% load staticfiles %}
 {% block side_bar %}
 {% include 'apostello/includes/default_sidebar.html' %}
 {% endblock %}
@@ -14,4 +15,9 @@
 
 <br>
 <figure><embed type="image/svg+xml" src="/graphs/recent/"/></figure>
+{% endblock %}
+{% block morejs %}
+{% if show_tour %}
+<script src="{% static 'js/tour.js' %}"></script>
+{% endif %}
 {% endblock %}

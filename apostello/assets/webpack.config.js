@@ -22,6 +22,7 @@ module.exports = {
     live_wall: './js/live_wall',
     item_remove_button: './js/item_remove_button',
     user_profiles: './js/user_profiles',
+    tour: './js/tour',
 
     vendor: [
       'jquery',

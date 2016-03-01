@@ -561,6 +561,10 @@ class UserProfile(models.Model):
         default=False,
         help_text='This must be true to grant users access to the site.'
     )
+    show_tour = models.BooleanField(
+        default=True,
+        help_text='If true, the user will be shown popup tour on index page.',
+    )
 
     can_see_groups = models.BooleanField(default=True)
     can_see_contact_names = models.BooleanField(default=True)

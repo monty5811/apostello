@@ -34,7 +34,14 @@ class SimpleView(LoginRequiredMixin, ProfilePermsMixin, View):
 
     def get(self, request, *args, **kwargs):
         """Handle get requests."""
-        return render(request, self.template_name, {})
+        user_profile = self.request.user.profile
+        context = {'show_tour': user_profile.show_tour}
+        if user_profile.show_tour:
+            # first run, disable tour on subsequent loads
+            user_profile.show_tour = False
+            user_profile.save()
+
+        return render(request, self.template_name, context)
 
 
 class SendAdhoc(LoginRequiredMixin, ProfilePermsMixin, View):

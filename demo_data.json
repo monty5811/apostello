@@ -268,6 +268,7 @@
     "fields": {
         "user": 1,
         "approved": false,
+        "show_tour": true,
         "can_see_groups": true,
         "can_see_contact_names": true,
         "can_see_keywords": true,
@@ -283,6 +284,7 @@
     "fields": {
         "user": 2,
         "approved": true,
+        "show_tour": true,
         "can_see_groups": true,
         "can_see_contact_names": true,
         "can_see_keywords": true,

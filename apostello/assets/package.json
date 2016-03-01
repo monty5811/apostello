@@ -5,6 +5,7 @@
   "main": "gulpfile.js",
   "dependencies": {
     "datetimepicker": "^0.1.26",
+    "intro.js": "^2.0.0",
     "opbeat-js": "^1.2.11",
     "sizzle": "^2.3.0"
   },
