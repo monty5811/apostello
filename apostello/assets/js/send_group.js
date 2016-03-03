@@ -1,15 +1,24 @@
 import $ from 'jquery';
-// const semantic = require('./../semantic/dist/semantic.js');
+import setCost from './calculate_sms_cost';
 
-/* global group_costs */
+/* global group_sizes */
 
-$(document).ready(() => {
-  $('.dropdown')
-  .dropdown({
-    onChange(text, value) {
-      let cost = `\$${group_costs[text]}`;
-      if (text === '') {cost = '$0';}
-      document.getElementById('#send').innerHTML = `Send (${cost})`;
-    },
-  });
-});
+$(document).ready(
+  () => {
+    $('.dropdown').dropdown(
+      {
+        onChange(text) {
+          setCost(group_sizes[text]);
+        },
+      }
+      );
+    $('#id_content').keyup(() => {
+      let nPeople = 0;
+      const selectedGroup = $('.item.active.selected')[0];
+      if (selectedGroup !== undefined) {
+        nPeople = group_sizes[selectedGroup.getAttribute('data-value')];
+      }
+      setCost(nPeople);
+    });
+  }
+);

@@ -16,9 +16,9 @@
 {%endblock%}
 {% block morejs %}
 <script>
-    var group_costs = {};
+    var group_sizes = {};
     {% for x in group_nums %}
-    group_costs['{{x.0}}'] = {{x.1}};
+    group_sizes['{{x.0}}'] = {{x.1}};
     {%endfor%}
 </script>
 <script src="{%static 'js/send_group.js'%}"></script>

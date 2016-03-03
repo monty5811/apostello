@@ -1,15 +1,18 @@
 import $ from 'jquery';
-// var semantic = require('./../semantic/dist/semantic.js');
+import setCost from './calculate_sms_cost';
 
 $(document).ready(
   () => {
     $('.dropdown').dropdown(
       {
-        onChange(text, value) {
-          const cost = `\$${0.04 * text.length}`;
-          document.getElementById('#send').innerHTML = `Send (${cost})`;
+        onChange(text) {
+          setCost(text.length);
         },
       }
     );
+    $('#id_content').keyup(() => {
+      const nPeople = $('.delete.icon').length;
+      setCost(nPeople);
+    });
   }
 );

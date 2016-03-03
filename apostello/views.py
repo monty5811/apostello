@@ -97,7 +97,8 @@ class SendGroup(LoginRequiredMixin, ProfilePermsMixin, View):
         context = self.context
         context['form'] = SendRecipientGroupForm
         context['group_nums'] = [
-            (x.id, x.calculate_cost) for x in RecipientGroup.objects.all()
+            (x.id, x.recipient_set.all().count())
+            for x in RecipientGroup.objects.all()
         ]
         return render(request, "apostello/send_group.html", context)
 
