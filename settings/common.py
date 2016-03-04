@@ -64,6 +64,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'apostello.context_processors.global_settings',
+                'apostello.context_processors.opbeat_js_settings',
             ],
             'loaders': [
                 'django.template.loaders.filesystem.Loader',
@@ -176,3 +177,13 @@ NO_ACCESS_WARNING = 'You do not have access to this page. '
 
 # Testing
 TESTING = False
+
+# opbeat django:
+OPBEAT = {
+    'ORGANIZATION_ID': os.environ.get('OPBEAT_ORG_ID', ''),
+    'APP_ID': os.environ.get('OPBEAT_APP_ID', ''),
+    'SECRET_TOKEN': os.environ.get('OPBEAT_SECRET_TOKEN', ''),
+}
+# opbeat js:
+OPBEAT_JS_APP_ID = os.environ.get('OPBEAT_APP_ID')
+OPBEAT_JS_ORG_ID = os.environ.get('OPBEAT_JS_ORG_ID')
