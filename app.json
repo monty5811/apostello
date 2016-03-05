@@ -66,6 +66,14 @@
     "OPBEAT_SECRET_TOKEN": {
       "value": "",
       "required": false
+    },
+    "OPBEAT_JS_APP_ID": {
+      "value": "",
+      "required": false
+    },
+    "OPBEAT_JS_ORG_ID": {
+      "value": "",
+      "required": false
     }
   },
   "addons": [
