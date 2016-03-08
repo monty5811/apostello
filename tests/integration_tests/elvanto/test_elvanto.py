@@ -22,8 +22,8 @@ class TestElvantoImport:
         browser_in.get(live_server + uri)
         assert uri in browser_in.current_url
         # check table is there
+        sleep(10)
         tables = browser_in.find_elements_by_class_name('table')
-        sleep(3)
         assert len(tables) == 1
         table = tables[0]
         assert 'Geneva' in table.text
