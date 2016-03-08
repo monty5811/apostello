@@ -373,3 +373,22 @@ def browser(request):
 
     yield driver
     driver.quit()
+
+
+@pytest.mark.usefixtures('users', 'live_server')
+@pytest.yield_fixture()
+def browser_in(request, live_server, users):
+    """Setup selenium browser."""
+    driver = webdriver.Firefox()
+    driver.get(live_server + '/')
+    email_box = driver.find_elements_by_name('login')[0]
+    email_box.send_keys(users['staff'].email)
+    password_box = driver.find_elements_by_name('password')[0]
+    password_box.send_keys('top_secret')
+    login_button = driver.find_elements_by_xpath(
+        '/html/body/div/div/form/button'
+    )[0]
+    login_button.click()
+
+    yield driver
+    driver.quit()
