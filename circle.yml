@@ -1,0 +1,15 @@
+---
+machine:
+  python:
+    version: 3.5.0
+dependencies:
+    override:
+        - pip install tox
+test:
+  override:
+		- tox
+  post:
+    - pip install coveralls && coveralls
+general:
+  artifacts:
+    - "coverage_html_report"
