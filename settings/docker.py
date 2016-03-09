@@ -11,3 +11,10 @@ DATABASES = {
 }
 
 BROKER_URL = 'amqp://guest:guest@broker:5672'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': 'cache:11211',
+    }
+}

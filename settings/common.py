@@ -187,3 +187,6 @@ OPBEAT = {
 # opbeat js:
 OPBEAT_JS_APP_ID = os.environ.get('OPBEAT_APP_ID')
 OPBEAT_JS_ORG_ID = os.environ.get('OPBEAT_JS_ORG_ID')
+
+# solo caching:
+SOLO_CACHE = 'default'

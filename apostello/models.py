@@ -1,4 +1,5 @@
 import hashlib
+import logging
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -22,6 +23,8 @@ from apostello.validators import (
     twilio_reserved, validate_lower
 )
 
+logger = logging.getLogger('apostello')
+
 
 class RecipientGroup(models.Model):
     """Stores groups of recipients."""
@@ -43,14 +46,18 @@ class RecipientGroup(models.Model):
         self.is_archived = True
         self.save()
 
+    @cached_property
+    def all_recipients(self):
+        return self.recipient_set.all()
+
     @property
     def all_recipients_names(self):
         """List of the names of recipients."""
-        return [str(x) for x in self.recipient_set.all()]
+        return [str(x) for x in self.all_recipients]
 
     def calculate_cost(self):
         """Calculate the cost of sending to this group."""
-        return settings.SENDING_COST * self.recipient_set.all().count()
+        return settings.SENDING_COST * self.all_recipients.count()
 
     @cached_property
     def get_absolute_url(self):
@@ -88,11 +95,13 @@ class Recipient(models.Model):
         "First Name",
         max_length=settings.MAX_NAME_LENGTH,
         validators=[gsm_validator],
+        db_index=True,
     )
     last_name = models.CharField(
         "Last Name",
         max_length=40,
         validators=[gsm_validator],
+        db_index=True,
     )
     number = PhoneNumberField(
         unique=True,
@@ -161,16 +170,20 @@ class Recipient(models.Model):
     @property
     def last_sms(self):
         """Last message sent to this person"""
-        msg = cache.get('last_msg__{0}'.format(self.number))
-        if msg is None:
+        last_sms = cache.get('last_msg__{0}'.format(self.pk))
+        if last_sms is None:
             msg = SmsInbound.objects.filter(sender_num=str(self.number))
             try:
                 msg = msg[0]  # sms are already sorted in time
+                last_sms = {
+                    'content': msg.content,
+                    'time_received': msg.time_received.strftime('%d %b %H:%M')
+                }
             except IndexError:
-                msg = None
-            cache.set('last_msg__{0}'.format(self.number), msg, 600)
+                last_sms = {'content': '', 'time_received': ''}
+            cache.set('last_msg__{0}'.format(self.pk), last_sms, 600)
 
-        return msg
+        return last_sms
 
     def __str__(self):
         """Pretty representation."""

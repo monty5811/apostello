@@ -9,7 +9,8 @@ import pytest
 @pytest.mark.failsontravis
 @pytest.mark.skipif(
     os.environ.get('TRAVIS') == 'true',
-    reason='Skip as fails on travis')
+    reason='Skip as fails on travis'
+)
 @pytest.mark.parametrize("uri", ['/users/profiles/', ])
 class TestUserProfiles:
     def test_page_and_submit(self, uri, live_server, browser_in, users):

@@ -11,7 +11,8 @@ my_vcr = vcr.VCR(record_mode='none', )
 @pytest.mark.django_db
 @pytest.mark.skipif(
     os.environ.get('TRAVIS') == 'true',
-    reason='Skip as fails on travis')
+    reason='Skip as fails on travis'
+)
 @pytest.mark.slow
 @pytest.mark.parametrize("uri", ['/elvanto/import/', ])
 class TestElvantoImport:

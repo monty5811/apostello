@@ -117,7 +117,6 @@ class SmsOutboundSerializer(serializers.ModelSerializer):
 class RecipientSerializer(serializers.ModelSerializer):
     """Serialize apostello.models.Recipient for use in table."""
     url = serializers.CharField(source='get_absolute_url')
-    last_sms = SmsInboundSimpleSerializer(read_only=True)
 
     class Meta:
         model = Recipient
