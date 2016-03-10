@@ -16,6 +16,7 @@ DATABASES = {
         'PASSWORD': os.environ.get('DATABASE_PASSWORD', ''),
         'HOST': 'localhost',
         'PORT': '',
+        'CONN_MAX_AGE': 600,
     }
 }
 
