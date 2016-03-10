@@ -10,6 +10,7 @@ omit =
     docs*
     run_yapf.py
     .tox*
+    setup.py
 source =
     .
 [html]

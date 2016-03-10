@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 import pytest
+import vcr
 
 from apostello import models
 from elvanto import models as emodels
 from site_config import models as smodels
+
+my_vcr = vcr.VCR(record_mode='none', )
 
 
 @pytest.mark.slow
@@ -200,6 +203,10 @@ class TestOthers:
                         '/api/v1/' + endpoint + '/in/1', {param: value}
                     )
 
+    @my_vcr.use_cassette(
+        'tests/fixtures/vcr_cass/elv.yaml',
+        filter_headers=['authorization']
+    )
     def test_api_elvanto_posts(self, users):
         # turn on
         config = smodels.SiteConfiguration.get_solo()

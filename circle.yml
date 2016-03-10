@@ -1,13 +1,18 @@
 ---
 machine:
   python:
-    version: 3.5.0
+    version: '3.4.3'
+  environment:
+    TOX_PY34: '3.4.3'
+    TOX_PY35: '3.5.1'
 dependencies:
   override:
-    - pip install tox
+    - pip install -U pip
+    - pip install tox tox-pyenv
+    - pyenv local $TOX_PY35 $TOX_PY34
 test:
   override:
-    - tox
+    - tox --recreate
   post:
     - pip install coveralls && coveralls
 general:

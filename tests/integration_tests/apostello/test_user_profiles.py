@@ -14,7 +14,6 @@ import pytest
 @pytest.mark.parametrize("uri", ['/users/profiles/', ])
 class TestUserProfiles:
     def test_page_and_submit(self, uri, live_server, browser_in, users):
-        print('test')
         # load page
         browser_in.get(live_server + uri)
         assert uri in browser_in.current_url

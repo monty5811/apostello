@@ -365,7 +365,6 @@ def users(recipients, keywords):
     return objs
 
 
-@pytest.mark.usefixtures("users")
 @pytest.yield_fixture(scope='module')
 def browser(request):
     """Setup selenium browser."""
