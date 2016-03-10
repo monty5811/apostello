@@ -9,6 +9,7 @@ omit =
     venv*
     docs*
     run_yapf.py
+    .tox*
 source =
     .
 [html]
