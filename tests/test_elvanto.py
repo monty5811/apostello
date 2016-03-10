@@ -7,7 +7,7 @@ from elvanto.elvanto import fix_elvanto_numbers, try_both_num_fields
 from elvanto.exceptions import NotValidPhoneNumber
 from elvanto.models import ElvantoGroup
 
-my_vcr = vcr.VCR(record_mode='none', )
+my_vcr = vcr.VCR(record_mode='none', ignore_localhost=True)
 
 
 class TestElvantoNumbers:

@@ -6,7 +6,7 @@ from apostello import models
 from elvanto import models as emodels
 from site_config import models as smodels
 
-my_vcr = vcr.VCR(record_mode='none', )
+my_vcr = vcr.VCR(record_mode='none', ignore_localhost=True)
 
 
 @pytest.mark.slow

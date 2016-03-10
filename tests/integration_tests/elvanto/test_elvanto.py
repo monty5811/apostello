@@ -5,7 +5,7 @@ import pytest
 import vcr
 from elvanto.models import ElvantoGroup
 
-my_vcr = vcr.VCR(record_mode='none', )
+my_vcr = vcr.VCR(record_mode='none', ignore_localhost=True)
 
 
 @pytest.mark.django_db
