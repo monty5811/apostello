@@ -10,7 +10,7 @@ class KeywordRow extends Component {
           <a href={this.props.keyword.url}>{this.props.keyword.keyword}</a>
         </td>
         <td>{this.props.keyword.description}</td>
-        <td>{this.props.keyword.custom_response}</td>
+        <td>{this.props.keyword.current_response}</td>
         <td>
           <a href={this.props.keyword.responses_url}>
             {this.props.keyword.num_replies}

@@ -266,46 +266,59 @@ class Keyword(models.Model):
 
     def construct_reply(self, sender):
         """Make reply to an incoming message."""
-        # check if keyword is active
+        reply = self.current_response
+        return sender.personalise(reply)
+
+    @cached_property
+    def current_response(self):
+        """Currently active response"""
         if not self.is_live:
-            if self.deactivated_response != '' and timezone.now(
-            ) > self.deactivate_time:
-                reply = sender.personalise(self.deactivated_response)
-            elif self.too_early_response != '' and timezone.now(
-            ) < self.activate_time:
-                reply = sender.personalise(self.too_early_response)
+            if self.deactivated_response != '' and self.has_ended:
+                reply = self.deactivated_response
+            elif self.too_early_response != '' and self.has_not_started:
+                reply = self.too_early_response
             else:
-                reply = sender.personalise(
-                    fetch_default_reply(
-                        'default_no_keyword_not_live'
-                    )
-                ).replace(
-                    "%keyword%", self.keyword
-                )
+                reply = fetch_default_reply('default_no_keyword_not_live')
         else:
             # keyword is active
             if self.custom_response == '':
                 # no custom response, use generic form
-                reply = sender.personalise(
-                    fetch_default_reply(
-                        'default_no_keyword_auto_reply'
-                    )
-                )
+                reply = fetch_default_reply('default_no_keyword_auto_reply')
             else:
                 # use custom response
-                reply = sender.personalise(self.custom_response)
+                reply = self.custom_response
 
-        return reply
+        return reply.replace("%keyword%", self.keyword)
 
     @property
-    def is_live(self):
-        """Is keyword active."""
-        started = timezone.now() > self.activate_time
+    def has_started(self):
+        """True if the current time is after the start time."""
+        return timezone.now() > self.activate_time
+
+    @property
+    def has_not_started(self):
+        """True if the current time is before the start time."""
+        return not self.has_started
+
+    @property
+    def has_not_ended(self):
+        """True if the current time is before the end time."""
         if self.deactivate_time is None:
             not_ended = True
         else:
             not_ended = timezone.now() < self.deactivate_time
-        return started and not_ended
+
+        return not_ended
+
+    @property
+    def has_ended(self):
+        """True if the current time is after the end time."""
+        return not self.has_not_ended
+
+    @property
+    def is_live(self):
+        """Is keyword active."""
+        return self.has_started and self.has_not_ended
 
     def fetch_matches(self):
         """Fetch un-archived messages that match keyword."""

@@ -49,7 +49,7 @@ class KeywordSerializer(serializers.ModelSerializer):
             'keyword',
             'pk',
             'description',
-            'custom_response',
+            'current_response',
             'is_live',
             'url',
             'responses_url',
