@@ -7,6 +7,7 @@ dependencies:
   override:
     - pip install -U pip
     - pip install tox tox-pyenv
+    - pyenv install $TOX_PY34
     - pyenv local $TOX_PY35 $TOX_PY34
 test:
   override:
