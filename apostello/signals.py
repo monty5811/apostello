@@ -33,8 +33,8 @@ def email_admin_on_signup(request, user, **kwargs):
     body = (
         "New User Signed Up: {}\n\n"
         "Please go to the admin page to approve their account.\n"
-        "If you do not approve their account, they will be unable "
-        "to access apostello."
+        "If you do not approve their account (and they are not using a "
+        "whitelisted domain), they will be unable to access apostello."
     )
     body = body.format(str(user))
     from site_config.models import SiteConfiguration
