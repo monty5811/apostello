@@ -2,7 +2,7 @@
 machine:
   environment:
     TOX_PY34: '3.4.3'
-    TOX_PY35: '3.5.1'
+    TOX_PY35: '3.5.0'
 dependencies:
   override:
     - pip install -U pip
