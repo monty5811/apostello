@@ -1,7 +1,5 @@
 ---
 machine:
-  python:
-    version: '3.4.3'
   environment:
     TOX_PY34: '3.4.3'
     TOX_PY35: '3.5.1'
