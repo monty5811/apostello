@@ -382,16 +382,15 @@ def browser(request):
 
 @pytest.mark.usefixtures('users', 'live_server')
 @pytest.yield_fixture()
-def browser_in(request, live_server):
+def browser_in(request, live_server, users):
     """Setup selenium browser."""
-    user, c = create_staff()
     driver = webdriver.Firefox()
     driver.get(live_server + '/')
     driver.add_cookie(
         {
             u'domain': u'localhost',
             u'name': u'sessionid',
-            u'value': c.session.session_key,
+            u'value': users['c_staff'].session.session_key,
             u'path': u'/',
             u'httponly': True,
             u'secure': False
