@@ -282,10 +282,7 @@ def keywords():
     return keywords
 
 
-@pytest.mark.usefixtures("recipients", "keywords")
-@pytest.fixture()
-def users(recipients, keywords):
-    """Create apostello users."""
+def create_staff():
     user = User.objects.create_user(
         username='test',
         email='test@example.com',
@@ -307,6 +304,17 @@ def users(recipients, keywords):
     p.can_see_contact_nums = True
     p.can_import = True
     p.save()
+
+    c = Client()
+    c.login(username='test', password='top_secret')
+    return user, c
+
+
+@pytest.mark.usefixtures("recipients", "keywords")
+@pytest.fixture()
+def users(recipients, keywords):
+    """Create apostello users."""
+    user, c = create_staff()
 
     user2 = User.objects.create_user(
         username='test2',
@@ -347,8 +355,6 @@ def users(recipients, keywords):
     )
     allauth_email.save()
 
-    c = Client()
-    c.login(username='test', password='top_secret')
     c2 = Client()
     c2.login(username='test3', password='top2_secret')
     c_out = Client()
@@ -376,18 +382,20 @@ def browser(request):
 
 @pytest.mark.usefixtures('users', 'live_server')
 @pytest.yield_fixture()
-def browser_in(request, live_server, users):
+def browser_in(request, live_server):
     """Setup selenium browser."""
+    user, c = create_staff()
     driver = webdriver.Firefox()
     driver.get(live_server + '/')
-    email_box = driver.find_elements_by_name('login')[0]
-    email_box.send_keys(users['staff'].email)
-    password_box = driver.find_elements_by_name('password')[0]
-    password_box.send_keys('top_secret')
-    login_button = driver.find_elements_by_xpath(
-        '/html/body/div/div/form/button'
-    )[0]
-    login_button.click()
-
+    driver.add_cookie(
+        {
+            u'domain': u'localhost',
+            u'name': u'sessionid',
+            u'value': c.session.session_key,
+            u'path': u'/',
+            u'httponly': True,
+            u'secure': False
+        }
+    )
     yield driver
     driver.quit()
