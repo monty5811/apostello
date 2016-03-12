@@ -16,6 +16,7 @@
 {%endblock%}
 {% block morejs %}
 <script>
+    var sms_cost = {{ TWILIO_SENDING_COST }};
     var group_sizes = {};
     {% for x in group_nums %}
     group_sizes['{{x.0}}'] = {{x.1}};

@@ -15,6 +15,9 @@
 </form>
 {% endblock %}
 {% block morejs %}
+<script>
+var sms_cost = {{ TWILIO_SENDING_COST }};
+</script>
 <script src="{%static 'js/send_adhoc.js'%}"></script>
 <script src="{% static 'js/date_picker.js' %}"></script>
 {% endblock %}

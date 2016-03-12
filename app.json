@@ -29,6 +29,10 @@
       "description": "The Twilio number you want to send from",
       "value": ""
     },
+    "TWILIO_SENDING_COST": {
+      "description": "The cost of sending a message - get this here: https://www.twilio.com/sms/pricing",
+      "value": ""
+    },
     "COUNTRY_CODE": {
       "description": "County code (used in Elvanto import)",
       "value": ""

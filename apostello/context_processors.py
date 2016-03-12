@@ -7,6 +7,7 @@ def global_settings(request):
     """Expose TWILIO_FROM_NUM, DEBUG and site config in templates."""
     return {
         'TWILIO_FROM_NUM': settings.TWILIO_FROM_NUM,
+        'TWILIO_SENDING_COST': settings.TWILIO_SENDING_COST,
         'DEBUG': settings.DEBUG,
         'CONFIG': SiteConfiguration.get_solo(),
     }

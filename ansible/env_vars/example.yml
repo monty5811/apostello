@@ -17,6 +17,7 @@ account_default_http_protocol: 'https'
 twilio_account_sid:
 twilio_auth_token:
 twilio_from_num:
+twilio_sending_cost:
 # Whitelisted domains
 whitelisted_login_domains:
 # Email

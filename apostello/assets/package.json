@@ -37,9 +37,9 @@
   },
   "scripts": {
     "prebuild": "gulp css uiBuildJs",
-    "build": "webpack --config webpack.config.js --progress --colors",
+    "build": "webpack --config webpack.config.js --colors",
     "prewatch": "npm run prebuild",
-    "watch": "webpack --config webpack.config.js --progress --colors --watch"
+    "watch": "webpack --config webpack.config.js --colors --watch"
   },
   "author": "",
   "license": "ISC"

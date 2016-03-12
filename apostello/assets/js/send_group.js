@@ -1,14 +1,14 @@
 import $ from 'jquery';
 import setCost from './calculate_sms_cost';
 
-/* global group_sizes */
+/* global group_sizes, sms_cost */
 
 $(document).ready(
   () => {
     $('.dropdown').dropdown(
       {
         onChange(text) {
-          setCost(group_sizes[text]);
+          setCost(group_sizes[text], sms_cost);
         },
       }
       );
@@ -18,7 +18,7 @@ $(document).ready(
       if (selectedGroup !== undefined) {
         nPeople = group_sizes[selectedGroup.getAttribute('data-value')];
       }
-      setCost(nPeople);
+      setCost(nPeople, sms_cost);
     });
   }
 );

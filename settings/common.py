@@ -162,11 +162,13 @@ ELVANTO_KEY = os.environ.get('ELVANTO_KEY', '')
 TWILIO_ACCOUNT_SID = os.environ['TWILIO_ACCOUNT_SID']
 TWILIO_AUTH_TOKEN = os.environ['TWILIO_AUTH_TOKEN']
 TWILIO_FROM_NUM = os.environ['TWILIO_FROM_NUM']
+TWILIO_SENDING_COST = float(
+    os.environ.get('TWILIO_SENDING_COST', '0.04')
+)  # cost in USD
 
 # Sms settings - note that messages over 160 will be charged twice
 MAX_NAME_LENGTH = 16
 SMS_CHAR_LIMIT = 160 - MAX_NAME_LENGTH + len('{name}')
-SENDING_COST = 0.04  # cost in USD
 # Used for nomalising elvanto imports, use twilio to limit sending to
 # particular countries:
 # https://www.twilio.com/help/faq/voice/what-are-global-permissions-and-why-do-they-exist
