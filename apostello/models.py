@@ -57,7 +57,7 @@ class RecipientGroup(models.Model):
 
     def calculate_cost(self):
         """Calculate the cost of sending to this group."""
-        return settings.SENDING_COST * self.all_recipients.count()
+        return settings.TWILIO_SENDING_COST * self.all_recipients.count()
 
     @cached_property
     def get_absolute_url(self):
