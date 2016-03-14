@@ -12,7 +12,7 @@ class KeywordsTable extends Component {
   archiveKeyword(keyword) {
     post(
       `/api/v1/keywords/${keyword.pk}`,
-      { archive: !keyword.is_archived },
+      { archived: keyword.is_archived },
       this.props.deleteItemUpdate
     );
   }

@@ -2,7 +2,7 @@ from django.conf.urls import url
 
 from api.drf_permissions import (
     CanSeeContactNames, CanSeeGroups, CanSeeIncoming, CanSeeKeyword,
-    CanSeeKeywords, CanSeeOutgoing, IsStaff
+    CanSeeKeywords, CanSeeOutgoing, CanImport, IsStaff
 )
 from api.serializers import (
     ElvantoGroupSerializer,
@@ -157,7 +157,7 @@ urlpatterns = [
         ApiCollection.as_view(
             model_class=ElvantoGroup,
             serializer_class=ElvantoGroupSerializer,
-            permission_classes=(IsAuthenticated, CanSeeGroups)
+            permission_classes=(IsAuthenticated, CanSeeGroups, CanImport)
         ),
         name='elvanto_groups'
     ),
@@ -166,7 +166,7 @@ urlpatterns = [
         ApiMember.as_view(
             model_class=ElvantoGroup,
             serializer_class=ElvantoGroupSerializer,
-            permission_classes=(IsAuthenticated, CanSeeGroups)
+            permission_classes=(IsAuthenticated, CanSeeGroups, CanImport)
         ),
         name='elvanto_group'
     ),

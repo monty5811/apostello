@@ -41,18 +41,14 @@ class TestElvantoImport:
         group_button.click()
         sleep(3)
         assert 'Syncing' in table.text
-        # grab buttons
+        # fetch groups
         wrench = browser_in.find_elements_by_class_name('wrench')[0]
+        wrench.click()
         buttons = browser_in.find_elements_by_class_name('fluid')
         fetch_button = buttons[0]
-        # fetch groups
-        wrench.click()
         fetch_button.click()
-        try:
-            alert = browser_in.switch_to_alert()
-            alert.accept()
-        except Exception:
-            pass
+        alert = browser_in.switch_to_alert()
+        alert.accept()
         # pull groups
         browser_in.get(live_server + uri)
         assert uri in browser_in.current_url
@@ -61,3 +57,5 @@ class TestElvantoImport:
         buttons = browser_in.find_elements_by_class_name('fluid')
         pull_button = buttons[1]
         pull_button.click()
+        alert = browser_in.switch_to_alert()
+        alert.accept()

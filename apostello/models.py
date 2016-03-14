@@ -365,6 +365,7 @@ class Keyword(models.Model):
         """Archive this keyword and all matches."""
         self.is_archived = True
         self.save()
+        logger.debug('Archived %s (pk=%s)', self.keyword, self.pk)
         for sms in self.fetch_matches():
             sms.archive()
 

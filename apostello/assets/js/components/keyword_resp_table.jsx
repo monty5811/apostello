@@ -13,14 +13,14 @@ class KeywordRespTable extends Component {
   archiveSms(sms) {
     post(
       `/api/v1/sms/in/${sms.pk}`,
-      { archive: !sms.is_archived },
+      { archived: sms.is_archived },
       this.props.deleteItemUpdate
     );
   }
   dealWithSms(sms) {
     post(
       `/api/v1/sms/in/${sms.pk}`,
-      { deal_with: !sms.dealt_with },
+      { dealt_with: sms.dealt_with },
       this.props.loadfromserver
     );
   }

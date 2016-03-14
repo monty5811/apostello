@@ -10,7 +10,7 @@ class ItemRemoveButton extends Component {
     const success = () => {window.location.href = this.props.redirect_url;};
     post(
       this.props.url,
-      { archive: !this.props.is_archived },
+      { archived: this.props.is_archived },
       success
     );
   }

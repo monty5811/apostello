@@ -53,6 +53,30 @@ class ApiMember(APIView):
     model_class = None
     serializer_class = None
 
+    @staticmethod
+    def get_val(request, val_name):
+        """Pull `val_name` from the request data and convert to a boolean or None."""
+        val = request.data.get(val_name)
+        if val is None:
+            return val
+        val = True if val == 'true' else False
+        return val
+
+    @staticmethod
+    def simple_update(request, obj, attr_name):
+        """Switch the value of a supplied field.
+
+        e.g. toggles the dealt with status of a keyword
+        """
+        attr_val = ApiMember.get_val(request, attr_name)
+        if attr_val is not None:
+            if attr_val:
+                setattr(obj, attr_name, False)
+            else:
+                setattr(obj, attr_name, True)
+        obj.save()
+        return obj
+
     def get(self, request, format=None, **kwargs):
         """Handle get requests."""
         obj = get_object_or_404(self.model_class, pk=kwargs['pk'])
@@ -62,46 +86,33 @@ class ApiMember(APIView):
     def post(self, request, format=None, **kwargs):
         """Handle toggle buttons."""
         pk = kwargs['pk']
-        reingest_sms = True if request.data.get(
-            'reingest', False
-        ) == 'true' else False
-        deal_with_sms = request.data.get('deal_with')
-        archive = request.data.get('archive')
-        display_on_wall = request.data.get('display_on_wall')
-        e_sync = request.data.get('sync')
-        user_profile = request.data.get('user_profile')
-
         obj = get_object_or_404(self.model_class, pk=pk)
-        if archive is not None:
-            if archive == 'true':
-                obj.archive()
-            else:
+
+        obj = self.simple_update(request, obj, 'dealt_with')
+        obj = self.simple_update(request, obj, 'display_on_wall')
+        obj = self.simple_update(request, obj, 'sync')
+
+        archived = self.get_val(request, 'archived')
+        if archived is not None:
+            if archived:
                 obj.is_archived = False
+                obj.save()
+            else:
+                obj.archive()
+
+        reingest_sms = self.get_val(request, 'reingest')
         if reingest_sms:
             obj.reimport()
-        if deal_with_sms is not None:
-            if deal_with_sms == 'true':
-                obj.dealt_with = True
-            else:
-                obj.dealt_with = False
-        if display_on_wall is not None:
-            if display_on_wall == 'true':
-                obj.display_on_wall = True
-            else:
-                obj.display_on_wall = False
-        if e_sync is not None:
-            if e_sync == 'true':
-                obj.sync = False
-            else:
-                obj.sync = True
+
+        user_profile = request.data.get('user_profile')
         if user_profile is not None:
             user_profile = json.loads(user_profile)
             user_profile.pop('user')
             user_profile.pop('pk')
             for x in user_profile:
                 setattr(obj, x, user_profile[x])
+            obj.save()
 
-        obj.save()
         serializer = self.serializer_class(obj)
         return Response(serializer.data)
 
@@ -159,7 +170,7 @@ class ApiCollectionAllWall(generics.ListAPIView):
 
 class ElvantoPullButton(LoginRequiredMixin, ProfilePermsMixin, View):
     """View for elvanto pull button."""
-    required_perms = ['can_see_groups']
+    required_perms = ['can_import']
 
     def post(self, request, format=None, **kwargs):
         """Handle post requests."""
@@ -169,7 +180,7 @@ class ElvantoPullButton(LoginRequiredMixin, ProfilePermsMixin, View):
 
 class ElvantoFetchButton(LoginRequiredMixin, ProfilePermsMixin, View):
     """View for elvanto fetch button."""
-    required_perms = ['can_see_groups']
+    required_perms = ['can_import']
 
     def post(self, request, format=None, **kwargs):
         """Handle post requests."""

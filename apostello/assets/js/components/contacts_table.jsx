@@ -12,7 +12,7 @@ class ContactsTable extends Component {
   archiveContact(contact) {
     post(
       `/api/v1/recipients/${contact.pk}`,
-      { archive: true },
+      { archived: contact.is_archived },
       this.props.deleteItemUpdate
     );
   }

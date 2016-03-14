@@ -196,7 +196,7 @@ class TestOthers:
     ):
         for endpoint in ['sms']:
             for param in [
-                'reingest', 'deal_with', 'archive', 'display_on_wall'
+                'reingest', 'dealt_with', 'archived', 'display_on_wall'
             ]:
                 for value in ['true', 'false']:
                     users['c_staff'].post(

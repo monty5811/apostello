@@ -46,6 +46,13 @@ class CanSeeKeyword(permissions.BasePermission):
         return obj.can_user_access(request.user)
 
 
+class CanImport(permissions.BasePermission):
+    """Check if a user can import."""
+
+    def has_permission(self, request, view):
+        return request.user.is_staff or request.user.profile.can_import
+
+
 class IsStaff(permissions.BasePermission):
     """Check if a user has staff privileges."""
 

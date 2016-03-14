@@ -12,7 +12,7 @@ class CurateTable extends Component {
   toggleSms(sms) {
     post(
       `/api/v1/sms/in/${sms.pk}`,
-      { display_on_wall: !sms.display_on_wall },
+      { display_on_wall: sms.display_on_wall },
       this.props.loadfromserver
     );
   }

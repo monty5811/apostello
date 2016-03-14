@@ -12,7 +12,7 @@ class GroupsTable extends Component {
   archiveGroup(group) {
     post(
       `/api/v1/groups/${group.pk}`,
-      { archive: true },
+      { archived: group.is_archived },
       this.props.deleteItemUpdate
     );
   }
