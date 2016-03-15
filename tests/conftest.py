@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 from datetime import datetime
 
 import pytest
@@ -371,22 +372,30 @@ def users(recipients, keywords):
     return objs
 
 
-@pytest.yield_fixture(scope='module')
-def browser(request):
+@pytest.fixture(scope='session')
+def driver_wait_time():
+    return int(os.environ.get('SELENIUM_IMPLICIT_WAIT', 1))
+
+
+@pytest.fixture(scope='session')
+def browser(request, driver_wait_time):
     """Setup selenium browser."""
     driver = webdriver.Firefox()
-    driver.implicitly_wait(10)
+    driver.implicitly_wait(driver_wait_time)
 
-    yield driver
-    driver.quit()
+    def fin():
+        driver.quit()
+
+    request.addfinalizer(fin)
+
+    return driver
 
 
 @pytest.mark.usefixtures('users', 'live_server')
 @pytest.yield_fixture()
-def browser_in(request, live_server, users):
+def browser_in(request, live_server, users, driver_wait_time):
     """Setup selenium browser."""
     driver = webdriver.Firefox()
-    driver.implicitly_wait(10)
     driver.get(live_server + '/')
     driver.add_cookie(
         {
@@ -398,5 +407,6 @@ def browser_in(request, live_server, users):
             u'secure': False
         }
     )
+    driver.implicitly_wait(driver_wait_time)
     yield driver
     driver.quit()

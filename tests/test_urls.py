@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
-import vcr
 
 from apostello import models
-from elvanto import models as emodels
-from site_config import models as smodels
-
-my_vcr = vcr.VCR(record_mode='none', ignore_localhost=True)
 
 
 @pytest.mark.slow
@@ -188,8 +183,8 @@ class TestNotStaff:
 
 @pytest.mark.slow
 @pytest.mark.django_db
-class TestOthers:
-    """Test posting as a user"""
+class TestButtonPosts:
+    """Test api end points behind buttons"""
 
     def test_api_posts(
         self, recipients, groups, smsin, smsout, keywords, users
@@ -203,30 +198,14 @@ class TestOthers:
                         '/api/v1/' + endpoint + '/in/1', {param: value}
                     )
 
-    @my_vcr.use_cassette(
-        'tests/fixtures/vcr_cass/elv.yaml',
-        filter_headers=['authorization']
-    )
-    def test_api_elvanto_posts(self, users):
-        # turn on
-        config = smodels.SiteConfiguration.get_solo()
-        config.sync_elvanto = True
-        config.save()
-        r = users['c_staff'].post('/api/v1/elvanto/group_fetch/', {})
-        users['c_staff'].post('/api/v1/elvanto/group_pull/', {})
-        r = users['c_staff'].get('/api/v1/elvanto/groups/')
-        assert len(r.data) == 4
-        r = users['c_staff'].get('/api/v1/elvanto/group/1')
-        assert r.data['name'] == 'Geneva'
-        assert r.data['pk'] == 1
-        r = users['c_staff'].post('/api/v1/elvanto/group/1', {'sync': 'false'})
-        assert r.data['sync']
-        assert emodels.ElvantoGroup.objects.get(pk=1).sync
-        r = users['c_staff'].post('/api/v1/elvanto/group/1', {'sync': 'true'})
-        assert r.data['sync'] is False
-        assert emodels.ElvantoGroup.objects.get(pk=1).sync is False
+
+@pytest.mark.slow
+@pytest.mark.django_db
+class TestSendingSmsForm:
+    """Test the sending of SMS."""
 
     def test_send_adhoc_now(self, recipients, users):
+        """Test sending a message now."""
         users['c_staff'].post(
             '/send/adhoc/', {
                 'content': 'test',
@@ -235,6 +214,7 @@ class TestOthers:
         )
 
     def test_send_adhoc_later(self, recipients, users):
+        """Test sending a message later."""
         users['c_staff'].post(
             '/send/adhoc/', {
                 'content': 'test',
@@ -244,10 +224,12 @@ class TestOthers:
         )
 
     def test_send_adhoc_error(self, users):
+        """Test missing field."""
         resp = users['c_staff'].post('/send/adhoc/', {'content': ''})
         assert 'This field is required.' in str(resp.content)
 
     def test_send_group_now(self, groups, users):
+        """Test sending a message now."""
         users['c_staff'].post(
             '/send/group/', {
                 'content': 'test',
@@ -256,6 +238,7 @@ class TestOthers:
         )
 
     def test_send_group_later(self, groups, users):
+        """Test sending a message later."""
         users['c_staff'].post(
             '/send/group/', {
                 'content': 'test',
@@ -265,9 +248,17 @@ class TestOthers:
         )
 
     def test_send_group_error(self, users):
+        """Test missing field."""
         users['c_staff'].post('/send/group/', {'content': ''})
 
+
+@pytest.mark.slow
+@pytest.mark.django_db
+class TestGroupForm:
+    """Test group form usage"""
+
     def test_new_group(self, users):
+        """Test creating a new group."""
         users['c_staff'].post(
             '/group/new/', {
                 'name': 'test_group',
@@ -278,6 +269,7 @@ class TestOthers:
         assert 'test_group' == str(test_group)
 
     def test_bring_group_from_archive(self, groups, users):
+        """Test creating a group that exists in the archive."""
         users['c_staff'].post(
             '/group/new/', {
                 'name': 'Archived Group',
@@ -286,6 +278,7 @@ class TestOthers:
         )
 
     def test_edit_group(self, users):
+        """Test editing a group."""
         new_group = models.RecipientGroup.objects.create(
             name='t1',
             description='t1'
@@ -305,6 +298,7 @@ class TestOthers:
         )
 
     def test_invalid_group_form(self, users):
+        """Test submitting an invalid form."""
         resp = users['c_staff'].post(
             '/group/new/', {
                 'name': '',
@@ -312,6 +306,12 @@ class TestOthers:
             }
         )
         assert 'This field is required.' in str(resp.content)
+
+
+@pytest.mark.slow
+@pytest.mark.django_db
+class TestOthers:
+    """Test posting as a user"""
 
     def test_keyword_responses_404(self, keywords, users):
         assert users['c_staff'].post(
@@ -344,9 +344,6 @@ class TestOthers:
                 'test,person,+447902533904,\ntest,person,+447902537994'
             }
         )
-
-    def test_elvanto_import(self, users):
-        users['c_staff'].post('/elvanto/import/', {})
 
     def test_no_csv(self, users):
         assert users['c_in'].get(
