@@ -375,6 +375,7 @@ def users(recipients, keywords):
 def browser(request):
     """Setup selenium browser."""
     driver = webdriver.Firefox()
+    driver.implicitly_wait(10)
 
     yield driver
     driver.quit()
@@ -385,6 +386,7 @@ def browser(request):
 def browser_in(request, live_server, users):
     """Setup selenium browser."""
     driver = webdriver.Firefox()
+    driver.implicitly_wait(10)
     driver.get(live_server + '/')
     driver.add_cookie(
         {
