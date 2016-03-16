@@ -9,6 +9,7 @@ const post = (url, data, success) => {
       success(respData);
     },
     error(xhr, errmsg, err) {
+      window.alert(err);
       console.log(`${xhr.status}: ${xhr.responseText}`);
       console.log(err);
     },

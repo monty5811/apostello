@@ -41,6 +41,11 @@ class UserProfileRow extends Component {
           user={this.props.user}
           field={'can_see_outgoing'}
         />
+        <UserProfileToggleCell
+          postUpdate={this.props.postUpdate}
+          user={this.props.user}
+          field={'can_archive'}
+        />
       </tr>
     );
   }

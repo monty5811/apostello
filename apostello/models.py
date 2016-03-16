@@ -602,6 +602,7 @@ class UserProfile(models.Model):
     can_send_sms = models.BooleanField(default=False)
     can_see_contact_nums = models.BooleanField(default=False)
     can_import = models.BooleanField(default=False)
+    can_archive = models.BooleanField(default=True)
 
     def __str__(self):
         """Pretty representation."""

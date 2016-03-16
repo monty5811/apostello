@@ -1,6 +1,7 @@
 from time import sleep
 
 import pytest
+from django.contrib.auth.models import User
 
 from apostello import models
 
@@ -8,6 +9,8 @@ from apostello import models
 @pytest.mark.django_db
 @pytest.mark.slow
 class TestButton:
+    """Test the ajax buttons."""
+
     @pytest.mark.parametrize(
         "uri,query_set", [
             ('/keyword/all', models.Keyword.objects.all()),
@@ -19,6 +22,7 @@ class TestButton:
         self, uri, query_set, live_server, browser_in, keywords, recipients,
         groups, smsin, driver_wait_time
     ):
+        """Test archive item buttons."""
         # load page
         browser_in.get(live_server + uri)
         assert uri in browser_in.current_url
@@ -41,6 +45,7 @@ class TestButton:
         self, live_server, browser_in, keywords, recipients, groups, smsin,
         driver_wait_time
     ):
+        """Test archive sms button."""
         uri = keywords['test'].get_responses_url
         query_set = models.SmsInbound.objects.filter(matched_keyword='test')
         self.test_archive_all(
@@ -48,8 +53,10 @@ class TestButton:
             groups, smsin, driver_wait_time
         )
 
-    def test_unarchive_keyword(self, live_server, browser_in, keywords,
-                               driver_wait_time):
+    def test_unarchive_keyword(
+        self, live_server, browser_in, keywords, driver_wait_time
+    ):
+        """Test restore from archive button."""
         k = models.Keyword.objects.get(keyword='test')
         k.is_archived = True
         k.save()
@@ -64,8 +71,10 @@ class TestButton:
         k.refresh_from_db()
         assert k.is_archived is False
 
-    def test_display_on_wall_toggle(self, live_server, browser_in, smsin,
-                                    driver_wait_time):
+    def test_display_on_wall_toggle(
+        self, live_server, browser_in, smsin, driver_wait_time
+    ):
+        """Test display on wall buttons."""
         sms = models.SmsInbound.objects.get(sid=smsin['sms1'].sid)
         sms.display_on_wall = False
         uri = '/incoming/curate_wall/'
@@ -93,8 +102,10 @@ class TestButton:
         sms.refresh_from_db()
         assert sms.display_on_wall is False
 
-    def test_reingest_button(self, live_server, browser_in, smsin,
-                             driver_wait_time):
+    def test_reingest_button(
+        self, live_server, browser_in, smsin, driver_wait_time
+    ):
+        """Test reingest sms button."""
         sms = models.SmsInbound.objects.create(
             sid='tmp_____',
             content='test',
@@ -122,3 +133,26 @@ class TestButton:
         sleep(driver_wait_time)
         for k in models.SmsInbound.objects.filter(matched_keyword='test'):
             assert k.dealt_with is False
+
+    def test_archive_without_permission(
+        self, live_server, browser_in, recipients, driver_wait_time
+    ):
+        # remove priveleges:
+        u = User.objects.get(username='test')
+        u.is_staff = False
+        u.is_superuser = False
+        u.save()
+        p = u.profile
+        p.can_archive = False
+        p.save()
+        # open page:
+        uri = '/recipient/all/'
+        browser_in.get(live_server + uri)
+        assert uri in browser_in.current_url
+        sleep(driver_wait_time)
+        # archive (should fail and show a popup):
+        toggle_buttons = browser_in.find_elements_by_class_name('grey')
+        toggle_buttons[0].click()
+        sleep(driver_wait_time)
+        alert = browser_in.switch_to_alert()
+        alert.accept()

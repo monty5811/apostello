@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics
+from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 
 from apostello.mixins import ProfilePermsMixin
@@ -98,7 +99,11 @@ class ApiMember(APIView):
                 obj.is_archived = False
                 obj.save()
             else:
-                obj.archive()
+                # restrict permission:
+                if request.user.profile.can_archive:
+                    obj.archive()
+                else:
+                    return Response({}, status=status.HTTP_403_FORBIDDEN)
 
         reingest_sms = self.get_val(request, 'reingest')
         if reingest_sms:

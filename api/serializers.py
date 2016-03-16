@@ -158,4 +158,5 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'can_send_sms',
             'can_see_contact_nums',
             'can_import',
+            'can_archive',
         )

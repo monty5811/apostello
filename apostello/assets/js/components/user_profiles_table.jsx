@@ -37,6 +37,7 @@ class UserProfilesTable extends Component {
             <th>Groups</th>
             <th>Incoming</th>
             <th>Outgoing</th>
+            <th>Archiving</th>
           </tr>
         </thead>
         <tbody className="searchable">

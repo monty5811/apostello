@@ -67,8 +67,9 @@ class TestElvantoImport:
         'tests/fixtures/vcr_cass/elv.yaml',
         filter_headers=['authorization']
     )
-    def test_fetch_groups(self, uri, live_server, browser_in,
-                          driver_wait_time):
+    def test_fetch_groups(
+        self, uri, live_server, browser_in, driver_wait_time
+    ):
         "Test fetch group button." ""
         # fetch groups
         browser_in.get(live_server + uri)
