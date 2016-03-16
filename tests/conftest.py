@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 
 import pytest
+import vcr
 from allauth.account.models import EmailAddress
 from django.contrib.auth.models import User
 from django.test import Client
@@ -410,3 +411,11 @@ def browser_in(request, live_server, users, driver_wait_time):
     driver.implicitly_wait(driver_wait_time)
     yield driver
     driver.quit()
+
+
+base_vcr = vcr.VCR(record_mode='none', ignore_localhost=True)
+twilio_vcr = base_vcr.use_cassette(
+    'tests/fixtures/vcr_cass/twilio.yaml',
+    filter_headers=['authorization'],
+    match_on=['method', 'scheme', 'host', 'port', 'path', 'query', 'body']
+)

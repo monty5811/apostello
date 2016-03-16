@@ -4,9 +4,9 @@ from datetime import datetime
 
 import pytest
 from django.conf import settings
-from twilio.rest.exceptions import TwilioRestException
 
 from apostello import logs, models
+from tests.conftest import twilio_vcr
 
 
 class MockMsg:
@@ -19,6 +19,7 @@ class MockMsg:
         self.date_sent = datetime.now()
 
 
+@pytest.mark.django_db
 class TestImportLogs:
     """
     Test log imports.
@@ -27,25 +28,21 @@ class TestImportLogs:
     credentials are used.
     """
 
+    @twilio_vcr
     def test_all_incoming(self):
-        # TODO mock response from Twilio so we can test this
-        with pytest.raises(TwilioRestException):
-            logs.check_incoming_log(fetch_all=True)
+        logs.check_incoming_log(fetch_all=True)
 
+    @twilio_vcr
     def test_incoming_consistent(self):
-        # TODO mock response from Twilio so we can test this
-        with pytest.raises(TwilioRestException):
-            logs.check_incoming_log(fetch_all=False)
+        logs.check_incoming_log(fetch_all=False)
 
+    @twilio_vcr
     def test_all_outgoing(self):
-        # TODO mock response from Twilio so we can test this
-        with pytest.raises(TwilioRestException):
-            logs.check_outgoing_log(fetch_all=True)
+        logs.check_outgoing_log(fetch_all=True)
 
+    @twilio_vcr
     def test_outgoing_consistent(self):
-        # TODO mock response from Twilio so we can test this
-        with pytest.raises(TwilioRestException):
-            logs.check_outgoing_log(fetch_all=False)
+        logs.check_outgoing_log(fetch_all=False)
 
 
 @pytest.mark.django_db
@@ -69,31 +66,34 @@ class TestSmsHandlers:
         assert cnp is None
 
 
+@pytest.mark.django_db
 class TestFetchingClients:
+    @twilio_vcr
     def test_fetch_all_in(self):
         i = logs.fetch_generator('in')
         assert isinstance(i, types.GeneratorType)
-        with pytest.raises(TwilioRestException):
-            for msg in i:
-                str(i)
+        for msg in i:
+            str(i)
 
+    @twilio_vcr
     def test_fetch_all_out(self):
         i = logs.fetch_generator('out')
         assert isinstance(i, types.GeneratorType)
-        with pytest.raises(TwilioRestException):
-            for msg in i:
-                str(i)
+        for msg in i:
+            str(i)
 
+    @twilio_vcr
     def test_fetch_all_bad(self):
         assert isinstance(logs.fetch_generator('nope'), list)
 
+    @twilio_vcr
     def test_fetch_page_in(self):
-        with pytest.raises(TwilioRestException):
-            assert isinstance(logs.fetch_list('in', 0), list)
+        assert isinstance(logs.fetch_list('in', 0), list)
 
+    @twilio_vcr
     def test_fetch_page_out(self):
-        with pytest.raises(TwilioRestException):
-            assert isinstance(logs.fetch_list('out', 0), list)
+        assert isinstance(logs.fetch_list('out', 0), list)
 
+    @twilio_vcr
     def test_fetch_page_bad(self):
         assert isinstance(logs.fetch_list('nope', 0), list)

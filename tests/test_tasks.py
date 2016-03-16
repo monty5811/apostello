@@ -6,16 +6,19 @@ from twilio.rest.exceptions import TwilioRestException
 
 from apostello.models import *
 from apostello.tasks import *
+from tests.conftest import twilio_vcr
 
 
 @pytest.mark.django_db
 class TestTasks:
+    @twilio_vcr
     def test_send_recipient_ok(self, recipients):
         # test sending via recipient
         recipient_send_message_task(
             recipients['calvin'].id, "This is a test", None, 'test'
         )
 
+    @twilio_vcr
     def test_send_recipient_blacklist(self, recipients):
         recipient_send_message_task(
             recipients[
@@ -26,13 +29,16 @@ class TestTasks:
             'test'
         )
 
+    @twilio_vcr
     def test_send_fail_number(self, recipients):
-        with pytest.raises(TwilioRestException):
+        with pytest.raises(TwilioRestException) as e_info:
             recipient_send_message_task(
                 recipients['thomas_chalmers'].id,
                 "This is a test to a number that will fail", None, 'test'
             )
+        assert "is not a mobile" in str(e_info.value)
 
+    @twilio_vcr
     def test_send_group(self):
         # test sending via group
         group_send_message_task(
@@ -42,19 +48,15 @@ class TestTasks:
             eta=None
         )
 
+    @twilio_vcr
     def test_check_log_consistent(self):
-        # TODO mock response from Twilio so we can test this
-        with pytest.raises(TwilioRestException):
-            check_incoming_log(page_id=0, fetch_all=False)
-        with pytest.raises(TwilioRestException):
-            check_incoming_log(fetch_all=True)
+        check_incoming_log(page_id=0, fetch_all=False)
+        check_incoming_log(fetch_all=True)
 
+    @twilio_vcr
     def test_check_outgoing_log_consistent(self):
-        # TODO mock response from Twilio so we can test this
-        with pytest.raises(TwilioRestException):
-            check_outgoing_log(page_id=0, fetch_all=False)
-        with pytest.raises(TwilioRestException):
-            check_outgoing_log(fetch_all=True)
+        check_outgoing_log(page_id=0, fetch_all=False)
+        check_outgoing_log(fetch_all=True)
 
     def test_send_keyword_digest(self, keywords, smsin, users):
         send_keyword_digest()

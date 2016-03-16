@@ -3,6 +3,8 @@ from datetime import datetime
 
 import pytest
 
+from tests.conftest import twilio_vcr
+
 
 @pytest.mark.django_db
 class TestRecipient:
@@ -24,12 +26,15 @@ class TestRecipient:
         assert recipients['calvin'].is_archived
         assert len(recipients['calvin'].groups.all()) == 0
 
+    @twilio_vcr
     def test_send_now(self, recipients):
         recipients['calvin'].send_message('test')
 
+    @twilio_vcr
     def test_send_eta(self, recipients):
         recipients['calvin'].send_message('test', eta=datetime.now())
 
+    @twilio_vcr
     def test_send_blacklist(self, recipients):
         recipients['wesley'].send_message('test')
 

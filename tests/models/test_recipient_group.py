@@ -1,11 +1,14 @@
 import pytest
 
+from tests.conftest import twilio_vcr
+
 
 @pytest.mark.django_db
 class TestRecipientGroup:
     def test_display(self, groups):
         assert str(groups['test_group']) == "Test Group"
 
+    @twilio_vcr
     def test_sending(self, groups):
         groups['test_group'].send_message(
             content='test content',
