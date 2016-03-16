@@ -5,7 +5,13 @@ upstream wsgi_server {
 
   server unix:{{ virtualenv_path }}/run/gunicorn.sock fail_timeout=0;
 }
-
+{% if setup_lets_encrypt %}
+server {
+  listen 80 default deferred;
+  server_name {{ nginx_server_name }};
+  return 301 https://$host$request_uri;
+}
+{% endif %}
 server {
     listen              80;
     {% if setup_lets_encrypt %}
