@@ -31,7 +31,7 @@ class RecipientGroup(models.Model):
     is_archived = models.BooleanField("Archived", default=False)
     name = models.CharField(
         "Name of group",
-        max_length=30,
+        max_length=150,
         unique=True,
         validators=[gsm_validator],
     )

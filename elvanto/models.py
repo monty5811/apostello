@@ -1,9 +1,13 @@
+import logging
+
 from django.db import models
 from django.utils import timezone
 
 from apostello.models import Recipient, RecipientGroup
 from elvanto.elvanto import elvanto, try_both_num_fields
 from elvanto.exceptions import ElvantoException, NotValidPhoneNumber
+
+logger = logging.getLogger('apostello')
 
 
 class ElvantoGroup(models.Model):
@@ -91,6 +95,11 @@ class ElvantoGroup(models.Model):
                 except ElvantoException:
                     # TODO add logging
                     pass
+                except Exception:
+                    logger.error(
+                        'Elvanto group import failed.',
+                        exc_info=True
+                    )
 
     @property
     def apostello_group_name(self):
