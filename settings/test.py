@@ -3,8 +3,6 @@ import djcelery
 
 from .common import *
 
-TESTING = True
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

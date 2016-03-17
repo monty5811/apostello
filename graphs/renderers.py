@@ -35,7 +35,7 @@ def recent():
 
 
 def contacts():
-    """Render pie chart for contacts"""
+    """Render pie chart for contacts."""
     pie_chart = pygal.Pie(
         inner_radius=.6,
         style=CleanStyleLargeText,
@@ -67,7 +67,7 @@ def groups():
 
 
 def keywords():
-    """Render pie chart for keywords"""
+    """Render pie chart for keywords."""
     pie_chart = pygal.Pie(
         inner_radius=.6,
         style=CleanStyleLargeText,
@@ -109,7 +109,7 @@ def outgoing_by_contact():
 
 
 def sms_totals():
-    """Render pie chart for sms totals"""
+    """Render pie chart for sms totals."""
     pie_chart = pygal.Pie(
         inner_radius=.6,
         style=CleanStyleLargeText,

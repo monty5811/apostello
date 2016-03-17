@@ -177,9 +177,6 @@ COUNTRY_CODE = os.environ['COUNTRY_CODE']
 NO_ACCESS_WARNING = 'You do not have access to this page. '
 'If you believe you are seeing it in error please contact the office'
 
-# Testing
-TESTING = False
-
 # opbeat django:
 OPBEAT = {
     'ORGANIZATION_ID': os.environ.get('OPBEAT_ORG_ID', ''),

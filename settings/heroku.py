@@ -1,4 +1,4 @@
-"""Settings for a heroku deploy"""
+"""Settings for a heroku deploy."""
 import dj_database_url
 
 from .production import *

@@ -48,6 +48,7 @@ class RecipientGroup(models.Model):
 
     @cached_property
     def all_recipients(self):
+        """Returns queryset of all recipients in group."""
         return self.recipient_set.all()
 
     @property

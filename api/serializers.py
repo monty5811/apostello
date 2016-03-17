@@ -133,7 +133,7 @@ class RecipientSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """Serialize user model"""
+    """Serialize user model."""
 
     class Meta:
         model = User

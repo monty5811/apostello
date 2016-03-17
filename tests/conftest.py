@@ -284,7 +284,10 @@ def keywords():
     return keywords
 
 
-def create_staff():
+@pytest.mark.usefixtures("recipients", "keywords")
+@pytest.fixture()
+def users(recipients, keywords):
+    """Create apostello users."""
     user = User.objects.create_user(
         username='test',
         email='test@example.com',
@@ -309,14 +312,6 @@ def create_staff():
 
     c = Client()
     c.login(username='test', password='top_secret')
-    return user, c
-
-
-@pytest.mark.usefixtures("recipients", "keywords")
-@pytest.fixture()
-def users(recipients, keywords):
-    """Create apostello users."""
-    user, c = create_staff()
 
     user2 = User.objects.create_user(
         username='test2',
@@ -375,6 +370,11 @@ def users(recipients, keywords):
 
 @pytest.fixture(scope='session')
 def driver_wait_time():
+    """Read web driver implicit wait time from env var. Defaults to 1s.
+
+    If selenium tests are failing, try setting the env var to a higher value,
+    e.g. 10.
+    """
     return int(os.environ.get('SELENIUM_IMPLICIT_WAIT', 1))
 
 
@@ -395,7 +395,7 @@ def browser(request, driver_wait_time):
 @pytest.mark.usefixtures('users', 'live_server')
 @pytest.yield_fixture()
 def browser_in(request, live_server, users, driver_wait_time):
-    """Setup selenium browser."""
+    """Setup selenium browser and log in."""
     driver = webdriver.Firefox()
     driver.get(live_server + '/')
     driver.add_cookie(

@@ -11,11 +11,13 @@ IGNORE_DIRS = [
 
 
 def yapf_file(f):
+    """Run yapf on file."""
     print(f.path)
     subprocess.call("yapf -i {}".format(f.path), shell=True)
 
 
 def yapf_or_recr(f):
+    """Run yapf or descend into folder."""
     if f.is_dir():
         if f.name in IGNORE_DIRS:
             return

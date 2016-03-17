@@ -104,7 +104,7 @@ class SendGroup(LoginRequiredMixin, ProfilePermsMixin, View):
 
     def post(self, request, *args, **kwargs):
         """Handle sending form submission."""
-        context = {'hide_menu': True}
+        context = {}
         context['group_nums'] = [
             (x.id, x.calculate_cost) for x in RecipientGroup.objects.all()
         ]
@@ -276,7 +276,7 @@ def keyword_csv(request, pk):
 @login_required
 def import_recipients(request):
     """Display the CSV import form."""
-    context = {'hide_menu': True}
+    context = {}
     if request.method == 'POST':
         form = CsvImport(request.POST)
         if form.is_valid():

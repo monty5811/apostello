@@ -14,7 +14,7 @@ def global_settings(request):
 
 
 def opbeat_js_settings(request):
-    """Expose opbeat frontend credentials"""
+    """Expose opbeat frontend credentials."""
     opbeat_vals = [settings.OPBEAT_JS_APP_ID, settings.OPBEAT_JS_ORG_ID]
     if any(val is None for val in opbeat_vals):
         return {}

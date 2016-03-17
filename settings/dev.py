@@ -7,6 +7,7 @@ INTERNAL_IPS = ('*', )
 
 
 def show_toolbar(request):
+    """Always show the debug toolbar."""
     return True
 
 

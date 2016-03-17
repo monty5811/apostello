@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 
 def loaddotenv():
+    """Load env vars from .env file."""
     fname = '.env'
     dotenv_path = os.path.abspath(
         os.path.join(
