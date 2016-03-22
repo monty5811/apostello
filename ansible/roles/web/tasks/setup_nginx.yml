@@ -5,6 +5,12 @@
   tags: packages
 
 - name: Create the Nginx configuration file
+  template: src=nginx.conf.j2
+            dest=/etc/nginx/nginx.conf
+            backup=yes
+  notify: reload nginx
+
+- name: Create the Nginx site configuration file
   template: src=nginx_site_config.j2
             dest=/etc/nginx/sites-available/{{ application_name }}
             backup=yes

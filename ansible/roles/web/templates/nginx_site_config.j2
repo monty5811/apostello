@@ -35,6 +35,9 @@ server {
 
     location /static/ {
         alias   {{ nginx_static_dir }};
+        location ~*  \.(jpg|jpeg|png|gif|ico|css|js)$ {
+          expires 365d;
+        }
     }
 
     location /media/ {
