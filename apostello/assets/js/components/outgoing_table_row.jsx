@@ -1,19 +1,15 @@
-import React, { Component } from 'react';
+import React from 'react';
 
-class OutgoingTableRow extends Component {
-  render() {
-    return (
-      <tr>
-        <td>
-          <a href={this.props.sms.recipient_url} style={{ color: '#212121' }}>
-            {this.props.sms.recipient}
-          </a>
-        </td>
-        <td>{this.props.sms.content}</td>
-        <td>{this.props.sms.time_sent}</td>
-      </tr>
-    );
-  }
-}
+const OutgoingTableRow = (props) => (
+  <tr>
+    <td>
+      <a href={props.sms.recipient_url} style={{ color: '#212121' }}>
+        {props.sms.recipient}
+      </a>
+    </td>
+    <td>{props.sms.content}</td>
+    <td>{props.sms.time_sent}</td>
+  </tr>
+);
 
 export default OutgoingTableRow;

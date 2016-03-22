@@ -1,16 +1,12 @@
-import React, { Component } from 'react';
+import React from 'react';
 import ActionCell from './action_cell';
 
-class ElvantoGroupRow extends Component {
-  render() {
-    return (
-      <tr>
-        <td>{this.props.grp.name}</td>
-        <td >{this.props.grp.last_synced}</td>
-        <ActionCell grp={this.props.grp} toggleSync={this.props.toggleSync} />
-      </tr>
-    );
-  }
-}
+const ElvantoGroupRow = (props) => (
+  <tr>
+    <td>{props.grp.name}</td>
+    <td >{props.grp.last_synced}</td>
+    <ActionCell grp={props.grp} toggleSync={props.toggleSync} />
+  </tr>
+);
 
 export default ElvantoGroupRow;

@@ -1,8 +1,9 @@
 var gulp = require('gulp'),
   plumber = require('gulp-plumber'),
   rename = require('gulp-rename'),
-  minifycss = require('gulp-minify-css'),
+  nano = require('gulp-cssnano'),
   sass = require('gulp-sass'),
+  purify = require('gulp-purifycss'),
   gutil = require("gulp-util"),
   webpack = require("webpack"),
   // require tasks as dependencies
@@ -28,7 +29,7 @@ gulp.task('copyThemeImages', function() {
     .pipe(gulp.dest('./../static/css/themes/default/assets/images'));
 });
 
-gulp.task('css', ['uiBuildCss', 'copyThemeFonts', 'copyThemeImages'], function() {
+gulp.task('css', ['uiBuildCss', 'webpack', 'copyThemeFonts', 'copyThemeImages'], function() {
   gulp.src([
       './css/**/*.scss',
     ])
@@ -47,7 +48,15 @@ gulp.task('css', ['uiBuildCss', 'copyThemeFonts', 'copyThemeImages'], function()
     .pipe(rename({
       suffix: '.min'
     }))
-    .pipe(minifycss())
+    .pipe(nano())
+    .pipe(purify([
+      './../templates/**/*.html',
+      './../static/js/**/*.js',
+      './node_modules/datetimepicker/dist/*.js',
+    ],
+    {info: true}
+    ))
+    .pipe(nano())
     .pipe(gulp.dest('./../static/css'));
 });
 

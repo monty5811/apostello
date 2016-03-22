@@ -17,5 +17,32 @@
   },
   "permission": false,
   "rtl": false,
-  "version": "2.1.7"
+  "components": [
+    "reset",
+    "site",
+    "button",
+    "container",
+    "divider",
+    "header",
+    "icon",
+    "image",
+    "input",
+    "label",
+    "list",
+    "loader",
+    "form",
+    "grid",
+    "menu",
+    "message",
+    "table",
+    "card",
+    "item",
+    "checkbox",
+    "dimmer",
+    "dropdown",
+    "popup",
+    "transition",
+    "form"
+  ],
+  "version": "2.1.8"
 }

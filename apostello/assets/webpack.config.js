@@ -1,6 +1,5 @@
 var path = require("path");
 var webpack = require('webpack');
-var BundleTracker = require('webpack-bundle-tracker');
 
 module.exports = {
   context: __dirname,
@@ -52,13 +51,23 @@ module.exports = {
       }
     }),
     //
-    new webpack.optimize.CommonsChunkPlugin("vendor", "vendor.bundle.js"),
+		new webpack.optimize.CommonsChunkPlugin({
+			name: 'vendor', 
+			filename: 'vendor.bundle.js'
+		}),
     // minifies code
     new webpack.optimize.UglifyJsPlugin({
-      compressor: {
-        warnings: false
-      }
+			compress: {
+				warnings: false
+			},
+			output: {
+				comments: false
+			}
     }),
+		new webpack.LoaderOptionsPlugin({
+			minimize: true,
+			debug: false
+		}),
     //
     new webpack.ProvidePlugin({
       $: "jquery",
@@ -81,7 +90,7 @@ module.exports = {
         query: {
           compact: true,
           comments: false,
-          presets: ['react', 'es2015']
+          presets: ['babel-preset-es2015-webpack', 'react']
         }
       }, // to transform JSX into JS
     ],
