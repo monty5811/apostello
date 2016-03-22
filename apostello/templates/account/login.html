@@ -14,7 +14,7 @@
 {% if socialaccount_providers %}
 <p>or</p>
 {% endif %}
-<form class="ui form login" method="POST" action="{% url 'account_login' %}">
+<form class="ui {% if not form.is_valid %}error{% endif %} form login" method="POST" action="{% url 'account_login' %}">
   {% csrf_token %}
   {{ form|semanticui }}
   {% if redirect_field_value %}
