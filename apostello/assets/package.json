@@ -34,10 +34,9 @@
     "webpack": "^2.1.0-beta.4"
   },
   "scripts": {
-    "prebuild": "gulp css uiBuildJs",
-    "build": "webpack --config webpack.config.js --color",
-    "prewatch": "npm run prebuild",
-    "watch": "webpack --config webpack.config.js --color --watch"
+    "build": "gulp css",
+    "prewatchjs": "gulp uiBuildJs",
+    "watchjs": "webpack --config webpack.config.js --color --watch"
   },
   "author": "",
   "license": "ISC"

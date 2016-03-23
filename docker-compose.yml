@@ -6,7 +6,7 @@ cache:
   image: memcached
 assets:
   build: ./apostello/assets/
-  command: bash -c "npm install --quiet && npm run watch"
+  command: bash -c "npm install --quiet && npm run watchjs"
   volumes:
     - .:/code
 celery:

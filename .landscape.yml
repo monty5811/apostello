@@ -1,0 +1,13 @@
+uses:
+    - django
+    - celery
+autodetect: yes
+requirements:
+    - requirements_test.txt
+ignore-paths:
+    - docs
+    - ansible
+    - assets
+    - migrations
+python-targets:
+    - 3
