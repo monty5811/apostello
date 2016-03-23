@@ -1,5 +1,11 @@
 ---
 
+- name: Generate strong Diffie-Hellman group
+  command: "openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048"
+  args:  
+    creates: /etc/ssl/certs/dhparam.pem
+  notify: reload nginx
+
 - name: Setup the le repo
   git: repo=https://github.com/letsencrypt/letsencrypt dest={{ le_repo_path }} accept_hostkey=yes version=master force=yes
   tags: git
