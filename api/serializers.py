@@ -143,12 +143,14 @@ class UserSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     """Serialize apostello.models.UserProfile for use in table."""
     user = UserSerializer(read_only=True)
+    url = serializers.CharField(source='get_absolute_url')
 
     class Meta:
         model = UserProfile
         fields = (
             'pk',
             'user',
+            'url',
             'approved',
             'can_see_groups',
             'can_see_contact_names',

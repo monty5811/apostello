@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django import forms
 
-from apostello.models import Keyword, Recipient, RecipientGroup
+from apostello.models import Keyword, Recipient, RecipientGroup, UserProfile
 from apostello.validators import gsm_validator, less_than_sms_char_limit
 
 
@@ -35,6 +35,20 @@ class SendAdhocRecipientsForm(forms.Form):
         ),
     )
 
+    def clean(self):
+        cleaned_data = super(SendAdhocRecipientsForm, self).clean()
+        if 'recipients' in cleaned_data and 'content' in cleaned_data:
+            # if we have no recipients, we don't need to check cost limit
+            Recipient.check_user_cost_limit(
+                cleaned_data['recipients'],
+                self.user.profile.message_cost_limit,
+                cleaned_data['content']
+            )
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super(SendAdhocRecipientsForm, self).__init__(*args, **kwargs)
+
 
 class SendRecipientGroupForm(forms.Form):
     """Send an sms to pre-defined group."""
@@ -67,6 +81,19 @@ class SendRecipientGroupForm(forms.Form):
             },
         ),
     )
+
+    def clean(self):
+        cleaned_data = super(SendRecipientGroupForm, self).clean()
+        if 'recipient_group' in cleaned_data and 'content' in cleaned_data:
+            # if we have no recipient group, we don't need to check cost limit
+            cleaned_data['recipient_group'].check_user_cost_limit(
+                self.user.profile.message_cost_limit,
+                cleaned_data['content']
+            )
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super(SendRecipientGroupForm, self).__init__(*args, **kwargs)
 
 
 class ManageRecipientGroupForm(forms.ModelForm):
@@ -197,3 +224,11 @@ class CsvImport(forms.Form):
         help_text='John, Calvin, +447095237960',
         widget=forms.Textarea
     )
+
+
+class UserProfileForm(forms.ModelForm):
+    """Handle User Permission Updates"""
+
+    class Meta:
+        model = UserProfile
+        exclude = ['user', ]

@@ -234,6 +234,11 @@ urlpatterns += [
     url(r'^admin/', include(admin.site.urls)),
     # edit user profiles
     url(
+        r'^users/profiles/(?P<pk>\d+)/$',
+        v.UserProfileView.as_view(),
+        name='user_profile_form'
+    ),
+    url(
         r'^users/profiles/$',
         v.SimpleView.as_view(
             template_name='apostello/users.html',

@@ -4,6 +4,14 @@ import pytest
 from apostello.forms import SendAdhocRecipientsForm
 
 
+class ProfileMock:
+    message_cost_limit = 50
+
+
+class UserMock:
+    profile = ProfileMock()
+
+
 @pytest.mark.parametrize(
     "form_content,form_recipients", [
         ('This is a message', ['1']),
@@ -17,7 +25,31 @@ class TestAdhocFormValid():
     def test_correct_single(self, form_content, form_recipients, recipients):
         """Tests valid form inputs"""
         form_data = {'content': form_content, 'recipients': form_recipients, }
-        form = SendAdhocRecipientsForm(data=form_data)
+        form = SendAdhocRecipientsForm(data=form_data, user=UserMock())
+        assert form.is_valid()
+
+    def test_fails_user_limit(self, form_content, form_recipients, recipients):
+        """Tests the SMS cost limit check."""
+        form_data = {'content': form_content, 'recipients': form_recipients, }
+        user = UserMock()
+        user.profile.message_cost_limit = 0.01
+        form = SendAdhocRecipientsForm(data=form_data, user=user)
+        assert not form.is_valid()
+        assert 'cost no more than ${0}'.format(
+            user.profile.message_cost_limit
+        ) in '\n'.join(
+            form.errors[
+                '__all__'
+            ]
+        )
+
+    def test_disabled_user_limit(self, form_content, form_recipients,
+                                 recipients):
+        """Tests the SMS cost limit check is disabled."""
+        form_data = {'content': form_content, 'recipients': form_recipients, }
+        user = UserMock()
+        user.profile.message_cost_limit = 0
+        form = SendAdhocRecipientsForm(data=form_data, user=user)
         assert form.is_valid()
 
 
@@ -28,7 +60,7 @@ class TestAdhocFormInvalid():
     def test_missing_person(self):
         """Test no person supplied"""
         form_data = {'content': 'This is a message', }
-        form = SendAdhocRecipientsForm(data=form_data)
+        form = SendAdhocRecipientsForm(data=form_data, user=UserMock())
         assert form.is_valid() is False
 
     def test_missing_content(self, recipients):

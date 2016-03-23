@@ -5,6 +5,7 @@ Features
 * Automatically respond to incoming messages that match keywords.
 * Track sign ups, questions, etc using keywords.
 * Manage access permissions - you can let anyone in you church have read only access.
+* Spending safety net - you can set a limit (in $) for each person. No individual SMS can be sent that will cost more than this.
 * Receive daily digest emails of incoming messages.
 * Live "wall" - curate and display incoming messages on a big screen. Great for a Q&A.
 * Post all messages to a slack channel.

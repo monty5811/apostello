@@ -1,5 +1,6 @@
 import hashlib
 import logging
+from math import ceil
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -45,6 +46,17 @@ class RecipientGroup(models.Model):
         """Archive the group."""
         self.is_archived = True
         self.save()
+
+    def check_user_cost_limit(self, limit, msg):
+        num_sms = ceil(len(msg) / 160)
+        if limit == 0:
+            return
+        if limit < num_sms * self.calculate_cost():
+            raise ValidationError(
+                'Sorry, you can only send messages that cost no more than ${0}.'.format(
+                    limit
+                )
+            )
 
     @cached_property
     def all_recipients(self):
@@ -147,6 +159,18 @@ class Recipient(models.Model):
         self.is_archived = True
         self.groups.clear()
         self.save()
+
+    @staticmethod
+    def check_user_cost_limit(recipients, limit, msg):
+        num_sms = ceil(len(msg) / 160)
+        if limit == 0:
+            return
+        if limit < len(recipients) * settings.TWILIO_SENDING_COST * num_sms:
+            raise ValidationError(
+                'Sorry, you can only send messages that cost no more than ${0}.'.format(
+                    limit
+                )
+            )
 
     @cached_property
     def get_absolute_url(self):
@@ -594,6 +618,17 @@ class UserProfile(models.Model):
         help_text='If true, the user will be shown popup tour on index page.',
     )
 
+    message_cost_limit = models.DecimalField(
+        default=2.00,
+        help_text='Amount in USD that this user can spend on a single SMS.'
+        ' Note that this is a sanity check, not a security measure -'
+        ' There are no rate limits.'
+        ' If you do not trust a user, revoke their ability to send SMS.'
+        ' Set to zero to disable limit.',
+        max_digits=5,
+        decimal_places=2,
+    )
+
     can_see_groups = models.BooleanField(default=True)
     can_see_contact_names = models.BooleanField(default=True)
     can_see_keywords = models.BooleanField(default=True)
@@ -605,9 +640,15 @@ class UserProfile(models.Model):
     can_import = models.BooleanField(default=False)
     can_archive = models.BooleanField(default=True)
 
+    def get_absolute_url(self):
+        return reverse('user_profile_form', args=[str(self.pk)])
+
     def __str__(self):
         """Pretty representation."""
         return "Profile: " + str(self.user)
+
+    class Meta:
+        ordering = ['user__email', ]
 
     def save(self, *args, **kwargs):
         """Override save method to set approved status and invalidate navbar cache."""

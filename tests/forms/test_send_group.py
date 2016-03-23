@@ -4,13 +4,40 @@ import pytest
 from apostello.forms import SendRecipientGroupForm
 
 
+class ProfileMock:
+    message_cost_limit = 50
+
+
+class UserMock:
+    profile = ProfileMock()
+
+
 @pytest.mark.django_db
 class TestSendGroupsValid():
     """Tests Send to Group form with valid inputs"""
 
     def test_correct_values(self, groups):
         form_data = {'content': 'This is a message', 'recipient_group': '1', }
-        form = SendRecipientGroupForm(data=form_data)
+        form = SendRecipientGroupForm(data=form_data, user=UserMock())
+        assert form.is_valid()
+
+    def test_fails_user_limit(self, groups):
+        """Tests the SMS cost limit check."""
+        form_data = {'content': 'This is a message', 'recipient_group': '1', }
+        user = UserMock()
+        user.profile.message_cost_limit = 0.01
+        form = SendRecipientGroupForm(data=form_data, user=UserMock())
+        assert not form.is_valid()
+        assert 'cost no more than ${0}'.format(
+            user.profile.message_cost_limit) in '\n'.join(form.errors[
+                '__all__'])
+
+    def test_disabled_user_limit(self, groups):
+        """Tests the SMS cost limit check is disabled."""
+        form_data = {'content': 'This is a message', 'recipient_group': '1', }
+        user = UserMock()
+        user.profile.message_cost_limit = 0
+        form = SendRecipientGroupForm(data=form_data, user=UserMock())
         assert form.is_valid()
 
 
@@ -27,13 +54,13 @@ class TestSendGroupsInvalid():
     def test_missing_content(self, groups):
         """Test missing content"""
         form_data = {'recipient_group': '1', }
-        form = SendRecipientGroupForm(data=form_data)
+        form = SendRecipientGroupForm(data=form_data, user=UserMock())
         assert form.is_valid() is False
 
     def test_empty_content(self, groups):
         """Test empty content"""
         form_data = {'content': '', 'recipient_group': '1', }
-        form = SendRecipientGroupForm(data=form_data)
+        form = SendRecipientGroupForm(data=form_data, user=UserMock())
         assert form.is_valid() is False
 
     def test_empty_group(self):

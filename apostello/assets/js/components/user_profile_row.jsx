@@ -3,7 +3,7 @@ import UserProfileToggleCell from './user_profile_toggle_cell';
 
 const UserProfileRow = (props) => (
   <tr className="center aligned">
-    <td>{props.user.user.email}</td>
+    <td><a href={props.user.url}>{props.user.user.email}</a></td>
     <UserProfileToggleCell
       postUpdate={props.postUpdate}
       user={props.user}

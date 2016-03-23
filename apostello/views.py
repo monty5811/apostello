@@ -9,6 +9,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.generic import View
+from django.views.generic.edit import UpdateView
 from django_twilio.decorators import twilio_view
 from phonenumber_field.validators import validate_international_phonenumber
 from twilio import twiml
@@ -17,10 +18,10 @@ from apostello.decorators import check_user_perms, keyword_access_check
 from apostello.exceptions import ArchivedItemException
 from apostello.forms import (
     ArchiveKeywordResponses, CsvImport, SendAdhocRecipientsForm,
-    SendRecipientGroupForm
+    SendRecipientGroupForm, UserProfileForm
 )
 from apostello.mixins import ProfilePermsMixin
-from apostello.models import Keyword, Recipient, RecipientGroup
+from apostello.models import Keyword, Recipient, RecipientGroup, UserProfile
 from apostello.reply import get_person_or_ask_for_name, reply_to_incoming
 from apostello.tasks import log_msg_in, sms_to_slack
 from apostello.utils import exists_and_archived
@@ -58,7 +59,11 @@ class SendAdhoc(LoginRequiredMixin, ProfilePermsMixin, View):
     def post(self, request, *args, **kwargs):
         """Handle sending form submission."""
         context = self.context
-        form = SendAdhocRecipientsForm(request.POST, ('recipients', ))
+        form = SendAdhocRecipientsForm(
+            request.POST,
+            ('recipients', ),
+            user=request.user
+        )
         if form.is_valid():
             for recipient in form.cleaned_data['recipients']:
                 # send and save message
@@ -108,7 +113,7 @@ class SendGroup(LoginRequiredMixin, ProfilePermsMixin, View):
         context['group_nums'] = [
             (x.id, x.calculate_cost) for x in RecipientGroup.objects.all()
         ]
-        form = SendRecipientGroupForm(request.POST)
+        form = SendRecipientGroupForm(request.POST, user=request.user)
         if form.is_valid():
             form.cleaned_data['recipient_group'].send_message(
                 content=form.cleaned_data['content'],
@@ -316,6 +321,20 @@ def import_recipients(request):
     else:
         context['form'] = CsvImport()
         return render(request, 'apostello/importer.html', context)
+
+
+class UserProfileView(LoginRequiredMixin, ProfilePermsMixin, UpdateView):
+    """View to handle user profile form."""
+    template_name = 'apostello/user_profile.html'
+    form_class = UserProfileForm
+    model = UserProfile
+    required_perms = []
+    success_url = '/users/profiles/'
+
+    def form_valid(self, form):
+        """Handle successful form submission."""
+        messages.success(self.request, 'User profile updated')
+        return super(UserProfileView, self).form_valid(form)
 
 
 @twilio_view

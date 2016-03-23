@@ -96,10 +96,7 @@ class ElvantoGroup(models.Model):
                     # TODO add logging
                     pass
                 except Exception:
-                    logger.error(
-                        'Elvanto group import failed.',
-                        exc_info=True
-                    )
+                    logger.error('Elvanto group import failed.', exc_info=True)
 
     @property
     def apostello_group_name(self):
