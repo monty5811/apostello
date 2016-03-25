@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.generic import View
-from django.views.generic.edit import UpdateView
+from django.views.generic.edit import FormView, UpdateView
 from django_twilio.decorators import twilio_view
 from phonenumber_field.validators import validate_international_phonenumber
 from twilio import twiml
@@ -45,99 +45,90 @@ class SimpleView(LoginRequiredMixin, ProfilePermsMixin, View):
         return render(request, self.template_name, context)
 
 
-class SendAdhoc(LoginRequiredMixin, ProfilePermsMixin, View):
+class SendView(LoginRequiredMixin, ProfilePermsMixin, FormView):
+    """Display send SMS form."""
+    required_perms = []
+    success_url = '/'
+
+    def get_form(self, **kwargs):
+        """Add user to form so we can check cost limits."""
+        form = super(SendView, self).get_form(**kwargs)
+        form.user = self.request.user
+        return form
+
+
+class SendAdhoc(SendView):
     """Display form for sending messages to individuals or ad-hoc groups."""
-    required_perms = []
-    context = {}
+    form_class = SendAdhocRecipientsForm
+    template_name = 'apostello/send_adhoc.html'
+    success_url = '/send/adhoc/'
 
-    def get(self, request, *args, **kwargs):
-        """Display sending form."""
-        context = self.context
-        context['form'] = SendAdhocRecipientsForm
-        return render(request, "apostello/send_adhoc.html", context)
+    def form_valid(self, form):
+        """Send message and notify the user on valid form submission."""
+        for recipient in form.cleaned_data['recipients']:
+            # send and save message
+            recipient.send_message(
+                content=form.cleaned_data['content'],
+                eta=form.cleaned_data['scheduled_time'],
+                sent_by=str(self.request.user)
+            )
 
-    def post(self, request, *args, **kwargs):
-        """Handle sending form submission."""
-        context = self.context
-        form = SendAdhocRecipientsForm(
-            request.POST,
-            ('recipients', ),
-            user=request.user
-        )
-        if form.is_valid():
-            for recipient in form.cleaned_data['recipients']:
-                # send and save message
-                recipient.send_message(
-                    content=form.cleaned_data['content'],
-                    eta=form.cleaned_data['scheduled_time'],
-                    sent_by=str(request.user)
+        if form.cleaned_data['scheduled_time'] is None:
+            messages.info(
+                self.request,
+                "Sending \"{0}\"...\n"
+                "Please check the logs for verification...".format(
+                    form.cleaned_data['content']
                 )
-
-            if form.cleaned_data['scheduled_time'] is None:
-                messages.info(
-                    request,
-                    "Sending \"{0}\"...\nPlease check the logs for verification...".format(
-                        form.cleaned_data['content']
-                    )
-                )
-            else:
-                messages.info(
-                    request, "'{0}' has been successfully queued.".format(
-                        form.cleaned_data['content']
-                    )
-                )
-            return redirect(reverse("send_adhoc"))
+            )
         else:
-            context['form'] = form
-            return render(request, "apostello/send_adhoc.html", context)
+            messages.info(
+                self.request, "'{0}' has been successfully queued.".format(
+                    form.cleaned_data['content']
+                )
+            )
+
+        return super(SendAdhoc, self).form_valid(form)
 
 
-class SendGroup(LoginRequiredMixin, ProfilePermsMixin, View):
+class SendGroup(SendView):
     """Display form for sending messages to a group."""
-    required_perms = []
-    context = {}
+    form_class = SendRecipientGroupForm
+    template_name = 'apostello/send_group.html'
+    success_url = '/send/group/'
 
-    def get(self, request, *args, **kwargs):
-        """Display sending form."""
-        context = self.context
-        context['form'] = SendRecipientGroupForm
+    def get_context_data(self, **kwargs):
+        """Add the per group costs to context."""
+        context = super(SendGroup, self).get_context_data(**kwargs)
         context['group_nums'] = [
             (x.id, x.recipient_set.all().count())
             for x in RecipientGroup.objects.all()
         ]
-        return render(request, "apostello/send_group.html", context)
+        return context
 
-    def post(self, request, *args, **kwargs):
-        """Handle sending form submission."""
-        context = {}
-        context['group_nums'] = [
-            (x.id, x.calculate_cost) for x in RecipientGroup.objects.all()
-        ]
-        form = SendRecipientGroupForm(request.POST, user=request.user)
-        if form.is_valid():
-            form.cleaned_data['recipient_group'].send_message(
-                content=form.cleaned_data['content'],
-                eta=form.cleaned_data['scheduled_time'],
-                sent_by=str(request.user)
+    def form_valid(self, form):
+        """Send message and notify the user on valid form submission."""
+        form.cleaned_data['recipient_group'].send_message(
+            content=form.cleaned_data['content'],
+            eta=form.cleaned_data['scheduled_time'],
+            sent_by=str(self.request.user)
+        )
+        if form.cleaned_data['scheduled_time'] is None:
+            messages.info(
+                self.request,
+                "Sending '{0}' to '{1}'...\n"
+                "Please check the logs for verification...".format(
+                    form.cleaned_data['content'],
+                    form.cleaned_data['recipient_group']
+                )
             )
-            if form.cleaned_data['scheduled_time'] is None:
-                messages.info(
-                    request,
-                    "Sending '{0}' to '{1}'...\nPlease check the logs for verification...".format(
-                        form.cleaned_data['content'],
-                        form.cleaned_data['recipient_group']
-                    )
-                )
-            else:
-                messages.info(
-                    request, "'{0}' has been successfully queued.".format(
-                        form.cleaned_data['content']
-                    )
-                )
-            return redirect(reverse('send_group'))
         else:
-            context['form'] = form
-            return render(request, "apostello/send_group.html", context)
+            messages.info(
+                self.request, "'{0}' has been successfully queued.".format(
+                    form.cleaned_data['content']
+                )
+            )
+        return super(SendGroup, self).form_valid(form)
 
 
 class ItemView(LoginRequiredMixin, ProfilePermsMixin, View):
@@ -206,7 +197,8 @@ class ItemView(LoginRequiredMixin, ProfilePermsMixin, View):
                 )
                 messages.info(
                     request,
-                    "'{0}' already exists. You can open the menu to restore it.".format(
+                    "'{0}' already exists."
+                    " You can open the menu to restore it.".format(
                         str(new_instance)
                     )
                 )
@@ -230,20 +222,19 @@ class ItemView(LoginRequiredMixin, ProfilePermsMixin, View):
 def keyword_responses(request, pk, archive=False):
     """Display the responses for a single keyword."""
     keyword = get_object_or_404(Keyword, pk=pk)
-
-    if archive is False and request.method == 'POST':
-        form = ArchiveKeywordResponses(request.POST)
-        if form.is_valid() and form.cleaned_data[
-            'tick_to_archive_all_responses'
-        ]:
-            for sms in keyword.fetch_matches():
-                sms.is_archived = True
-                sms.save()
-            return redirect(reverse("keyword_responses", kwargs={'pk': pk}))
-
     context = {"keyword": keyword, "archive": archive}
+
     if archive is False:
-        context["form"] = ArchiveKeywordResponses
+        context['form'] = ArchiveKeywordResponses
+        if request.method == 'POST':
+            form = ArchiveKeywordResponses(request.POST)
+            context['form'] = form
+            if form.is_valid() and form.cleaned_data[
+                'tick_to_archive_all_responses'
+            ]:
+                for sms in keyword.fetch_matches():
+                    sms.archive()
+                return redirect(reverse("keyword_responses", kwargs={'pk': pk}))
 
     return render(request, "apostello/keyword_responses.html", context)
 
@@ -255,24 +246,19 @@ def keyword_csv(request, pk):
     keyword = get_object_or_404(Keyword, pk=pk)
     # Create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(content_type='text/csv')
-    response[
-        'Content-Disposition'
-    ] = 'attachment; filename="' + keyword.keyword + '.csv"'
-
+    response['Content-Disposition'] = 'attachment; filename="{0}.csv"'.format(
+        keyword.keyword
+    )
     writer = csv.writer(response)
     writer.writerow(['From', 'Time', 'Keyword', 'Message'])
-
     # write response rows
     for sms_ in keyword.fetch_matches():
-        writer.writerow(
-            [
-                sms_.sender_name.encode(
-                    'utf8'
-                ), sms_.time_received, sms_.matched_keyword.encode(
-                    'utf8'
-                ), sms_.content.encode('utf8')
-            ]
-        )
+        writer.writerow([
+            sms_.sender_name,
+            sms_.time_received,
+            sms_.matched_keyword,
+            sms_.content
+        ])
 
     return response
 

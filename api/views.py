@@ -49,6 +49,51 @@ class ApiCollection(generics.ListAPIView):
         return objs
 
 
+class ApiCollectionRecentSms(ApiCollection):
+    """SMS collection for a single recipient."""
+    serializer_class = SmsInboundSerializer
+
+    def get_queryset(self):
+        """Handle get requests."""
+        objs = SmsInbound.objects.filter(
+            sender_num=Recipient.objects.get(pk=self.kwargs['pk']).number
+        )
+        return objs
+
+
+class ApiCollectionKeywordSms(ApiCollection):
+    """SMS collection for a single keyword."""
+    serializer_class = SmsInboundSerializer
+    pk = None
+    archive = False
+
+    def get_queryset(self):
+        """Handle get requests."""
+        keyword_obj = Keyword.objects.get(pk=self.kwargs['pk'])
+        self.check_object_permissions(self.request, keyword_obj)
+        objs = SmsInbound.objects.filter(matched_keyword=str(keyword_obj))
+        if self.archive:
+            objs = objs.filter(is_archived=True)
+        else:
+            objs = objs.filter(is_archived=False)
+        return objs
+
+
+class ApiCollectionAllWall(ApiCollection):
+    """SMS collection for the curating wall."""
+    serializer_class = SmsInboundSimpleSerializer
+
+    def get_queryset(self):
+        """Handle get requests."""
+        cache_key = 'live_wall_all'
+        objs = cache.get(cache_key)
+        if objs is None:
+            objs = SmsInbound.objects.filter(is_archived=False)
+            cache.set(cache_key, objs, 120)
+
+        return objs
+
+
 class ApiMember(APIView):
     """Basic member view. Check user is authenticated by default."""
     permission_classes = (IsAuthenticated, )
@@ -121,57 +166,6 @@ class ApiMember(APIView):
 
         serializer = self.serializer_class(obj)
         return Response(serializer.data)
-
-
-class ApiCollectionRecentSms(generics.ListAPIView):
-    """SMS collection for a single recipient."""
-    permission_classes = (IsAuthenticated, )
-    pagination_class = StandardPagination
-    serializer_class = SmsInboundSerializer
-
-    def get_queryset(self):
-        """Handle get requests."""
-        objs = SmsInbound.objects.filter(
-            sender_num=Recipient.objects.get(pk=self.kwargs['pk']).number
-        )
-        return objs
-
-
-class ApiCollectionKeywordSms(generics.ListAPIView):
-    """SMS collection for a single keyword."""
-    permission_classes = (IsAuthenticated, )
-    pagination_class = StandardPagination
-    serializer_class = SmsInboundSerializer
-    pk = None
-    archive = False
-
-    def get_queryset(self):
-        """Handle get requests."""
-        keyword_obj = Keyword.objects.get(pk=self.kwargs['pk'])
-        self.check_object_permissions(self.request, keyword_obj)
-        objs = SmsInbound.objects.filter(matched_keyword=str(keyword_obj))
-        if self.archive:
-            objs = objs.filter(is_archived=True)
-        else:
-            objs = objs.filter(is_archived=False)
-        return objs
-
-
-class ApiCollectionAllWall(generics.ListAPIView):
-    """SMS collection for the curating wall."""
-    permission_classes = (IsAuthenticated, )
-    pagination_class = StandardPagination
-    serializer_class = SmsInboundSimpleSerializer
-
-    def get_queryset(self):
-        """Handle get requests."""
-        cache_key = 'live_wall_all'
-        objs = cache.get(cache_key)
-        if objs is None:
-            objs = SmsInbound.objects.filter(is_archived=False)
-            cache.set(cache_key, objs, 120)
-
-        return objs
 
 
 class ElvantoPullButton(LoginRequiredMixin, ProfilePermsMixin, View):
