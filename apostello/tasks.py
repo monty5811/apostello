@@ -128,7 +128,7 @@ def send_async_mail(subject, body, to):
 @task()
 def notify_office_mail(subject, body):
     """Send email to office."""
-    from apostello.models import SiteConfiguration
+    from site_config.models import SiteConfiguration
     to_ = SiteConfiguration.get_solo().office_email
     send_async_mail(subject, body, [to_])
 

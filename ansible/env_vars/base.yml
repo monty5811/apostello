@@ -1,7 +1,7 @@
 ---
 
 git_repo: https://github.com/monty5811/apostello.git
-git_version: v1.4.0
+git_version: v1.4.1
 
 project_name: apostello
 application_name: apostello
