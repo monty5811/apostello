@@ -121,7 +121,7 @@ def update_msgs_name(person_pk):
 @task()
 def send_async_mail(subject, body, to):
     """Send email."""
-    from_ = settings.FROM_EMAIL
+    from_ = settings.EMAIL_FROM
     send_mail(subject, body, from_, to)
 
 
