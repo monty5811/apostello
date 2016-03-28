@@ -41,8 +41,7 @@ class SendAdhocRecipientsForm(forms.Form):
             # if we have no recipients, we don't need to check cost limit
             Recipient.check_user_cost_limit(
                 cleaned_data['recipients'],
-                self.user.profile.message_cost_limit,
-                cleaned_data['content']
+                self.user.profile.message_cost_limit, cleaned_data['content']
             )
 
     def __init__(self, *args, **kwargs):
@@ -87,8 +86,7 @@ class SendRecipientGroupForm(forms.Form):
         if 'recipient_group' in cleaned_data and 'content' in cleaned_data:
             # if we have no recipient group, we don't need to check cost limit
             cleaned_data['recipient_group'].check_user_cost_limit(
-                self.user.profile.message_cost_limit,
-                cleaned_data['content']
+                self.user.profile.message_cost_limit, cleaned_data['content']
             )
 
     def __init__(self, *args, **kwargs):
@@ -232,3 +230,14 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         exclude = ['user', ]
+
+
+class GroupAllCreateForm(forms.Form):
+    """Form used to create groups with all recipients.
+    Should only be used to create, not edit groups.
+    """
+    group_name = forms.CharField(
+        help_text='Name of group.\n'
+        'If this group already exists it will be overwritten.',
+        max_length=150,
+    )

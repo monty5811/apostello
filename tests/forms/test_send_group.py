@@ -29,8 +29,12 @@ class TestSendGroupsValid():
         form = SendRecipientGroupForm(data=form_data, user=UserMock())
         assert not form.is_valid()
         assert 'cost no more than ${0}'.format(
-            user.profile.message_cost_limit) in '\n'.join(form.errors[
-                '__all__'])
+            user.profile.message_cost_limit
+        ) in '\n'.join(
+            form.errors[
+                '__all__'
+            ]
+        )
 
     def test_disabled_user_limit(self, groups):
         """Tests the SMS cost limit check is disabled."""

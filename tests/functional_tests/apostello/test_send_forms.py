@@ -72,7 +72,9 @@ class TestSendAdhoc:
         assert 'This field is required.' in b.page_source
         assert ADHOC_URI in b.current_url
 
-    def test_good_form(self, live_server, browser_in, users, driver_wait_time, recipients):
+    def test_good_form(
+        self, live_server, browser_in, users, driver_wait_time, recipients
+    ):
         """Test good form submission."""
         b = load_page(browser_in, driver_wait_time, live_server + ADHOC_URI)
         b = add_recipient(b, driver_wait_time)
@@ -82,7 +84,9 @@ class TestSendAdhoc:
         assert 'Please check the logs for verification' in b.page_source
         assert ADHOC_URI in b.current_url
 
-    def test_scheduled_message(self, live_server, browser_in, users, driver_wait_time, recipients):
+    def test_scheduled_message(
+        self, live_server, browser_in, users, driver_wait_time, recipients
+    ):
         """Test good form submission with a scheduled time."""
         b = load_page(browser_in, driver_wait_time, live_server + ADHOC_URI)
         # add scheduled time
@@ -94,7 +98,9 @@ class TestSendAdhoc:
         assert 'has been successfully queued' in b.page_source
         assert ADHOC_URI in b.current_url
 
-    def test_too_expensive(self, live_server, browser_in, users, driver_wait_time, recipients):
+    def test_too_expensive(
+        self, live_server, browser_in, users, driver_wait_time, recipients
+    ):
         """Test good form submission but with a too expensive message."""
         user_profile = users['staff'].profile
         user_profile.message_cost_limit = 0.01
@@ -121,7 +127,9 @@ class TestSendGroup:
         assert 'This field is required.' in b.page_source
         assert GROUP_URI in b.current_url
 
-    def test_good_form(self, live_server, browser_in, users, driver_wait_time, groups):
+    def test_good_form(
+        self, live_server, browser_in, users, driver_wait_time, groups
+    ):
         """Test good form submission."""
         b = load_page(browser_in, driver_wait_time, live_server + GROUP_URI)
         b = add_group(b, driver_wait_time)
@@ -131,7 +139,9 @@ class TestSendGroup:
         assert 'Please check the logs for verification' in b.page_source
         assert GROUP_URI in b.current_url
 
-    def test_scheduled_message(self, live_server, browser_in, users, driver_wait_time, groups):
+    def test_scheduled_message(
+        self, live_server, browser_in, users, driver_wait_time, groups
+    ):
         """Test good form submission with a scheduled time."""
         b = load_page(browser_in, driver_wait_time, live_server + GROUP_URI)
         # add scheduled time
@@ -143,7 +153,9 @@ class TestSendGroup:
         assert 'has been successfully queued' in b.page_source
         assert GROUP_URI in b.current_url
 
-    def test_too_expensive(self, live_server, browser_in, users, driver_wait_time, groups):
+    def test_too_expensive(
+        self, live_server, browser_in, users, driver_wait_time, groups
+    ):
         """Test good form submission but with a too expensive message."""
         user_profile = users['staff'].profile
         user_profile.message_cost_limit = 0.01

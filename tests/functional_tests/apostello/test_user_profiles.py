@@ -27,8 +27,9 @@ class TestUserProfiles:
         toggle_button.click()
         assert users['staff'].profile.approved
 
-    def test_user_profile_form(self, live_server, browser_in, users,
-                               driver_wait_time):
+    def test_user_profile_form(
+        self, live_server, browser_in, users, driver_wait_time
+    ):
         """Test an individual user profile form."""
         uri = users['staff'].profile.get_absolute_url()
         # load page

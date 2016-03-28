@@ -10,6 +10,9 @@
 <div id="toggle_button" class="item"></div>
 {% endblock %}
 {% block content %}
+{% if intro_text %}
+<p>{{ intro_text }}</p>
+{% endif %}
 <form class="ui {%if not form.is_valid %}error {% endif %}form" method="post">
     {% csrf_token %}
     {{ form|semanticui }}

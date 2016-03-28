@@ -43,8 +43,9 @@ class TestAdhocFormValid():
             ]
         )
 
-    def test_disabled_user_limit(self, form_content, form_recipients,
-                                 recipients):
+    def test_disabled_user_limit(
+        self, form_content, form_recipients, recipients
+    ):
         """Tests the SMS cost limit check is disabled."""
         form_data = {'content': form_content, 'recipients': form_recipients, }
         user = UserMock()

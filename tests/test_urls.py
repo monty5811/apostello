@@ -13,6 +13,7 @@ from apostello import models
         ('/group/all/', 302),
         ('/group/new/', 302),
         ('/group/edit/1/', 302),
+        ('/group/create_all/', 302),
         ('/recipient/all/', 302),
         ('/recipient/new/', 302),
         ('/recipient/edit/1/', 302),
@@ -68,6 +69,7 @@ class TestNotLoggedIn:
         ('/group/all/', 200),
         ('/group/new/', 200),
         ('/group/edit/1/', 200),
+        ('/group/create_all/', 200),
         ('/recipient/all/', 200),
         ('/recipient/new/', 200),
         ('/recipient/edit/1/', 200),
@@ -129,6 +131,7 @@ class TestStaff:
         ('/group/all/', 200),
         ('/group/new/', 200),
         ('/group/edit/1/', 200),
+        ('/group/create_all/', 302),
         ('/recipient/all/', 200),
         ('/recipient/new/', 200),
         ('/recipient/edit/1/', 302),
@@ -309,6 +312,33 @@ class TestGroupForm:
             }
         )
         assert 'This field is required.' in str(resp.content)
+
+    def test_create_all_group_form(self, users, recipients):
+        """Test the form to create a group composed of all recipients."""
+        resp = users['c_staff'].post(
+            '/group/create_all/', {
+                'group_name': 'test',
+            }
+        )
+        assert resp.status_code == 302
+        assert resp.url == '/group/all/'
+        assert len(models.RecipientGroup.objects.all()) == 1
+        assert models.RecipientGroup.objects.all()[0].name == 'test'
+        assert len(models.RecipientGroup.objects.all()[0].all_recipients) == 5
+
+    def test_create_all_group_form_update(self, users, recipients, groups):
+        """Test the form to create a group composed of all recipients.
+        Test populating an already existing group.
+        """
+        resp = users['c_staff'].post(
+            '/group/create_all/', {
+                'group_name': 'Empty Group',
+            }
+        )
+        assert resp.status_code == 302
+        assert resp.url == '/group/all/'
+        g = models.RecipientGroup.objects.get(name='Empty Group')
+        assert len(g.all_recipients) == 5
 
 
 @pytest.mark.slow

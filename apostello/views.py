@@ -17,8 +17,8 @@ from twilio import twiml
 from apostello.decorators import check_user_perms, keyword_access_check
 from apostello.exceptions import ArchivedItemException
 from apostello.forms import (
-    ArchiveKeywordResponses, CsvImport, SendAdhocRecipientsForm,
-    SendRecipientGroupForm, UserProfileForm
+    ArchiveKeywordResponses, CsvImport, GroupAllCreateForm,
+    SendAdhocRecipientsForm, SendRecipientGroupForm, UserProfileForm
 )
 from apostello.mixins import ProfilePermsMixin
 from apostello.models import Keyword, Recipient, RecipientGroup, UserProfile
@@ -75,8 +75,7 @@ class SendAdhoc(SendView):
 
         if form.cleaned_data['scheduled_time'] is None:
             messages.info(
-                self.request,
-                "Sending \"{0}\"...\n"
+                self.request, "Sending \"{0}\"...\n"
                 "Please check the logs for verification...".format(
                     form.cleaned_data['content']
                 )
@@ -115,8 +114,7 @@ class SendGroup(SendView):
         )
         if form.cleaned_data['scheduled_time'] is None:
             messages.info(
-                self.request,
-                "Sending '{0}' to '{1}'...\n"
+                self.request, "Sending '{0}' to '{1}'...\n"
                 "Please check the logs for verification...".format(
                     form.cleaned_data['content'],
                     form.cleaned_data['recipient_group']
@@ -196,8 +194,7 @@ class ItemView(LoginRequiredMixin, ProfilePermsMixin, View):
                     form, self.model_class, self.identifier
                 )
                 messages.info(
-                    request,
-                    "'{0}' already exists."
+                    request, "'{0}' already exists."
                     " You can open the menu to restore it.".format(
                         str(new_instance)
                     )
@@ -234,7 +231,12 @@ def keyword_responses(request, pk, archive=False):
             ]:
                 for sms in keyword.fetch_matches():
                     sms.archive()
-                return redirect(reverse("keyword_responses", kwargs={'pk': pk}))
+                return redirect(
+                    reverse(
+                        "keyword_responses",
+                        kwargs={'pk': pk}
+                    )
+                )
 
     return render(request, "apostello/keyword_responses.html", context)
 
@@ -253,12 +255,12 @@ def keyword_csv(request, pk):
     writer.writerow(['From', 'Time', 'Keyword', 'Message'])
     # write response rows
     for sms_ in keyword.fetch_matches():
-        writer.writerow([
-            sms_.sender_name,
-            sms_.time_received,
-            sms_.matched_keyword,
-            sms_.content
-        ])
+        writer.writerow(
+            [
+                sms_.sender_name, sms_.time_received, sms_.matched_keyword,
+                sms_.content
+            ]
+        )
 
     return response
 
@@ -321,6 +323,35 @@ class UserProfileView(LoginRequiredMixin, ProfilePermsMixin, UpdateView):
         """Handle successful form submission."""
         messages.success(self.request, 'User profile updated')
         return super(UserProfileView, self).form_valid(form)
+
+
+class CreateAllGroupView(LoginRequiredMixin, ProfilePermsMixin, FormView):
+    """View to handle creation of an 'all' group."""
+    template_name = 'apostello/item.html'
+    form_class = GroupAllCreateForm
+    model = RecipientGroup
+    required_perms = []
+    success_url = '/group/all/'
+
+    def get_context_data(self, **kwargs):
+        context = super(CreateAllGroupView, self).get_context_data(**kwargs)
+        context['submit_text'] = 'Create'
+        context['intro_text'] = 'You can use this form to create a new group' \
+            ' that contains all currently active contacts.'
+        return context
+
+    def form_valid(self, form):
+        """Create the group and add all active users."""
+        g, created = RecipientGroup.objects.get_or_create(
+            name=form.cleaned_data['group_name'],
+            defaults={'description': 'Created using "All" form'},
+        )
+        if not created:
+            g.recipient_set.clear()
+        for r in Recipient.objects.filter(is_archived=False):
+            g.recipient_set.add(r)
+        g.save()
+        return super(CreateAllGroupView, self).form_valid(form)
 
 
 @twilio_view

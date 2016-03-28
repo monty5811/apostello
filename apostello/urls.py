@@ -86,6 +86,11 @@ urlpatterns += [
         ),
         name='group'
     ),
+    url(
+        r'^group/create_all/$',
+        v.CreateAllGroupView.as_view(),
+        name='group_create_all',
+    ),
 ]
 
 # recipient urls
