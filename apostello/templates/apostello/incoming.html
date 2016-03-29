@@ -1,5 +1,6 @@
 {% extends "apostello/base.html" %}
 {% load staticfiles %}
+{% block title %}Incoming{% endblock %}
 {% block side_bar %}
 <a class="item" href="{% url 'incoming_wall' %}">Live Updates</a>
 <a class="item" href="{% url 'incoming_wall_curator' %}">Live Curator</a>

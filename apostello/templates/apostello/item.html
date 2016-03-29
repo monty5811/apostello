@@ -1,6 +1,13 @@
 {% extends "apostello/base.html" %}
 {% load staticfiles %}
 {% load semanticui %}
+{% block title %}
+{% if not object %}
+  New {{identifier}}
+{% else %}
+  {{object}}
+{% endif %}
+{% endblock %}
 {% block side_bar %}
 {% if keyword %}
 <a class="item" href="{% url 'keyword_responses' keyword.id %}">Replies ({{ keyword.fetch_matches.count }})</a>

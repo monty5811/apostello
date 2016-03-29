@@ -1,6 +1,7 @@
 {% extends "apostello/base.html" %}
 {% load staticfiles %}
 {% load semanticui %}
+{% block title %}{{keyword}}{% endblock %}
 {% block side_bar %}
 <a class="item" href="{% url 'keyword' keyword.id %}">Edit</a>
 <div class="divider"></div>
