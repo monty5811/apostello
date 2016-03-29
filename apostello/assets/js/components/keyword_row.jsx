@@ -5,17 +5,20 @@ import ArchiveButton from './archive_button';
 const KeywordRow = (props) => (
   <tr>
     <td>
-      <a href={props.keyword.url}>{props.keyword.keyword}</a>
+      <a href={props.keyword.responses_url}>{props.keyword.keyword}</a>
     </td>
-    <td>{props.keyword.description}</td>
-    <td>{props.keyword.current_response}</td>
-    <td>
+    <td className="center aligned">
       <a href={props.keyword.responses_url}>
         {props.keyword.num_replies}
       </a>
     </td>
+    <td>{props.keyword.description}</td>
+    <td>{props.keyword.current_response}</td>
     <td>
       <KeywordStatus is_live={props.keyword.is_live} />
+    </td>
+    <td>
+      <a href={props.keyword.url} className="ui button tiny fluid primary">Edit</a>
     </td>
     <td>
       <ArchiveButton

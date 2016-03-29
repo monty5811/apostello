@@ -30,10 +30,11 @@ class KeywordsTable extends Component {
         <thead>
           <tr>
             <th></th>
+            <th>Matches</th>
             <th>Description</th>
             <th>Auto Reply</th>
-            <th>Matches</th>
             <th>Status</th>
+            <th></th>
             <th></th>
           </tr>
         </thead>
