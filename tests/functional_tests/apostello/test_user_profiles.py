@@ -5,6 +5,7 @@ import pytest
 
 @pytest.mark.django_db
 @pytest.mark.slow
+@pytest.mark.selenium
 class TestUserProfiles:
     def test_table_page_and_buttons(
         self, live_server, browser_in, users, driver_wait_time

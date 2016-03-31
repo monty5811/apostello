@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import pytest
 
 from apostello.forms import ManageRecipientGroupForm
@@ -10,7 +9,7 @@ class TestManageGroups():
         form_data = {
             'name': 'test_new_group',
             'description': 'not very interesting',
-            'members': ['1']
+            'members': [recipients['calvin'].pk]
         }
         form = ManageRecipientGroupForm(data=form_data)
         assert form.is_valid()
@@ -38,7 +37,7 @@ class TestManageGroups():
         form_data = {
             'name': 'Test Group',
             'description': 'not very interesting',
-            'members': ['1']
+            'members': [recipients['calvin'].pk]
         }
         form = ManageRecipientGroupForm(data=form_data)
         assert form.is_valid() is False
@@ -47,7 +46,7 @@ class TestManageGroups():
         form_data = {
             'name': 'Archived Group',
             'description': 'not very interesting',
-            'members': ['1']
+            'members': [recipients['calvin'].pk]
         }
         form = ManageRecipientGroupForm(data=form_data)
         assert form.is_valid() is False

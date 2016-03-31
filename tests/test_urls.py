@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 import pytest
 
 from apostello import models
+from tests.conftest import twilio_vcr
 
 
 @pytest.mark.slow
@@ -210,6 +210,7 @@ class TestButtonPosts:
 class TestSendingSmsForm:
     """Test the sending of SMS."""
 
+    @twilio_vcr
     def test_send_adhoc_now(self, recipients, users):
         """Test sending a message now."""
         users['c_staff'].post(
@@ -219,6 +220,7 @@ class TestSendingSmsForm:
             }
         )
 
+    @twilio_vcr
     def test_send_adhoc_later(self, recipients, users):
         """Test sending a message later."""
         users['c_staff'].post(
@@ -234,15 +236,17 @@ class TestSendingSmsForm:
         resp = users['c_staff'].post('/send/adhoc/', {'content': ''})
         assert 'This field is required.' in str(resp.content)
 
+    @twilio_vcr
     def test_send_group_now(self, groups, users):
         """Test sending a message now."""
         users['c_staff'].post(
             '/send/group/', {
                 'content': 'test',
-                'recipient_group': '1'
+                'recipient_group': groups['test_group'].pk
             }
         )
 
+    @twilio_vcr
     def test_send_group_later(self, groups, users):
         """Test sending a message later."""
         users['c_staff'].post(

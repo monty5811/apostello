@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-import djcelery
-
 from .common import *
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',
+        'NAME': os.path.join(BASE_DIR, 'testdb.sqlite3'),
     }
 }
 
@@ -24,14 +22,15 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
 
 ALLOWED_HOSTS = ['testserver']
 
-DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3'}}
-
-# celery - use test runner
-djcelery.setup_loader()
-
-BROKER_BACKEND = 'memory'
-TEST_RUNNER = 'djcelery.contrib.test_runner.CeleryTestSuiteRunner'
-CELERY_ALWAYS_EAGER = True
+#
+Q_CLUSTER = {
+    'name': 'apostello_test',
+    'cpu_affinity': 1,
+    'django_redis': 'default',
+    'log_level': 'WARNING',
+    'sync': True,
+    'testing': True,
+}
 
 PASSWORD_HASHERS = ('django.contrib.auth.hashers.MD5PasswordHasher', )
 

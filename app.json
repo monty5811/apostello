@@ -83,7 +83,6 @@
   "addons": [
     "heroku-postgresql:hobby-dev",
     "heroku-redis",
-    "cloudamqp:lemur",
     "papertrail:choklad",
     "scheduler:standard"
   ]

@@ -24,9 +24,6 @@ DATABASES = {
     }
 }
 
-# celery
-BROKER_URL = 'amqp://guest:guest@127.0.0.1:5672'
-
 # overwrite static files
 STATIC_ROOT = BASE_DIR + '/static/'
 

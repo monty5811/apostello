@@ -8,6 +8,7 @@ from apostello import models
 
 @pytest.mark.django_db
 @pytest.mark.slow
+@pytest.mark.selenium
 class TestButton:
     """Test the ajax buttons."""
 

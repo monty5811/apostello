@@ -1,3 +1,5 @@
+from time import sleep
+
 import pytest
 from django.contrib.auth.models import User
 from django.core import mail
@@ -7,12 +9,17 @@ from site_config.models import SiteConfiguration
 
 @pytest.mark.django_db
 @pytest.mark.slow
+@pytest.mark.selenium
 class TestSignup:
-    def test_sign_up(self, live_server, browser, users):
+    def test_sign_up(self, live_server, browser, driver_wait_time, users):
         """
         Tests the sign up form and checks that the appropriate emails
         have been sent afterwards.
         """
+        # add an office email to test correct email is sent on sign up
+        config = SiteConfiguration.get_solo()
+        config.office_email = 'test@apostello.ninja'
+        config.save()
         # signup
         uri = '/accounts/signup'
         browser.get(live_server + uri)
@@ -27,12 +34,13 @@ class TestSignup:
         )[0]
         login_button.click()
         # check we have been redirected
+        sleep(driver_wait_time)
         assert '/accounts/confirm-email/' in browser.current_url
-        assert len(mail.outbox) == 1
-        # assert '[apostello] New User' in mail.outbox[0].subject # not sent
+        assert len(mail.outbox) == 2
+        assert '[apostello] New User' in mail.outbox[0].subject
         # when we have no office email set
-        assert 'Please Confirm Your E-mail Address' in mail.outbox[0].subject
-        for x in mail.outbox[0].body.split():
+        assert 'Please Confirm Your E-mail Address' in mail.outbox[1].subject
+        for x in mail.outbox[1].body.split():
             if x.startswith('http'):
                 confirm_url = x
         browser.get(confirm_url)

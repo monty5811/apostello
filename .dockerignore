@@ -6,3 +6,5 @@ db.sqlite3
 .testmondata
 .tmontmp
 .tox
+*.pyc
+__pycache__

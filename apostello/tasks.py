@@ -2,19 +2,16 @@
 import json
 
 import requests
-from celery import task
-from celery.decorators import periodic_task
-from celery.task.schedules import crontab
 from django.conf import settings
 from django.core.mail import send_mail
 from django.utils import timezone
 from django_twilio.client import twilio_client
+from django_q.tasks import async
 from twilio.rest.exceptions import TwilioRestException
 
 # sending messages
 
 
-@task()
 def group_send_message_task(body, group_name, sent_by, eta):
     """Send message to all members of group."""
     from apostello.models import Recipient, RecipientGroup
@@ -29,7 +26,6 @@ def group_send_message_task(body, group_name, sent_by, eta):
         )
 
 
-@task()
 def recipient_send_message_task(recipient_pk, body, group, sent_by):
     """Send a message asynchronously."""
     from apostello.models import Recipient
@@ -63,28 +59,25 @@ def recipient_send_message_task(recipient_pk, body, group, sent_by):
         if e.code == 21610:
             recipient.is_blocking = True
             recipient.save()
-            warn_on_blacklist.delay(recipient.pk)
+            async('apostello.tasks.warn_on_blacklist', recipient.pk)
         else:
             raise e
 
 # SMS logging and consistency checks
 
 
-@task()
 def check_incoming_log(page_id=0, fetch_all=False):
     """Update incoming log."""
     from apostello.logs import check_incoming_log
     check_incoming_log(page_id=page_id, fetch_all=fetch_all)
 
 
-@task()
 def check_outgoing_log(page_id=0, fetch_all=False):
     """Update outgoing log."""
     from apostello.logs import check_outgoing_log
     check_outgoing_log(page_id=page_id, fetch_all=fetch_all)
 
 
-@task()
 def log_msg_in(p, t, from_pk):
     """Log incoming message."""
     from apostello.models import Keyword, SmsInbound, Recipient
@@ -101,10 +94,9 @@ def log_msg_in(p, t, from_pk):
         matched_colour=Keyword.lookup_colour(p['Body'].strip())
     )
     # check log is consistent:
-    check_incoming_log.delay()
+    async('apostello.tasks.check_incoming_log')
 
 
-@task()
 def update_msgs_name(person_pk):
     """Back date sender_name field on inbound sms."""
     from apostello.models import Recipient, SmsInbound
@@ -118,14 +110,12 @@ def update_msgs_name(person_pk):
 # notifications, email, slack etc
 
 
-@task()
 def send_async_mail(subject, body, to):
     """Send email."""
     from_ = settings.EMAIL_FROM
     send_mail(subject, body, from_, to)
 
 
-@task()
 def notify_office_mail(subject, body):
     """Send email to office."""
     from site_config.models import SiteConfiguration
@@ -133,12 +123,12 @@ def notify_office_mail(subject, body):
     send_async_mail(subject, body, [to_])
 
 
-@task()
 def warn_on_blacklist(recipient_pk):
     """Send email to office when we discover we are blacklisted."""
     from apostello.models import Recipient
     recipient = Recipient.objects.get(pk=recipient_pk)
-    notify_office_mail.delay(
+    async(
+        'apostello.tasks.notify_office_mail',
         '[Apostello] Blacklist Update',
         "{0} ({1}) is now blocking us".format(
             str(recipient.number),
@@ -147,29 +137,25 @@ def warn_on_blacklist(recipient_pk):
     )
 
 
-@task()
 def warn_on_blacklist_receipt(recipient_pk, sms):
     """Send email to office on reciept of message from a blacklister."""
     from apostello.models import Recipient
     recipient = Recipient.objects.get(pk=recipient_pk)
     if recipient.is_blocking:
-        email_body = "{0} has blacklisted us in the past but has just sent this message:".format(
-            str(recipient)
-        )
-        email_body += "\n\n\t{0}\n\nYou may need to email them as we cannot currently reply to them.".format(
-            sms
-        )
-        notify_office_mail.delay(
+        email_body = "{0} has blacklisted us in the past but has just sent " \
+            "this message:\n\n\t{1}\n\n" \
+            "You may need to email them as we cannot currently reply to them."
+        email_body.format(str(recipient), sms)
+        async(
+            'apostello.tasks.notify_office_mail',
             '[Apostello] Blacklist Receipt Notice',
             email_body,
         )
 
 
-@periodic_task(run_every=(crontab(hour="21", minute="30", day_of_week="*")))
 def send_keyword_digest():
     """Send daily digest email."""
     from apostello.models import Keyword
-    # http://celery.readthedocs.org/en/latest/userguide/periodic-tasks.html
     for keyword in Keyword.objects.filter(is_archived=False):
         checked_time = timezone.now()
         new_responses = keyword.fetch_matches()
@@ -180,7 +166,8 @@ def send_keyword_digest():
         # if any, loop over subscribers and send email
         if new_responses.count() > 0:
             for subscriber in keyword.subscribed_to_digest.all():
-                send_async_mail.delay(
+                async(
+                    'apostello.tasks.send_async_mail',
                     'Daily update for "{0}" responses'.format(
                         str(keyword)
                     ),
@@ -193,7 +180,6 @@ def send_keyword_digest():
         keyword.save()
 
 
-@task()
 def post_to_slack(attachments):
     """Post message to slack webhook."""
     from site_config.models import SiteConfiguration
@@ -206,11 +192,9 @@ def post_to_slack(attachments):
             'attachments': attachments
         }
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-        r = requests.post(url, data=json.dumps(data), headers=headers)
-        print(r)
+        requests.post(url, data=json.dumps(data), headers=headers)
 
 
-@task()
 def sms_to_slack(sms_body, person, keyword):
     """Post message to slack webhook."""
     fallback = "{0}\nFrom: {1}\n(matched: {2})".format(
@@ -238,7 +222,6 @@ def sms_to_slack(sms_body, person, keyword):
 
 
 # Elvanto import
-@periodic_task(run_every=(crontab(hour="2", minute="30", day_of_week="*")))
 def fetch_elvanto_groups(force=False):
     """Fetch all Elvanto groups."""
     from site_config.models import SiteConfiguration
@@ -248,7 +231,6 @@ def fetch_elvanto_groups(force=False):
         ElvantoGroup.fetch_all_groups()
 
 
-@periodic_task(run_every=(crontab(hour="3", minute="0", day_of_week="*")))
 def pull_elvanto_groups(force=False):
     """Pull all the Elvanto groups that are set to sync."""
     from site_config.models import SiteConfiguration

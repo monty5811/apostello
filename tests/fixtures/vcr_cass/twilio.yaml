@@ -42,6 +42,47 @@ interactions:
     status: {code: 201, message: CREATED}
 - request:
     body: !!binary |
+      RnJvbT0lMkIxNTAwNTU1MDAwNiZCb2R5PUhpK3RoZXJlJTJDK0klMjdtK2FmcmFpZCt3ZStjdXJy
+      ZW50bHkrZG9uJTI3dCtoYXZlK3lvdXIrbnVtYmVyK2lub3VyK2FkZHJlc3MrYm9vay4rQ291bGQre
+      W91K3BsZWFzZStyZXBseStpbit0aGUrZm9ybWF0JTBBJTI3bmFtZStKb2huK1NtaXRoJTI3JlRvPS
+      UyQjQ0NzkyNzQwMTc0OQ==
+    headers:
+      accept: [application/json]
+      accept-charset: [utf-8]
+      accept-encoding: ['gzip, deflate']
+      content-type: [application/x-www-form-urlencoded]
+      user-agent: [twilio-python/5.3.0 (Python 3.4.3)]
+    method: POST
+    uri: https://api.twilio.com/2010-04-01/Accounts/AC00000000000000000000000000000000/Messages.json
+  response:
+    body: {string: '{"sid": "SM1e53034d64854d5aa9d866237622541c", "date_created":
+        "Wed, 16 Mar 2016 11:42:17 +0000", "date_updated": "Wed, 16 Mar 2016 11:42:17
+        +0000", "date_sent": null, "account_sid": "AC00000000000000000000000000000000",
+        "to": "+447927401749", "from": "+15005550006", "messaging_service_sid": null,
+        "body": "Hi there, I''m afraid we currently don''t have your number inour
+        address book. Could you please reply in the format\n''name John Smith''",
+        "status": "queued", "num_segments": "1", "num_media": "0", "direction": "outbound-api",
+        "api_version": "2010-04-01", "price": null, "price_unit": "USD", "uri": "/2010-04-01/Accounts/AC00000000000000000000000000000000/Messages/SM1e53034d64854d5aa9d866237622541b.json",
+        "subresource_uris": {"media": "/2010-04-01/Accounts/AC00000000000000000000000000000000/Messages/SM1e53034d64854d5aa9d866237622541b/Media.json"}}'}
+    headers:
+      Access-Control-Allow-Credentials: ['true']
+      Access-Control-Allow-Headers: ['Accept, Authorization, Content-Type, If-Match,
+          If-Modified-Since, If-None-Match, If-Unmodified-Since']
+      Access-Control-Allow-Methods: ['GET, POST, DELETE, OPTIONS']
+      Access-Control-Allow-Origin: ['*']
+      Access-Control-Expose-Headers: [ETag]
+      Connection: [keep-alive]
+      Content-Length: ['854']
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 16 Mar 2016 11:42:17 GMT']
+      Strict-Transport-Security: [max-age=15768000]
+      Twilio-Request-Duration: ['0.063']
+      Twilio-Request-Id: [RQ70ae362bf14c4fd386ad747a32eed01e]
+      X-Powered-By: [AT-5000]
+      X-Shenanigans: [none]
+    status: {code: 201, message: CREATED}
+- request:
+    body: !!binary |
       RnJvbT0lMkIxNTAwNTU1MDAwNiZCb2R5PVRoaXMraXMrYSt0ZXN0JlRvPSUyQjQ0NzkyNzQwMTc0
       OQ==
     headers:
@@ -158,6 +199,43 @@ interactions:
         "Wed, 16 Mar 2016 11:42:23 +0000", "date_updated": "Wed, 16 Mar 2016 11:42:23
         +0000", "date_sent": null, "account_sid": "AC00000000000000000000000000000000",
         "to": "+447927401749", "from": "+15005550006", "messaging_service_sid": null,
+        "body": "test", "status": "queued", "num_segments": "1", "num_media": "0",
+        "direction": "outbound-api", "api_version": "2010-04-01", "price": null, "price_unit":
+        "USD", "uri": "/2010-04-01/Accounts/AC00000000000000000000000000000000/Messages/SM197df07a357a47f586aac9fabe45234e.json",
+        "subresource_uris": {"media": "/2010-04-01/Accounts/AC00000000000000000000000000000000/Messages/SM197df07a357a47f586aac9fabe45234e/Media.json"}}'}
+    headers:
+      Access-Control-Allow-Credentials: ['true']
+      Access-Control-Allow-Headers: ['Accept, Authorization, Content-Type, If-Match,
+          If-Modified-Since, If-None-Match, If-Unmodified-Since']
+      Access-Control-Allow-Methods: ['GET, POST, DELETE, OPTIONS']
+      Access-Control-Allow-Origin: ['*']
+      Access-Control-Expose-Headers: [ETag]
+      Connection: [keep-alive]
+      Content-Length: ['726']
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 16 Mar 2016 11:42:23 GMT']
+      Strict-Transport-Security: [max-age=15768000]
+      Twilio-Request-Duration: ['0.055']
+      Twilio-Request-Id: [RQc3a09b49c5a8485eacc2acbe5879dd50]
+      X-Powered-By: [AT-5000]
+      X-Shenanigans: [none]
+    status: {code: 201, message: CREATED}
+- request:
+    body: !!binary |
+      RnJvbT0lMkIxNTAwNTU1MDAwNiZCb2R5PXRlc3QmVG89JTJCNDQ3OTI3NDAxNzQw
+    headers:
+      accept: [application/json]
+      accept-charset: [utf-8]
+      accept-encoding: ['gzip, deflate']
+      content-type: [application/x-www-form-urlencoded]
+      user-agent: [twilio-python/5.3.0 (Python 3.4.3)]
+    method: POST
+    uri: https://api.twilio.com/2010-04-01/Accounts/AC00000000000000000000000000000000/Messages.json
+  response:
+    body: {string: '{"sid": "SM197df07a357a47f586aac9fabe45235e", "date_created":
+        "Wed, 16 Mar 2016 11:42:23 +0000", "date_updated": "Wed, 16 Mar 2016 11:42:23
+        +0000", "date_sent": null, "account_sid": "AC00000000000000000000000000000000",
+        "to": "+447927401740", "from": "+15005550006", "messaging_service_sid": null,
         "body": "test", "status": "queued", "num_segments": "1", "num_media": "0",
         "direction": "outbound-api", "api_version": "2010-04-01", "price": null, "price_unit":
         "USD", "uri": "/2010-04-01/Accounts/AC00000000000000000000000000000000/Messages/SM197df07a357a47f586aac9fabe45234e.json",

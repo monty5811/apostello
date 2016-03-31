@@ -11,6 +11,8 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils import timezone
 from django.utils.functional import cached_property
+from django_q.tasks import async, schedule
+from django_q.models import Schedule
 from phonenumber_field.modelfields import PhoneNumberField
 
 from apostello.exceptions import NoKeywordMatchException
@@ -40,7 +42,10 @@ class RecipientGroup(models.Model):
 
     def send_message(self, content, sent_by, eta=None):
         """Send message to group."""
-        group_send_message_task.delay(content, self.name, sent_by, eta)
+        async(
+            'apostello.tasks.group_send_message_task', content, self.name,
+            sent_by, eta
+        )
 
     def archive(self):
         """Archive the group."""
@@ -147,11 +152,19 @@ class Recipient(models.Model):
         if self.is_blocking:
             return
         elif eta is None:
-            recipient_send_message_task.delay(self.pk, content, group, sent_by)
+            async(
+                'apostello.tasks.recipient_send_message_task', self.pk,
+                content, group, sent_by
+            )
         else:
-            recipient_send_message_task.apply_async(
-                args=[self.pk, content, group, sent_by],
-                eta=eta
+            schedule(
+                'apostello.tasks.recipient_send_message_task',
+                self.pk,
+                content,
+                group,
+                sent_by,
+                schedule_type=Schedule.ONCE,
+                next_run=eta
             )
 
     def archive(self):
