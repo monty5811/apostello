@@ -1,0 +1,18 @@
+---
+
+server_root_dir: /webapps
+
+virtualenv_path: "/webapps/{{ application_name }}"
+project_path: "{{ virtualenv_path }}/{{ project_name }}"
+application_path: "{{ project_path }}"
+
+django_q_user: "{{ application_name }}"
+django_q_group: webapps
+django_q_application_name: django_q
+
+django_q_scripts_dir: "{{ virtualenv_path }}/scripts/django_q"
+django_q_template_file: "django_q_start.j2"
+
+# Django Environment variables
+django_environment:
+  DJANGO_SETTINGS_MODULE: "{{ django_settings_file }}"
