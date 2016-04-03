@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import pytest
 
 from apostello.forms import SendAdhocRecipientsForm
@@ -14,8 +13,8 @@ class UserMock:
 
 @pytest.mark.parametrize(
     "form_content,form_recipients", [
-        ('This is a message', ['1']),
-        ('This is a message', ['1', '2']),
+        ('This is a message', ['calvin']),
+        ('This is a message', ['calvin', 'house_lamp']),
     ]
 )
 @pytest.mark.django_db
@@ -24,12 +23,14 @@ class TestAdhocFormValid():
 
     def test_correct_single(self, form_content, form_recipients, recipients):
         """Tests valid form inputs"""
+        form_recipients = [recipients[x].pk for x in form_recipients]
         form_data = {'content': form_content, 'recipients': form_recipients, }
         form = SendAdhocRecipientsForm(data=form_data, user=UserMock())
         assert form.is_valid()
 
     def test_fails_user_limit(self, form_content, form_recipients, recipients):
         """Tests the SMS cost limit check."""
+        form_recipients = [recipients[x].pk for x in form_recipients]
         form_data = {'content': form_content, 'recipients': form_recipients, }
         user = UserMock()
         user.profile.message_cost_limit = 0.01
@@ -47,6 +48,7 @@ class TestAdhocFormValid():
         self, form_content, form_recipients, recipients
     ):
         """Tests the SMS cost limit check is disabled."""
+        form_recipients = [recipients[x].pk for x in form_recipients]
         form_data = {'content': form_content, 'recipients': form_recipients, }
         user = UserMock()
         user.profile.message_cost_limit = 0

@@ -1,0 +1,4 @@
+---
+
+- name: restart django_q
+  supervisorctl: name=django_q state=restarted

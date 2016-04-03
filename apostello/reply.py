@@ -1,11 +1,11 @@
-from django.conf import settings
+from datetime import timedelta
+from django.utils import timezone
 from django.core.exceptions import ValidationError
 
+from django_q.tasks import async, schedule
+from django_q.models import Schedule
+
 from apostello.models import Recipient
-from apostello.tasks import (
-    check_outgoing_log, notify_office_mail, update_msgs_name,
-    warn_on_blacklist, warn_on_blacklist_receipt
-)
 from apostello.utils import fetch_default_reply
 
 
@@ -52,7 +52,8 @@ def get_person_or_ask_for_name(from_, sms_body, keyword_obj):
                     content=fetch_default_reply('auto_name_request'),
                     sent_by="auto name request"
                 )
-                notify_office_mail.delay(
+                async(
+                    'apostello.tasks.notify_office_mail',
                     '[Apostello] Unknown Contact!',
                     'SMS: {0}\nFrom: {1}\n\n\nThis person is unknown and has been asked for their name.'.format(
                         sms_body, from_
@@ -65,7 +66,11 @@ def get_person_or_ask_for_name(from_, sms_body, keyword_obj):
 def reply_to_incoming(person_from, from_, sms_body, keyword):
     """Construct appropriate reply."""
     # update outgoing log 1 minute from now:
-    check_outgoing_log.apply_async(countdown=60)
+    schedule(
+        'apostello.tasks.check_outgoing_log',
+        schedule_type=Schedule.ONCE,
+        next_run=timezone.now() + timedelta(minutes=1)
+    )
 
     if keyword == "start":
         person_from.is_blocking = False
@@ -74,10 +79,13 @@ def reply_to_incoming(person_from, from_, sms_body, keyword):
     elif keyword == "stop":
         person_from.is_blocking = True
         person_from.save()
-        warn_on_blacklist.delay(person_from.id)
+        async('apostello.tasks.warn_on_blacklist', person_from.pk)
         return ''
     elif keyword == "name":
-        warn_on_blacklist_receipt.delay(person_from.id, sms_body)
+        async(
+            'apostello.tasks.warn_on_blacklist_receipt', person_from.pk,
+            sms_body
+        )
         try:
             # update person's name:
             person_from.first_name = sms_body.split()[1].strip()
@@ -86,9 +94,10 @@ def reply_to_incoming(person_from, from_, sms_body, keyword):
                 raise ValidationError('No last name')
             person_from.save()
             # update old messages with this person's name
-            update_msgs_name.delay(person_from.id)
+            async('apostello.tasks.update_msgs_name', person_from.pk)
             # thank person
-            notify_office_mail.delay(
+            async(
+                'apostello.tasks.notify_office_mail',
                 '[Apostello] New Signup!',
                 'SMS:\n\t{0}\nFrom:\n\t{1}\n'.format(
                     sms_body,
@@ -100,7 +109,8 @@ def reply_to_incoming(person_from, from_, sms_body, keyword):
                 'name_update_reply'
             ) % person_from.first_name
         except (ValidationError, IndexError):
-            notify_office_mail.delay(
+            async(
+                'apostello.tasks.notify_office_mail',
                 '[Apostello] New Signup - FAILED!',
                 'SMS:\n\t{0}\nFrom:\n\t{1}\n'.format(
                     sms_body, from_
@@ -109,5 +119,8 @@ def reply_to_incoming(person_from, from_, sms_body, keyword):
             return fetch_default_reply('name_failure_reply')
     else:
         # otherwise construct reply
-        warn_on_blacklist_receipt.delay(person_from.id, sms_body)
+        async(
+            'apostello.tasks.warn_on_blacklist_receipt', person_from.pk,
+            sms_body
+        )
         return keyword_replier(keyword, person_from)

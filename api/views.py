@@ -5,6 +5,7 @@ from django.core.cache import cache
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.generic import View
+from django_q.tasks import async
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -174,7 +175,7 @@ class ElvantoPullButton(LoginRequiredMixin, ProfilePermsMixin, View):
 
     def post(self, request, format=None, **kwargs):
         """Handle post requests."""
-        pull_elvanto_groups.delay(force=True)
+        async('apostello.tasks.pull_elvanto_groups', force=True)
         return JsonResponse({'status': 'pulling'})
 
 
@@ -184,5 +185,5 @@ class ElvantoFetchButton(LoginRequiredMixin, ProfilePermsMixin, View):
 
     def post(self, request, format=None, **kwargs):
         """Handle post requests."""
-        fetch_elvanto_groups.delay(force=True)
+        async('apostello.tasks.fetch_elvanto_groups', force=True)
         return JsonResponse({'status': 'fetching'})

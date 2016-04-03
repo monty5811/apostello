@@ -1,0 +1,27 @@
+---
+
+- name: Install Supervisor
+  apt: name=supervisor update_cache={{ update_apt_cache }} state=installed
+  tags:
+    - django_q
+
+- name: Ensure supervisor service is started
+  service: name=supervisor state=started enabled=yes
+  tags:
+    - django_q
+
+- name: Create the Supervisor config file for django_q
+  template: src=supervisor_django_q.conf.j2
+            dest=/etc/supervisor/conf.d/django_q.conf
+  tags:
+    - django_q
+
+- name: Re-read the Supervisor config files
+  command: supervisorctl reread
+  tags:
+    - django_q
+
+- name: Update Supervisor to add the app in the process group
+  command: supervisorctl update
+  tags:
+    - django_q

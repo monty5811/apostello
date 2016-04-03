@@ -1,0 +1,3 @@
+test:
+  build: .
+  command: bash docker_test_cmd.sh 

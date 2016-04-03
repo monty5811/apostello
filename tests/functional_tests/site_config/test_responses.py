@@ -3,6 +3,7 @@ import pytest
 
 @pytest.mark.django_db
 @pytest.mark.slow
+@pytest.mark.selenium
 @pytest.mark.parametrize("uri", ['/config/responses/', ])
 class TestDefaultResponses:
     def test_display_form(self, uri, live_server, browser_in):

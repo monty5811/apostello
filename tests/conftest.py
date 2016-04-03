@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 from datetime import datetime
 
@@ -12,6 +11,35 @@ from django.utils.timezone import get_current_timezone
 from selenium import webdriver
 
 from apostello.models import *
+
+
+@pytest.fixture(autouse=True)
+def short_circuit_q(monkeypatch):
+    def new_async(func, *args, **kwargs):
+        # pull django_q kwargs out:
+        schedule_kwargs = ['name', 'hook', 'schedule_type', 'minutes',
+                           'repeats', 'next_run']
+        async_kwargs = [
+            'hook', 'group', 'save', 'sync', 'cached', 'iter_count',
+            'iter_cached', 'chain', 'broker', 'q_options'
+        ]
+        for k in schedule_kwargs + async_kwargs:
+            kwargs.pop(k, None)
+        f = func
+        if not callable(func):
+            try:
+                import importlib
+                module, func = f.rsplit('.', 1)
+                m = importlib.import_module(module)
+                f = getattr(m, func)
+            except (ValueError, ImportError, AttributeError) as e:
+                result = (e, False)
+        result = f(*args, **kwargs)
+
+        return result
+
+    monkeypatch.setattr('django_q.tasks.async.__code__', new_async.__code__)
+    monkeypatch.setattr('django_q.tasks.schedule.__code__', new_async.__code__)
 
 
 @pytest.fixture

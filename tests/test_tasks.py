@@ -78,6 +78,7 @@ class TestTasks:
         keywords['test'].save()
         send_keyword_digest()
 
+    @twilio_vcr
     def test_log_msg_in(self, recipients):
         calvin = recipients['calvin']
         p = {

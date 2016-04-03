@@ -2,6 +2,8 @@ from time import sleep
 
 import pytest
 
+from tests.conftest import twilio_vcr
+
 ADHOC_URI = '/send/adhoc/'
 GROUP_URI = '/send/group/'
 
@@ -62,6 +64,7 @@ def add_scheduled_time(b, wt):
 
 @pytest.mark.django_db
 @pytest.mark.slow
+@pytest.mark.selenium
 class TestSendAdhoc:
     def test_empty_form(
         self, live_server, browser_in, users, driver_wait_time
@@ -72,6 +75,7 @@ class TestSendAdhoc:
         assert 'This field is required.' in b.page_source
         assert ADHOC_URI in b.current_url
 
+    @twilio_vcr
     def test_good_form(
         self, live_server, browser_in, users, driver_wait_time, recipients
     ):
@@ -84,6 +88,7 @@ class TestSendAdhoc:
         assert 'Please check the logs for verification' in b.page_source
         assert ADHOC_URI in b.current_url
 
+    @twilio_vcr
     def test_scheduled_message(
         self, live_server, browser_in, users, driver_wait_time, recipients
     ):
@@ -117,6 +122,7 @@ class TestSendAdhoc:
 
 @pytest.mark.django_db
 @pytest.mark.slow
+@pytest.mark.selenium
 class TestSendGroup:
     def test_empty_form(
         self, live_server, browser_in, users, driver_wait_time
@@ -127,6 +133,7 @@ class TestSendGroup:
         assert 'This field is required.' in b.page_source
         assert GROUP_URI in b.current_url
 
+    @twilio_vcr
     def test_good_form(
         self, live_server, browser_in, users, driver_wait_time, groups
     ):
@@ -139,6 +146,7 @@ class TestSendGroup:
         assert 'Please check the logs for verification' in b.page_source
         assert GROUP_URI in b.current_url
 
+    @twilio_vcr
     def test_scheduled_message(
         self, live_server, browser_in, users, driver_wait_time, groups
     ):

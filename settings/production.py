@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Settings used in production with ansible deploy."""
 import os
 

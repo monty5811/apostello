@@ -9,6 +9,7 @@ my_vcr = vcr.VCR(record_mode='none', ignore_localhost=True)
 
 @pytest.mark.django_db
 @pytest.mark.slow
+@pytest.mark.selenium
 @pytest.mark.parametrize("uri", ['/elvanto/import/', ])
 class TestElvantoImport:
     @my_vcr.use_cassette(

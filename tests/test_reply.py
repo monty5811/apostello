@@ -6,6 +6,7 @@ from apostello.reply import (
     get_person_or_ask_for_name, keyword_replier, reply_to_incoming
 )
 from apostello.utils import fetch_default_reply
+from tests.conftest import twilio_vcr
 
 
 @pytest.mark.django_db
@@ -31,6 +32,7 @@ class TestKeywordReplier:
 class TestReply:
     """Tests apostello.reply.reply_to_incoming fn."""
 
+    @twilio_vcr
     def test_name(self, recipients):
         sms_body = "name John Calvin"
         k_obj = Keyword.match(sms_body)
@@ -39,6 +41,7 @@ class TestReply:
         )
         assert "John" in str(reply)
 
+    @twilio_vcr
     def test_only_one_name(self, recipients):
         sms_body = "name JohnCalvin"
         k_obj = Keyword.match(sms_body)
@@ -47,6 +50,7 @@ class TestReply:
         )
         assert "Something went wrong" in str(r_new)
 
+    @twilio_vcr
     def test_stop_start(self, recipients):
         sms_body = "stop "
         k_obj = Keyword.match(sms_body)
@@ -62,6 +66,7 @@ class TestReply:
         )
         assert recipients['calvin'].is_blocking is False
 
+    @twilio_vcr
     def test_other(self, recipients):
         sms_body = "test message"
         k_obj = Keyword.match(sms_body)
@@ -80,6 +85,7 @@ class TestGetOrAskPerson():
             '+447927401749', 'hello', 'hello'
         )
 
+    @twilio_vcr
     def test_unknown(self):
         person_from = get_person_or_ask_for_name(
             '+447928401749', 'hello', 'hello'

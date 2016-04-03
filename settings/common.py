@@ -3,8 +3,6 @@
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
-import djcelery
-
 # Django settings
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -30,11 +28,12 @@ INSTALLED_APPS = [
     'site_config',
     # third party apps
     'rest_framework',
-    'djcelery',
     'semanticuiform',
     'django_extensions',
     'solo',
+    'django_redis',
     'django_twilio',
+    'django_q',
     # auth
     'allauth',
     'allauth.account',
@@ -91,36 +90,38 @@ AUTHENTICATION_BACKENDS = [
 ROOT_URLCONF = 'apostello.urls'
 WSGI_APPLICATION = 'apostello.wsgi.application'
 LANGUAGE_CODE = 'en-gb'
-TIME_ZONE = 'GMT'
+TIME_ZONE = 'Europe/London'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
 # session settings
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
-MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
-
-# Celery settings
-CELERY_DISABLE_RATE_LIMITS = True
-CELERY_TIMEZONE = 'Europe/London'
-CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
-CELERY_IGNORE_RESULT = True
-CELERY_ACCEPT_CONTENT = ['pickle']
-
-# rabbit MQ settings
-djcelery.setup_loader()
-BROKER_URL = 'amqp://{user}:{password}@127.0.0.1:5672/{vhost}'.format(
-    user=os.environ.get('RABBITMQ_APPLICATION_USER'),
-    password=os.environ.get('RABBITMQ_APPLICATION_PASSWORD'),
-    vhost=os.environ.get('RABBITMQ_APPLICATION_VHOST')
-)
+MESSAGE_STORAGE = 'django.contrib.messages.storage.fallback.FallbackStorage'
 
 # Cache settings
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": '127.0.0.1:6379',
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
     }
+}
+
+#
+Q_CLUSTER = {
+    'name': 'apostello',
+    'workers': 1,
+    'recycle': 250,
+    'timeout': 120,
+    'compress': True,
+    'save_limit': 500,
+    'queue_limit': 500,
+    'cpu_affinity': 1,
+    'label': 'Django Q',
+    'django_redis': 'default',
 }
 
 REST_FRAMEWORK = {
@@ -174,8 +175,8 @@ SMS_CHAR_LIMIT = 160 - MAX_NAME_LENGTH + len('{name}')
 # https://www.twilio.com/help/faq/voice/what-are-global-permissions-and-why-do-they-exist
 COUNTRY_CODE = os.environ['COUNTRY_CODE']
 
-NO_ACCESS_WARNING = 'You do not have access to this page. '
-'If you believe you are seeing it in error please contact the office'
+NO_ACCESS_WARNING = 'You do not have access to this page. ' \
+    'If you believe you are seeing it in error please contact the office'
 
 # opbeat django:
 OPBEAT = {

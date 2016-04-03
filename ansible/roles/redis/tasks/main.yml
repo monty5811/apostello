@@ -1,0 +1,11 @@
+---
+
+- name: Install redis
+  apt: name={{ item }} update_cache={{ update_apt_cache }} state=installed
+  with_items:
+    - redis-server
+    - python-redis
+  tags: packages
+
+- name: Ensure the redis service is running
+  service: name=redis-server state=started enabled=yes

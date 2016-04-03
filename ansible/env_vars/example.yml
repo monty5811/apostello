@@ -5,10 +5,6 @@ le_email: "dean.montgomery@stcolumbas.freechurch.org"
 db_password:
 # Nginx settings
 nginx_server_name:
-# RabbitMQ settings:
-rabbitmq_admin_user:
-rabbitmq_admin_password:
-rabbitmq_application_password:
 # Application Settings
 django_secret_key: 'this should be a very long string'
 # this is used in the account related emails and should match your server settings

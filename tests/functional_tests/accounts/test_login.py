@@ -3,6 +3,7 @@ import pytest
 
 @pytest.mark.django_db
 @pytest.mark.slow
+@pytest.mark.selenium
 class TestLogin:
     @pytest.mark.parametrize("uri", ['/', ])
     def test_not_logged_in(self, uri, live_server, browser, users):

@@ -8,14 +8,14 @@
   vars:
     - setup_git_repo: yes
     - update_apt_cache: yes
-    - setup_ufw: yes
-    - create_swap_file: yes
+    - setup_ufw: no
+    - create_swap_file: no
     - run_django_migrate: yes
     - run_django_collectstatic: yes
     - setup_lets_encrypt: no
   vars_files:
     - env_vars/base.yml
-    - env_vars/example.yml # you need to change this!
+    - env_vars/test.yml
   roles:
     - base
     - db

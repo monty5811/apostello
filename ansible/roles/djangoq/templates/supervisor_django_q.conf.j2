@@ -1,0 +1,7 @@
+[program:{{ django_q_application_name }}]
+command={{ django_q_scripts_dir }}/{{ django_q_application_name }}_start
+
+autostart=true
+autorestart=true
+
+user={{ django_q_user }}

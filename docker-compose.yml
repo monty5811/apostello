@@ -1,28 +1,25 @@
 db:
   image: postgres
-broker:
-  image: rabbitmq
-cache:
-  image: memcached
+redis:
+  image: redis
 assets:
   build: ./apostello/assets/
   command: bash -c "npm install --quiet && npm run watchjs"
   volumes:
     - .:/code
-celery:
+q:
   build: .
   environment:
     DJANGO_SETTINGS_MODULE: settings.docker
-    C_FORCE_ROOT: 'True'
-  command: ./manage.py celery worker -E -B -l info --concurrency=1
+    REDIS_URL: redis://redis:6379
+  command: ./manage.py qcluster
   volumes:
     - .:/code
   ports:
     - "8000:8000"
   links:
     - db
-    - broker
-    - cache
+    - redis
 web:
   build: .
   environment:
@@ -33,7 +30,6 @@ web:
   ports:
     - "4000:8000"
   links:
-    - celery 
+    - q 
     - db
-    - broker
-    - cache
+    - redis

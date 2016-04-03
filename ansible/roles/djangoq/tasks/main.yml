@@ -1,0 +1,22 @@
+---
+
+- include: copy_scripts.yml
+
+- include: setup_supervisor.yml
+
+- name: Check running applications managed by supervisor
+  shell: supervisorctl status
+  register: supervisor_applications
+  tags:
+    - django_q
+    - deploy
+
+- name: Restart the django_q app
+  supervisorctl: name=django_q state=restarted
+  when: supervisor_applications.stdout.find('django_q') != -1
+  tags:
+    - django_q
+    - deploy
+
+- name: Setup periodic tasks
+  command: '{{virtualenv_path}}/bin/python {{ application_path}}/manage.py setup_periodic_tasks --settings={{ django_settings_file}}'
