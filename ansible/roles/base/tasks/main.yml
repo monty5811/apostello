@@ -29,7 +29,7 @@
   tags: packages
 
 - name: Start supervisor
-  service: name=supervisor state=reloaded enabled=yes
+  service: name=supervisor state=started enabled=yes
 
 - name: Install virtualenv
   pip: name=virtualenv executable=pip3
