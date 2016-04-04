@@ -16,15 +16,19 @@ class TestSendGroupsValid():
     """Tests Send to Group form with valid inputs"""
 
     def test_correct_values(self, groups):
-        form_data = {'content': 'This is a message',
-                     'recipient_group': groups['test_group'].pk, }
+        form_data = {
+            'content': 'This is a message',
+            'recipient_group': groups['test_group'].pk,
+        }
         form = SendRecipientGroupForm(data=form_data, user=UserMock())
         assert form.is_valid()
 
     def test_fails_user_limit(self, groups):
         """Tests the SMS cost limit check."""
-        form_data = {'content': 'This is a message',
-                     'recipient_group': groups['test_group'].pk, }
+        form_data = {
+            'content': 'This is a message',
+            'recipient_group': groups['test_group'].pk,
+        }
         user = UserMock()
         user.profile.message_cost_limit = 0.01
         form = SendRecipientGroupForm(data=form_data, user=UserMock())
@@ -39,8 +43,10 @@ class TestSendGroupsValid():
 
     def test_disabled_user_limit(self, groups):
         """Tests the SMS cost limit check is disabled."""
-        form_data = {'content': 'This is a message',
-                     'recipient_group': groups['test_group'].pk, }
+        form_data = {
+            'content': 'This is a message',
+            'recipient_group': groups['test_group'].pk,
+        }
         user = UserMock()
         user.profile.message_cost_limit = 0
         form = SendRecipientGroupForm(data=form_data, user=UserMock())

@@ -17,8 +17,9 @@ from apostello.models import *
 def short_circuit_q(monkeypatch):
     def new_async(func, *args, **kwargs):
         # pull django_q kwargs out:
-        schedule_kwargs = ['name', 'hook', 'schedule_type', 'minutes',
-                           'repeats', 'next_run']
+        schedule_kwargs = [
+            'name', 'hook', 'schedule_type', 'minutes', 'repeats', 'next_run'
+        ]
         async_kwargs = [
             'hook', 'group', 'save', 'sync', 'cached', 'iter_count',
             'iter_cached', 'chain', 'broker', 'q_options'
