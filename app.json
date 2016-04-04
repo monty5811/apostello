@@ -17,6 +17,10 @@
     "DJANGO_SECRET_KEY": {
       "generator": "secret"
     },
+    "DJANGO_TIME_ZONE": {
+      "description": "Time zone for the server. List of options can be found here: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones",
+      "value": ""
+    },
     "TWILIO_ACCOUNT_SID": {
       "description": "Your Twilio account SID",
       "value": ""

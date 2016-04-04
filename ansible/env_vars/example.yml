@@ -21,6 +21,8 @@ django_email_host:
 django_email_host_user:
 django_email_host_password:
 django_from_email:
+# locale and time zone:
+django_time_zone:
 # Elvanto
 elvanto_key:
 country_code:
