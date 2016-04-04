@@ -2,62 +2,60 @@
 {% load staticfiles %}
 {% load semanticui %}
 {% block title %}
-{% if not object %}
-  New {{identifier}}
-{% else %}
-  {{object}}
-{% endif %}
+  {% if not object %}
+    New {{identifier}}
+  {% else %}
+    {{object}}
+  {% endif %}
 {% endblock %}
 {% block side_bar %}
-{% if keyword %}
-<a class="item" href="{% url 'keyword_responses' keyword.id %}">Replies ({{ keyword.fetch_matches.count }})</a>
-<a class="item" href="{% url 'keyword_responses_archive' keyword.id %}">Archived Replies ({{ keyword.num_archived_matches }})</a>
-<div class="divider"></div>
-{% endif %}
-<div id="toggle_button" class="item"></div>
+  {% if keyword %}
+    <a class="item" href="{% url 'keyword_responses' keyword.id %}">Replies ({{ keyword.fetch_matches.count }})</a>
+    <a class="item" href="{% url 'keyword_responses_archive' keyword.id %}">Archived Replies ({{ keyword.num_archived_matches }})</a>
+    <div class="divider"></div>
+  {% endif %}
+  {% if object %}
+    <div id="toggle_button" class="item"></div>
+  {% endif %}
 {% endblock %}
 {% block content %}
-{% if intro_text %}
-<p>{{ intro_text }}</p>
-{% endif %}
-<form class="ui {%if not form.is_valid %}error {% endif %}form" method="post">
-    {% csrf_token %}
-    {{ form|semanticui }}
-    <div id="dtBox"></div>
-    {% if identifier == 'group' %}
-    <!--disabled due to very poor performance-->
-    <!--<div class="ui toggle checkbox">-->
-    <!--  <input type="checkbox" id="selectall">-->
-    <!--  <label>Select all</label>-->
-    <!--</div>-->
-    <!--<p>-->
-    {% endif %}
-    <button class="ui primary button" type="submit">{{ submit_text }}</button>
-</form>
+  {% if intro_text %}
+    <p>{{ intro_text }}</p>
+  {% endif %}
+  <form class="ui {%if not form.is_valid %}error {% endif %}form" method="post">
+      {% csrf_token %}
+      {{ form|semanticui }}
+      <div id="dtBox"></div>
+      {% if identifier == 'group' %}
+      {% endif %}
+      <button class="ui primary button" type="submit">{{ submit_text }}</button>
+  </form>
 
-{% if sms_history %}
-{% if user.profile.can_see_incoming %}
-<br>
-<h4>Recent Incoming History</h4>
-<div id="incoming_table" name={{object.pk}}></div>
-{% endif %}
-{% endif %}
+  {% if sms_history %}
+    {% if user.profile.can_see_incoming %}
+      <br>
+      <h4>Recent Incoming History</h4>
+      <div id="incoming_table" name={{object.pk}}></div>
+    {% endif %}
+  {% endif %}
 {% endblock %}
 {% block morejs %}
-<script>
-    var _url = "{{ object.get_api_url }}";
-    var _redirect_url = "{{ object.get_table_url }}";
-    {% if object.is_archived %}
-    var _is_archived = true;
-    {% else %}
-    var _is_archived = false;
+  <script>
+      var _url = "{{ object.get_api_url }}";
+      var _redirect_url = "{{ object.get_table_url }}";
+      {% if object.is_archived %}
+      var _is_archived = true;
+      {% else %}
+      var _is_archived = false;
+      {% endif %}
+  </script>
+  {% if object %}
+    <script src="{%static 'js/item_remove_button.js'%}"></script>
+  {% endif %}
+  {% if sms_history %}
+    {% if user.profile.can_see_incoming %}
+      <script src="{%static 'js/contacts_recent_sms_table.js'%}"></script>
     {% endif %}
-</script>
-<script src="{%static 'js/item_remove_button.js'%}"></script>
-{% if sms_history %}
-{% if user.profile.can_see_incoming %}
-<script src="{%static 'js/contacts_recent_sms_table.js'%}"></script>
-{% endif %}
-{% endif %}
-<script src="{% static 'js/date_picker.js' %}"></script>
+  {% endif %}
+  <script src="{% static 'js/date_picker.js' %}"></script>
 {% endblock %}
