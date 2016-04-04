@@ -33,8 +33,7 @@ class ElvantoGroup(models.Model):
     def pull(self):
         """Pull group from Elvanto into related apostello group."""
         apostello_group = self.create_apostello_group()
-        e_api = elvanto()
-        data = e_api._Post("groups/getInfo", id=self.e_id, fields=['people'])
+        data = elvanto("groups/getInfo", id=self.e_id, fields=['people'])
         if data['status'] != 'ok':
             raise ElvantoException
 
@@ -75,8 +74,7 @@ class ElvantoGroup(models.Model):
     @staticmethod
     def fetch_all_groups():
         """Pull all group names and ids from Elvanto."""
-        e_api = elvanto()
-        data = e_api._Post("groups/getAll")
+        data = elvanto("groups/getAll")
         if data['status'] != 'ok':
             raise ElvantoException
 

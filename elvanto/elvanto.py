@@ -1,14 +1,27 @@
+import json
 import re
 
-import ElvantoAPI
 from django.conf import settings
 
-from elvanto.exceptions import NotValidPhoneNumber
+from apostello.utils import retry_request
+from elvanto.exceptions import ElvantoException, NotValidPhoneNumber
 
 
-def elvanto():
+def elvanto(end_point, **kwargs):
     """Shortcut to create Elvanto API instance."""
-    return ElvantoAPI.Connection(APIKey=settings.ELVANTO_KEY)
+    base_url = 'https://api.elvanto.com/v1/'
+    e_url = '{0}{1}.json'.format(base_url, end_point)
+    resp = retry_request(
+        e_url,
+        'post',
+        json=kwargs,
+        auth=(settings.ELVANTO_KEY, '_')
+    )
+    data = json.loads(resp.text)
+    if data['status'] == 'ok':
+        return data
+    else:
+        raise ElvantoException(data['error'])
 
 
 def fix_elvanto_numbers(num_string):

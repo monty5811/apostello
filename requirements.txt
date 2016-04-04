@@ -10,7 +10,6 @@ django-solo==1.1.2
 django-twilio==0.8.0
 django<1.10
 djangorestframework==3.3.2
-elvantoapi==1.4.0.0
 gunicorn==19.4.5
 ipython==4.1.1
 opbeat==3.2.1
