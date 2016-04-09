@@ -16,7 +16,7 @@
 {% block content %}
 <h2>{{keyword}} {%if archive%}(Archived){%endif%}</h2>
 
-<div id="incoming_keyword_table"></div>
+<div id="react_table" {% if archive %}src="{% url 'api:keyword_sms_archive' keyword.id %}"{% else %}src="{%url 'api:keyword_sms' keyword.id %}"{% endif %} pollInterval="20000"></div>
 
 {%if form%}
 <br>
@@ -29,16 +29,4 @@
     <button type="submit" class="ui red button">Archive all!</button>
 </form>
 {%endif%}
-{% endblock %}
-{% block morejs %}
-<script>
-    {% if archive %}
-    var _url = "{%url 'api:keyword_sms_archive' keyword.id %}",
-        _viewingArchive = true;
-    {% else %}
-    var _url = "{%url 'api:keyword_sms' keyword.id %}",
-        _viewingArchive = false;
-    {% endif %}
-</script>
-<script src="{%static 'js/keyword_resp_table.js'%}"></script>
 {% endblock %}

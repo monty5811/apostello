@@ -16,9 +16,6 @@ from django_q.models import Schedule
 from phonenumber_field.modelfields import PhoneNumberField
 
 from apostello.exceptions import NoKeywordMatchException
-from apostello.tasks import (
-    group_send_message_task, recipient_send_message_task
-)
 from apostello.utils import fetch_default_reply
 from apostello.validators import (
     TWILIO_INFO_WORDS, TWILIO_START_WORDS, TWILIO_STOP_WORDS, gsm_validator,
@@ -199,6 +196,11 @@ class Recipient(models.Model):
     def get_table_url(self):
         """Url for recipient list page."""
         return reverse('recipients')
+
+    @cached_property
+    def get_recent_sms_table_url(self):
+        """Url for recipient edit recent sms."""
+        return reverse('api:contact_recent_sms', args=[str(self.pk)])
 
     @cached_property
     def full_name(self):

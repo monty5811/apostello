@@ -125,11 +125,13 @@ class TestButton:
     def test_keyword_resp_table_dealt_with(
         self, live_server, browser_in, smsin, keywords, driver_wait_time
     ):
-        browser_in.get(live_server + keywords['test'].get_absolute_url)
+        browser_in.get(live_server + keywords['test'].get_responses_url)
+        sleep(driver_wait_time)
         for button in browser_in.find_elements_by_class_name('positive'):
             browser_in.execute_script(
                 "return arguments[0].scrollIntoView();", button
             )
+            sleep(driver_wait_time)
             button.click()
         sleep(driver_wait_time)
         for k in models.SmsInbound.objects.filter(matched_keyword='test'):

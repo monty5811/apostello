@@ -1,5 +1,4 @@
 {% extends "apostello/base.html" %}
-{% load staticfiles %}
 {% load semanticui %}
 {% block title %}
   {% if not object %}
@@ -15,7 +14,7 @@
     <div class="divider"></div>
   {% endif %}
   {% if object %}
-    <div id="toggle_button" class="item"></div>
+  <div class="item" id="toggle_button"  postUrl="{{ object.get_api_url }}" redirectUrl="{{ object.get_table_url }}" viewingArchive={{ object.is_archived|yesno:"true,false" }}></div>
   {% endif %}
 {% endblock %}
 {% block content %}
@@ -35,27 +34,7 @@
     {% if user.profile.can_see_incoming %}
       <br>
       <h4>Recent Incoming History</h4>
-      <div id="incoming_table" name={{object.pk}}></div>
+      <div id="react_table" src="{{ object.get_recent_sms_table_url }}" pollInterval="20000"></div>
     {% endif %}
   {% endif %}
-{% endblock %}
-{% block morejs %}
-  <script>
-      var _url = "{{ object.get_api_url }}";
-      var _redirect_url = "{{ object.get_table_url }}";
-      {% if object.is_archived %}
-      var _is_archived = true;
-      {% else %}
-      var _is_archived = false;
-      {% endif %}
-  </script>
-  {% if object %}
-    <script src="{%static 'js/item_remove_button.js'%}"></script>
-  {% endif %}
-  {% if sms_history %}
-    {% if user.profile.can_see_incoming %}
-      <script src="{%static 'js/contacts_recent_sms_table.js'%}"></script>
-    {% endif %}
-  {% endif %}
-  <script src="{% static 'js/date_picker.js' %}"></script>
 {% endblock %}

@@ -1,6 +1,5 @@
 {% extends "apostello/base.html" %}
 {% load semanticui %}
-{% load staticfiles %}
 {% block title %}Send{% endblock %}
 {% block side_bar %}
 {% include 'apostello/includes/default_sidebar.html' %}
@@ -8,7 +7,7 @@
 {% block content %}
 <br>
 <p>Send a message to a group:</p>
-<form class="ui {%if not form.is_valid %}error {% endif %}form" method="post" action="send/group/">
+<form class="ui {%if not form.is_valid %}error {% endif %}form" method="post">
     {% csrf_token %}
     {{ form|semanticui }}
     <div id="dtBox"></div>
@@ -23,6 +22,4 @@
     group_sizes['{{x.0}}'] = {{x.1}};
     {%endfor%}
 </script>
-<script src="{%static 'js/send_group.js'%}"></script>
-<script src="{% static 'js/date_picker.js' %}"></script>
 {% endblock %}

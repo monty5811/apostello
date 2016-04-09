@@ -6,23 +6,7 @@ module.exports = {
 
   entry: {
     main: './js/main',
-    date_picker: './js/date_picker',
-    send_adhoc: './js/send_adhoc',
-    send_group: './js/send_group',
-    incoming_table: './js/incoming_table',
-    outgoing_table: './js/outgoing_table',
-    contacts_table: './js/contacts_table',
-    contacts_recent_sms_table: './js/contacts_recent_sms_table',
-    groups_table: './js/groups_table',
-    keywords_table: './js/keywords_table',
-    keyword_resp_table: './js/keyword_resp_table',
-    elvanto: './js/elvanto',
-    live_curate: './js/live_curate',
-    live_wall: './js/live_wall',
-    item_remove_button: './js/item_remove_button',
-    user_profiles: './js/user_profiles',
     tour: './js/tour',
-
     vendor: [
       'jquery',
       'datetimepicker',

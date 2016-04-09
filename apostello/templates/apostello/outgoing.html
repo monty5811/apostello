@@ -5,8 +5,5 @@
 {% include 'apostello/includes/default_sidebar.html' %}
 {% endblock %}
 {% block content %}
-<div id="outgoing_table"></div>
-{% block morejs %}
-<script src="{%static 'js/outgoing_table.js'%}"></script>
-{% endblock %}
+<div id="react_table" src="/api/v1/sms/out/" pollInterval="20000"></div>
 {% endblock %}

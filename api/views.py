@@ -15,7 +15,6 @@ from rest_framework.pagination import PageNumberPagination
 
 from apostello.mixins import ProfilePermsMixin
 from apostello.models import Keyword, Recipient, SmsInbound
-from apostello.tasks import fetch_elvanto_groups, pull_elvanto_groups
 
 from .serializers import SmsInboundSerializer, SmsInboundSimpleSerializer
 

@@ -37,17 +37,17 @@ urlpatterns = [
         name='help'
     ),
     url(
-        r'^send/adhoc/',
+        r'^send/adhoc/$',
         v.SendAdhoc.as_view(required_perms=['can_send_sms']),
         name='send_adhoc'
     ),
     url(
-        r'^send/group/',
+        r'^send/group/$',
         v.SendGroup.as_view(required_perms=['can_send_sms']),
         name='send_group'
     ),
     url(
-        r'^usage/',
+        r'^usage/$',
         v.SimpleView.as_view(
             template_name='apostello/usage_dashboard.html',
         ),
@@ -167,7 +167,7 @@ urlpatterns += [
         name='keyword_responses'
     ),
     url(
-        r'^keyword/responses/(?P<pk>\d+)/archive/$',
+        r'^keyword/responses/archive/(?P<pk>\d+)/$',
         v.keyword_responses,
         {'archive': True},
         name='keyword_responses_archive'

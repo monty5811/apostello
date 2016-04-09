@@ -6,8 +6,5 @@
 <div class="item"><div id="elvanto_pull_button"></div></div>
 {% endblock %}
 {% block content %}
-<div id="elvanto_table"></div>
+<div id="react_table" src="/api/v1/elvanto/groups/" pollInterval="50000"></div>
 {%endblock%}
-{% block morejs %}
-<script src="{%static 'js/elvanto.js'%}"></script>
-{% endblock %}

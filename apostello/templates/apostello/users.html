@@ -5,8 +5,5 @@
 <a class="item" href="/admin/auth/user/">Admin: Users</a>
 {% endblock %}
 {% block content %}
-<div id="table"></div>
-{% endblock %}
-{% block morejs %}
-<script src="{% static 'js/user_profiles.js' %}"></script>
+<div id="react_table" src="/api/v1/users/profiles/" pollInterval="20000"></div>
 {% endblock %}

@@ -6,9 +6,6 @@
 {% endblock %}
 {% block content %}
 <div class="ten wide column">
-<div id="groups_table"></div>
+<div id="react_table" src="/api/v1/groups/" pollInterval="20000"></div>
 </div>
-{% endblock %}
-{% block morejs %}
-<script src="{%static 'js/groups_table.js'%}"></script>
 {% endblock %}

@@ -45,6 +45,9 @@
             async
             ></script>
     {% endif %}
+    <script>
+     var _url = '{{ request.path }}';
+    </script>
 		<script src="{% static 'js/vendor.bundle.js' %}"></script>
 		<script src="{% static 'js/main.js' %}"></script>
 		{% block morejs %}{% endblock %}

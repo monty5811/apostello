@@ -18,7 +18,7 @@ const KeywordRow = (props) => (
       <KeywordStatus is_live={props.keyword.is_live} />
     </td>
     <td>
-      <a href={props.keyword.url} className="ui button tiny fluid primary">Edit</a>
+      <a href={props.keyword.url} className="ui tiny primary button">Edit</a>
     </td>
     <td>
       <ArchiveButton

@@ -1,38 +1,13 @@
 import $ from 'jquery';
+import { csrfSafeMethod, getCookie, sameOrigin } from './django_cookies';
+import { setupSendAdhoc, setupSendGroup } from './send_costs';
+import { renderTable } from './render_table';
+import { renderElvantoButtons } from './elvanto';
+import { renderToggleButton } from './item_remove_button';
 
-function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== '') {
-    const cookies = document.cookie.split(';');
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = $.trim(cookies[i]);
-      // Does this cookie string begin with the name we want?
-      if (cookie.substring(0, name.length + 1) === (`${name}=`)) {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  return cookieValue;
-}
+/* global _url */
 
-function csrfSafeMethod(method) {
-  // these HTTP methods do not require CSRF protection
-  return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-}
-
-function sameOrigin(url) {
-  const host = document.location.host; // host + port
-  const protocol = document.location.protocol;
-  const srOrigin = `//${host}`;
-  const origin = protocol + srOrigin;
-  // Allow absolute or scheme relative URLs to same origin
-  return (url === origin || url.slice(0, origin.length + 1) === `${origin}/`) ||
-    (url === srOrigin || url.slice(0, srOrigin.length + 1) === `${srOrigin}/`) ||
-      // or any other URL that isn't scheme relative or absolute i.e relative.
-      !(/^(\/\/|http:|https:).*/.test(url));
-}
-
+// use django cookie for all ajax calls
 $.ajaxSetup({
   beforeSend(xhr, settings) {
     if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
@@ -43,11 +18,52 @@ $.ajaxSetup({
 });
 
 $(document).ready(() => {
+  // initialise dropdown menus
   $('.dropdown').dropdown({
     label: {
       transition: 'horizontal flip',
       duration: 0,
       variation: false,
     },
+  });
+});
+
+$(document).ready(() => {
+  // handle live cost estimates
+  if (_url === '/send/adhoc/') {
+    setupSendAdhoc();
+  } else if (_url === '/send/group/') {
+    setupSendGroup();
+  }
+});
+
+$(document).ready(() => {
+  // render table on page
+  if ($('#react_table').length > 0) {
+    renderTable();
+  }
+});
+
+$(document).ready(() => {
+  // render elvanto buttons
+  if ($('#elvanto_pull_button').length > 0) {
+    renderElvantoButtons();
+  }
+});
+
+$(document).ready(() => {
+  // render remove/restore buttons
+  if ($('#toggle_button').length > 0) {
+    renderToggleButton();
+  }
+});
+
+$(document).ready(() => {
+  // initialise any date pickers
+  $('#dtBox').DateTimePicker({
+    dateTimeFormat: 'yyyy-MM-dd hh:mm',
+    minuteInterval: 5,
+    setValueInTextboxOnEveryClick: true,
+    buttonsToDisplay: ['SetButton', 'ClearButton'],
   });
 });

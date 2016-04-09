@@ -46,7 +46,7 @@ class TestElvantoImport:
         # enable a group
         sleep(driver_wait_time)
         group_button = browser_in.find_elements_by_xpath(
-            '//*[@id="elvanto_table"]/table/tbody/tr[1]/td[3]/a'
+            '//*[@id="react_table"]/table/tbody/tr[1]/td[3]/a'
         )[0]
         group_button.click()
         sleep(driver_wait_time)

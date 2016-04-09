@@ -5,8 +5,5 @@
 <a class="item" href="{% url 'incoming_wall' %}">Live Updates</a>
 {% endblock %}
 {% block content %}
-<div id="wall"></div>
-{% endblock %}
-{% block morejs %}
-<script src="{% static 'js/live_curate.js' %}"></script>
+<div id="react_table" src="/api/v1/sms/live_wall/all/" pollInterval="10000"></div>
 {% endblock %}

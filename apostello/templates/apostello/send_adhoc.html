@@ -1,5 +1,4 @@
 {% extends "apostello/base.html" %}
-{% load staticfiles %}
 {% load semanticui %}
 {% block title %}Send{% endblock %}
 {% block side_bar %}
@@ -8,7 +7,7 @@
 {% block content %}
 <br>
 <p>Send a message to a single person or to an ad-hoc group of people:</p>
-<form class="ui {%if not form.is_valid %}error {% endif %}form" method="post" action="send/adhoc/">
+<form class="ui {%if not form.is_valid %}error {% endif %}form" method="post">
     {% csrf_token %}
     {{ form|semanticui }}
     <div id="dtBox"></div>
@@ -19,6 +18,4 @@
 <script>
 var sms_cost = {{ TWILIO_SENDING_COST }};
 </script>
-<script src="{%static 'js/send_adhoc.js'%}"></script>
-<script src="{% static 'js/date_picker.js' %}"></script>
 {% endblock %}

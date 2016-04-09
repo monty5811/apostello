@@ -6,8 +6,5 @@
 <a class="item" href="{% url 'incoming_wall_curator' %}">Live Curator</a>
 {% endblock %}
 {% block content %}
-<div id="incoming_table"></div>
-{% endblock %}
-{% block morejs %}
-<script src="{% static 'js/incoming_table.js' %}"></script>
+<div id="react_table" src="/api/v1/sms/in/" pollInterval="20000"></div>
 {% endblock %}
