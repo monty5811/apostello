@@ -1,3 +1,4 @@
+from allauth.socialaccount.models import SocialApp
 from django.conf import settings
 
 from site_config.models import SiteConfiguration
@@ -10,6 +11,8 @@ def global_settings(request):
         'TWILIO_SENDING_COST': settings.TWILIO_SENDING_COST,
         'DEBUG': settings.DEBUG,
         'CONFIG': SiteConfiguration.get_solo(),
+        'DISPLAY_GOOGLE_LOGIN':
+        SocialApp.objects.filter(provider='google').count(),
     }
 
 

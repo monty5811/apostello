@@ -7,11 +7,11 @@
 {% get_providers as socialaccount_providers %}
 
 <h3>{% trans "Sign In" %}</h3>
-{% if socialaccount_providers %}
+{% if DISPLAY_GOOGLE_LOGIN %}
 <a href="/accounts/google/login/?next=%2F&process=login"><img src="{% static 'images/goog_login.png' %}" height="46" alt="Google"></a>
 {% endif %}
 {% if not CONFIG.disable_email_login_form %}
-{% if socialaccount_providers %}
+{% if DISPLAY_GOOGLE_LOGIN %}
 <p>or</p>
 {% endif %}
 <form class="ui {% if not form.is_valid %}error{% endif %} form login" method="POST" action="{% url 'account_login' %}">
