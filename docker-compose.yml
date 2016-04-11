@@ -4,7 +4,7 @@ redis:
   image: redis
 assets:
   build: ./apostello/assets/
-  command: bash -c "npm install --quiet && npm run watchjs"
+  command: bash -c "npm install --quiet && npm run build"
   volumes:
     - .:/code
 q:

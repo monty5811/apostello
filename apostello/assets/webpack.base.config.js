@@ -28,26 +28,6 @@ module.exports = {
   },
 
   plugins: [
-    // removes a lot of debugging code in React
-    new webpack.DefinePlugin({
-      'process.env': {
-        'NODE_ENV': JSON.stringify('production')
-      }
-    }),
-    //
-		new webpack.optimize.CommonsChunkPlugin({
-			name: 'vendor', 
-			filename: 'vendor.bundle.js'
-		}),
-    // minifies code
-    new webpack.optimize.UglifyJsPlugin({
-			compress: {
-				warnings: false
-			},
-			output: {
-				comments: false
-			}
-    }),
 		new webpack.LoaderOptionsPlugin({
 			minimize: true,
 			debug: false

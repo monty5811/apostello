@@ -61,7 +61,7 @@ gulp.task('css', ['uiBuildCss', 'webpack', 'copyThemeFonts', 'copyThemeImages'],
 });
 
 gulp.task("webpack", ['uiBuildJs'], function(callback) {
-  var config = require('./webpack.config.js');
+  var config = require('./webpack.production.config.js');
   // run webpack
   webpack(config, function(err, stats) {
     if (err) throw new gutil.PluginError("webpack", err);
