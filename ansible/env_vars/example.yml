@@ -26,8 +26,6 @@ django_time_zone:
 # Elvanto
 elvanto_key:
 country_code:
-# Slack
-slack_url:
 # Opbeat
 opbeat_org_id:
 opbeat_app_id:
