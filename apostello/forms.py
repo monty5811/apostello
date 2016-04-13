@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 from django import forms
+from django.forms import ModelMultipleChoiceField
 
 from apostello.models import Keyword, Recipient, RecipientGroup, UserProfile
 from apostello.validators import gsm_validator, less_than_sms_char_limit
@@ -157,12 +157,24 @@ class RecipientForm(forms.ModelForm):
         }
 
 
+class UserChoiceField(ModelMultipleChoiceField):
+    """Display emails and user names when selecting users."""
+
+    def label_from_instance(self, obj):
+        """Display the user's label."""
+        return '{0} ({1})'.format(obj.email, obj.username)
+
+
 class KeywordForm(forms.ModelForm):
     """Handle Keywords."""
 
     class Meta:
         model = Keyword
         exclude = ['is_archived', 'last_email_sent_time']
+        field_classes = {
+            'subscribed_to_digest': UserChoiceField,
+            'owners': UserChoiceField,
+        }
         widgets = {
             'keyword':
             forms.TextInput(attrs={'placeholder': '(No spaces allowed)'}),
