@@ -6,10 +6,10 @@ pytest-env==0.6.0
 pytest-flakes==1.0.1
 pytest-isort==0.1.0
 pytest-pep8==1.0.6
-pytest-watch==3.8.0
+pytest-watch==4.1.0
 pytest-xdist==1.14
-pytest==2.8.7
+pytest==2.9.1
 scandir==1.2
-selenium==2.51.1
+selenium==2.53.2
 tox==2.3.1
 vcrpy==1.7.4
