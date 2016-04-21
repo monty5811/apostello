@@ -31,4 +31,4 @@ class TestDefaultResponses:
 
         from site_config.models import DefaultResponses
         resps = DefaultResponses.get_solo()
-        assert resps.start_reply == 'Thank you for signing up :-)'
+        assert 'signing up' in resps.start_reply

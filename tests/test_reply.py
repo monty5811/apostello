@@ -1,99 +1,95 @@
-# -*- coding: utf-8 -*-
 import pytest
 
-from apostello.models import Keyword
-from apostello.reply import (
-    get_person_or_ask_for_name, keyword_replier, reply_to_incoming
-)
+from apostello.models import Recipient
+from apostello.reply import InboundSms
 from apostello.utils import fetch_default_reply
 from tests.conftest import twilio_vcr
 
 
 @pytest.mark.django_db
-class TestKeywordReplier:
-    """Tests apostello.reply.keyword_replier function."""
+class TestConstructReply:
+    """Tests apostello.reply:InboundSms.construct_reply function."""
 
     def test_no_existing_keyword(self, recipients):
-        assert keyword_replier(
-            None, recipients[
-                'calvin'
-            ]
-        ) == fetch_default_reply('keyword_no_match').replace(
+        msg = InboundSms(
+            {
+                'From': str(recipients['calvin'].number),
+                'Body': 'nope'
+            }
+        )
+        reply = msg.construct_reply()
+        assert reply == fetch_default_reply('keyword_no_match').replace(
             "%name%", "John"
         )
 
     def test_existing_keyword(self, recipients, keywords):
-        assert keyword_replier(
-            keywords['test'], recipients['calvin']
-        ) == "Test custom response with John"
-
-
-@pytest.mark.django_db
-class TestReply:
-    """Tests apostello.reply.reply_to_incoming fn."""
+        msg = InboundSms(
+            {
+                'From': str(recipients['calvin'].number),
+                'Body': 'test msg'
+            }
+        )
+        reply = msg.construct_reply()
+        assert reply == "Test custom response with John"
 
     @twilio_vcr
     def test_name(self, recipients):
-        sms_body = "name John Calvin"
-        k_obj = Keyword.match(sms_body)
-        reply = reply_to_incoming(
-            recipients['calvin'], recipients['calvin'].number, sms_body, k_obj
+        msg = InboundSms(
+            {
+                'From': str(recipients['calvin'].number),
+                'Body': 'name John Calvin'
+            }
         )
+        reply = msg.construct_reply()
         assert "John" in str(reply)
 
     @twilio_vcr
     def test_only_one_name(self, recipients):
-        sms_body = "name JohnCalvin"
-        k_obj = Keyword.match(sms_body)
-        r_new = reply_to_incoming(
-            recipients['calvin'], recipients['calvin'].number, sms_body, k_obj
+        msg = InboundSms(
+            {
+                'From': str(recipients['calvin'].number),
+                'Body': 'name JohnCalvin'
+            }
         )
-        assert "Something went wrong" in str(r_new)
+        reply = msg.construct_reply()
+        assert "Something went wrong" in reply
 
     @twilio_vcr
     def test_stop_start(self, recipients):
-        sms_body = "stop "
-        k_obj = Keyword.match(sms_body)
-        reply_to_incoming(
-            recipients['calvin'], recipients['calvin'].number, sms_body, k_obj
+        msg = InboundSms(
+            {
+                'From': str(recipients['calvin'].number),
+                'Body': 'stop '
+            }
         )
-        assert recipients['calvin'].is_blocking
+        reply = msg.construct_reply()
+        assert len(reply) == 0
+        assert Recipient.objects.get(pk=recipients['calvin'].pk).is_blocking
 
-        sms_body = "start"
-        k_obj = Keyword.match(sms_body)
-        reply_to_incoming(
-            recipients['calvin'], recipients['calvin'].number, sms_body, k_obj
+        msg = InboundSms(
+            {
+                'From': str(recipients['calvin'].number),
+                'Body': 'start '
+            }
         )
-        assert recipients['calvin'].is_blocking is False
+        reply = msg.construct_reply()
+        assert Recipient.objects.get(
+            pk=recipients['calvin'].pk
+        ).is_blocking is False
+        assert 'signing up' in reply
 
     @twilio_vcr
-    def test_other(self, recipients):
-        sms_body = "test message"
-        k_obj = Keyword.match(sms_body)
-        r_new = reply_to_incoming(
-            recipients['calvin'], recipients['calvin'].number, sms_body, k_obj
+    def test_existing_keyword_new_contact(self, keywords):
+        msg = InboundSms({'From': '+447927401749', 'Body': 'test msg'})
+        reply = msg.construct_reply()
+        assert reply == "Test custom response with Unknown"
+
+    def test_is_blocking_reply(self, recipients):
+        msg = InboundSms(
+            {
+                'From': str(recipients['wesley'].number),
+                'Body': 'test'
+            }
         )
-        assert "" in str(r_new)
-
-
-@pytest.mark.django_db
-class TestGetOrAskPerson():
-    """Tests apostello.reply.get_person_or_ask_for_name fn."""
-
-    def test_known(self, recipients):
-        assert recipients['calvin'] == get_person_or_ask_for_name(
-            '+447927401749', 'hello', 'hello'
-        )
-
-    @twilio_vcr
-    def test_unknown(self):
-        person_from = get_person_or_ask_for_name(
-            '+447928401749', 'hello', 'hello'
-        )
-        assert 'Unknown' == person_from.first_name
-
-    def test_unknown_name_keyword(self):
-        person_from = get_person_or_ask_for_name(
-            '+447928521749', 'name', 'name'
-        )
-        assert 'Unknown' == person_from.first_name
+        reply = msg.construct_reply()
+        assert len(reply) == 0

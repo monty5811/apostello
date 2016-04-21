@@ -119,6 +119,24 @@ class TestSendAdhoc:
         assert 'cost no more than' in b.page_source
         assert ADHOC_URI in b.current_url
 
+    def test_sms_too_long(
+        self, live_server, browser_in, users, driver_wait_time, recipients
+    ):
+        """Test form submission with a message that is too long."""
+        from site_config.models import SiteConfiguration
+        s = SiteConfiguration.get_solo()
+        s.sms_char_limit = 2
+        s.save()
+        b = load_page(browser_in, driver_wait_time, live_server + ADHOC_URI)
+        b = add_recipient(b, driver_wait_time)
+        b = add_content(b, driver_wait_time)
+        b = click_send(b, driver_wait_time)
+
+        assert 'You have exceeded' in b.page_source
+        assert ADHOC_URI in b.current_url
+        s.sms_char_limit = 200
+        s.save()
+
 
 @pytest.mark.django_db
 @pytest.mark.slow

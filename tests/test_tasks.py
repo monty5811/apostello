@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from datetime import datetime
 
 import pytest
@@ -93,4 +92,4 @@ class TestTasks:
         ).count() == 1
 
     def test_warn_on_blacklist_receipt(self, recipients):
-        warn_on_blacklist_receipt(recipients['wesley'].pk, 'stop')
+        blacklist_notify(recipients['wesley'].pk, 'stop it', 'stop')

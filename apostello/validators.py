@@ -67,7 +67,7 @@ def less_than_sms_char_limit(value):
     sms_char_lim = s.sms_char_limit - settings.MAX_NAME_LENGTH + len('%name%')
     if len(value) > sms_char_lim:
         raise ValidationError(
-            'You have exceed the maximum char limit of {0}.'.format(
+            'You have exceeded the maximum char limit of {0}.'.format(
                 sms_char_lim
             )
         )

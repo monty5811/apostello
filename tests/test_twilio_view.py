@@ -2,6 +2,7 @@ import sys
 
 import pytest
 from django.conf import settings
+from django.core import mail
 from django.test import RequestFactory
 from twilio.util import RequestValidator
 
@@ -87,6 +88,12 @@ def test_request_data():
     }
 
 
+def test_request_data_blocked():
+    data = test_request_data()
+    data['From'] = u'+447927401745'
+    return data
+
+
 @pytest.mark.slow
 @pytest.mark.parametrize(
     "msg,reply", [
@@ -100,7 +107,7 @@ def test_request_data():
 @pytest.mark.django_db
 class TestTwilioView:
     @twilio_vcr
-    def test_not_logged_in(self, msg, reply, keywords):
+    def test_not_logged_in(self, msg, reply, keywords, recipients):
         # make sure replies are on:
         from site_config.models import SiteConfiguration
         config = SiteConfiguration.get_solo()
@@ -112,6 +119,44 @@ class TestTwilioView:
         request = factory.post(uri, data=data)
         resp = sms(request)
         assert reply in str(resp.content)
+
+
+@pytest.mark.slow
+@pytest.mark.django_db
+class TestTwilioViewBlockingContact:
+    @twilio_vcr
+    def test_not_logged_in(self, keywords, recipients):
+        # make sure replies are on:
+        from site_config.models import SiteConfiguration
+        config = SiteConfiguration.get_solo()
+        config.disable_all_replies = False
+        config.save()
+        factory = TwilioRequestFactory(token=settings.TWILIO_AUTH_TOKEN)
+        data = test_request_data_blocked()
+        data['Body'] = u'Test'
+        request = factory.post(uri, data=data)
+        resp = sms(request)
+        assert '<Message><Body /></Message>' in str(resp.content)
+
+
+@pytest.mark.slow
+@pytest.mark.django_db
+class TestTwilioViewAskForName:
+    @twilio_vcr
+    def test_not_logged_in(self, keywords):
+        # make sure replies are on:
+        from site_config.models import SiteConfiguration
+        config = SiteConfiguration.get_solo()
+        config.disable_all_replies = False
+        config.save()
+        factory = TwilioRequestFactory(token=settings.TWILIO_AUTH_TOKEN)
+        data = test_request_data()
+        data['Body'] = u'Test'
+        request = factory.post(uri, data=data)
+        resp = sms(request)
+        assert 'Unknown' in str(resp.content)
+        assert len(mail.outbox) == 1
+        assert 'asked for their name' in mail.outbox[0].body
 
 
 @pytest.mark.slow

@@ -7,11 +7,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils import timezone
 from django.views.generic import View
 from django.views.generic.edit import FormView, UpdateView
 from django_twilio.decorators import twilio_view
-from django_q.tasks import async
 from phonenumber_field.validators import validate_international_phonenumber
 from twilio import twiml
 
@@ -23,7 +21,7 @@ from apostello.forms import (
 )
 from apostello.mixins import ProfilePermsMixin
 from apostello.models import Keyword, Recipient, RecipientGroup, UserProfile
-from apostello.reply import get_person_or_ask_for_name, reply_to_incoming
+from apostello.reply import InboundSms
 from apostello.utils import exists_and_archived
 from site_config.models import SiteConfiguration
 
@@ -362,19 +360,11 @@ def sms(request):
     This is the start of the message processing pipeline.
     """
     r = twiml.Response()
-    params = request.POST
-    from_ = params['From']
-    sms_body = params['Body'].strip()
-    keyword_obj = Keyword.match(sms_body)
-    # get person object and optionally ask for their name
-    person_from = get_person_or_ask_for_name(from_, sms_body, keyword_obj)
-    async('apostello.tasks.log_msg_in', params, timezone.now(), person_from.pk)
-    async('apostello.tasks.sms_to_slack', sms_body, person_from, keyword_obj)
-
-    reply = reply_to_incoming(person_from, from_, sms_body, keyword_obj)
+    msg = InboundSms(request.POST)
+    msg.start_bg_tasks()
 
     config = SiteConfiguration.get_solo()
     if not config.disable_all_replies:
-        r.message(reply)
+        r.message(msg.reply)
 
     return r

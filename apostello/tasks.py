@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import json
 
 import requests
@@ -6,8 +5,10 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.utils import timezone
 from django_twilio.client import twilio_client
-from django_q.tasks import async
 from twilio.rest.exceptions import TwilioRestException
+
+from apostello.utils import fetch_default_reply
+from django_q.tasks import async
 
 # sending messages
 
@@ -59,9 +60,32 @@ def recipient_send_message_task(recipient_pk, body, group, sent_by):
         if e.code == 21610:
             recipient.is_blocking = True
             recipient.save()
-            async('apostello.tasks.warn_on_blacklist', recipient.pk)
+            async('apostello.tasks.blacklist_notify', recipient.pk, '', 'stop')
         else:
             raise e
+
+
+def ask_for_name(person_from_pk, sms_body, ask_for_name):
+    """Asks a contact to provide their name."""
+    if not ask_for_name:
+        return
+    from site_config.models import SiteConfiguration
+    config = SiteConfiguration.get_solo()
+    if not config.disable_all_replies:
+        from apostello.models import Recipient
+        contact = Recipient.objects.get(pk=person_from_pk)
+        contact.send_message(
+            content=fetch_default_reply('auto_name_request'),
+            sent_by="auto name request"
+        )
+        async(
+            'apostello.tasks.notify_office_mail',
+            '[Apostello] Unknown Contact!',
+            'SMS: {0}\nFrom: {1}\n\n\nThis person is unknown and has been'
+            ' asked for their name.'.format(
+                sms_body, str(contact)
+            ),
+        )
 
 # SMS logging and consistency checks
 
@@ -123,29 +147,27 @@ def notify_office_mail(subject, body):
     send_async_mail(subject, body, [to_])
 
 
-def warn_on_blacklist(recipient_pk):
+def blacklist_notify(recipient_pk, sms_body, keyword):
     """Send email to office when we discover we are blacklisted."""
     from apostello.models import Recipient
     recipient = Recipient.objects.get(pk=recipient_pk)
-    async(
-        'apostello.tasks.notify_office_mail',
-        '[Apostello] Blacklist Update',
-        "{0} ({1}) is now blocking us".format(
-            str(recipient.number),
-            str(recipient),
-        ),
-    )
-
-
-def warn_on_blacklist_receipt(recipient_pk, sms):
-    """Send email to office on reciept of message from a blacklister."""
-    from apostello.models import Recipient
-    recipient = Recipient.objects.get(pk=recipient_pk)
+    if keyword == 'start':
+        return
+    if keyword == 'stop':
+        async(
+            'apostello.tasks.notify_office_mail',
+            '[Apostello] Blacklist Update',
+            "{0} ({1}) is now blocking us".format(
+                str(recipient.number),
+                str(recipient),
+            ),
+        )
+        return
     if recipient.is_blocking:
         email_body = "{0} has blacklisted us in the past but has just sent " \
             "this message:\n\n\t{1}\n\n" \
             "You may need to email them as we cannot currently reply to them."
-        email_body.format(str(recipient), sms)
+        email_body.format(str(recipient), sms_body)
         async(
             'apostello.tasks.notify_office_mail',
             '[Apostello] Blacklist Receipt Notice',
@@ -195,10 +217,10 @@ def post_to_slack(attachments):
         requests.post(url, data=json.dumps(data), headers=headers)
 
 
-def sms_to_slack(sms_body, person, keyword):
+def sms_to_slack(sms_body, person_name, keyword_name):
     """Post message to slack webhook."""
     fallback = "{0}\nFrom: {1}\n(matched: {2})".format(
-        sms_body, str(person), str(keyword)
+        sms_body, person_name, keyword_name
     )
     attachments = [
         {
@@ -208,11 +230,11 @@ def sms_to_slack(sms_body, person, keyword):
             'fields': [
                 {
                     'title': 'From',
-                    'value': str(person),
+                    'value': person_name,
                     'short': True
                 }, {
                     'title': 'Matched',
-                    'value': str(keyword),
+                    'value': keyword_name,
                     'short': True
                 }
             ],
