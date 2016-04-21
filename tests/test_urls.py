@@ -8,6 +8,7 @@ from tests.conftest import twilio_vcr
 @pytest.mark.parametrize(
     "url,status_code", [
         ('/', 302),
+        ('/not_approved/', 200),
         ('/send/adhoc/', 302),
         ('/send/group/', 302),
         ('/group/all/', 302),

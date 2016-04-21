@@ -2,7 +2,6 @@
 from allauth.account.views import PasswordChangeView
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.views.generic import TemplateView
 
 from apostello import views as v
 from apostello.decorators import keyword_access_check
@@ -25,7 +24,7 @@ urlpatterns = [
     ),
     url(
         r'not_approved/$',
-        TemplateView.as_view(template_name='apostello/not_approved.html'),
+        v.NotApprovedView.as_view(),
         name='not_approved'
     ),
     url(

@@ -42,6 +42,14 @@ class SiteConfiguration(SingletonModel):
         help_text='Toggle automatic syncing of Elvanto groups.'
         ' Syncing will be done every 24 hours.',
     )
+    not_approved_msg = models.TextField(
+        default='\n\nYour account has not yet been approved.'
+        '\n\nAll new accounts require approval to help prevent abuse.'
+        ' Someone should approve your account soon.'
+        '\n\nPlease get in touch if you believe you are seeing this in error.'
+        '\n',
+        help_text='This message will be shown on the "not approved" page.',
+    )
 
     def __str__(self):
         """Pretty representation."""
