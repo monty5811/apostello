@@ -25,13 +25,4 @@ Try out the :ref:`demo site <demo_site>` or the :ref:`getting started <getting-s
    demo_site
    screenshots
    development
-   api
 
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

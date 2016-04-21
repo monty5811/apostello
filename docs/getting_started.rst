@@ -40,7 +40,7 @@ After you have successfully installed apostello there are a few more steps to fi
 .. _setup-twilio:
 
 Twilio Setup
-============
+------------
 
 Once you have apostello setup we need to tell Twilio what url to talk to when it receives an SMS:
 

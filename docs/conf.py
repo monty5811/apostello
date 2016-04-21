@@ -44,7 +44,7 @@ project = 'apostello'
 copyright = '2015, Dean Montgomery'
 author = 'Dean Montgomery'
 
-version = '0.1'
+version = '1.6'
 # The full version, including alpha/beta/rc tags.
 release = '0.1'
 language = None
@@ -65,8 +65,8 @@ html_theme = 'sphinx_rtd_theme'
 # html_theme_path = []
 # html_title = None
 # html_short_title = None
-# html_logo = None
-# html_favicon = None
+html_logo = '../apostello/static/images/favicons/android-chrome-48x48.png'
+html_favicon = '../apostello/static/images/favicons/favicon.ico'
 html_static_path = ['_static']
 # html_extra_path = []
 # html_last_updated_fmt = '%b %d, %Y'
