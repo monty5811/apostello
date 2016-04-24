@@ -5,7 +5,7 @@ Demo Site
 
 There is a demo site available at https://apostello-demo.herokuapp.com
 
-You can login with the email `test@example.com` and the password `apostello`.
+You can login with the email ``test@example.com`` and the password ``apostello``.
 
 Note that:
 

@@ -136,11 +136,14 @@ REST_FRAMEWORK = {
 
 # email settings
 EMAIL_USE_TLS = True
-EMAIL_HOST = os.environ.get('DJANGO_EMAIL_HOST', 'smtp.mailgun.org')
-EMAIL_HOST_USER = os.environ.get('DJANGO_EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('DJANGO_EMAIL_HOST_PASSWORD', '')
-EMAIL_FROM = os.environ.get('DJANGO_FROM_EMAIL')
-EMAIL_PORT = 587
+# these email settings can be overridden in the SiteConfiguration model
+# this also allows for these settings to be left blank on initial setup and
+# filled in later
+EMAIL_HOST = os.environ.get('DJANGO_EMAIL_HOST', None)
+EMAIL_HOST_USER = os.environ.get('DJANGO_EMAIL_HOST_USER', None)
+EMAIL_HOST_PASSWORD = os.environ.get('DJANGO_EMAIL_HOST_PASSWORD', None)
+EMAIL_FROM = os.environ.get('DJANGO_FROM_EMAIL', None)
+EMAIL_PORT = int(os.environ.get('DJANGO_EMAIL_HOST_port', 587))
 
 # social login settings
 ACCOUNT_AUTHENTICATION_METHOD = 'email'

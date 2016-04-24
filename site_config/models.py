@@ -50,6 +50,35 @@ class SiteConfiguration(SingletonModel):
         '\n',
         help_text='This message will be shown on the "not approved" page.',
     )
+    # email sending settings
+    email_host = models.URLField(
+        blank=True,
+        help_text='Email host.'
+        ' This will override values in settings.py',
+    )
+    email_port = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        help_text='Email host port.'
+        ' This will override values in settings.py',
+    )
+    email_username = models.CharField(
+        blank=True,
+        max_length=255,
+        help_text='Email user name.'
+        ' This will override values in settings.py',
+    )
+    email_password = models.CharField(
+        blank=True,
+        max_length=255,
+        help_text='Email password.'
+        ' This will override values in settings.py',
+    )
+    email_from = models.EmailField(
+        blank=True,
+        help_text='Email will be sent from this address.'
+        ' This will override values in settings.py',
+    )
 
     def __str__(self):
         """Pretty representation."""

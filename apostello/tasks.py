@@ -2,7 +2,7 @@ import json
 
 import requests
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import get_connection, send_mail
 from django.utils import timezone
 from django_twilio.client import twilio_client
 from twilio.rest.exceptions import TwilioRestException
@@ -136,8 +136,18 @@ def update_msgs_name(person_pk):
 
 def send_async_mail(subject, body, to):
     """Send email."""
-    from_ = settings.EMAIL_FROM
-    send_mail(subject, body, from_, to)
+    # read email settings from DB, if they are empty, they will be read from
+    # settings.py instead
+    from site_config.models import SiteConfiguration
+    s = SiteConfiguration.get_solo()
+    conn = get_connection(
+        host=s.email_host or None,
+        port=s.email_port or None,
+        username=s.email_username or None,
+        password=s.email_password or None,
+    )
+    from_ = s.email_from or settings.EMAIL_FROM
+    send_mail(subject, body, from_, to, connection=conn)
 
 
 def notify_office_mail(subject, body):

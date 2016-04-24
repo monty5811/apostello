@@ -9,6 +9,11 @@ class SiteConfigurationForm(forms.ModelForm):
     class Meta:
         model = SiteConfiguration
         exclude = []
+        widgets = {
+            'email_password': forms.PasswordInput(
+                render_value=True,
+            ),
+        }
 
 
 class DefaultResponsesForm(forms.ModelForm):

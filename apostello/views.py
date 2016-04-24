@@ -48,7 +48,6 @@ class NotApprovedView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(NotApprovedView, self).get_context_data(**kwargs)
-        from site_config. models import SiteConfiguration
         s = SiteConfiguration.get_solo()
         context['msg'] = s.not_approved_msg
         return context

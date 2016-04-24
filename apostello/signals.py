@@ -1,11 +1,7 @@
-import logging
-
-from django.core.mail import send_mail
 from django.dispatch import receiver
 
 from allauth.account.signals import email_confirmed, user_signed_up
-
-logger = logging.getLogger('apostello')
+from apostello.tasks import send_async_mail
 
 
 @receiver(email_confirmed)
@@ -39,11 +35,5 @@ def email_admin_on_signup(request, user, **kwargs):
     body = body.format(str(user))
     from site_config.models import SiteConfiguration
     to_ = SiteConfiguration.get_solo().office_email
-    try:
-        if len(to_) > 0:
-            send_mail("[apostello] New User", body, '', [to_], )
-    except Exception:
-        logger.error(
-            'Error sending email to office on new user sign up',
-            exc_info=True
-        )
+    if len(to_) > 0:
+        send_async_mail("[apostello] New User", body, [to_], )
