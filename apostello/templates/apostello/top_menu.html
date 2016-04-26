@@ -11,6 +11,9 @@
     {% if profile.can_send_sms or request.user.is_staff %}
     <a class="item" href="{% url 'send_adhoc' %}">Send to Individuals</a>
     <a class="item" href="{% url 'send_group' %}">Send to a Group</a>
+    {% if request.user.is_staff %}
+    <a class="item" href="/scheduled/sms/">Scheduled Messages</a>
+    {% endif %}
     <div class="divider"></div>
     {% endif %}
     {% if profile.can_see_contact_names or request.user.is_staff %}<a class="item" href="{% url 'recipients' %}">Contacts</a>{% endif %}

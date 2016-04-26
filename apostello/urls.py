@@ -187,28 +187,39 @@ urlpatterns += [
             required_perms=['can_see_incoming']
         ),
         name='incoming'
-    ), url(
+    ),
+    url(
         r'^incoming/wall/$',
         v.SimpleView.as_view(
             template_name='apostello/wall.html',
             required_perms=['can_see_incoming']
         ),
         name='incoming_wall'
-    ), url(
+    ),
+    url(
         r'^incoming/curate_wall/$',
         v.SimpleView.as_view(
             template_name='apostello/wall_curator.html',
             required_perms=['can_see_incoming']
         ),
         name='incoming_wall_curator'
-    ), url(
+    ),
+    url(
         r'^outgoing/$',
         v.SimpleView.as_view(
             template_name='apostello/outgoing.html',
             required_perms=['can_see_outgoing']
         ),
         name='outgoing'
-    )
+    ),
+    url(
+        r'^scheduled/sms/$',
+        v.SimpleView.as_view(
+            template_name='apostello/scheduled_sms.html',
+            required_perms=[]
+        ),
+        name='scheduled_sms'
+    ),
 ]
 
 # import urls

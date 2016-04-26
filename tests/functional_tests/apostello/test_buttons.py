@@ -1,8 +1,11 @@
+from datetime import datetime
 from time import sleep
 
-import pytest
 from django.contrib.auth.models import User
+from django.utils import timezone
+from django_q.models import Schedule
 
+import pytest
 from apostello import models
 
 
@@ -159,3 +162,56 @@ class TestButton:
         sleep(driver_wait_time)
         alert = browser_in.switch_to_alert()
         alert.accept()
+
+    def test_cancel_tasks(
+        self, live_server, browser_in, recipients, groups, driver_wait_time
+    ):
+        """Test the scheduled messages table."""
+        # create a couple of scheduled tasks, we need to create the model
+        # objects directly as django_q.tasks.schedule is monkeypatched in tests
+        Schedule.objects.create(
+            name='test1',
+            func='apostello.tasks.recipient_send_message_task',
+            args='({0},"test message", None, "admin")'.format(
+                recipients[
+                    'calvin'
+                ].pk
+            ),
+            schedule_type='ONCE',
+            repeats=-1,
+            next_run=timezone.make_aware(
+                datetime.strptime(
+                    'Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'
+                ), timezone.get_current_timezone()
+            ),
+        )
+        Schedule.objects.create(
+            name='test2',
+            func='apostello.tasks.recipient_send_message_task',
+            args='({0},"another test message", "Test Group", "admin")'.format(
+                recipients['calvin'].pk
+            ),
+            schedule_type='ONCE',
+            repeats=-1,
+            next_run=timezone.make_aware(
+                datetime.strptime(
+                    'Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'
+                ), timezone.get_current_timezone()
+            ),
+        )
+        # verify tasks are shown in table
+        uri = '/scheduled/sms/'
+        browser_in.get(live_server + uri)
+        assert uri in browser_in.current_url
+        sleep(driver_wait_time)
+        assert 'test message' in browser_in.page_source
+        assert 'another test message' in browser_in.page_source
+        assert 'Calvin' in browser_in.page_source
+        # delete tasks
+        while len(browser_in.find_elements_by_class_name('grey')) > 0:
+            browser_in.find_elements_by_class_name('grey')[0].click()
+            sleep(driver_wait_time)
+        assert 'test message' not in browser_in.page_source
+        assert 'another test message' not in browser_in.page_source
+        assert 'Calvin' not in browser_in.page_source
+        assert Schedule.objects.all().count() == 0

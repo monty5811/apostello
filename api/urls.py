@@ -1,45 +1,35 @@
 from django.conf.urls import url
+from django_q.models import Schedule
+from rest_framework.permissions import IsAuthenticated
 
+from api import serializers as s
+from api import views as v
 from api.drf_permissions import (
-    CanSeeContactNames, CanSeeGroups, CanSeeIncoming, CanSeeKeyword,
-    CanSeeKeywords, CanSeeOutgoing, CanImport, IsStaff
-)
-from api.serializers import (
-    ElvantoGroupSerializer,
-    KeywordSerializer,
-    RecipientGroupSerializer,
-    RecipientSerializer,
-    SmsInboundSerializer,
-    SmsOutboundSerializer,
-    UserProfileSerializer,
-)
-from api.views import (
-    ApiCollection, ApiCollectionAllWall, ApiCollectionKeywordSms,
-    ApiCollectionRecentSms, ApiMember, ElvantoFetchButton, ElvantoPullButton
+    CanImport, CanSeeContactNames, CanSeeGroups, CanSeeIncoming, CanSeeKeyword,
+    CanSeeKeywords, CanSeeOutgoing, IsStaff
 )
 from apostello.models import (
     Keyword, Recipient, RecipientGroup, SmsInbound, SmsOutbound, UserProfile
 )
 from elvanto.models import ElvantoGroup
-from rest_framework.permissions import IsAuthenticated
 
 # api
 urlpatterns = [
     # user profiles
     url(
         r'^v1/users/profiles/$',
-        ApiCollection.as_view(
+        v.ApiCollection.as_view(
             model_class=UserProfile,
-            serializer_class=UserProfileSerializer,
+            serializer_class=s.UserProfileSerializer,
             permission_classes=(IsAuthenticated, IsStaff),
         ),
         name='user_profiles'
     ),
     url(
         r'^v1/users/profiles/(?P<pk>[0-9]+)$',
-        ApiMember.as_view(
+        v.ApiMember.as_view(
             model_class=UserProfile,
-            serializer_class=UserProfileSerializer,
+            serializer_class=s.UserProfileSerializer,
             permission_classes=(IsAuthenticated, IsStaff),
         ),
         name='user_profiles_member'
@@ -47,18 +37,18 @@ urlpatterns = [
     # sms views
     url(
         r'^v1/sms/in/$',
-        ApiCollection.as_view(
+        v.ApiCollection.as_view(
             model_class=SmsInbound,
-            serializer_class=SmsInboundSerializer,
+            serializer_class=s.SmsInboundSerializer,
             permission_classes=(IsAuthenticated, CanSeeIncoming)
         ),
         name='in_log'
     ),
     url(
         r'^v1/sms/out/$',
-        ApiCollection.as_view(
+        v.ApiCollection.as_view(
             model_class=SmsOutbound,
-            serializer_class=SmsOutboundSerializer,
+            serializer_class=s.SmsOutboundSerializer,
             permission_classes=(IsAuthenticated, CanSeeOutgoing),
             related_field='recipient',
         ),
@@ -66,14 +56,14 @@ urlpatterns = [
     ),
     url(
         r'^v1/sms/live_wall/all/$',
-        ApiCollectionAllWall.as_view(
+        v.ApiCollectionAllWall.as_view(
             permission_classes=(IsAuthenticated, CanSeeIncoming)
         ),
         name='live_wall_all'
     ),
     url(
         r'^v1/sms/in/recpient/(?P<pk>\d+)/$',
-        ApiCollectionRecentSms.as_view(
+        v.ApiCollectionRecentSms.as_view(
             permission_classes=(
                 IsAuthenticated, CanSeeContactNames, CanSeeIncoming
             )
@@ -82,7 +72,7 @@ urlpatterns = [
     ),
     url(
         r'^v1/sms/in/keyword/(?P<pk>\d+)/$',
-        ApiCollectionKeywordSms.as_view(
+        v.ApiCollectionKeywordSms.as_view(
             permission_classes=(
                 IsAuthenticated, CanSeeKeywords, CanSeeKeyword, CanSeeIncoming
             ),
@@ -92,7 +82,7 @@ urlpatterns = [
     ),
     url(
         r'^v1/sms/in/keyword/(?P<pk>\d+)/archive/$',
-        ApiCollectionKeywordSms.as_view(
+        v.ApiCollectionKeywordSms.as_view(
             permission_classes=(
                 IsAuthenticated, CanSeeKeywords, CanSeeKeyword, CanSeeIncoming
             ),
@@ -102,9 +92,9 @@ urlpatterns = [
     ),
     url(
         r'^v1/sms/in/(?P<pk>[0-9]+)$',
-        ApiMember.as_view(
+        v.ApiMember.as_view(
             model_class=SmsInbound,
-            serializer_class=SmsInboundSerializer,
+            serializer_class=s.SmsInboundSerializer,
             permission_classes=(IsAuthenticated, CanSeeIncoming),
         ),
         name='sms_in_member'
@@ -112,9 +102,9 @@ urlpatterns = [
     # recipient views
     url(
         r'^v1/recipients/$',
-        ApiCollection.as_view(
+        v.ApiCollection.as_view(
             model_class=Recipient,
-            serializer_class=RecipientSerializer,
+            serializer_class=s.RecipientSerializer,
             filter_list=True,
             filters={'is_archived': False},
             permission_classes=(IsAuthenticated, CanSeeContactNames)
@@ -123,9 +113,9 @@ urlpatterns = [
     ),
     url(
         r'^v1/recipients/(?P<pk>[0-9]+)$',
-        ApiMember.as_view(
+        v.ApiMember.as_view(
             model_class=Recipient,
-            serializer_class=RecipientSerializer,
+            serializer_class=s.RecipientSerializer,
             permission_classes=(IsAuthenticated, CanSeeContactNames)
         ),
         name='recipient'
@@ -133,9 +123,9 @@ urlpatterns = [
     # group views
     url(
         r'^v1/groups/$',
-        ApiCollection.as_view(
+        v.ApiCollection.as_view(
             model_class=RecipientGroup,
-            serializer_class=RecipientGroupSerializer,
+            serializer_class=s.RecipientGroupSerializer,
             filter_list=True,
             filters={'is_archived': False},
             permission_classes=(IsAuthenticated, CanSeeGroups)
@@ -144,9 +134,9 @@ urlpatterns = [
     ),
     url(
         r'^v1/groups/(?P<pk>[0-9]+)$',
-        ApiMember.as_view(
+        v.ApiMember.as_view(
             model_class=RecipientGroup,
-            serializer_class=RecipientGroupSerializer,
+            serializer_class=s.RecipientGroupSerializer,
             permission_classes=(IsAuthenticated, CanSeeGroups)
         ),
         name='group'
@@ -154,18 +144,18 @@ urlpatterns = [
     # Elvanto groups
     url(
         r'^v1/elvanto/groups/$',
-        ApiCollection.as_view(
+        v.ApiCollection.as_view(
             model_class=ElvantoGroup,
-            serializer_class=ElvantoGroupSerializer,
+            serializer_class=s.ElvantoGroupSerializer,
             permission_classes=(IsAuthenticated, CanSeeGroups, CanImport)
         ),
         name='elvanto_groups'
     ),
     url(
         r'^v1/elvanto/group/(?P<pk>[0-9]+)$',
-        ApiMember.as_view(
+        v.ApiMember.as_view(
             model_class=ElvantoGroup,
-            serializer_class=ElvantoGroupSerializer,
+            serializer_class=s.ElvantoGroupSerializer,
             permission_classes=(IsAuthenticated, CanSeeGroups, CanImport)
         ),
         name='elvanto_group'
@@ -173,20 +163,20 @@ urlpatterns = [
     # Elvanto group buttons
     url(
         r'^v1/elvanto/group_fetch/$',
-        ElvantoFetchButton.as_view(),
+        v.ElvantoFetchButton.as_view(),
         name='fetch_elvanto_groups'
     ),
     url(
         r'^v1/elvanto/group_pull/$',
-        ElvantoPullButton.as_view(),
+        v.ElvantoPullButton.as_view(),
         name='pull_elvanto_groups'
     ),
     # keyword views
     url(
         r'^v1/keywords/$',
-        ApiCollection.as_view(
+        v.ApiCollection.as_view(
             model_class=Keyword,
-            serializer_class=KeywordSerializer,
+            serializer_class=s.KeywordSerializer,
             filter_list=True,
             filters={'is_archived': False},
             permission_classes=(IsAuthenticated, CanSeeKeywords)
@@ -195,11 +185,32 @@ urlpatterns = [
     ),
     url(
         r'^v1/keywords/(?P<pk>[0-9]+)$',
-        ApiMember.as_view(
+        v.ApiMember.as_view(
             model_class=Keyword,
-            serializer_class=KeywordSerializer,
+            serializer_class=s.KeywordSerializer,
             permission_classes=(IsAuthenticated, CanSeeKeyword)
         ),
         name='keyword'
+    ),
+    # scheduled task views
+    url(
+        r'^v1/q/scheduled/sms/$',
+        v.ApiCollection.as_view(
+            model_class=Schedule,
+            serializer_class=s.QScheduleSerializer,
+            filter_list=True,
+            filters={'func__contains': 'send'},
+            permission_classes=(IsAuthenticated, IsStaff)
+        ),
+        name='q_schedules'
+    ),
+    url(
+        r'^v1/q/scheduled/sms/(?P<pk>[0-9]+)$',
+        v.ApiMember.as_view(
+            model_class=Schedule,
+            serializer_class=s.QScheduleSerializer,
+            permission_classes=(IsAuthenticated, IsStaff)
+        ),
+        name='q_schedule'
     ),
 ]

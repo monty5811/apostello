@@ -164,6 +164,12 @@ class ApiMember(APIView):
                 setattr(obj, x, user_profile[x])
             obj.save()
 
+        cancel_task = request.data.get('cancel_task')
+        if cancel_task is not None:
+            r = Response({'pk': obj.pk}, status=status.HTTP_200_OK)
+            obj.delete()
+            return r
+
         serializer = self.serializer_class(obj)
         return Response(serializer.data)
 

@@ -1,5 +1,8 @@
+import ast
+
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from django_q.models import Schedule
 
 from apostello.models import (
     Keyword, Recipient, RecipientGroup, SmsInbound, SmsOutbound, UserProfile
@@ -161,4 +164,53 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'can_see_contact_nums',
             'can_import',
             'can_archive',
+        )
+
+
+class QScheduleSerializer(serializers.ModelSerializer):
+
+    next_run = serializers.DateTimeField()
+    message_body = serializers.SerializerMethodField()
+    recipient = serializers.SerializerMethodField()
+    recipient_group = serializers.SerializerMethodField()
+    queued_by = serializers.SerializerMethodField()
+
+    @staticmethod
+    def _split_args(sched_args):
+        """Convert the schedule's args value to tuple."""
+        return ast.literal_eval(sched_args)
+
+    def get_message_body(self, obj):
+        return self._split_args(obj.args)[1]
+
+    def get_recipient(self, obj):
+        pk = self._split_args(obj.args)[0]
+        if pk is not None:
+            grp = Recipient.objects.get(pk=pk)
+            serializer = RecipientSerializer(grp)
+            return serializer.data
+        else:
+            return {'url': '#', 'full_name': 'n/a'}
+
+    def get_recipient_group(self, obj):
+        grp_name = self._split_args(obj.args)[2]
+        if grp_name is not None:
+            grp = RecipientGroup.objects.get(name=grp_name)
+            serializer = RecipientGroupSerializer(grp)
+            return serializer.data
+        else:
+            return {'url': '#', 'name': 'n/a'}
+
+    def get_queued_by(self, obj):
+        return self._split_args(obj.args)[3]
+
+    class Meta:
+        model = Schedule
+        fields = (
+            'pk',
+            'message_body',
+            'recipient',
+            'recipient_group',
+            'queued_by',
+            'next_run',
         )

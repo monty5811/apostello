@@ -26,6 +26,7 @@
     "gulp-sass": "2.2.0",
     "intro.js": "^2.0.0",
     "jquery": "2.2.3",
+    "moment": "2.13.0",
     "opbeat-js": "2.0.2",
     "react": "15.0.1",
     "react-dom": "15.0.1",

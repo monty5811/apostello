@@ -13,7 +13,7 @@ config.plugins = config.plugins.concat([
   //
   new webpack.optimize.CommonsChunkPlugin({
     name: 'vendor', 
-    filename: 'vendor.bundle.js'
+    filename: 'vendor.js'
   }),
   // minifies code
   new webpack.optimize.UglifyJsPlugin({
@@ -23,15 +23,6 @@ config.plugins = config.plugins.concat([
     output: {
       comments: false
     }
-  }),
-  new webpack.LoaderOptionsPlugin({
-    minimize: true,
-    debug: false
-  }),
-  //
-  new webpack.ProvidePlugin({
-    $: "jquery",
-    jQuery: "jquery"
   })
 ]);
 
