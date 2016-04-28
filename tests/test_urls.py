@@ -332,7 +332,7 @@ class TestGroupForm:
         assert resp.url == '/group/all/'
         assert len(models.RecipientGroup.objects.all()) == 1
         assert models.RecipientGroup.objects.all()[0].name == 'test'
-        assert len(models.RecipientGroup.objects.all()[0].all_recipients) == 5
+        assert len(models.RecipientGroup.objects.all()[0].all_recipients) == 6
 
     def test_create_all_group_form_update(self, users, recipients, groups):
         """Test the form to create a group composed of all recipients.
@@ -346,7 +346,7 @@ class TestGroupForm:
         assert resp.status_code == 302
         assert resp.url == '/group/all/'
         g = models.RecipientGroup.objects.get(name='Empty Group')
-        assert len(g.all_recipients) == 5
+        assert len(g.all_recipients) == 6
 
 
 @pytest.mark.slow

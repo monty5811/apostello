@@ -93,3 +93,13 @@ class TestConstructReply:
         )
         reply = msg.construct_reply()
         assert len(reply) == 0
+
+    def test_do_not_reply(self, recipients):
+        msg = InboundSms(
+            {
+                'From': str(recipients['beza'].number),
+                'Body': 'test'
+            }
+        )
+        reply = msg.construct_reply()
+        assert len(reply) == 0

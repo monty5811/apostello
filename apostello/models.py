@@ -123,6 +123,12 @@ class Recipient(models.Model):
         validators=[not_twilio_num],
         help_text="Cannot be our number, or we get an SMS loop."
     )
+    do_not_reply = models.BooleanField(
+        "Do not reply",
+        default=False,
+        help_text=
+        "Tick this box to disable automated replies for this person.",
+    )
     groups = models.ManyToManyField(RecipientGroup, blank=True)
 
     def personalise(self, message):

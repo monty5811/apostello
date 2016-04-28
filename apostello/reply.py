@@ -120,6 +120,9 @@ class InboundSms:
     def construct_reply(self):
         """Construct appropriate reply."""
 
+        if self.contact.do_not_reply:
+            return ''
+
         if self.keyword == "start":
             reply = self.reply_to_start()
         elif self.keyword == "stop":

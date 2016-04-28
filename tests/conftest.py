@@ -78,6 +78,12 @@ def recipients():
         last_name="Chalmers",
         number='+15005550009'
     )  # can't recieve
+    beza = Recipient.objects.create(
+        first_name="Theodore",
+        last_name="Beza",
+        number='+447927411115',
+        do_not_reply=True
+    )
 
     objs = {
         'calvin': calvin,
@@ -85,7 +91,8 @@ def recipients():
         'knox': knox,
         'wesley': wesley,
         'john_owen': john_owen,
-        'thomas_chalmers': thomas_chalmers
+        'thomas_chalmers': thomas_chalmers,
+        'beza': beza,
     }
     return objs
 

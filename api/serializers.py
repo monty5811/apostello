@@ -131,6 +131,7 @@ class RecipientSerializer(serializers.ModelSerializer):
             'full_name',
             'is_archived',
             'is_blocking',
+            'do_not_reply',
             'last_sms',
         )
 

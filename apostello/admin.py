@@ -42,7 +42,11 @@ class KeywordAdmin(admin.ModelAdmin):
 @admin.register(models.Recipient)
 class RecipientAdmin(admin.ModelAdmin):
     """Admin class for apostello.models.Recipient."""
-    list_display = ('full_name', 'number', 'is_blocking', 'is_archived', )
+    list_display = ('full_name',
+                    'number',
+                    'is_blocking',
+                    'is_archived',
+                    'do_not_reply', )
 
 
 @admin.register(models.RecipientGroup)
