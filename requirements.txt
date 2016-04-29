@@ -3,7 +3,7 @@ django-allauth==0.25.2
 django-debug-toolbar==1.4
 django-extensions==1.6.1
 django-phonenumber-field==1.1.0
-django-q==0.7.16
+django-q==0.7.17
 django-redis==4.4.2
 git+git://github.com/monty5811/django-semanticui-form.git@0a5d180395a8ffb1227791c311f51c46ea113778
 django-solo==1.1.2
@@ -11,13 +11,13 @@ django-twilio==0.8.0
 django<1.10
 djangorestframework==3.3.2
 gunicorn==19.4.5
-ipython==4.1.1
+ipython==4.2.0
 opbeat==3.3
 psycopg2==2.6.1
-pygal==2.2.1
+pygal==2.2.2
 python-dotenv==0.4.0
 redis==2.10.5
 requests==2.9.1
 twilio==5.4.0
-whitenoise==2.0.6
-yapf==0.6.2
+whitenoise==3.0.0
+yapf==0.7.1

@@ -17,8 +17,3 @@ if os.environ.get('DYNO_RAM') is None:
     loaddotenv()
 
 application = get_wsgi_application()
-
-if os.environ.get('DYNO_RAM') is not None:
-    # detect if we are running on heroku and use whitenoise
-    from whitenoise.django import DjangoWhiteNoise
-    application = DjangoWhiteNoise(application)
