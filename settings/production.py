@@ -29,12 +29,6 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
     ),
 ]
 
-INSTALLED_APPS += ['opbeat.contrib.django', ]
-
-MIDDLEWARE_CLASSES = [
-    'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
-] + MIDDLEWARE_CLASSES
-
 STATIC_ROOT = '/webapps/apostello/static/'
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
@@ -48,10 +42,6 @@ LOGGING = {
         },
     },
     'handlers': {
-        'opbeat': {
-            'level': 'WARNING',
-            'class': 'opbeat.contrib.django.handlers.OpbeatHandler',
-        },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
@@ -69,11 +59,22 @@ LOGGING = {
             'handlers': ['opbeat'],
             'propagate': False,
         },
-        # Log errors from the Opbeat module to the console (recommended)
-        'opbeat.errors': {
-            'level': 'ERROR',
-            'handlers': ['console'],
-            'propagate': False,
-        },
     },
 }
+
+if os.environ.get('OPBEAT_ORG_ID', None) is not None:
+    INSTALLED_APPS += ['opbeat.contrib.django', ]
+
+    MIDDLEWARE_CLASSES = [
+        'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
+    ] + MIDDLEWARE_CLASSES
+
+    LOGGING['handlers']['opbeat'] = {
+        'level': 'WARNING',
+        'class': 'opbeat.contrib.django.handlers.OpbeatHandler',
+    }
+    LOGGING['loggers']['opbeat.errors'] = {
+        'level': 'ERROR',
+        'handlers': ['console'],
+        'propagate': False,
+    }
