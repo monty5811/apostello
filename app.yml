@@ -1,0 +1,14 @@
+name: apostello
+image: ubuntu-14-04-x64
+min_size: 512mb
+config:
+  #cloud-config
+  users:
+    - name: apostello
+      groups: sudo
+      shell: /bin/bash
+      sudo: ['ALL=(ALL) NOPASSWD:ALL']
+  packages:
+    - curl
+  runcmd:
+    - cd /home/apostello && curl -sf https://raw.githubusercontent.com/monty5811/apostello/master/scripts/install.sh | sh
