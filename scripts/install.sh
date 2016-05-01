@@ -1,5 +1,5 @@
 set -e
-AP_VER=v1.6.0
+AP_VER=v1.7.0
 
 echo "Installing and upgrading packages"
 sudo apt-get update -qq
@@ -49,8 +49,5 @@ echo "## Twilio setup: http://goo.gl/2lt8dX                         ##"
 echo "##                                                            ##"
 echo "## Then run the command:                                      ##"
 echo "## ./apostello-install/scripts/install.sh                     ##"
-echo "##                                                            ##"
-echo "## Future upgrades can be carried out by running the same     ##"
-echo "## command                                                    ##"
 echo "##                                                            ##"
 echo "################################################################"
