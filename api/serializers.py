@@ -169,6 +169,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class QScheduleSerializer(serializers.ModelSerializer):
+    """Serialize scheduled django-q tasks.
+
+    Note - this will only work with scheduled message tasks.
+    """
 
     next_run = serializers.DateTimeField()
     message_body = serializers.SerializerMethodField()
@@ -182,9 +186,13 @@ class QScheduleSerializer(serializers.ModelSerializer):
         return ast.literal_eval(sched_args)
 
     def get_message_body(self, obj):
+        if obj.args is None:
+            return None
         return self._split_args(obj.args)[1]
 
     def get_recipient(self, obj):
+        if obj.args is None:
+            return None
         pk = self._split_args(obj.args)[0]
         if pk is not None:
             grp = Recipient.objects.get(pk=pk)
@@ -194,6 +202,8 @@ class QScheduleSerializer(serializers.ModelSerializer):
             return {'url': '#', 'full_name': 'n/a'}
 
     def get_recipient_group(self, obj):
+        if obj.args is None:
+            return None
         grp_name = self._split_args(obj.args)[2]
         if grp_name is not None:
             grp = RecipientGroup.objects.get(name=grp_name)
@@ -203,6 +213,8 @@ class QScheduleSerializer(serializers.ModelSerializer):
             return {'url': '#', 'name': 'n/a'}
 
     def get_queued_by(self, obj):
+        if obj.args is None:
+            return None
         return self._split_args(obj.args)[3]
 
     class Meta:

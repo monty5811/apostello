@@ -199,7 +199,7 @@ urlpatterns = [
             model_class=Schedule,
             serializer_class=s.QScheduleSerializer,
             filter_list=True,
-            filters={'func__contains': 'send'},
+            filters={'func__contains': 'send_message'},
             permission_classes=(IsAuthenticated, IsStaff)
         ),
         name='q_schedules'
