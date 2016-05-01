@@ -11,3 +11,4 @@
 For more information, please see the [documentation](https://apostello.readthedocs.org/)
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+[![Install on DigitalOcean](https://apostello-one-click.herokuapp.com/button.svg)](https://apostello-one-click.herokuapp.com/install?url=https://github.com/monty5811/apostello)
