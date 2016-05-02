@@ -4,6 +4,8 @@ RUN apt-get update && \
         python-pip \
         python-dev \
         openssh-server \
+        libssl-dev \
+        libffi-dev \
         curl \
         && apt-get clean \
         && rm -rf /var/cache/apt/* /var/lib/apt/lists/*
