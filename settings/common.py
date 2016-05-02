@@ -136,6 +136,7 @@ REST_FRAMEWORK = {
 }
 
 # email settings
+EMAIL_BACKEND = 'apostello.mail.ApostelloEmailBackend'
 EMAIL_USE_TLS = True
 # these email settings can be overridden in the SiteConfiguration model
 # this also allows for these settings to be left blank on initial setup and
@@ -147,6 +148,7 @@ EMAIL_FROM = os.environ.get('DJANGO_FROM_EMAIL', None)
 EMAIL_PORT = int(os.environ.get('DJANGO_EMAIL_HOST_port', 587))
 
 # social login settings
+ACCOUNT_ADAPTER = 'apostello.account.ApostelloAccountAdapter'
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'

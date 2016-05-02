@@ -140,14 +140,8 @@ def send_async_mail(subject, body, to):
     # settings.py instead
     from site_config.models import SiteConfiguration
     s = SiteConfiguration.get_solo()
-    conn = get_connection(
-        host=s.email_host or None,
-        port=s.email_port or None,
-        username=s.email_username or None,
-        password=s.email_password or None,
-    )
     from_ = s.email_from or settings.EMAIL_FROM
-    send_mail(subject, body, from_, to, connection=conn)
+    send_mail(subject, body, from_, to)
 
 
 def notify_office_mail(subject, body):
