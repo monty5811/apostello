@@ -53,6 +53,7 @@ def fetch_default_reply(msg=''):
 
 
 def retry_request(url, http_method, *args, **kwargs):
+    """Make a http request and retry 3 times if it fails."""
     assert http_method in ['get', 'post', 'delete', 'patch', 'put']
     MAX_TRIES = 3
     r_func = getattr(requests, http_method)

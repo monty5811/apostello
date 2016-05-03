@@ -13,4 +13,5 @@ class Command(BaseCommand):
     help = 'Import outgoing messages from twilio'
 
     def handle(self, *args, **options):
+        """Handle the command."""
         check_outgoing_log(fetch_all=True)

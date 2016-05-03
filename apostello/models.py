@@ -50,6 +50,7 @@ class RecipientGroup(models.Model):
         self.save()
 
     def check_user_cost_limit(self, limit, msg):
+        """Check the user has not exceeded their per SMS cost limit."""
         num_sms = ceil(len(msg) / 160)
         if limit == 0:
             return
@@ -178,6 +179,7 @@ class Recipient(models.Model):
 
     @staticmethod
     def check_user_cost_limit(recipients, limit, msg):
+        """Check the user has not exceeded their per SMS cost limit."""
         num_sms = ceil(len(msg) / 160)
         if limit == 0:
             return
@@ -662,6 +664,7 @@ class UserProfile(models.Model):
     can_archive = models.BooleanField(default=True)
 
     def get_absolute_url(self):
+        """Url for this user profile."""
         return reverse('user_profile_form', args=[str(self.pk)])
 
     def __str__(self):

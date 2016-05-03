@@ -11,5 +11,6 @@ class Command(BaseCommand):
     help = 'Update from_name fields'
 
     def handle(self, *args, **options):
+        """Handle the command."""
         for c in Recipient.objects.all():
             update_msgs_name(c.id)

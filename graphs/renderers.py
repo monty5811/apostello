@@ -7,7 +7,7 @@ from apostello.models import (
 )
 from graphs.sms_freq import sms_graph_data
 
-CleanStyleLargeText = CleanStyle(legend_font_size=30, tooltip_font_size=30, )
+clean_style_large_text = CleanStyle(legend_font_size=30, tooltip_font_size=30,)
 
 
 def recent():
@@ -38,7 +38,7 @@ def contacts():
     """Render pie chart for contacts."""
     pie_chart = pygal.Pie(
         inner_radius=.6,
-        style=CleanStyleLargeText,
+        style=clean_style_large_text,
         margin=0,
         value_formatter=lambda x: '{}'.format(x),
     )
@@ -59,7 +59,7 @@ def contacts():
 
 def groups():
     """Render tree map of group size."""
-    treemap = pygal.Treemap(style=CleanStyleLargeText, margin=0, )
+    treemap = pygal.Treemap(style=clean_style_large_text, margin=0, )
     for grp in RecipientGroup.objects.filter(is_archived=False):
         treemap.add(str(grp), [grp.recipient_set.all().count()])
 
@@ -70,7 +70,7 @@ def keywords():
     """Render pie chart for keywords."""
     pie_chart = pygal.Pie(
         inner_radius=.6,
-        style=CleanStyleLargeText,
+        style=clean_style_large_text,
         margin=0,
         value_formatter=lambda x: '{}'.format(x),
     )
@@ -86,7 +86,7 @@ def keywords():
 
 def incoming_by_contact():
     """Render tree map of incoming messages, grouped by user."""
-    treemap = pygal.Treemap(style=CleanStyleLargeText, margin=0, )
+    treemap = pygal.Treemap(style=clean_style_large_text, margin=0, )
     for con in Recipient.objects.filter(is_archived=False):
         treemap.add(
             str(con),
@@ -98,7 +98,7 @@ def incoming_by_contact():
 
 def outgoing_by_contact():
     """Render tree map of outgoing messages, grouped by user."""
-    treemap = pygal.Treemap(style=CleanStyleLargeText, margin=0, )
+    treemap = pygal.Treemap(style=clean_style_large_text, margin=0, )
     for con in Recipient.objects.filter(is_archived=False):
         treemap.add(
             str(con),
@@ -112,7 +112,7 @@ def sms_totals():
     """Render pie chart for sms totals."""
     pie_chart = pygal.Pie(
         inner_radius=.6,
-        style=CleanStyleLargeText,
+        style=clean_style_large_text,
         margin=0,
         value_formatter=lambda x: '{}'.format(x),
     )

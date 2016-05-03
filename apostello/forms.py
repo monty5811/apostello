@@ -36,6 +36,7 @@ class SendAdhocRecipientsForm(forms.Form):
     )
 
     def clean(self):
+        """Override clean method to check SMS cost limit."""
         cleaned_data = super(SendAdhocRecipientsForm, self).clean()
         if 'recipients' in cleaned_data and 'content' in cleaned_data:
             # if we have no recipients, we don't need to check cost limit
@@ -82,6 +83,7 @@ class SendRecipientGroupForm(forms.Form):
     )
 
     def clean(self):
+        """Override clean method to check SMS cost limit."""
         cleaned_data = super(SendRecipientGroupForm, self).clean()
         if 'recipient_group' in cleaned_data and 'content' in cleaned_data:
             # if we have no recipient group, we don't need to check cost limit

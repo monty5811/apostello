@@ -186,11 +186,13 @@ class QScheduleSerializer(serializers.ModelSerializer):
         return ast.literal_eval(sched_args)
 
     def get_message_body(self, obj):
+        """Fetch the message body arg."""
         if obj.args is None:
             return None
         return self._split_args(obj.args)[1]
 
     def get_recipient(self, obj):
+        """Fetch the recipient arg and serialize."""
         if obj.args is None:
             return None
         pk = self._split_args(obj.args)[0]
@@ -202,6 +204,7 @@ class QScheduleSerializer(serializers.ModelSerializer):
             return {'url': '#', 'full_name': 'n/a'}
 
     def get_recipient_group(self, obj):
+        """Fetch the recipient group arg and serialize."""
         if obj.args is None:
             return None
         grp_name = self._split_args(obj.args)[2]
@@ -213,6 +216,7 @@ class QScheduleSerializer(serializers.ModelSerializer):
             return {'url': '#', 'name': 'n/a'}
 
     def get_queued_by(self, obj):
+        """Fetch the queued by arg."""
         if obj.args is None:
             return None
         return self._split_args(obj.args)[3]

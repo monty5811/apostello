@@ -44,9 +44,11 @@ class SimpleView(LoginRequiredMixin, ProfilePermsMixin, View):
 
 
 class NotApprovedView(TemplateView):
+    """Simple view that presents the not approved page."""
     template_name = 'apostello/not_approved.html'
 
     def get_context_data(self, **kwargs):
+        """Inject not approved message into context."""
         context = super(NotApprovedView, self).get_context_data(**kwargs)
         s = SiteConfiguration.get_solo()
         context['msg'] = s.not_approved_msg
@@ -342,6 +344,7 @@ class CreateAllGroupView(LoginRequiredMixin, ProfilePermsMixin, FormView):
     success_url = '/group/all/'
 
     def get_context_data(self, **kwargs):
+        """Inject intro and button text into context."""
         context = super(CreateAllGroupView, self).get_context_data(**kwargs)
         context['submit_text'] = 'Create'
         context['intro_text'] = 'You can use this form to create a new group' \

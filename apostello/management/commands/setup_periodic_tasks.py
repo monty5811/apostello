@@ -5,6 +5,7 @@ from django_q.models import Schedule
 
 
 def add_day_if_req(dt):
+    """Check to see if the time has passsed already and adds a day if so."""
     if dt > datetime.datetime.now():
         return dt
 
@@ -21,6 +22,7 @@ class Command(BaseCommand):
     help = 'Import incoming messages from twilio'
 
     def handle(self, *args, **options):
+        """Handle the command."""
         now = datetime.datetime.now()
         now = now.replace(minute=0, second=0)
         next_3am = add_day_if_req(now.replace(hour=3))
