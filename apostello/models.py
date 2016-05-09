@@ -142,8 +142,7 @@ class Recipient(models.Model):
         return message.replace('%name%', self.first_name)
 
     def send_message(
-        self,
-        content='test message',
+        self, content='test message',
         group=None,
         sent_by='',
         eta=None
@@ -308,8 +307,7 @@ class Keyword(models.Model):
     )
     last_email_sent_time = models.DateTimeField(
         "Time of last sent email",
-        blank=True,
-        null=True
+        blank=True, null=True
     )
 
     def construct_reply(self, sender):

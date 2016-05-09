@@ -7,7 +7,8 @@ from apostello.models import (
 )
 from graphs.sms_freq import sms_graph_data
 
-clean_style_large_text = CleanStyle(legend_font_size=30, tooltip_font_size=30,)
+clean_style_large_text = CleanStyle(legend_font_size=30,
+                                    tooltip_font_size=30, )
 
 
 def recent():

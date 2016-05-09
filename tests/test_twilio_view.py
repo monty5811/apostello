@@ -35,8 +35,7 @@ class TwilioRequestFactory(RequestFactory):
             extra.update(
                 {
                     'HTTP_X_TWILIO_SIGNATURE': self._compute_signature(
-                        path,
-                        params=data
+                        path, params=data
                     )
                 }
             )
@@ -49,8 +48,7 @@ class TwilioRequestFactory(RequestFactory):
             extra.update(
                 {
                     'HTTP_X_TWILIO_SIGNATURE': self._compute_signature(
-                        path,
-                        params=data
+                        path, params=data
                     )
                 }
             )

@@ -4,8 +4,7 @@ from site_config import views
 
 urlpatterns = [
     url(
-        r'^site/',
-        views.SiteConfigView.as_view(),
+        r'^site/', views.SiteConfigView.as_view(),
         name='site'
     ),
     url(

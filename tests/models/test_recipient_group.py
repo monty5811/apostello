@@ -11,12 +11,10 @@ class TestRecipientGroup:
     @twilio_vcr
     def test_sending(self, groups):
         groups['test_group'].send_message(
-            content='test content',
-            sent_by="user"
+            content='test content', sent_by="user"
         )
         groups['empty_group'].send_message(
-            content='test content',
-            sent_by="user"
+            content='test content', sent_by="user"
         )
 
     def test_all_recipients_names(self, groups):

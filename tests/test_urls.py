@@ -294,8 +294,7 @@ class TestGroupForm:
     def test_edit_group(self, users):
         """Test editing a group."""
         new_group = models.RecipientGroup.objects.create(
-            name='t1',
-            description='t1'
+            name='t1', description='t1'
         )
         new_group.save()
         pk = new_group.pk

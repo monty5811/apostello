@@ -167,8 +167,7 @@ urlpatterns += [
     ),
     url(
         r'^keyword/responses/archive/(?P<pk>\d+)/$',
-        v.keyword_responses,
-        {'archive': True},
+        v.keyword_responses, {'archive': True},
         name='keyword_responses_archive'
     ),
     url(
@@ -234,8 +233,7 @@ urlpatterns += [
     url(
         r'^elvanto/',
         include(
-            'elvanto.urls',
-            namespace='elvanto'
+            'elvanto.urls', namespace='elvanto'
         )
     )
 ]
@@ -273,22 +271,17 @@ urlpatterns += [
     url(
         r'^config/',
         include(
-            'site_config.urls',
-            namespace='site_config'
+            'site_config.urls', namespace='site_config'
         )
     ),
     url(
-        r'^graphs/',
-        include(
-            'graphs.urls',
-            namespace='graphs'
+        r'^graphs/', include(
+            'graphs.urls', namespace='graphs'
         )
     ),
     url(
-        r'^api/',
-        include(
-            'api.urls',
-            namespace='api'
+        r'^api/', include(
+            'api.urls', namespace='api'
         )
     ),
 ]

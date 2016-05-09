@@ -333,10 +333,8 @@ def users(recipients, keywords):
     user.is_staff = True
     user.save()
     allauth_email = EmailAddress.objects.create(
-        user=user,
-        email=user.email,
-        primary=True,
-        verified=True
+        user=user, email=user.email,
+        primary=True, verified=True
     )
     allauth_email.save()
     p = UserProfile.objects.get(user=user)
@@ -360,8 +358,7 @@ def users(recipients, keywords):
     p.approved = True
     p.save()
     allauth_email = EmailAddress.objects.create(
-        user=user2,
-        email=user2.email,
+        user=user2, email=user2.email,
         primary=True,
         verified=True
     )
@@ -381,8 +378,7 @@ def users(recipients, keywords):
     user3.profile.approved = True
     user3.profile.save()
     allauth_email = EmailAddress.objects.create(
-        user=user3,
-        email=user3.email,
+        user=user3, email=user3.email,
         primary=True,
         verified=True
     )

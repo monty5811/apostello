@@ -43,8 +43,7 @@ class TestTasks:
         group_send_message_task(
             "This is another test",
             "Test group",
-            'test',
-            eta=None
+            'test', eta=None
         )
 
     @twilio_vcr
