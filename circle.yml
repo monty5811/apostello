@@ -9,7 +9,6 @@ dependencies:
     - pip install -U pip
     - pip install docker-compose
     - docker-compose version
-    - docker-compose build
     - pip install --editable .
 
 test:
