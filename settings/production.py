@@ -56,7 +56,7 @@ LOGGING = {
         },
         'apostello': {
             'level': 'WARNING',
-            'handlers': ['opbeat'],
+            'handlers': ['console'],
             'propagate': False,
         },
     },
@@ -78,3 +78,4 @@ if os.environ.get('OPBEAT_ORG_ID', None) is not None:
         'handlers': ['console'],
         'propagate': False,
     }
+    LOGGING['loggers']['apostello']['handlers'] += ['opbeat']

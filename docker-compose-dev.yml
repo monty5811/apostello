@@ -1,0 +1,36 @@
+version: '2'
+
+volumes:
+  postgres_data_dev: {}
+
+services:
+  postgres:
+    extends:
+      file: docker-compose.yml
+      service: postgres
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+  q:
+    extends:
+      file: docker-compose.yml
+      service: q
+    environment:
+      - DJANGO_SETTINGS_MODULE=settings.docker_dev
+    env_file: .env.dev
+    volumes:
+      - .:/code
+  django:
+    extends:
+      file: docker-compose.yml
+      service: django
+    command: bash -c "./manage.py runserver 0.0.0.0:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=settings.docker_dev
+    env_file: .env.dev
+    volumes:
+      - .:/code
+  caddy:
+    build: 
+      context: .
+      dockerfile: ./docker/caddy/Dockerfile
+    env_file: .env.dev

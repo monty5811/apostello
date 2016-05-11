@@ -5,7 +5,8 @@ Getting Started
 
 There are a number of ways you can deploy apostello:
 
-* One click `Digital Ocean deploy <http://installer.71m.us/install?url=https://github.com/monty5811/apostello>`_
+* One click `Digital Ocean deploy <http://installer.71m.us/install?url=https://github.com/monty5811/apostello>`_ (recommended)
+* Deploy with :ref:`docker <deploy-docker>`. This is currently experimental, but may become the preferred option soon
 * On your server using the :ref:`ansible playbook <deploy-ansible>` included in the repo
 * One click :ref:`Heroku <deploy-heroku>` deploy
 * Manually on your own server, you will need to setup a message broker, a database, a web server and the django app and background worker. If you have deployed a Django app before, then this shouldn't be too difficult

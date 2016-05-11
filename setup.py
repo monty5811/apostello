@@ -2,6 +2,7 @@
 
 import os
 import sys
+import pip
 
 from pip.req import parse_requirements
 
@@ -17,7 +18,10 @@ if sys.argv[-1] == 'tag':
     os.system("git push --tags")
     sys.exit()
 
-install_reqs = parse_requirements('requirements_test.txt')
+install_reqs = parse_requirements(
+    'requirements_test.txt',
+    session=pip.download.PipSession()
+)
 reqs = [str(ir.req) for ir in install_reqs]
 
 description = 'sms communication for churches, built with django'
@@ -31,7 +35,12 @@ setup(
     author_email='montgomery.dean97@gmail.com',
     url='https://github.com/monty5811/apostello',
     packages=[],
-    install_requires=install_reqs,
+    install_requires=[
+        'click<0.7',
+        'docker-compose>=1.7',
+        'gitpython<2.1',
+        'semantic_version<2.6',
+    ],
     license='BSD',
     zip_safe=False,
     classifiers=[
@@ -45,4 +54,8 @@ setup(
     keywords=(
         'Python, twilio, sms, church, django, '
     ),
+    entry_points='''
+        [console_scripts]
+    apostello=cli.main:cli
+    ''',
 )

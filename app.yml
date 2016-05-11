@@ -11,4 +11,4 @@ config:
   packages:
     - curl
   runcmd:
-    - cd /home/apostello && curl -sf https://raw.githubusercontent.com/monty5811/apostello/master/scripts/install.sh | sh
+    - cd /home/apostello && curl -sf https://raw.githubusercontent.com/monty5811/apostello/master/scripts/ansible_install.sh | sh

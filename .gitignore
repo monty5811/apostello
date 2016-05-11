@@ -3,6 +3,7 @@
 # static cache
 apostello/static/CACHE
 static/CACHE
+/static/
 
 # front end
 dist/

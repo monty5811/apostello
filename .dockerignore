@@ -8,3 +8,5 @@ db.sqlite3
 .tox
 *.pyc
 __pycache__
+coverage_html_report
+node_modules

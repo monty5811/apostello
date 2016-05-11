@@ -1,1 +1,0 @@
-docker-compose run assets

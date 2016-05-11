@@ -1,0 +1,7 @@
+assets:
+  build: 
+    context: .
+    dockerfile: ./docker/assets/Dockerfile
+  command: bash -c "npm install --quiet && npm run build"
+  volumes:
+    - .:/code
