@@ -37,3 +37,4 @@ PASSWORD_HASHERS = ('django.contrib.auth.hashers.MD5PasswordHasher', )
 DJANGO_TWILIO_FORGERY_PROTECTION = False
 
 EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'

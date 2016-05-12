@@ -11,6 +11,7 @@ omit =
     run_yapf.py
     .tox*
     setup.py
+    cli*
 source =
     .
 [html]
