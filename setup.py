@@ -38,7 +38,6 @@ setup(
     install_requires=[
         'click<0.7',
         'docker-compose>=1.7',
-        'gitpython<2.1',
         'semantic_version<2.6',
     ],
     license='BSD',
@@ -56,6 +55,6 @@ setup(
     ),
     entry_points='''
         [console_scripts]
-    apostello=cli.main:cli
+    apostello=apostello.cli.main:cli
     ''',
 )
