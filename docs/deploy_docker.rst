@@ -4,9 +4,9 @@
 Deploying with Docker
 =====================
 
-Deploying with docker is quick and simple with the command line tool bundled in apostello.
+Deploying with docker is quick and simple with our command line tool.
 
-The docker setup uses caddy as a web server which means that we get automatic SSL for free with no setup required.
+The docker setup uses caddy as a web server which means that we get automatic SSL for free with no additional setup.
 
 Instructions
 ~~~~~~~~~~~~
@@ -17,11 +17,9 @@ Assuming you already have docker `installed <https://docs.docker.com/engine/inst
 
 .. code-block:: bash
 
-    git clone https://github.com/monty5811/apostello.git
-    cd apostello
-    virtualenv venv
     . venv/bin/activate
-    pip install --editable .
+    pip install apostello-cli
+    apostello init
     apostello config
     apostello build
     apostello start
@@ -37,9 +35,5 @@ Future updates are a matter of:
 .. code-block:: bash
 
     . venv/bin/activate
-    git pull orgin {version}
-    apostello config # only if new config options
-    apostello stop
-    apostello build
-    apostello start
-    apostello migrate # only if database schema has changed
+    cd apostello # we must run commands in the folder we installed apostello
+    apostello upgrade

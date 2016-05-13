@@ -11,12 +11,7 @@ try:
 except ImportError:
     from distutils.core import setup
 
-version = "1.0.0"
-
-if sys.argv[-1] == 'tag':
-    os.system("git tag -a %s -m 'version %s'" % (version, version))
-    os.system("git push --tags")
-    sys.exit()
+version = "1.7.10"
 
 install_reqs = parse_requirements(
     'requirements_test.txt',
@@ -35,12 +30,8 @@ setup(
     author_email='montgomery.dean97@gmail.com',
     url='https://github.com/monty5811/apostello',
     packages=[],
-    install_requires=[
-        'click<0.7',
-        'docker-compose>=1.7',
-        'semantic_version<2.6',
-    ],
-    license='BSD',
+    install_requires=reqs,
+    license='MIT',
     zip_safe=False,
     classifiers=[
         'Framework :: Django :: 1.9',
@@ -53,8 +44,4 @@ setup(
     keywords=(
         'Python, twilio, sms, church, django, '
     ),
-    entry_points='''
-        [console_scripts]
-    apostello=apostello.cli.main:cli
-    ''',
 )
