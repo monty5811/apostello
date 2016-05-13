@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import biu from 'biu.js';
 
 const post = (url, data, success) => {
   $.ajax({
@@ -9,7 +10,7 @@ const post = (url, data, success) => {
       success(respData);
     },
     error(xhr, errmsg, err) {
-      window.alert(err);
+      biu(err, { type: 'warning' });
       console.log(`${xhr.status}: ${xhr.responseText}`);
       console.log(err);
     },

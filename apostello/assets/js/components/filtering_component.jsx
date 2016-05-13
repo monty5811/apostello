@@ -19,10 +19,10 @@ function obj2str(obj) {
 export const FilteringComponent = ComposedComponent => class extends Component {
   constructor() {
     super();
-    this._onChange = this._onChange.bind(this);
+    this.onChange = this.onChange.bind(this);
     this.state = { filterRegex: new RegExp('', 'img') };
   }
-  _onChange(e) {
+  onChange(e) {
     this.setState({ filterRegex: new RegExp(e.target.value, 'img') });
   }
   render() {
@@ -36,7 +36,7 @@ export const FilteringComponent = ComposedComponent => class extends Component {
     return (
       <div>
         <div className="ui left icon large transparent fluid input">
-          <input type="text" placeholder="Filter..." onChange={this._onChange} />
+          <input type="text" placeholder="Filter..." onChange={this.onChange} />
           <i className="violet filter icon"></i>
         </div>
 

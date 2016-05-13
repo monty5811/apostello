@@ -3,9 +3,9 @@ import React, { Component } from 'react';
 class ReprocessButton extends Component {
   constructor() {
     super();
-    this._onClick = this._onClick.bind(this);
+    this.onClick = this.onClick.bind(this);
   }
-  _onClick() {
+  onClick() {
     this.props.reprocessSms(this.props.sms);
   }
   render() {
@@ -13,7 +13,7 @@ class ReprocessButton extends Component {
       return <div />;
     }
     return (
-      <a className="ui tiny blue button" onClick={this._onClick}>
+      <a className="ui tiny blue button" onClick={this.onClick}>
         Reprocess
       </a>
     );

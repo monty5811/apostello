@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import post from './../ajax_post';
+import biu from 'biu.js';
 
 class ElvantoFetchButton extends Component {
   constructor() {
@@ -7,10 +8,13 @@ class ElvantoFetchButton extends Component {
     this.fetchGroups = this.fetchGroups.bind(this);
   }
   fetchGroups() {
+    const success = () => {
+      biu('Groups are being fetched, it may take a couple of minutes', { type: 'info' });
+    };
     post(
       '/api/v1/elvanto/group_fetch/',
       {},
-      window.alert('Groups are being fetched, it may take a couple of minutes')
+      success
     );
   }
   render() {

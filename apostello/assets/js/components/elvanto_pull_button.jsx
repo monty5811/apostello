@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import post from './../ajax_post';
+import biu from 'biu.js';
 
 class ElvantoPullButton extends Component {
   constructor() {
@@ -8,7 +9,7 @@ class ElvantoPullButton extends Component {
   }
   pullGroups() {
     const success = () => {
-      window.alert('Groups are being synced, it may take a couple of minutes');
+      biu('Groups are being synced, it may take a couple of minutes', { type: 'info' });
     };
     post(
       '/api/v1/elvanto/group_pull/',

@@ -15,7 +15,7 @@ const ScheduledSmsTableRow = (props) => (
     <td>{props.task.message_body}</td>
     <td>{props.sendTime}</td>
     <td>
-        <CancelButton item={props.task} cancelFn={props.cancelTask} />
+      <CancelButton item={props.task} cancelFn={props.cancelTask} />
     </td>
   </tr>
 );

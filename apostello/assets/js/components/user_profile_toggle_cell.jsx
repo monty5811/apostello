@@ -3,9 +3,9 @@ import React, { Component } from 'react';
 class BooleanButton extends Component {
   constructor() {
     super();
-    this._onClick = this._onClick.bind(this);
+    this.onClick = this.onClick.bind(this);
   }
-  _onClick() {
+  onClick() {
     const user = this.props.user;
     user[this.props.field] = !user[this.props.field];
     this.props.postUpdate(user);
@@ -19,7 +19,7 @@ class BooleanButton extends Component {
     }
     return (
       <td>
-        <button className={`ui tiny ${buttonType} icon button`} onClick={this._onClick}>
+        <button className={`ui tiny ${buttonType} icon button`} onClick={this.onClick}>
           <i className={`${iconType} icon`} />
         </button>
       </td>

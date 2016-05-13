@@ -7,7 +7,7 @@ class ItemRemoveButton extends Component {
     this.archiveItem = this.archiveItem.bind(this);
   }
   archiveItem() {
-    const success = () => {window.location.href = this.props.redirect_url;};
+    const success = () => { window.location.href = this.props.redirect_url; };
     post(
       this.props.url,
       { archived: this.props.is_archived },

@@ -3,9 +3,9 @@ import React, { Component } from 'react';
 class ArchiveButton extends Component {
   constructor() {
     super();
-    this._onClick = this._onClick.bind(this);
+    this.onClick = this.onClick.bind(this);
   }
-  _onClick() {
+  onClick() {
     this.props.archiveFn(this.props.item);
   }
   render() {
@@ -14,7 +14,7 @@ class ArchiveButton extends Component {
       txt = 'UnArchive';
     }
     return (
-      <a className="ui tiny grey button" onClick={this._onClick}>
+      <a className="ui tiny grey button" onClick={this.onClick}>
         {txt}
       </a>
     );

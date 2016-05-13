@@ -9,7 +9,6 @@ import KeywordRespTable from './components/keyword_resp_table';
 import KeywordsTable from './components/keywords_table';
 import LiveWall from './components/live_wall';
 import OutgoingTable from './components/outgoing_table';
-import SmsTable from './components/incoming_table';
 import UserProfilesTable from './components/user_profiles_table';
 import ScheduledSmsTable from './components/scheduled_sms_table';
 
@@ -33,7 +32,7 @@ function renderTable() {
     '/keyword/responses/': KeywordRespTable,
     '/outgoing/': OutgoingTable,
     '/recipient/all/': ContactsTable,
-    '/recipient/edit/': SmsTable,
+    '/recipient/edit/': IncomingTable,
     '/users/profiles/': UserProfilesTable,
     '/scheduled/sms/': ScheduledSmsTable,
   };

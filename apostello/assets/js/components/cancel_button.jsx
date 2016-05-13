@@ -3,14 +3,14 @@ import React, { Component } from 'react';
 class CancelButton extends Component {
   constructor() {
     super();
-    this._onClick = this._onClick.bind(this);
+    this.onClick = this.onClick.bind(this);
   }
-  _onClick() {
+  onClick() {
     this.props.cancelFn(this.props.item);
   }
   render() {
     return (
-      <a className="ui tiny grey button" onClick={this._onClick}>Cancel</a>
+      <a className="ui tiny grey button" onClick={this.onClick}>Cancel</a>
     );
   }
 }
