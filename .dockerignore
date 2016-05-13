@@ -1,12 +1,38 @@
+# third party files
+.checkignore
 .cache
 .coverage
-db.sqlite3
-.git
-.gitignore
+.coveragerc
+coverage_html_report
+.landscape.yml
+pytest.ini
+Procfile
+runtime.txt
+.style.yapf
 .testmondata
 .tmontmp
 .tox
-*.pyc
-__pycache__
-coverage_html_report
-node_modules
+tox.ini
+
+# git
+.git
+.gitignore
+
+# python cache
+**/*.pyc
+**/__pycache__
+
+# sqlite
+db.sqlite3
+
+# misc files 
+app.json
+.env.example
+app.yml
+LICENSE
+
+# dev folders
+docs
+ansible
+tests
+apostello/assets

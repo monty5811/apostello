@@ -40,6 +40,8 @@ services:
     environment:
       - DJANGO_SETTINGS_MODULE=settings.docker_prod
     command: ./docker/django/gunicorn.sh
+    volumes:
+      - ./static/:/code/static/
     depends_on:
       - postgres
       - redis
