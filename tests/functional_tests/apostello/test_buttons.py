@@ -7,6 +7,7 @@ from django_q.models import Schedule
 
 import pytest
 from apostello import models
+from tests.functional_tests.utils import check_and_close_biu
 
 
 @pytest.mark.django_db
@@ -160,8 +161,7 @@ class TestButton:
         toggle_buttons = browser_in.find_elements_by_class_name('grey')
         toggle_buttons[0].click()
         sleep(driver_wait_time)
-        alert = browser_in.switch_to_alert()
-        alert.accept()
+        check_and_close_biu(browser_in, driver_wait_time)
 
     def test_cancel_tasks(
         self, live_server, browser_in, recipients, groups, driver_wait_time
