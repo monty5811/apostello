@@ -11,7 +11,7 @@ class ReprocessButton extends Component {
   render() {
     let txt = 'Showing';
     let colour = 'green';
-    if (!this.props.sms.displayon_wall) {
+    if (!this.props.sms.display_on_wall) {
       colour = 'red';
       txt = 'Hidden';
     }
