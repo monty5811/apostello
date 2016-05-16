@@ -127,8 +127,7 @@ class Recipient(models.Model):
     do_not_reply = models.BooleanField(
         "Do not reply",
         default=False,
-        help_text=
-        "Tick this box to disable automated replies for this person.",
+        help_text="Tick this box to disable automated replies for this person.",
     )
     groups = models.ManyToManyField(RecipientGroup, blank=True)
 
