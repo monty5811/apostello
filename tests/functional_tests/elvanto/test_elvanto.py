@@ -79,4 +79,5 @@ class TestElvantoImport:
         buttons = browser_in.find_elements_by_class_name('fluid')
         fetch_button = buttons[0]
         fetch_button.click()
+        sleep(driver_wait_time)
         check_and_close_biu(browser_in, driver_wait_time)
