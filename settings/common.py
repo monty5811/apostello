@@ -145,7 +145,7 @@ EMAIL_HOST = os.environ.get('DJANGO_EMAIL_HOST', None)
 EMAIL_HOST_USER = os.environ.get('DJANGO_EMAIL_HOST_USER', None)
 EMAIL_HOST_PASSWORD = os.environ.get('DJANGO_EMAIL_HOST_PASSWORD', None)
 EMAIL_FROM = os.environ.get('DJANGO_FROM_EMAIL', None)
-EMAIL_PORT = int(os.environ.get('DJANGO_EMAIL_HOST_port', 587))
+EMAIL_PORT = int(os.environ.get('DJANGO_EMAIL_HOST_PORT', 587))
 
 # social login settings
 ACCOUNT_ADAPTER = 'apostello.account.ApostelloAccountAdapter'

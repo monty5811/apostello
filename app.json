@@ -41,16 +41,20 @@
       "description": "County code (used in Elvanto import)",
       "value": ""
     },
-    "EMAIL_HOST": {
+    "DJANGO_EMAIL_HOST": {
       "description": "Email host (required for user sign ups)",
       "value": ""
     },
-    "EMAIL_HOST_USER": {
+    "DJANGO_EMAIL_HOST_USER": {
       "description": "Email host user",
       "value": ""
     },
-    "EMAIL_HOST_PASSWORD": {
+    "DJANGO_EMAIL_HOST_PASSWORD": {
       "description": "Email host password",
+      "value": ""
+    },
+    "DJANGO_FROM_EMAIL": {
+      "description": "Email address from which to send emails",
       "value": ""
     },
     "WHITELISTED_LOGIN_DOMAINS": {
