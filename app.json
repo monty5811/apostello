@@ -12,6 +12,16 @@
   "scripts": {
     "postdeploy": "./manage.py migrate"
   },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "free"
+    },
+    "worker": {
+      "quantity": 1,
+      "size": "free"
+    }
+  },
   "env": {
     "DJANGO_SETTINGS_MODULE": "settings.heroku",
     "DJANGO_SECRET_KEY": {
