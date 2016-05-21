@@ -1,0 +1,70 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% include 'apostello/includes/head.html' %}
+    <title>apostello - First Run Setup</title>
+		{% block morehead %}
+    {% endblock %}
+  </head>
+  <body>
+    <div class="ui hidden divider"></div>
+    <div class="ui stackable centered grid container">
+      <div class="twelve wide column">
+        <img src="{% static 'images/favicons/apostello-logo.svg' %}" height="150">
+        <h2>apostello initial setup</h2>
+
+        <p>Welcome! This page should help you verify your installation and configuration of apostello.
+        You can see all your configured settings, send a test email and set up and admin login</p>
+
+        <p><b>Note:</b> once a user has been created, this page will no longer be accessible for security reasons.</p>
+        <div class="ui raised segment">
+          <h3>Configuration Variables</h3>
+          <table class="ui small striped table">
+            <thead>
+              <tr>
+                <th>Environment Variable</th>
+                <th>Description</th>
+                <th>Current Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in variables %}
+              <tr>
+                <td>{{ row.env_var_name }}</td>
+                <td>{{ row.info }}</td>
+                <td>{{ row.val|linebreaks }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        </br>
+
+        <div id="send_test_email"></div>
+        </br>
+        
+        <div id="send_test_sms"></div>
+        </br>
+        
+        <div id="create_admin_user"></div>
+        </br>
+
+      </div>
+    </div>
+    <div class="ui hidden divider"></div>
+    </div>
+    {% if OPBEAT_JS_APP_ID %}
+    <script src="https://d3tvtfb6518e3e.cloudfront.net/1/opbeat.min.js"
+            data-org-id="{{ OPBEAT_JS_ORG_ID }}"
+            data-app-id="{{ OPBEAT_JS_APP_ID }}"
+            async
+            ></script>
+    {% endif %}
+    <script>
+     var _url = '{{ request.path }}';
+    </script>
+		<script src="{% static 'js/vendor.js' %}"></script>
+		<script src="{% static 'js/main.js' %}"></script>
+	</body>
+</html>

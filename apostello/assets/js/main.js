@@ -4,6 +4,7 @@ import { setupSendAdhoc, setupSendGroup } from './send_costs';
 import { renderTable } from './render_table';
 import { renderElvantoButtons } from './elvanto';
 import { renderToggleButton } from './item_remove_button';
+import { renderAdminUserForm, renderTestEmailForm, renderTestSmsForm } from './first_run';
 
 /* global _url */
 
@@ -19,13 +20,15 @@ $.ajaxSetup({
 
 $(document).ready(() => {
   // initialise dropdown menus
-  $('.dropdown').dropdown({
-    label: {
-      transition: 'horizontal flip',
-      duration: 0,
-      variation: false,
-    },
-  });
+  if ($('.dropdown').length > 0) {
+    $('.dropdown').dropdown({
+      label: {
+        transition: 'horizontal flip',
+        duration: 0,
+        variation: false,
+      },
+    });
+  }
 });
 
 $(document).ready(() => {
@@ -60,10 +63,25 @@ $(document).ready(() => {
 
 $(document).ready(() => {
   // initialise any date pickers
-  $('#dtBox').DateTimePicker({
-    dateTimeFormat: 'yyyy-MM-dd hh:mm',
-    minuteInterval: 5,
-    setValueInTextboxOnEveryClick: true,
-    buttonsToDisplay: ['SetButton', 'ClearButton'],
-  });
+  if ($('#dtBox').length > 0) {
+    $('#dtBox').DateTimePicker({
+      dateTimeFormat: 'yyyy-MM-dd hh:mm',
+      minuteInterval: 5,
+      setValueInTextboxOnEveryClick: true,
+      buttonsToDisplay: ['SetButton', 'ClearButton'],
+    });
+  }
+});
+
+$(document).ready(() => {
+  // render remove/restore buttons
+  if ($('#send_test_email').length > 0) {
+    renderTestEmailForm();
+  }
+  if ($('#send_test_sms').length > 0) {
+    renderTestSmsForm();
+  }
+  if ($('#create_admin_user').length > 0) {
+    renderAdminUserForm();
+  }
 });
