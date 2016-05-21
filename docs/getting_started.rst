@@ -26,17 +26,18 @@ First Run
 
 After you have successfully installed apostello there are a few more steps to finish setup.
 
-* Open your instance of apostello, you will be redirected to the login page
-* Click the sign up button at the bottom to create a user account
-* You should receive a confirmation email (if this does not work, there may be something wrong with your email settings, or you have not yet setup email sending - the first user to sign up is does not get verified so you will be able to log in, but you need to finish setting up the emails before anyone else will be able to sign up)
-* Log in to your site. As the first user you will have been given admin privileges
+* Open your instance of apostello, you will be redirected to a initial setup page
+* Here you can check various settings and tokens and test sending an email and an SMS
+* If you see an incorrect setting, change it and reload the page to check it has updated
+* If you have issues sending an email or SMS, you should see the corresponding error message. If you need help, please get in touch
+* When you are confident everything is working, use the form at the bottom to create an admin. Note that once you do this, you will lose access to this page.
+* Once you have created your account, refresh the page and login with you email and password
 * Open the `Tools` menu where you can edit the site configuration and some canned responses
 * If you want to let users sign in with Google, then you need to follow the steps `here <https://django-allauth.readthedocs.org/en/stable/providers.html#google>`_
 * If you need to approve new users, you will can use the User Permissions page under the tools menu
-* Now you need to :ref:`setup Twilio <setup-twilio>`
-* You may want to send yourself a test message to verify your setup
+* Now you need to :ref:`setup Twilio <setup-twilio>` so you can received messages
 * You can now continue to set up apostello: import contacts, start sending messages, publicise your number, etc
-* Any future users will be able to use the sign up page. If you do not whitelist any domains, you will need to approve new users before they can do anything. Please be extremely careful with the whitelisting setting - if you set it to a domain that you have no control over (e.g ``gmail.com``), then anyone will be able to access your instance of apostello
+* Any future users will be able to use the normal sign up page. If you do not whitelist any domains, you will need to approve new users before they can do anything. Please be extremely careful with the whitelisting setting - if you set it to a domain that you have no control over (e.g ``gmail.com``), then anyone will be able to access your instance of apostello
 
 
 .. _setup-twilio:

@@ -42,7 +42,8 @@
     "dropdown",
     "popup",
     "transition",
-    "form"
+    "form",
+    "segment"
   ],
   "version": "2.1.8"
 }

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
 SITE_ID = 1
 
 MIDDLEWARE_CLASSES = [
+    'apostello.middleware.FirstRunRedirect',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -191,7 +192,7 @@ OPBEAT = {
     'SECRET_TOKEN': os.environ.get('OPBEAT_SECRET_TOKEN', ''),
 }
 # opbeat js:
-OPBEAT_JS_APP_ID = os.environ.get('OPBEAT_APP_ID')
+OPBEAT_JS_APP_ID = os.environ.get('OPBEAT_JS_APP_ID')
 OPBEAT_JS_ORG_ID = os.environ.get('OPBEAT_JS_ORG_ID')
 
 # solo caching:
