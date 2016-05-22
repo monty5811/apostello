@@ -62,7 +62,7 @@ LOGGING = {
     },
 }
 
-if os.environ.get('OPBEAT_ORG_ID', None) is not None:
+if OPBEAT['ORGANIZATION_ID']:
     INSTALLED_APPS += ['opbeat.contrib.django', ]
 
     MIDDLEWARE_CLASSES = [
