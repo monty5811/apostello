@@ -39,8 +39,10 @@ class TestFirstRun:
         body_input_box.send_keys('test message')
 
         submit_button = browser.find_elements_by_css_selector(
-            '#send_test_email > div > form > button')[0]
-        import pdb;pdb.set_trace();
+            '#send_test_email > div > form > button'
+        )[0]
+        import pdb
+        pdb.set_trace()
         submit_button.click()
 
         sleep(driver_wait_time)
@@ -48,8 +50,9 @@ class TestFirstRun:
         assert 'test message' in mail.outbox[0].body
 
     @twilio_vcr
-    def disabled_test_sms_form(self, live_server, browser, driver_wait_time,
-                      recipients):
+    def disabled_test_sms_form(
+        self, live_server, browser, driver_wait_time, recipients
+    ):
         # TODO fix test - click does not work!
         browser.get(live_server + URI)
         assert URI in browser.current_url
@@ -67,7 +70,8 @@ class TestFirstRun:
         body_input_box.send_keys('test')
 
         submit_button = browser.find_elements_by_css_selector(
-            '#send_test_sms > div > form > button')[0]
+            '#send_test_sms > div > form > button'
+        )[0]
         submit_button.click()
 
         sleep(driver_wait_time)
@@ -97,7 +101,8 @@ class TestFirstRun:
         pass2_input_box.send_keys('password')
 
         submit_button = browser.find_elements_by_css_selector(
-            '#create_admin_user > div > form > button')[0]
+            '#create_admin_user > div > form > button'
+        )[0]
         submit_button.click()
 
         sleep(driver_wait_time)

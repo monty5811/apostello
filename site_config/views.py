@@ -13,6 +13,7 @@ from django.shortcuts import redirect, render
 from django.views.generic import View
 from django.views.generic.edit import UpdateView
 from django_twilio.client import twilio_client
+from twilio.rest.exceptions import TwilioRestException
 
 from apostello.mixins import ProfilePermsMixin
 from site_config.forms import DefaultResponsesForm, SiteConfigurationForm
@@ -64,6 +65,22 @@ class FirstRunView(View):
         if User.objects.count() > 0:
             # once we have a user set up, deny access to this view
             return redirect('/')
+
+        try:
+            numbers = twilio_client.phone_numbers.list(
+                phone_number=settings.TWILIO_FROM_NUM)
+            if numbers:
+                number = numbers[0]
+                sms_url = number.sms_url
+                sms_method = number.sms_method
+            else:
+                sms_url = 'Number not found'
+                sms_method = sms_url
+        except TwilioRestException:
+            sms_url = 'Uh oh, something went wrong, please refresh the page.'
+            sms_method = sms_url
+
+        context['number'] = {'sms_url': sms_url, 'sms_method': sms_method, }
 
         context['variables'] = [
             EnvVarSetting(
@@ -214,9 +231,7 @@ class CreateSuperUser(TestSetupView):
             email=request.POST['email_'],
         )
         email.save()
-        email_confirm = EmailConfirmation.create(
-            email_address=email
-        )
+        email_confirm = EmailConfirmation.create(email_address=email)
         email_confirm.save()
         email = EmailAddress.objects.get(email=request.POST['email_'])
         email.verified = True

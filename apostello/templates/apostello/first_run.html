@@ -15,9 +15,29 @@
         <h2>apostello initial setup</h2>
 
         <p>Welcome! This page should help you verify your installation and configuration of apostello.
-        You can see all your configured settings, send a test email and set up and admin login</p>
+        You can see all your configured settings, send a test email and set up an admin user account.</p>
 
         <p><b>Note:</b> once a user has been created, this page will no longer be accessible for security reasons.</p>
+        <div class="ui raised segment">
+          <h3>Twilio Incoming Setup</h3>
+          
+          <p>Twilio sends any incoming messages to the URL below, this URL should be your domain name, followed by "/sms/", and the method should be "POST".</p>
+
+          <p>If you do not see these values below, then you need to update your settings in Twilio.</p>
+
+          <table class="ui definition table">
+            <tbody>
+              <tr>
+                <td>SMS Url</td>
+                <td>{{ number.sms_url }}</td>
+              </tr>
+              <tr>
+                <td>SMS Method</td>
+                <td>{{ number.sms_method }}</td>
+              </tr>
+              <tbody>
+          </table>
+        </div>
         <div class="ui raised segment">
           <h3>Configuration Variables</h3>
           <table class="ui small striped table">
