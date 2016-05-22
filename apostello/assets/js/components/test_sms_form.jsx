@@ -92,7 +92,7 @@ class TestSmsForm extends Component {
             <div className="four wide field">
               <label>Phone Number</label>
               <input
-                type="email"
+                type="text"
                 value={this.state.to}
                 name="sms-to"
                 placeholder="+447095320967"
