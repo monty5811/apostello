@@ -3,6 +3,8 @@
 # but serve static files directly
 proxy / django:8000 {
     except static
+    proxy_header Host {host}
+    proxy_header X-Forwarded-Proto {scheme}
 }
 gzip {
     level 5
