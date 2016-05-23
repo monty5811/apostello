@@ -42,6 +42,6 @@ finish.
 Let's Encrypt
 ~~~~~~~~~~~~~
 
-An SSL certificate can be setup by setting `setup_lets_encrypt` to `yes` in the file `production.yml`.
+An SSL certificate can be setup by setting ``setup_lets_encrypt`` to ``yes`` in the file ``production.yml``.
 This is disabled by default as it seems to fail on brand new setups.
 If you want enable this, run the playbook without lets encrypt, then turn the setting on and run the playbook again.

@@ -12,6 +12,7 @@ Features
 * Post all messages to a slack channel.
 * Import contacts (CSV or `Elvanto <https://www.elvanto.com/r_Y7HXKNE6>`_).
 * Usage overview dashboard
+* Sign up and login by email or with a Google account
 
 
 Keywords
@@ -38,7 +39,7 @@ You can create as many keywords as you like, and each keyword comes with the fol
 * Archiving of old responses
 * Activation time and a too early custom response
 * Deactivation time and a too late custom response
-* Ability to lock a keyword to certain users (staff can see all)
+* Ability to lock a keyword to certain users (staff users can always see all keywords)
 * Daily email digests - send digest of today's responses every night
 * CSV export of messages
 

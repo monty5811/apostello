@@ -6,7 +6,7 @@ Welcome to apostello's documentation!
 Introduction
 ============
 
-apostello is a web app designed to allow a church to communicate with its
+apostello is a web app designed to enable a church to communicate with its
 congregation via SMS.
 Messages can be sent, received and automatically replied to.
 
@@ -16,6 +16,8 @@ since early 2015.
 
 Try out the :ref:`demo site <demo_site>` or the :ref:`getting started <getting-started>` help.
 
+Pull requests are encouraged. Please open an issue before working on anything other than minor bug fixes.
+
 .. toctree::
    :maxdepth: 2
    :glob:
@@ -24,5 +26,4 @@ Try out the :ref:`demo site <demo_site>` or the :ref:`getting started <getting-s
    getting_started
    demo_site
    screenshots
-   development
 

@@ -4,6 +4,8 @@
 Deploying with Docker
 =====================
 
+*This deployment option is still experimental, please try it out and get in touch if you run into any issues.*
+
 Deploying with docker is quick and simple with our command line tool.
 
 The docker setup uses caddy as a web server which means that we get automatic SSL for free with no additional setup.
