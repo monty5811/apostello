@@ -1,4 +1,4 @@
-![screenshots](/screenshot.png?raw=true)
+<img src="/screenshot.png?raw=true" height="350">
 
 # apostello
 
