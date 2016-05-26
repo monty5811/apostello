@@ -307,6 +307,12 @@ def keywords():
     )
     test_early.save()
 
+    test_do_not_reply = Keyword.objects.create(
+        keyword='donotreply',
+        disable_all_replies=True,
+    )
+    test_do_not_reply.save()
+
     keywords = {
         'test': test,
         'test2': test2,
@@ -315,7 +321,8 @@ def keywords():
         'test_no_end': test_no_end,
         'test_deac_resp': test_deac_resp,
         'test_deac_resp_fail': test_deac_resp_fail,
-        'test_early_with_response': test_early_with_response
+        'test_early_with_response': test_early_with_response,
+        'test_do_not_reply': test_do_not_reply,
     }
     return keywords
 

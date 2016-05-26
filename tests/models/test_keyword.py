@@ -14,6 +14,10 @@ class TestKeywords():
     def test_display(self, keywords):
         assert str(keywords['test']) == "test"
 
+    def test_disabled_reply(self, keywords, recipients):
+        assert keywords['test_do_not_reply'].construct_reply(
+        recipients['calvin']) == ''
+
     def test_expired(self, recipients, keywords):
         assert keywords['test_expired'].construct_reply(
             recipients[

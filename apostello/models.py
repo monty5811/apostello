@@ -251,6 +251,12 @@ class Keyword(models.Model):
         ]
     )
     description = models.CharField("Keyword Description", max_length=200, )
+    disable_all_replies = models.BooleanField(
+        'Disable all replies',
+        default=False,
+        help_text='If checked, then we will never reply to this keyword.'
+        'Note that users may still be asked for their name if they are new.',
+    )
     custom_response = models.CharField(
         "Auto response",
         max_length=100,
@@ -317,6 +323,9 @@ class Keyword(models.Model):
     @cached_property
     def current_response(self):
         """Currently active response"""
+        if self.disable_all_replies:
+            return ''
+
         if not self.is_live:
             if self.deactivated_response != '' and self.has_ended:
                 reply = self.deactivated_response

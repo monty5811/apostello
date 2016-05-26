@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 @pytest.mark.slow
 @pytest.mark.selenium
 @pytest.mark.parametrize("uri", ['/config/responses/', ])
@@ -31,4 +31,4 @@ class TestDefaultResponses:
 
         from site_config.models import DefaultResponses
         resps = DefaultResponses.get_solo()
-        assert 'signing up' in resps.start_reply
+        assert 'Thank you for signing up' in resps.start_reply
