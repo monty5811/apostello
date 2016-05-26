@@ -22,6 +22,7 @@ Assuming you already have docker `installed <https://docs.docker.com/engine/inst
     . venv/bin/activate
     pip install apostello-cli
     apostello init
+    cd apostello
     apostello config
     apostello build
     apostello start
@@ -39,3 +40,9 @@ Future updates are a matter of:
     . venv/bin/activate
     cd apostello # we must run commands in the folder we installed apostello
     apostello upgrade
+
+Demo
+~~~~
+.. raw:: html
+    
+    <script type="text/javascript" src="https://asciinema.org/a/9ai6n1hamr14cu2k5ljfccvor.js" id="asciicast-9ai6n1hamr14cu2k5ljfccvor" async></script>
