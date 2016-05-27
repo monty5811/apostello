@@ -79,6 +79,8 @@ Subsequent updates are quicker:
     git pull origin master && git checkout master
     # Then push the code to Heroku
     heroku builds:create -a <your-app-name-here>
+    # you may also need to run any migrations:
+    heroku run -a <your-app-name-here> ./manage.py migrate
 
 
 Do be aware that if you make any other changes in this folder, they
