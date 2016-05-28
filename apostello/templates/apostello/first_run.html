@@ -60,7 +60,6 @@
           </table>
         </div>
         </br>
-
         <div id="send_test_email"></div>
         </br>
         
@@ -86,5 +85,6 @@
     </script>
 		<script src="{% static 'js/vendor.js' %}"></script>
 		<script src="{% static 'js/main.js' %}"></script>
+    {% csrf_token %}
 	</body>
 </html>
