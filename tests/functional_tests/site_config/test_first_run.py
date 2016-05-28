@@ -21,8 +21,7 @@ class TestFirstRun:
         assert "DJANGO_EMAIL_HOST" in browser.page_source
         assert "TWILIO_AUTH_TOKEN" in browser.page_source
 
-    def disabled_test_email_form(self, live_server, browser, driver_wait_time):
-        # TODO fix test - click does not work!
+    def test_email_form(self, live_server, browser, driver_wait_time):
         browser.get(live_server + URI)
         assert URI in browser.current_url
         sleep(driver_wait_time)
@@ -41,24 +40,21 @@ class TestFirstRun:
         submit_button = browser.find_elements_by_css_selector(
             '#send_test_email > div > form > button'
         )[0]
-        import pdb
-        pdb.set_trace()
         submit_button.click()
 
         sleep(driver_wait_time)
         assert len(mail.outbox) == 1
         assert 'test message' in mail.outbox[0].body
 
-    @twilio_vcr
-    def disabled_test_sms_form(
+    # @twilio_vcr
+    def test_sms_form(
         self, live_server, browser, driver_wait_time, recipients
     ):
-        # TODO fix test - click does not work!
         browser.get(live_server + URI)
         assert URI in browser.current_url
         sleep(driver_wait_time)
         to_input_box = browser.find_elements_by_css_selector(
-            '#send_test_sms > div > form > div > div.four.wide.field > input[type="email"]'
+            '#send_test_sms > div > form > div > div.four.wide.field > input[type="text"]'
         )[0]
         to_input_box.clear()
         to_input_box.send_keys(str(recipients['calvin'].number))
@@ -75,10 +71,10 @@ class TestFirstRun:
         submit_button.click()
 
         sleep(driver_wait_time)
-        assert SmsOutbound.objects.count() == 1
+        assert 'AC00000000000000000000000000000000' in browser.page_source
+        assert 'Twilio returned the following information:' in browser.page_source
 
-    def disabled_test_user_form(self, live_server, browser, driver_wait_time):
-        # TODO fix test - click does not work!
+    def test_user_form(self, live_server, browser, driver_wait_time):
         browser.get(live_server + URI)
         assert URI in browser.current_url
         sleep(driver_wait_time)
