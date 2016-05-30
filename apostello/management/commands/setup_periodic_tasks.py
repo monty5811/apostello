@@ -14,12 +14,9 @@ def add_day_if_req(dt):
 
 
 class Command(BaseCommand):
-    """
-    Checks Twilio's incoming logs for our number and updates the
-    database to match.
-    """
+    """Setup periodic tasks for django-q."""
     args = ''
-    help = 'Import incoming messages from twilio'
+    help = 'Setup periodic tasks for django-q.'
 
     def handle(self, *args, **options):
         """Handle the command."""
