@@ -34,8 +34,8 @@ class SiteConfiguration(SingletonModel):
     )
     slack_url = models.URLField(
         blank=True,
-        help_text='Post all incoming messages to this slack hook. '
-        'Leave blank to disable.'
+        help_text='Post all incoming messages to this slack hook.'
+        ' Leave blank to disable.'
     )
     sync_elvanto = models.BooleanField(
         default=False,
@@ -97,23 +97,23 @@ class DefaultResponses(SingletonModel):
     """
     keyword_no_match = models.TextField(
         max_length=1000,
-        default='Thank you, %name%, your message has not matched any of our '
-        'keywords. Please correct your message and try again.',
+        default='Thank you, %name%, your message has not matched any of our'
+        ' keywords. Please correct your message and try again.',
         validators=[less_than_sms_char_limit],
         help_text='Reply to use when an SMS does not match any keywords.'
-        '("%name%" will be replaced with the user\'s first name)'
+        ' ("%name%" will be replaced with the user\'s first name)'
     )
     default_no_keyword_auto_reply = models.TextField(
         max_length=1000,
         default='Thank you, %name%, your message has been received.',
         validators=[less_than_sms_char_limit],
-        help_text='This message will be sent when an SMS matches a keyword, '
-        'but that keyword has no reply set.'
+        help_text='This message will be sent when an SMS matches a keyword,'
+        ' but that keyword has no reply set.'
     )
     default_no_keyword_not_live = models.TextField(
         max_length=1000,
-        default='Thank you, %name%, for your text. '
-        'But "%keyword%" is not active...',
+        default='Thank you, %name%, for your text.'
+        ' But "%keyword%" is not active...',
         validators=[less_than_sms_char_limit],
         help_text='Default message for when a keyword is not currently active.'
         ' ("%keyword" will be replaced with the matched keyword)'
@@ -127,7 +127,7 @@ class DefaultResponses(SingletonModel):
     auto_name_request = models.TextField(
         max_length=1000,
         default="Hi there, I'm afraid we currently don't have your number in"
-        "our address book. Could you please reply in the format"
+        " our address book. Could you please reply in the format"
         "\n'name John Smith'",
         validators=[less_than_sms_char_limit],
         help_text='Message to send when we first receive a message from'
@@ -142,8 +142,8 @@ class DefaultResponses(SingletonModel):
     )
     name_failure_reply = models.TextField(
         max_length=1000,
-        default="Something went wrong, sorry, "
-        "please try again with the format 'name John Smith'.",
+        default="Something went wrong, sorry,"
+        " please try again with the format 'name John Smith'.",
         validators=[less_than_sms_char_limit],
         help_text='Reply to use when someone matches "name"'
         ' but we are unable to parse their name.'

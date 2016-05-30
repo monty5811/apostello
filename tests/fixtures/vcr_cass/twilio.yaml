@@ -2,9 +2,9 @@ interactions:
 - request:
     body: !!binary |
       RnJvbT0lMkIxNTAwNTU1MDAwNiZCb2R5PUhpK3RoZXJlJTJDK0klMjdtK2FmcmFpZCt3ZStjdXJy
-      ZW50bHkrZG9uJTI3dCtoYXZlK3lvdXIrbnVtYmVyK2lub3VyK2FkZHJlc3MrYm9vay4rQ291bGQr
-      eW91K3BsZWFzZStyZXBseStpbit0aGUrZm9ybWF0JTBBJTI3bmFtZStKb2huK1NtaXRoJTI3JlRv
-      PSUyQjQ0NzkyODQwMTc0OQ==
+      ZW50bHkrZG9uJTI3dCtoYXZlK3lvdXIrbnVtYmVyK2luK291cithZGRyZXNzK2Jvb2suK0NvdWxk
+      K3lvdStwbGVhc2UrcmVwbHkraW4rdGhlK2Zvcm1hdCUwQSUyN25hbWUrSm9obitTbWl0aCUyNyZU
+      bz0lMkI0NDc5Mjg0MDE3NDk=
     headers:
       accept: [application/json]
       accept-charset: [utf-8]
@@ -18,8 +18,7 @@ interactions:
         "Wed, 16 Mar 2016 11:42:17 +0000", "date_updated": "Wed, 16 Mar 2016 11:42:17
         +0000", "date_sent": null, "account_sid": "AC00000000000000000000000000000000",
         "to": "+447928401749", "from": "+15005550006", "messaging_service_sid": null,
-        "body": "Hi there, I''m afraid we currently don''t have your number inour
-        address book. Could you please reply in the format\n''name John Smith''",
+        "body": "Hi there, I''m afraid we currently don''t have your number in our address book. Could you please reply in the format\n''name John Smith''",
         "status": "queued", "num_segments": "1", "num_media": "0", "direction": "outbound-api",
         "api_version": "2010-04-01", "price": null, "price_unit": "USD", "uri": "/2010-04-01/Accounts/AC00000000000000000000000000000000/Messages/SM1e53034d64854d5aa9d866237622541b.json",
         "subresource_uris": {"media": "/2010-04-01/Accounts/AC00000000000000000000000000000000/Messages/SM1e53034d64854d5aa9d866237622541b/Media.json"}}'}
@@ -43,9 +42,9 @@ interactions:
 - request:
     body: !!binary |
       RnJvbT0lMkIxNTAwNTU1MDAwNiZCb2R5PUhpK3RoZXJlJTJDK0klMjdtK2FmcmFpZCt3ZStjdXJy
-      ZW50bHkrZG9uJTI3dCtoYXZlK3lvdXIrbnVtYmVyK2lub3VyK2FkZHJlc3MrYm9vay4rQ291bGQre
-      W91K3BsZWFzZStyZXBseStpbit0aGUrZm9ybWF0JTBBJTI3bmFtZStKb2huK1NtaXRoJTI3JlRvPS
-      UyQjQ0NzkyNzQwMTc0OQ==
+      ZW50bHkrZG9uJTI3dCtoYXZlK3lvdXIrbnVtYmVyK2luK291cithZGRyZXNzK2Jvb2suK0NvdWxkK
+      3lvdStwbGVhc2UrcmVwbHkraW4rdGhlK2Zvcm1hdCUwQSUyN25hbWUrSm9obitTbWl0aCUyNyZUbz
+      0lMkI0NDc5Mjc0MDE3NDk=
     headers:
       accept: [application/json]
       accept-charset: [utf-8]
@@ -59,8 +58,7 @@ interactions:
         "Wed, 16 Mar 2016 11:42:17 +0000", "date_updated": "Wed, 16 Mar 2016 11:42:17
         +0000", "date_sent": null, "account_sid": "AC00000000000000000000000000000000",
         "to": "+447927401749", "from": "+15005550006", "messaging_service_sid": null,
-        "body": "Hi there, I''m afraid we currently don''t have your number inour
-        address book. Could you please reply in the format\n''name John Smith''",
+        "body": "Hi there, I''m afraid we currently don''t have your number in our address book. Could you please reply in the format\n''name John Smith''",
         "status": "queued", "num_segments": "1", "num_media": "0", "direction": "outbound-api",
         "api_version": "2010-04-01", "price": null, "price_unit": "USD", "uri": "/2010-04-01/Accounts/AC00000000000000000000000000000000/Messages/SM1e53034d64854d5aa9d866237622541b.json",
         "subresource_uris": {"media": "/2010-04-01/Accounts/AC00000000000000000000000000000000/Messages/SM1e53034d64854d5aa9d866237622541b/Media.json"}}'}
