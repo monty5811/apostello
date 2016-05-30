@@ -231,6 +231,11 @@ class Recipient(models.Model):
 
         return last_sms
 
+    def save(self, *args, **kwargs):
+        """Override save method to back date name change to SMS."""
+        super(Recipient, self).save(*args, **kwargs)
+        async('apostello.tasks.update_msgs_name', self.pk)
+
     def __str__(self):
         """Pretty representation."""
         return self.full_name
