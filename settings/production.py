@@ -49,7 +49,7 @@ LOGGING = {
         }
     },
     'loggers': {
-        'django.db.backends': {
+        'django': {
             'level': 'ERROR',
             'handlers': ['console'],
             'propagate': False,
@@ -79,3 +79,4 @@ if OPBEAT['ORGANIZATION_ID']:
         'propagate': False,
     }
     LOGGING['loggers']['apostello']['handlers'] += ['opbeat']
+    LOGGING['loggers']['django']['handlers'] += ['opbeat']

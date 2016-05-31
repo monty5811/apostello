@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 ### Changed
 - When a contact is saved, their name is now backdated to any SMS they have sent us
+- Better logging output
 ### Deprecated
 ### Removed
 ### Fixed
