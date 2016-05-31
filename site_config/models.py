@@ -97,6 +97,7 @@ class DefaultResponses(SingletonModel):
     """
     keyword_no_match = models.TextField(
         max_length=1000,
+        blank=True,
         default='Thank you, %name%, your message has not matched any of our'
         ' keywords. Please correct your message and try again.',
         validators=[less_than_sms_char_limit],

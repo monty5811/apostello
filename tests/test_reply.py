@@ -103,3 +103,18 @@ class TestConstructReply:
         )
         reply = msg.construct_reply()
         assert len(reply) == 0
+
+    def test_switch_off_no_keyword_reply(self, recipients):
+        from site_config.models import DefaultResponses
+        dr = DefaultResponses.get_solo()
+        dr.keyword_no_match = ''
+        dr.clean()
+        dr.save()
+        msg = InboundSms(
+            {
+                'From': str(recipients['calvin'].number),
+                'Body': 'test'
+            }
+        )
+        reply = msg.construct_reply()
+        assert len(reply) == 0
