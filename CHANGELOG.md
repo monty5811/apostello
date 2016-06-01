@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - When a contact is saved, their name is now backdated to any SMS they have sent us
 - Allow disabling of "no keyword matched" warning
 - Better logging output
+- Pull forms app from pypi instead of github
 ### Deprecated
 ### Removed
 ### Fixed
