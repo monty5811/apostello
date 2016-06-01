@@ -152,3 +152,9 @@ class InboundSms:
         self.contact, self.send_name_sms = self.lookup_contact()
         # construct reply sms
         self.reply = self.construct_reply()
+        # add contact to keyword linked groups:
+        try:
+            self.keyword.add_contact_to_groups(self.contact)
+        except AttributeError:
+            # not a custom keyword
+            pass

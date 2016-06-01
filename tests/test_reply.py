@@ -1,6 +1,6 @@
 import pytest
 
-from apostello.models import Recipient
+from apostello.models import Recipient, RecipientGroup
 from apostello.reply import InboundSms
 from apostello.utils import fetch_default_reply
 from tests.conftest import twilio_vcr
@@ -118,3 +118,28 @@ class TestConstructReply:
         )
         reply = msg.construct_reply()
         assert len(reply) == 0
+
+    def test_contact_added_to_group_keyword(self, recipients, groups, keywords):
+        populated_group = groups['test_group']
+        empty_group = groups['empty_group']
+        assert empty_group.recipient_set.count() == 0
+        assert populated_group.recipient_set.count() == 2
+        test_keyword = keywords['test']
+        test_keyword.linked_groups.add(empty_group, populated_group)
+        test_keyword.save()
+        msg = InboundSms(
+            {
+                'From': str(recipients['beza'].number),
+                'Body': 'test'
+            }
+        )
+        reply = msg.construct_reply()
+        grp1 = RecipientGroup.objects.get(name='Empty Group')
+        assert grp1.recipient_set.all().count() == 1
+        grp2 = RecipientGroup.objects.get(name='Test Group')
+        assert grp2.recipient_set.all().count() == 3
+
+        # let's repeat to test case where contact already in group:
+        reply = msg.construct_reply()
+        grp = RecipientGroup.objects.get(name='Empty Group')
+        assert grp.recipient_set.count() == 1

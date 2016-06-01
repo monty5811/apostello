@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Added
+- Can now link groups to a keyword. When a contact send a message to a keyword, they will be added to the selected groups.
 ### Changed
 - When a contact is saved, their name is now backdated to any SMS they have sent us
 - Allow disabling of "no keyword matched" warning

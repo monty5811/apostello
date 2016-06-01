@@ -211,6 +211,13 @@ class KeywordForm(forms.ModelForm):
                     "id": "owners_dropdown",
                 }
             ),
+            'linked_groups': forms.SelectMultiple(
+                attrs={
+                    "class": "ui fluid search dropdown",
+                    "multiple": "",
+                    "id": "linked_group_dropdown",
+                }
+            ),
             'subscribed_to_digest': forms.SelectMultiple(
                 attrs={
                     "class": "ui fluid search dropdown",

@@ -47,6 +47,7 @@ class RecipientGroup(models.Model):
     def archive(self):
         """Archive the group."""
         self.is_archived = True
+        self.keyword_set.clear() # unlink any keywords
         self.save()
 
     def check_user_cost_limit(self, limit, msg):
@@ -300,6 +301,12 @@ class Keyword(models.Model):
         help_text='The keyword will not be active after this time and so no '
         'messages will be able to match it. Leave blank to never deactivate.'
     )
+    linked_groups = models.ManyToManyField(
+        RecipientGroup,
+        blank=True,
+        help_text='Contacts that match this keyword will be added to the'
+        ' selected groups.',
+    )
     owners = models.ManyToManyField(
         User,
         blank=True,
@@ -324,6 +331,19 @@ class Keyword(models.Model):
         """Make reply to an incoming message."""
         reply = self.current_response
         return sender.personalise(reply)
+
+    def add_contact_to_groups(self, sender):
+        """Add contact to linked group.
+
+        If this keyword has a linked group, we want to add the contact that
+        sent the current SMS.
+
+        Note, this will only be called if we have already matched the keyword.
+        """
+        for grp in self.linked_groups.all():
+            if not grp.is_archived:
+                grp.recipient_set.add(sender)
+                grp.save()
 
     @cached_property
     def current_response(self):
