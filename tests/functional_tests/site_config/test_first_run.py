@@ -10,7 +10,7 @@ from apostello.models import SmsOutbound
 URI = '/config/first_run/'
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 @pytest.mark.slow
 @pytest.mark.selenium
 class TestFirstRun:

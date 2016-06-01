@@ -10,7 +10,7 @@ from apostello import models
 from tests.functional_tests.utils import check_and_close_biu
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 @pytest.mark.slow
 @pytest.mark.selenium
 class TestButton:

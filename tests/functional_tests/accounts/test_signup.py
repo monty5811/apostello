@@ -7,7 +7,7 @@ from django.core import mail
 from site_config.models import SiteConfiguration
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 @pytest.mark.slow
 @pytest.mark.selenium
 class TestSignup:

@@ -62,7 +62,7 @@ def add_scheduled_time(b, wt):
     return b
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 @pytest.mark.slow
 @pytest.mark.selenium
 class TestSendAdhoc:
@@ -138,7 +138,7 @@ class TestSendAdhoc:
         s.save()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 @pytest.mark.slow
 @pytest.mark.selenium
 class TestSendGroup:
