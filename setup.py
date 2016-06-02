@@ -11,7 +11,7 @@ try:
 except ImportError:
     from distutils.core import setup
 
-version = "1.8.1"
+version = "1.9.0"
 
 install_reqs = parse_requirements(
     'requirements_test.txt',
@@ -41,7 +41,5 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: Implementation :: CPython',
     ],
-    keywords=(
-        'Python, twilio, sms, church, django, '
-    ),
+    keywords=('Python, twilio, sms, church, django, '),
 )

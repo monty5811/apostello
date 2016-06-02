@@ -2,20 +2,21 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+## [1.9.0]
 ### Added
 - Can now link groups to a keyword. When a contact send a message to a keyword, they will be added to the selected groups.
+- Allow disabling of "no keyword matched" warning
+
 ### Changed
 - When a contact is saved, their name is now backdated to any SMS they have sent us
-- Allow disabling of "no keyword matched" warning
 - Better logging output
 - Pull forms app from pypi instead of github
-### Deprecated
-### Removed
+
 ### Fixed
-- Create schduled tasks on Heroku
-- Create schduled tasks on Docker
+- Create scheduled tasks on Heroku
+- Create scheduled tasks on Docker
 - Typo in default responses and help text
-### Security
 
 ## [1.8.1] - 2016-05-28
 ### Fixed
@@ -25,6 +26,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Disable replies for a keyword
 - New first run page
+
 ### Fixed
 - Issues with Docker set up
 
@@ -36,8 +38,10 @@ All notable changes to this project will be documented in this file.
 ## [1.7.2] - 2016-05-16
 ### Added
 - Docker deploy option
+
 ### Changed
 - Nicer JS alerts
+
 ### Fixed
 - Account emails now respect settings in database
 - Bug in wall curation page
@@ -51,6 +55,7 @@ All notable changes to this project will be documented in this file.
 - Customise "not approved" page
 - View and cancel scheduled messages
 - Block replies to individual contacts
+
 ### Changed
 - Change email settings on Site Configuration page
 
@@ -58,6 +63,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - New logo
 - Show email addresses in dropdowns instead of user names
+
 ### Fixed
 - Remove button showing on new item pages
 - Google button showing with no SocialApp set up
@@ -69,6 +75,7 @@ All notable changes to this project will be documented in this file.
 ## [1.4.3] - 2016-03-31
 ### Added
 - Add all contacts to group form
+
 ### Changed
 - Add titles to pages
 - Move links around on Keywords table
@@ -85,9 +92,11 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Edit user profile form
 - Per SMS cost limit for each user
+
 ### Changed
 - Ansible: add gzip, far future headers and improve SSL
 - Slim down frontend assets
+
 ### Fixed
 - Login errors not displaying
 
@@ -98,8 +107,10 @@ All notable changes to this project will be documented in this file.
 ## [1.3.0] - 2016-03-16
 ### Added
 - Add new "can archive" permission
+
 ### Changed
 - Ansible deploy: redirect to https
+
 ### Fixed
 - Elvanto import permissions
 
