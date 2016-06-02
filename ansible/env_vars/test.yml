@@ -20,7 +20,7 @@ django_email_host_user: test
 django_email_host_password: test
 django_from_email: test
 # locale and time zone:
-django_time_zone:
+django_time_zone: 'Europe/London'
 # Elvanto
 elvanto_key: '00000000000000000000000000000000'
 country_code: 44

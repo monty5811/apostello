@@ -8,7 +8,7 @@
            creates={{ virtualenv_path }}/bin/activate
 
 - name: Ensure gunicorn is installed
-  pip: virtualenv={{ virtualenv_path }} name=gunicorn executable=pip3
+  pip: virtualenv={{ virtualenv_path }} name=gunicorn
 
 - name: Create the Gunicorn script file
   template: src=gunicorn_start.j2
@@ -26,8 +26,7 @@
         state=directory
 
 - name: Create the application log file
-  command: touch {{ application_log_file }}
-           creates={{ application_log_file }}
+  file: path={{ application_log_file }} state=touch
 
 - name: Create the virtualenv postactivate script to set environment variables
   template: src=virtualenv_postactivate.j2

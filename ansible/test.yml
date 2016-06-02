@@ -2,8 +2,8 @@
 
 - name: Provision a {{ application_name }} server
   hosts: all
-  sudo: yes
-  sudo_user: root
+  become: yes
+  become_user: root
   remote_user: root
   vars:
     - setup_git_repo: yes
