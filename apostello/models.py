@@ -35,7 +35,10 @@ class RecipientGroup(models.Model):
         unique=True,
         validators=[gsm_validator],
     )
-    description = models.CharField("Group description", max_length=200, )
+    description = models.CharField(
+        "Group description",
+        max_length=200,
+    )
 
     def send_message(self, content, sent_by, eta=None):
         """Send message to group."""
@@ -47,7 +50,7 @@ class RecipientGroup(models.Model):
     def archive(self):
         """Archive the group."""
         self.is_archived = True
-        self.keyword_set.clear() # unlink any keywords
+        self.keyword_set.clear()  # unlink any keywords
         self.save()
 
     def check_user_cost_limit(self, limit, msg):
@@ -256,7 +259,10 @@ class Keyword(models.Model):
             validate_lower, gsm_validator, twilio_reserved, no_overlap_keyword
         ]
     )
-    description = models.CharField("Keyword Description", max_length=200, )
+    description = models.CharField(
+        "Keyword Description",
+        max_length=200,
+    )
     disable_all_replies = models.BooleanField(
         'Disable all replies',
         default=False,

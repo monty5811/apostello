@@ -53,11 +53,8 @@ class ElvantoGroup(models.Model):
         except NotValidPhoneNumber:
             print(
                 'Adding {0} {1} failed ({2},{3})'.format(
-                    prsn[
-                        'firstname'
-                    ], prsn['lastname'], prsn['mobile'], prsn[
-                        'phone'
-                    ]
+                    prsn['firstname'], prsn['lastname'], prsn['mobile'],
+                    prsn['phone']
                 )
             )
             return

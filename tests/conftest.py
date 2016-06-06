@@ -188,14 +188,12 @@ def keywords():
         description="This is an active test keyword with custom response",
         custom_response="Test custom response with %name%",
         activate_time=timezone.make_aware(
-            datetime.strptime(
-                'Jun 1 1970  1:33PM', '%b %d %Y %I:%M%p'
-            ), get_current_timezone()
+            datetime.strptime('Jun 1 1970  1:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
         ),
         deactivate_time=timezone.make_aware(
-            datetime.strptime(
-                'Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'
-            ), get_current_timezone()
+            datetime.strptime('Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
         )
     )
     test.save()
@@ -205,14 +203,12 @@ def keywords():
         description="This is an active test keyword with no custom response",
         custom_response="",
         activate_time=timezone.make_aware(
-            datetime.strptime(
-                'Jun 1 1970  1:33PM', '%b %d %Y %I:%M%p'
-            ), get_current_timezone()
+            datetime.strptime('Jun 1 1970  1:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
         ),
         deactivate_time=timezone.make_aware(
-            datetime.strptime(
-                'Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'
-            ), get_current_timezone()
+            datetime.strptime('Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
         )
     )
     test2.save()
@@ -222,14 +218,12 @@ def keywords():
         description="This is an expired test keyword with no custom response",
         custom_response="",
         activate_time=timezone.make_aware(
-            datetime.strptime(
-                'Jun 1 1970  1:33PM', '%b %d %Y %I:%M%p'
-            ), get_current_timezone()
+            datetime.strptime('Jun 1 1970  1:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
         ),
         deactivate_time=timezone.make_aware(
-            datetime.strptime(
-                'Jun 1 1975  1:33PM', '%b %d %Y %I:%M%p'
-            ), get_current_timezone()
+            datetime.strptime('Jun 1 1975  1:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
         )
     )
     test_expired.save()
@@ -240,14 +234,12 @@ def keywords():
         "with no custom response",
         custom_response="",
         activate_time=timezone.make_aware(
-            datetime.strptime(
-                'Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'
-            ), get_current_timezone()
+            datetime.strptime('Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
         ),
         deactivate_time=timezone.make_aware(
-            datetime.strptime(
-                'Jun 1 2400  1:35PM', '%b %d %Y %I:%M%p'
-            ), get_current_timezone()
+            datetime.strptime('Jun 1 2400  1:35PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
         )
     )
     test_early.save()
@@ -257,9 +249,8 @@ def keywords():
         description="This has no end",
         custom_response="Will always reply",
         activate_time=timezone.make_aware(
-            datetime.strptime(
-                'Jun 1 1400  1:33PM', '%b %d %Y %I:%M%p'
-            ), get_current_timezone()
+            datetime.strptime('Jun 1 1400  1:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
         )
     )
     test_no_end.save()
@@ -270,9 +261,8 @@ def keywords():
         custom_response="Hi!",
         deactivated_response="Too slow, Joe!",
         activate_time=timezone.make_aware(
-            datetime.strptime(
-                'Jun 1 1400  1:33PM', '%b %d %Y %I:%M%p'
-            ), get_current_timezone()
+            datetime.strptime('Jun 1 1400  1:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
         )
     )
 
@@ -282,14 +272,12 @@ def keywords():
         custom_response="Just in time!",
         deactivated_response="Too slow, Joe!",
         deactivate_time=timezone.make_aware(
-            datetime.strptime(
-                'Jun 1 1400  2:33PM', '%b %d %Y %I:%M%p'
-            ), get_current_timezone()
+            datetime.strptime('Jun 1 1400  2:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
         ),
         activate_time=timezone.make_aware(
-            datetime.strptime(
-                'Jun 1 1400  1:33PM', '%b %d %Y %I:%M%p'
-            ), get_current_timezone()
+            datetime.strptime('Jun 1 1400  1:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
         )
     )
     test_no_end.save()
@@ -300,9 +288,8 @@ def keywords():
         "with a custom response",
         too_early_response="This is far too early",
         activate_time=timezone.make_aware(
-            datetime.strptime(
-                'Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'
-            ), get_current_timezone()
+            datetime.strptime('Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'),
+            get_current_timezone()
         ),
     )
     test_early.save()

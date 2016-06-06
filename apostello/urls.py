@@ -22,11 +22,9 @@ urlpatterns = [
         ),
         name='index'
     ),
-    url(
-        r'not_approved/$',
+    url(r'not_approved/$',
         v.NotApprovedView.as_view(),
-        name='not_approved'
-    ),
+        name='not_approved'),
     url(
         r'^help/$',
         v.SimpleView.as_view(
@@ -223,19 +221,13 @@ urlpatterns += [
 
 # import urls
 urlpatterns += [
-    url(
-        r'^recipient/import/$',
+    url(r'^recipient/import/$',
         v.import_recipients,
-        name='import_recipients'
-    ),
+        name='import_recipients'),
 ]
 urlpatterns += [
-    url(
-        r'^elvanto/',
-        include(
-            'elvanto.urls', namespace='elvanto'
-        )
-    )
+    url(r'^elvanto/',
+        include('elvanto.urls', namespace='elvanto'))
 ]
 
 # twilio api url
@@ -268,20 +260,8 @@ urlpatterns += [
 ]
 # apps etc
 urlpatterns += [
-    url(
-        r'^config/',
-        include(
-            'site_config.urls', namespace='site_config'
-        )
-    ),
-    url(
-        r'^graphs/', include(
-            'graphs.urls', namespace='graphs'
-        )
-    ),
-    url(
-        r'^api/', include(
-            'api.urls', namespace='api'
-        )
-    ),
+    url(r'^config/',
+        include('site_config.urls', namespace='site_config')),
+    url(r'^graphs/', include('graphs.urls', namespace='graphs')),
+    url(r'^api/', include('api.urls', namespace='api')),
 ]

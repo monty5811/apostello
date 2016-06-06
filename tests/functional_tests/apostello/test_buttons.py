@@ -173,16 +173,13 @@ class TestButton:
             name='test1',
             func='apostello.tasks.recipient_send_message_task',
             args='({0},"test message", None, "admin")'.format(
-                recipients[
-                    'calvin'
-                ].pk
+                recipients['calvin'].pk
             ),
             schedule_type='ONCE',
             repeats=-1,
             next_run=timezone.make_aware(
-                datetime.strptime(
-                    'Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'
-                ), timezone.get_current_timezone()
+                datetime.strptime('Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'),
+                timezone.get_current_timezone()
             ),
         )
         Schedule.objects.create(
@@ -194,9 +191,8 @@ class TestButton:
             schedule_type='ONCE',
             repeats=-1,
             next_run=timezone.make_aware(
-                datetime.strptime(
-                    'Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'
-                ), timezone.get_current_timezone()
+                datetime.strptime('Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'),
+                timezone.get_current_timezone()
             ),
         )
         # verify tasks are shown in table

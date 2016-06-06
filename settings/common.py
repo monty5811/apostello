@@ -157,9 +157,8 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.environ.get(
     'ACCOUNT_DEFAULT_HTTP_PROTOCOL', 'https'
 )
-WHITELISTED_LOGIN_DOMAINS = os.environ.get(
-    'WHITELISTED_LOGIN_DOMAINS', ''
-).split(',')
+WHITELISTED_LOGIN_DOMAINS = os.environ.get('WHITELISTED_LOGIN_DOMAINS',
+                                           '').split(',')
 
 LOGIN_REDIRECT_URL = '/'
 
@@ -170,9 +169,8 @@ ELVANTO_KEY = os.environ.get('ELVANTO_KEY', '')
 TWILIO_ACCOUNT_SID = os.environ['TWILIO_ACCOUNT_SID']
 TWILIO_AUTH_TOKEN = os.environ['TWILIO_AUTH_TOKEN']
 TWILIO_FROM_NUM = os.environ['TWILIO_FROM_NUM']
-TWILIO_SENDING_COST = float(
-    os.environ.get('TWILIO_SENDING_COST', '0.04')
-)  # cost in USD
+TWILIO_SENDING_COST = float(os.environ.get('TWILIO_SENDING_COST', '0.04')
+                            )  # cost in USD
 
 # Sms settings - note that messages over 160 will be charged twice
 MAX_NAME_LENGTH = 16

@@ -34,9 +34,8 @@ class TwilioRequestFactory(RequestFactory):
         if 'HTTP_X_TWILIO_SIGNATURE' not in extra:
             extra.update(
                 {
-                    'HTTP_X_TWILIO_SIGNATURE': self._compute_signature(
-                        path, params=data
-                    )
+                    'HTTP_X_TWILIO_SIGNATURE':
+                    self._compute_signature(path, params=data)
                 }
             )
         return super(TwilioRequestFactory, self).get(path, data, **extra)
@@ -47,9 +46,8 @@ class TwilioRequestFactory(RequestFactory):
         if 'HTTP_X_TWILIO_SIGNATURE' not in extra:
             extra.update(
                 {
-                    'HTTP_X_TWILIO_SIGNATURE': self._compute_signature(
-                        path, params=data
-                    )
+                    'HTTP_X_TWILIO_SIGNATURE':
+                    self._compute_signature(path, params=data)
                 }
             )
         if content_type is None:

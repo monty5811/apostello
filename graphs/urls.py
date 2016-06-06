@@ -11,30 +11,22 @@ urlpatterns = [
             required_perms=[],
         )
     ),
-    url(
-        r'^contacts/',
+    url(r'^contacts/',
         v.GraphView.as_view(
             graph_renderer=r.contacts,
-        )
-    ),
-    url(
-        r'^groups/',
+        )),
+    url(r'^groups/',
         v.GraphView.as_view(
             graph_renderer=r.groups,
-        )
-    ),
-    url(
-        r'^keywords/',
+        )),
+    url(r'^keywords/',
         v.GraphView.as_view(
             graph_renderer=r.keywords,
-        )
-    ),
-    url(
-        r'^sms/totals/',
+        )),
+    url(r'^sms/totals/',
         v.GraphView.as_view(
             graph_renderer=r.sms_totals,
-        )
-    ),
+        )),
     url(
         r'^sms/in/bycontact',
         v.GraphView.as_view(

@@ -35,7 +35,10 @@ class ElvantoGroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ElvantoGroup
-        fields = ('name', 'pk', 'sync', 'last_synced', )
+        fields = ('name',
+                  'pk',
+                  'sync',
+                  'last_synced', )
 
 
 class KeywordSerializer(serializers.ModelSerializer):
@@ -141,7 +144,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'username', )
+        fields = ('email',
+                  'username', )
 
 
 class UserProfileSerializer(serializers.ModelSerializer):

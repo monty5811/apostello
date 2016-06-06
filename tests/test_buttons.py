@@ -15,5 +15,6 @@ class TestButtonPosts:
             ]:
                 for value in ['true', 'false']:
                     users['c_staff'].post(
-                        '/api/v1/' + endpoint + '/in/1', {param: value}
+                        '/api/v1/' + endpoint + '/in/1',
+                        {param: value}
                     )

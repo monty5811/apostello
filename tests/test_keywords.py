@@ -7,9 +7,8 @@ class TestOthers:
     """Test posting as a user"""
 
     def test_keyword_responses_404(self, keywords, users):
-        assert users['c_staff'].post(
-            '/keyword/responses/51234/'
-        ).status_code == 404
+        assert users[
+            'c_staff'].post('/keyword/responses/51234/').status_code == 404
 
     def test_keyword_responses_archive_all_not_ticked(self, keywords, users):
         users['c_staff'].post(
@@ -25,20 +24,13 @@ class TestOthers:
         )
 
     def test_no_csv(self, users):
-        assert users['c_in'].get(
-            '/keyword/responses/csv/500/'
-        ).status_code == 404
+        assert users[
+            'c_in'].get('/keyword/responses/csv/500/').status_code == 404
 
     def test_keyword_access_check(self, keywords, users):
         keywords['test'].owners.add(users['staff'])
         keywords['test'].save()
-        assert users['c_staff'].get(
-            keywords[
-                'test'
-            ].get_responses_url
-        ).status_code == 200
-        assert users['c_in'].get(
-            keywords[
-                'test'
-            ].get_responses_url
-        ).status_code == 302
+        assert users['c_staff'].get(keywords['test'].get_responses_url
+                                    ).status_code == 200
+        assert users['c_in'].get(keywords['test'].get_responses_url
+                                 ).status_code == 302

@@ -20,9 +20,8 @@ class TestTasks:
     @twilio_vcr
     def test_send_recipient_blacklist(self, recipients):
         recipient_send_message_task(
-            recipients[
-                'john_owen'
-            ].id,  # doesn't actually test blacklisted number handling :(
+            recipients['john_owen'].
+            id,  # doesn't actually test blacklisted number handling :(
             "This is a test to a blacklisted number...",
             None,
             'test'
@@ -86,9 +85,8 @@ class TestTasks:
         }
         log_msg_in(p, datetime.now(), calvin.pk)
 
-        assert SmsInbound.objects.filter(
-            content="New test message"
-        ).count() == 1
+        assert SmsInbound.objects.filter(content="New test message"
+                                         ).count() == 1
 
     def test_warn_on_blacklist_receipt(self, recipients):
         blacklist_notify(recipients['wesley'].pk, 'stop it', 'stop')

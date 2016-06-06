@@ -73,9 +73,8 @@ class TestConstructReply:
             }
         )
         reply = msg.construct_reply()
-        assert Recipient.objects.get(
-            pk=recipients['calvin'].pk
-        ).is_blocking is False
+        assert Recipient.objects.get(pk=recipients['calvin'].pk
+                                     ).is_blocking is False
         assert 'signing up' in reply
 
     @twilio_vcr
@@ -119,7 +118,9 @@ class TestConstructReply:
         reply = msg.construct_reply()
         assert len(reply) == 0
 
-    def test_contact_added_to_group_keyword(self, recipients, groups, keywords):
+    def test_contact_added_to_group_keyword(
+        self, recipients, groups, keywords
+    ):
         populated_group = groups['test_group']
         empty_group = groups['empty_group']
         assert empty_group.recipient_set.count() == 0

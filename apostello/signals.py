@@ -17,4 +17,8 @@ def email_admin_on_signup(request, user, **kwargs):
     from site_config.models import SiteConfiguration
     to_ = SiteConfiguration.get_solo().office_email
     if to_:
-        send_async_mail("[apostello] New User", body, [to_], )
+        send_async_mail(
+            "[apostello] New User",
+            body,
+            [to_],
+        )

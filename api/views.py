@@ -41,9 +41,8 @@ class ApiCollection(generics.ListAPIView):
         if self.related_field is None:
             objs = self.model_class.objects.all()
         else:
-            objs = self.model_class.objects.all().select_related(
-                self.related_field
-            )
+            objs = self.model_class.objects.all(
+            ).select_related(self.related_field)
         if self.filter_list:
             objs = objs.filter(**self.filters)
         return objs

@@ -62,7 +62,10 @@ def contacts():
 
 def groups():
     """Render tree map of group size."""
-    treemap = pygal.Treemap(style=clean_style_large_text, margin=0, )
+    treemap = pygal.Treemap(
+        style=clean_style_large_text,
+        margin=0,
+    )
     for grp in RecipientGroup.objects.filter(is_archived=False):
         treemap.add(str(grp), [grp.recipient_set.all().count()])
 
@@ -89,7 +92,10 @@ def keywords():
 
 def incoming_by_contact():
     """Render tree map of incoming messages, grouped by user."""
-    treemap = pygal.Treemap(style=clean_style_large_text, margin=0, )
+    treemap = pygal.Treemap(
+        style=clean_style_large_text,
+        margin=0,
+    )
     for con in Recipient.objects.filter(is_archived=False):
         treemap.add(
             str(con),
@@ -101,7 +107,10 @@ def incoming_by_contact():
 
 def outgoing_by_contact():
     """Render tree map of outgoing messages, grouped by user."""
-    treemap = pygal.Treemap(style=clean_style_large_text, margin=0, )
+    treemap = pygal.Treemap(
+        style=clean_style_large_text,
+        margin=0,
+    )
     for con in Recipient.objects.filter(is_archived=False):
         treemap.add(
             str(con),

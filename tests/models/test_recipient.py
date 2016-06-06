@@ -16,10 +16,9 @@ class TestRecipient:
 
     def test_get_abs_url(self, recipients):
         assert recipients[
-            'calvin'
-        ].get_absolute_url == '/recipient/edit/{0}/'.format(
-            recipients['calvin'].pk
-        )
+            'calvin'].get_absolute_url == '/recipient/edit/{0}/'.format(
+                recipients['calvin'].pk
+            )
 
     def test_archiving(self, recipients):
         recipients['calvin'].archive()

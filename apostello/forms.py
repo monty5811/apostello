@@ -58,9 +58,7 @@ class SendRecipientGroupForm(forms.Form):
         min_length=1
     )
     recipient_group = forms.ModelChoiceField(
-        queryset=RecipientGroup.objects.filter(
-            is_archived=False
-        ),
+        queryset=RecipientGroup.objects.filter(is_archived=False),
         required=True,
         empty_label='Choose a group...',
         widget=forms.Select(
@@ -109,9 +107,7 @@ class ManageRecipientGroupForm(forms.ModelForm):
 
     # Representing the many to many related field in SmsGroup
     members = forms.ModelMultipleChoiceField(
-        queryset=Recipient.objects.filter(
-            is_archived=False
-        ),
+        queryset=Recipient.objects.filter(is_archived=False),
         required=False,
         widget=forms.SelectMultiple(
             attrs={

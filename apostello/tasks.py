@@ -82,9 +82,7 @@ def ask_for_name(person_from_pk, sms_body, ask_for_name):
             'apostello.tasks.notify_office_mail',
             '[Apostello] Unknown Contact!',
             'SMS: {0}\nFrom: {1}\n\n\nThis person is unknown and has been'
-            ' asked for their name.'.format(
-                sms_body, str(contact)
-            ),
+            ' asked for their name.'.format(sms_body, str(contact)),
         )
 
 # SMS logging and consistency checks
@@ -194,12 +192,11 @@ def send_keyword_digest():
             for subscriber in keyword.subscribed_to_digest.all():
                 async(
                     'apostello.tasks.send_async_mail',
-                    'Daily update for "{0}" responses'.format(
-                        str(keyword)
-                    ),
+                    'Daily update for "{0}" responses'.format(str(keyword)),
                     "The following text messages have been received today:\n\n{0}".format(
                         "\n".join([str(x) for x in new_responses])
-                    ), [subscriber.email]
+                    ),
+                    [subscriber.email]
                 )
 
         keyword.last_email_sent_time = checked_time

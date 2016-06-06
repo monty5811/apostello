@@ -39,8 +39,7 @@ class TestUserProfile:
 class TestSiteConfig:
     def test_display(self):
         assert "Site Configuration" == str(
-            smodels.SiteConfiguration.get_solo(
-            )
+            smodels.SiteConfiguration.get_solo()
         )
 
 

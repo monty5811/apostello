@@ -15,14 +15,12 @@ class TestKeywords():
         assert str(keywords['test']) == "test"
 
     def test_disabled_reply(self, keywords, recipients):
-        assert keywords['test_do_not_reply'].construct_reply(
-        recipients['calvin']) == ''
+        assert keywords[
+            'test_do_not_reply'].construct_reply(recipients['calvin']) == ''
 
     def test_expired(self, recipients, keywords):
         assert keywords['test_expired'].construct_reply(
-            recipients[
-                'calvin'
-            ]
+            recipients['calvin']
         ) == recipients['calvin'].personalise(
             fetch_default_reply('default_no_keyword_not_live').replace(
                 "%keyword%", str(keywords['test_expired'])
@@ -31,9 +29,7 @@ class TestKeywords():
 
     def test_early(self, recipients, keywords):
         assert keywords['test_early'].construct_reply(
-            recipients[
-                'calvin'
-            ]
+            recipients['calvin']
         ) == recipients['calvin'].personalise(
             fetch_default_reply('default_no_keyword_not_live').replace(
                 "%keyword%", str(keywords['test_early'])
@@ -41,62 +37,45 @@ class TestKeywords():
         )
 
     def test_no_end(self, recipients, keywords):
-        assert keywords['test_no_end'].construct_reply(
-            recipients[
-                'calvin'
-            ]
-        ) == "Will always reply"
+        assert keywords['test_no_end'].construct_reply(recipients['calvin']
+                                                       ) == "Will always reply"
 
     def test_custom_reply(self, recipients, keywords):
         assert keywords['test'].construct_reply(
-            recipients[
-                'calvin'
-            ]
+            recipients['calvin']
         ) == "Test custom response with John"
 
     def test_no_custom_reply(self, recipients, keywords):
         assert keywords['test2'].construct_reply(
-            recipients[
-                'calvin'
-            ]
+            recipients['calvin']
         ) == recipients['calvin'].personalise(
-            fetch_default_reply(
-                'default_no_keyword_auto_reply'
-            )
+            fetch_default_reply('default_no_keyword_auto_reply')
         )
 
     def test_deactivated_custom_reply(self, recipients, keywords):
         assert keywords['test_deac_resp'].construct_reply(
-            recipients[
-                'calvin'
-            ]
+            recipients['calvin']
         ) == "Too slow, Joe!"
 
     def test_deactivated_custom_reply_no_deac_time(self, recipients, keywords):
         assert keywords['test_deac_resp_fail'].construct_reply(
-            recipients[
-                'calvin'
-            ]
+            recipients['calvin']
         ) == "Hi!"
 
     def test_too_early_custom_reply(self, recipients, keywords):
         assert keywords['test_early_with_response'].construct_reply(
-            recipients[
-                'calvin'
-            ]
+            recipients['calvin']
         ) == "This is far too early"
 
     def test_fetch_matched_responses(self, keywords, smsin):
         assert len(keywords['test'].fetch_matches()) == 2
-        assert str(keywords['test'].fetch_matches()[0]) == str(
-            SmsInbound.objects.filter(content="test message")[0]
-        )
+        assert str(keywords['test'].fetch_matches(
+        )[0]) == str(SmsInbound.objects.filter(content="test message")[0])
 
     def test_fetch_archived_matched_responses(self, keywords, smsin):
         assert len(keywords['test'].fetch_archived_matches()) == 1
-        assert str(keywords['test'].fetch_archived_matches()[0]) == str(
-            SmsInbound.objects.filter(content="archived message")[0]
-        )
+        assert str(keywords['test'].fetch_archived_matches(
+        )[0]) == str(SmsInbound.objects.filter(content="archived message")[0])
 
     def test_num_matches(self, keywords, smsin):
         assert keywords['test'].num_matches == 2
@@ -128,9 +107,7 @@ class TestKeywords():
 
     def test_get_log_link_keyword(self, keywords):
         assert Keyword.get_log_link(
-            keywords[
-                'test'
-            ]
+            keywords['test']
         ) == '/keyword/responses/{0}/'.format(keywords['test'].pk)
 
     def test_lookup_colour_test(self, keywords):

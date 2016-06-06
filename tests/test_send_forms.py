@@ -39,7 +39,8 @@ class TestSendingSmsForm:
     def test_send_group_now(self, groups, users):
         """Test sending a message now."""
         users['c_staff'].post(
-            '/send/group/', {
+            '/send/group/',
+            {
                 'content': 'test',
                 'recipient_group': groups['test_group'].pk
             }
@@ -100,9 +101,7 @@ class TestGroupForm:
             }
         )
         assert 'test_group_changed' == str(
-            models.RecipientGroup.objects.get(
-                pk=pk
-            )
+            models.RecipientGroup.objects.get(pk=pk)
         )
 
     def test_invalid_group_form(self, users):
