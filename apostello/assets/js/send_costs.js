@@ -7,6 +7,7 @@ function setupSendAdhoc() {
   // handle send adhoc cost updates
   $('.dropdown').dropdown(
     {
+      fullTextSearch: true,
       onChange(text) {
         setCost(text.length, sms_cost);
       },
@@ -24,6 +25,7 @@ function setupSendGroup() {
     () => {
       $('.dropdown').dropdown(
         {
+          fullTextSearch: true,
           onChange(text) {
             setCost(group_sizes[text], sms_cost);
           },
