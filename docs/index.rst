@@ -24,6 +24,7 @@ Pull requests are encouraged. Please open an issue before working on anything ot
 
    features
    getting_started
+   faq
    demo_site
    screenshots
 
