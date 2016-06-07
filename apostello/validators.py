@@ -64,7 +64,12 @@ def less_than_sms_char_limit(value):
     """Ensure message is less than the maximum character limit."""
     from site_config.models import SiteConfiguration
     s = SiteConfiguration.get_solo()
-    sms_char_lim = s.sms_char_limit - settings.MAX_NAME_LENGTH + len('%name%')
+    sms_char_lim = s.sms_char_limit
+
+    if '%name%' in value:
+        # if `%name%` in value, then adjust limit to handle substitutions
+        sms_char_lim = sms_char_lim - settings.MAX_NAME_LENGTH + len('%name%')
+
     if len(value) > sms_char_lim:
         raise ValidationError(
             'You have exceeded the maximum char limit of {0}.'.format(

@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Dropdowns now do full-text search (searching by surname will now work)
+- Content box size now a function of SMS character limit
+- SMS character limit now more forgiving when `%name%` not used in a message
 
 ## [1.9.0]
 ### Added

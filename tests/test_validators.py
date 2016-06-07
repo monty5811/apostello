@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
 import pytest
 from django.conf import settings
 from django.core.exceptions import ValidationError
 
 from apostello.validators import (
-    gsm_validator, no_overlap_keyword, not_twilio_num, twilio_reserved,
-    validate_lower
+    gsm_validator, less_than_sms_char_limit, no_overlap_keyword,
+    not_twilio_num, twilio_reserved, validate_lower
 )
+from site_config.models import SiteConfiguration
 
 
 class TestLower:
@@ -68,3 +68,30 @@ class TestNoOverlapKeyword:
 
     def test_updating(self, keywords):
         no_overlap_keyword('test')
+
+
+@pytest.mark.django_db
+class TestCharLimit:
+    def test_no_name_ok(self):
+        """Test message ok."""
+        s = SiteConfiguration.get_solo()
+        less_than_sms_char_limit('t' * (s.sms_char_limit - 1))
+
+    def test_name_ok(self):
+        """Test message ok with %name%."""
+        less_than_sms_char_limit('test %name%')
+
+    def test_no_name_raises(self):
+        """Test raises error with no %name% sub."""
+        s = SiteConfiguration.get_solo()
+        with pytest.raises(ValidationError):
+            less_than_sms_char_limit('t' * (s.sms_char_limit + 1))
+
+    def test_no_name_raises(self):
+        """Test shorter limit imposed with %name% present."""
+        s = SiteConfiguration.get_solo()
+        with pytest.raises(ValidationError):
+            less_than_sms_char_limit(
+                't %name%' *
+                (s.sms_char_limit - settings.MAX_NAME_LENGTH + len('%name%'))
+            )
