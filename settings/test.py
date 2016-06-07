@@ -23,6 +23,17 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
 ALLOWED_HOSTS = ['testserver']
 
 #
+import fakeredis
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": '127.0.0.1:6379',
+        "OPTIONS": {
+            "REDIS_CLIENT_CLASS": "fakeredis.FakeStrictRedis",
+        }
+    }
+}
+
 Q_CLUSTER = {
     'name': 'apostello_test',
     'cpu_affinity': 1,

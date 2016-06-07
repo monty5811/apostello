@@ -595,6 +595,11 @@ class SmsInbound(models.Model):
         """Url for message sender."""
         return Recipient.objects.get(number=self.sender_num).get_absolute_url
 
+    @cached_property
+    def sender_pk(self):
+        """pk for message sender."""
+        return Recipient.objects.get(number=self.sender_num).pk
+
     def reimport(self):
         """
         Manual retrieval of a message from twilio in case of server downtime.

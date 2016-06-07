@@ -84,6 +84,7 @@ class SmsInboundSerializer(serializers.ModelSerializer):
             'matched_colour',
             'matched_link',
             'sender_url',
+            'sender_pk',
         )
 
 

@@ -3,9 +3,11 @@ from time import sleep
 import pytest
 
 from tests.conftest import twilio_vcr
+from apostello.models import SmsOutbound
 
 ADHOC_URI = '/send/adhoc/'
 GROUP_URI = '/send/group/'
+LOG_URI = '/incoming/'
 
 
 def load_page(b, wt, url):
@@ -136,6 +138,29 @@ class TestSendAdhoc:
         assert ADHOC_URI in b.current_url
         s.sms_char_limit = 200
         s.save()
+
+    @twilio_vcr
+    def test_prepopulated(
+        self, live_server, browser_in, users, driver_wait_time, recipients,
+        smsin
+    ):
+        """Test the reply to button on incoming log."""
+        # load the incoming log
+        b = load_page(browser_in, driver_wait_time, live_server + LOG_URI)
+        # check reply buttons are present
+        reply_buttons = b.find_elements_by_class_name('reply')
+        assert len(reply_buttons) == len(smsin)
+        # test button works
+        reply_buttons[0].click()
+        sleep(driver_wait_time)
+        assert '/send/adhoc/?recipient=' in browser_in.current_url
+        # check message sent to correct recipient
+        b = add_content(b, driver_wait_time)
+        b = click_send(b, driver_wait_time)
+        assert 'Please check the logs for verification' in b.page_source
+        assert ADHOC_URI in b.current_url
+        last_out_sms = SmsOutbound.objects.all()[0]
+        assert last_out_sms.recipient.pk == recipients['calvin'].pk
 
 
 @pytest.mark.django_db(transaction=True)

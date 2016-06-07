@@ -63,6 +63,9 @@ class SendView(LoginRequiredMixin, ProfilePermsMixin, FormView):
     def get_form(self, **kwargs):
         """Add user to form so we can check cost limits."""
         form = super(SendView, self).get_form(**kwargs)
+        prepopulated_recipient = self.request.GET.get('recipient', None)
+        if prepopulated_recipient is not None:
+            form.initial['recipients'] = [prepopulated_recipient]
         form.user = self.request.user
         return form
 

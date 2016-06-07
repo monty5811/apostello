@@ -5,6 +5,9 @@ import ReprocessButton from './reprocess_button';
 const IncomingTableRow = (props) => (
   <tr style={{ backgroundColor: props.sms.matched_colour }}>
     <td>
+      <a href={`/send/adhoc/?recipient=${props.sms.sender_pk}`}>
+        <i className="violet reply link icon"></i>
+      </a>
       <a href={props.sms.sender_url} style={{ color: '#212121' }}>
         {props.sms.sender_name}
       </a>
