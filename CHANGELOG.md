@@ -2,8 +2,12 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+**Release requires database migration to be run**
+
 ### Added
 - Reply to button in incoming logs so you can easily reply to a contact
+- API documented and Key access enabled to facilitate read only access
 
 ### Changed
 - Dropdowns now do full-text search (searching by surname will now work)

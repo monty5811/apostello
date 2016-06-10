@@ -61,6 +61,7 @@ StatusCode = namedtuple('StatusCode', 'anon, user, staff')
         ('/config/site/', StatusCode(302, 302, 200)),
         ('/config/responses/', StatusCode(302, 302, 200)),
         ('/config/first_run/', StatusCode(302, 302, 302)),
+        ('/api-setup/', StatusCode(302, 302, 200)),
     ]
 )
 @pytest.mark.django_db
@@ -86,3 +87,28 @@ class TestUrls:
     ):
         """Test logged in as staff"""
         assert users['c_staff'].get(url).status_code == status_code.staff
+
+
+from rest_framework.authtoken.models import Token
+
+
+@pytest.mark.slow
+@pytest.mark.django_db(transaction=True)
+class TestAPITokens:
+    """Test Auth Token Access to API."""
+
+    def test_no_access(self, users):
+        assert users['c_out'].get('/api/v1/recipients/').status_code == 403
+
+    def test_good_token(self, users, recipients):
+        t = Token.objects.create(user=users['staff'])
+        r = users['c_out'].get(
+            '/api/v1/recipients/', **
+            {'HTTP_AUTHORIZATION': 'Token {}'.format(t.key)}
+        )
+        assert r.status_code == 200
+        data = r.json()
+        assert data['count'] == len(data['results'])
+        assert data['count'] == models.Recipient.objects.filter(
+            is_archived=False
+        ).count()

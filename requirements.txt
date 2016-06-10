@@ -10,6 +10,7 @@ django-solo==1.1.2
 django-twilio==0.8.0
 django<1.10
 djangorestframework==3.3.3
+drfdocs==0.0.11
 fakeredis==0.7.0
 gunicorn==19.6.0
 ipython==4.2.0

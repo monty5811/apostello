@@ -237,6 +237,12 @@ urlpatterns += [url(r'^sms/$', v.sms)]
 urlpatterns += [
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', include(admin.site.urls)),
+    # auth-setup
+    url(
+        r'^api-setup/$',
+        v.APISetupView.as_view(),
+        name='api-setup',
+    ),
     # edit user profiles
     url(
         r'^users/profiles/(?P<pk>\d+)/$',
@@ -264,4 +270,5 @@ urlpatterns += [
         include('site_config.urls', namespace='site_config')),
     url(r'^graphs/', include('graphs.urls', namespace='graphs')),
     url(r'^api/', include('api.urls', namespace='api')),
+    url(r'^api-docs/', include('rest_framework_docs.urls')),
 ]

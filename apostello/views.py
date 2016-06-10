@@ -4,6 +4,8 @@ import io
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -11,6 +13,7 @@ from django.views.generic import View, TemplateView
 from django.views.generic.edit import FormView, UpdateView
 from django_twilio.decorators import twilio_view
 from phonenumber_field.validators import validate_international_phonenumber
+from rest_framework.authtoken.models import Token
 from twilio import twiml
 
 from apostello.decorators import check_user_perms, keyword_access_check
@@ -361,6 +364,40 @@ class CreateAllGroupView(LoginRequiredMixin, ProfilePermsMixin, FormView):
             g.recipient_set.add(r)
         g.save()
         return super(CreateAllGroupView, self).form_valid(form)
+
+
+class APISetupView(LoginRequiredMixin, ProfilePermsMixin, View):
+    """Simple view that can ensure user is logged in and has permissions."""
+    template_name = 'apostello/api-setup.html'
+    required_perms = []
+
+    def get(self, request, *args, **kwargs):
+        """Handle get requests."""
+        context = {}
+        try:
+            context['api_token'] = request.user.auth_token
+        except ObjectDoesNotExist:
+            context['api_token'] = 'No API Token Generated'
+
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        """Handle token generation."""
+        if request.GET.get('regen') is not None:
+            t, created = Token.objects.get_or_create(user=request.user)
+            if not created:
+                t.delete()
+                Token.objects.create(user=request.user)
+
+        if request.GET.get('delete') is not None:
+            try:
+                t = Token.objects.get(user=request.user)
+                t.delete()
+            except Token.DoesNotExist:
+                # no token to delete, just continue
+                pass
+
+        return redirect(reverse('api-setup'))
 
 
 @twilio_view

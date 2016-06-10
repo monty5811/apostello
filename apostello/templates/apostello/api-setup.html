@@ -1,0 +1,33 @@
+{% extends "apostello/base.html" %}
+{% load semanticui %}
+{% block title %}API{% endblock %}
+{% block side_bar %}
+{% include 'apostello/includes/default_sidebar.html' %}
+{% endblock %}
+{% block content %}
+<br>
+<p>apostello currently allows read only access via its API.</p>
+
+<p>For more details and help, please read the <a href="apostello.readthedocs.io/en/latest/api.html">docs</a></p>
+
+<div class="ui segments">
+  <div class="ui segment">
+    <p>API Token</p>
+  </div>
+  <div class="ui secondary segment">
+    <pre>{{ api_token }}</pre>
+  </div>
+</div>
+
+<div class="ui buttons">
+  <form method="post" action="?regen=true">
+    {% csrf_token %}
+    <button class="ui green button" type="submit">(Re)Generate Token</button>
+  </form>
+  <form method="post" action="?delete=true">
+    {% csrf_token %}
+    <button class="ui red button" type="submit">Delete Token</button>
+  </form>
+</div>
+
+{% endblock %}
