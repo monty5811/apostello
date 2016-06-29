@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [v1.10.0]
+
 **Release requires database migration to be run**
 
 ### Added
