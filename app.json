@@ -81,7 +81,7 @@
       "value": "",
       "required": false
     },
-    "OPBEAT_ORG_ID": {
+    "OPBEAT_ORGANIZATION_ID": {
       "value": "",
       "required": false
     },

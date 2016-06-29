@@ -191,7 +191,7 @@ NO_ACCESS_WARNING = 'You do not have access to this page. ' \
 
 # opbeat django:
 OPBEAT = {
-    'ORGANIZATION_ID': os.environ.get('OPBEAT_ORG_ID', ''),
+    'ORGANIZATION_ID': os.environ.get('OPBEAT_ORGANIZATION_ID', ''),
     'APP_ID': os.environ.get('OPBEAT_APP_ID', ''),
     'SECRET_TOKEN': os.environ.get('OPBEAT_SECRET_TOKEN', ''),
 }

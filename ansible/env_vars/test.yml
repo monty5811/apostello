@@ -25,7 +25,7 @@ django_time_zone: 'Europe/London'
 elvanto_key: '00000000000000000000000000000000'
 country_code: 44
 # Opbeat
-opbeat_org_id: ''
+opbeat_organization_id: ''
 opbeat_app_id: ''
 opbeat_secret_token: ''
 opbeat_js_org_id: ''
