@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- View archived contacts, groups and keywords (only staff can view)
 
 ## [v1.10.0]
 

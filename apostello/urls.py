@@ -57,9 +57,18 @@ urlpatterns += [
         r'^group/all/$',
         v.SimpleView.as_view(
             template_name='apostello/groups.html',
-            required_perms=['can_see_groups']
+            required_perms=['can_see_groups'],
+            rest_uri='/api/v1/groups/',
         ),
         name='recipient_groups'
+    ),
+    url(
+        r'^group/archive/$',
+        v.SimpleView.as_view(
+            template_name='apostello/groups.html',
+            rest_uri='/api/v1/groups_archive/',
+        ),
+        name='recipient_groups_archive'
     ),
     url(
         r'^group/new/$',
@@ -96,9 +105,18 @@ urlpatterns += [
         r'^recipient/all/$',
         v.SimpleView.as_view(
             template_name='apostello/recipients.html',
-            required_perms=['can_see_contact_names']
+            required_perms=['can_see_contact_names'],
+            rest_uri='/api/v1/recipients/',
         ),
         name='recipients'
+    ),
+    url(
+        r'^recipient/archive/$',
+        v.SimpleView.as_view(
+            template_name='apostello/recipients.html',
+            rest_uri='/api/v1/recipients_archive/',
+        ),
+        name='recipients_archive'
     ),
     url(
         r'^recipient/new/$',
@@ -130,9 +148,18 @@ urlpatterns += [
         r'^keyword/all/$',
         v.SimpleView.as_view(
             template_name='apostello/keywords.html',
-            required_perms=['can_see_keywords']
+            required_perms=['can_see_keywords'],
+            rest_uri='/api/v1/keywords/',
         ),
         name='keywords',
+    ),
+    url(
+        r'^keyword/archive/$',
+        v.SimpleView.as_view(
+            template_name='apostello/keywords.html',
+            rest_uri='/api/v1/keywords_archive/',
+        ),
+        name='keywords_archive',
     ),
     url(
         r'^keyword/new/$',

@@ -3,7 +3,10 @@
 {% block title %}Keywords{% endblock %}
 {% block side_bar %}
 <a class="item" href="{% url 'keyword' %}">New Keyword</a>
+{% if request.user.is_staff %}
+<a class="item" href="{% url 'keywords_archive' %}">Archived Keywords</a>
+{% endif %}
 {% endblock %}
 {% block content %}
-<div id="react_table" src="/api/v1/keywords/" pollInterval="20000"></div>
+<div id="react_table" src="{{ rest_uri }}" pollInterval="20000"></div>
 {%endblock%}

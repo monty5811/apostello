@@ -112,6 +112,17 @@ urlpatterns = [
         name='recipients'
     ),
     url(
+        r'^v1/recipients_archive/$',
+        v.ApiCollection.as_view(
+            model_class=Recipient,
+            serializer_class=s.RecipientSerializer,
+            filter_list=True,
+            filters={'is_archived': True},
+            permission_classes=(IsAuthenticated, IsStaff)
+        ),
+        name='recipients_archive'
+    ),
+    url(
         r'^v1/recipients/(?P<pk>[0-9]+)$',
         v.ApiMember.as_view(
             model_class=Recipient,
@@ -131,6 +142,17 @@ urlpatterns = [
             permission_classes=(IsAuthenticated, CanSeeGroups)
         ),
         name='recipient_groups'
+    ),
+    url(
+        r'^v1/groups_archive/$',
+        v.ApiCollection.as_view(
+            model_class=RecipientGroup,
+            serializer_class=s.RecipientGroupSerializer,
+            filter_list=True,
+            filters={'is_archived': True},
+            permission_classes=(IsAuthenticated, IsStaff)
+        ),
+        name='recipient_groups_archive'
     ),
     url(
         r'^v1/groups/(?P<pk>[0-9]+)$',
@@ -182,6 +204,17 @@ urlpatterns = [
             permission_classes=(IsAuthenticated, CanSeeKeywords)
         ),
         name='keywords'
+    ),
+    url(
+        r'^v1/keywords_archive/$',
+        v.ApiCollection.as_view(
+            model_class=Keyword,
+            serializer_class=s.KeywordSerializer,
+            filter_list=True,
+            filters={'is_archived': True},
+            permission_classes=(IsAuthenticated, IsStaff)
+        ),
+        name='keywords_archive'
     ),
     url(
         r'^v1/keywords/(?P<pk>[0-9]+)$',

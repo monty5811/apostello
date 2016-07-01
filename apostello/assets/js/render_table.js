@@ -17,7 +17,9 @@ import ScheduledSmsTable from './components/scheduled_sms_table';
 function renderTable() {
   // handle urls with pks:
   let path = _url.replace(/\d+\/$/, '');
-  path = path.replace(/archive\/$/, '');
+  if (path !== _url) {
+    path = path.replace(/archive\/$/, '');
+  }
 
   const toggleDiv = document.getElementById('toggle_button');
   const viewingArchive = toggleDiv === null ? {} : toggleDiv.getAttribute('viewingArchive');
@@ -25,13 +27,16 @@ function renderTable() {
   const tables = {
     '/elvanto/import/': ElvantoTable,
     '/group/all/': GroupsTable,
+    '/group/archive/': GroupsTable,
     '/incoming/': IncomingTable,
     '/incoming/curate_wall/': CurateTable,
     '/incoming/wall/': LiveWall,
     '/keyword/all/': KeywordsTable,
+    '/keyword/archive/': KeywordsTable,
     '/keyword/responses/': KeywordRespTable,
     '/outgoing/': OutgoingTable,
     '/recipient/all/': ContactsTable,
+    '/recipient/archive/': ContactsTable,
     '/recipient/edit/': IncomingTable,
     '/users/profiles/': UserProfilesTable,
     '/scheduled/sms/': ScheduledSmsTable,

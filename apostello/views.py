@@ -33,6 +33,7 @@ class SimpleView(LoginRequiredMixin, ProfilePermsMixin, View):
     """Simple view that can ensure user is logged in and has permissions."""
     template_name = ''
     required_perms = []
+    rest_uri = None
 
     def get(self, request, *args, **kwargs):
         """Handle get requests."""
@@ -42,6 +43,9 @@ class SimpleView(LoginRequiredMixin, ProfilePermsMixin, View):
             # first run, disable tour on subsequent loads
             user_profile.show_tour = False
             user_profile.save()
+
+        if self.rest_uri is not None:
+            context['rest_uri'] = self.rest_uri
 
         return render(request, self.template_name, context)
 
