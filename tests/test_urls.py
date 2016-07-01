@@ -109,8 +109,8 @@ class TestAPITokens:
     def test_good_token(self, users, recipients):
         t = Token.objects.create(user=users['staff'])
         r = users['c_out'].get(
-            '/api/v1/recipients/', **
-            {'HTTP_AUTHORIZATION': 'Token {}'.format(t.key)}
+            '/api/v1/recipients/',
+            **{'HTTP_AUTHORIZATION': 'Token {}'.format(t.key)}
         )
         assert r.status_code == 200
         data = r.json()

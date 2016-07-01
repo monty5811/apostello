@@ -54,7 +54,9 @@ class SendAdhocRecipientsForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super(SendAdhocRecipientsForm, self).__init__(*args, **kwargs)
-        self.fields['content'].widget = forms.Textarea(attrs={'rows': get_content_rows()})
+        self.fields['content'].widget = forms.Textarea(
+            attrs={'rows': get_content_rows()}
+        )
 
 
 class SendRecipientGroupForm(forms.Form):
@@ -99,7 +101,9 @@ class SendRecipientGroupForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super(SendRecipientGroupForm, self).__init__(*args, **kwargs)
-        self.fields['content'].widget = forms.Textarea(attrs={'rows': get_content_rows()})
+        self.fields['content'].widget = forms.Textarea(
+            attrs={'rows': get_content_rows()}
+        )
 
 
 class ManageRecipientGroupForm(forms.ModelForm):
@@ -266,4 +270,3 @@ class GroupAllCreateForm(forms.Form):
         'If this group already exists it will be overwritten.',
         max_length=150,
     )
-
