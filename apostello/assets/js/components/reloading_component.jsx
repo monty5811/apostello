@@ -1,13 +1,35 @@
 import React, { Component } from 'react';
 import $ from 'jquery';
+import localforage from 'localforage';
 import Loader from './loader';
 
 export const LoadingComponent = ComposedComponent => class extends Component {
   constructor() {
     super();
+    this.loadFromStorage = this.loadFromStorage.bind(this);
     this.loadFromServer = this.loadFromServer.bind(this);
     this.deleteItemUpdate = this.deleteItemUpdate.bind(this);
     this.state = { data: 'loading' };
+  }
+  loadFromStorage() {
+    if (this.state.data !== 'loading') {
+      // only load from storage when table is empty
+      return;
+    }
+    localforage.getItem(this.props.url).then((value) => {
+      if (value === null) {
+        // no data in store yet, skip
+        return;
+      }
+      const curData = new Map();
+      value.results.map(x => curData.set(x.pk, x));
+      if (this.state.data === 'loading') {
+        // only update state if we are still 'loading'
+        // we do not want to override any results that we
+        // have already got from the server
+        this.setState({ data: curData });
+      }
+    });
   }
   loadFromServer() {
     const that = this;
@@ -22,6 +44,13 @@ export const LoadingComponent = ComposedComponent => class extends Component {
         data.results.map(x => curData.set(x.pk, x));
 
         that.setState({ data: curData });
+        if (data.prev === null) {
+          // first page - drop it in storage for the next
+          // page load
+          // this will also be called after any posts to the
+          // server, which should minimise stale data on reload
+          localforage.setItem(that.props.url, data);
+        }
         if (data.next) {
           // if there is another page, grab it
           that.fetchNextPage(data.next);
@@ -60,6 +89,7 @@ export const LoadingComponent = ComposedComponent => class extends Component {
     this.loadFromServer();
   }
   componentDidMount() {
+    this.loadFromStorage();
     this.loadFromServer();
     setInterval(this.loadFromServer, this.props.pollInterval);
   }
