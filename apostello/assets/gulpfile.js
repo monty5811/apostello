@@ -56,7 +56,9 @@ gulp.task('css', ['uiBuildCss', 'webpack', 'copyThemeFonts', 'copyThemeImages'],
     ],
     {info: true}
     ))
-    .pipe(nano())
+    .pipe(nano({
+      discardComments: {removeAll: true}
+    }))
     .pipe(gulp.dest('./../static/css'));
 });
 

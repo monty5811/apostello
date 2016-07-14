@@ -1,6 +1,7 @@
 var path = require("path");
 var webpack = require('webpack');
 var config = require('./webpack.base.config.js');
+var ClosureCompilerPlugin = require('closure-compiler-webpack-plugin');
 
 
 config.plugins = config.plugins.concat([
@@ -12,18 +13,11 @@ config.plugins = config.plugins.concat([
   }),
   //
   new webpack.optimize.CommonsChunkPlugin({
-    name: 'vendor', 
+    name: 'vendor',
     filename: 'vendor.js'
   }),
   // minifies code
-  new webpack.optimize.UglifyJsPlugin({
-    compress: {
-      warnings: false
-    },
-    output: {
-      comments: false
-    }
-  })
+  new ClosureCompilerPlugin()
 ]);
 
 module.exports = config;

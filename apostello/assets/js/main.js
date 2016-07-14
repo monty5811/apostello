@@ -8,60 +8,60 @@ import { renderAdminUserForm, renderTestEmailForm, renderTestSmsForm } from './f
 
 /* global _url */
 
-// use django cookie for all ajax calls
-$.ajaxSetup({
-  beforeSend(xhr, settings) {
-    if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
-      const csrftoken = getCookie('csrftoken');
-      xhr.setRequestHeader('X-CSRFToken', csrftoken);
-    }
-  },
-});
+function setupDropdowns() {
+  // manually specify all dropdowns to setup:
+  const dropdownOptions = {
+    label: {
+      transition: 'horizontal flip',
+      duration: 0,
+      variation: false,
+    },
+  };
+  // main menu:
+  $('#primary-menu').dropdown(dropdownOptions);
+  $('#tools-menu').dropdown(dropdownOptions);
+  // create/edit group
+  $('#members_dropdown').dropdown(dropdownOptions);
+  // create/edit contact
+  $('#groups_dropdown').dropdown(dropdownOptions);
+  // create/edit keyword
+  $('#linked_group_dropdown').dropdown(dropdownOptions);
+  $('#owners_dropdown').dropdown(dropdownOptions);
+  $('#digest_dropdown').dropdown(dropdownOptions);
+  // send sms dropdowns are initialised in send_costs.js
+}
 
-$(document).ready(() => {
-  // initialise dropdown menus
-  if ($('.dropdown').length > 0) {
-    $('.dropdown').dropdown({
-      label: {
-        transition: 'horizontal flip',
-        duration: 0,
-        variation: false,
-      },
-    });
-  }
-});
+function appInit() {
+  // setup ajax
+  $.ajaxSetup({
+    beforeSend(xhr, settings) {
+      if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+        const csrftoken = getCookie('csrftoken');
+        xhr.setRequestHeader('X-CSRFToken', csrftoken);
+      }
+    },
+  });
 
-$(document).ready(() => {
+  setupDropdowns();
+
   // handle live cost estimates
   if (_url === '/send/adhoc/') {
     setupSendAdhoc();
   } else if (_url === '/send/group/') {
     setupSendGroup();
   }
-});
-
-$(document).ready(() => {
   // render table on page
   if ($('#react_table').length > 0) {
     renderTable();
   }
-});
-
-$(document).ready(() => {
   // render elvanto buttons
   if ($('#elvanto_pull_button').length > 0) {
     renderElvantoButtons();
   }
-});
-
-$(document).ready(() => {
   // render remove/restore buttons
   if ($('#toggle_button').length > 0) {
     renderToggleButton();
   }
-});
-
-$(document).ready(() => {
   // initialise any date pickers
   if ($('#dtBox').length > 0) {
     $('#dtBox').DateTimePicker({
@@ -71,10 +71,7 @@ $(document).ready(() => {
       buttonsToDisplay: ['SetButton', 'ClearButton'],
     });
   }
-});
-
-$(document).ready(() => {
-  // render remove/restore buttons
+  // setup first run page
   if ($('#send_test_email').length > 0) {
     renderTestEmailForm();
   }
@@ -84,4 +81,6 @@ $(document).ready(() => {
   if ($('#create_admin_user').length > 0) {
     renderAdminUserForm();
   }
-});
+}
+
+$(document).ready(() => appInit());

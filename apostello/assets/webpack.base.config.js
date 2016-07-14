@@ -8,8 +8,10 @@ module.exports = {
     main: './js/main',
     tour: './js/tour',
     vendor: [
-      'jquery',
       'datetimepicker',
+      'jquery',
+      'localforage',
+      'moment',
       'react',
       'react-dom',
       './semantic/dist/semantic.js',
@@ -58,6 +60,8 @@ module.exports = {
         }
       }, // to transform JSX into JS
     ],
+    // do not include moment locales
+    noParse: [/moment.js/],
   },
 
   resolve: {

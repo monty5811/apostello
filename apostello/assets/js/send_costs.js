@@ -5,7 +5,7 @@ import setCost from './calculate_sms_cost';
 
 function setupSendAdhoc() {
   // handle send adhoc cost updates
-  $('.dropdown').dropdown(
+  $('.field .dropdown').dropdown(
     {
       fullTextSearch: true,
       onChange(text) {
@@ -21,26 +21,22 @@ function setupSendAdhoc() {
 
 function setupSendGroup() {
   // handle send group cost updates
-  $(document).ready(
-    () => {
-      $('.dropdown').dropdown(
-        {
-          fullTextSearch: true,
-          onChange(text) {
-            setCost(group_sizes[text], sms_cost);
-          },
-        }
-      );
-      $('#id_content').keyup(() => {
-        let nPeople = 0;
-        const selectedGroup = $('.item.active.selected')[0];
-        if (selectedGroup !== undefined) {
-          nPeople = group_sizes[selectedGroup.getAttribute('data-value')];
-        }
-        setCost(nPeople, sms_cost);
-      });
+  $('.field .dropdown').dropdown(
+    {
+      fullTextSearch: true,
+      onChange(text) {
+        setCost(group_sizes[text], sms_cost);
+      },
     }
   );
+  $('#id_content').keyup(() => {
+    let nPeople = 0;
+    const selectedGroup = $('.item.active.selected')[0];
+    if (selectedGroup !== undefined) {
+      nPeople = group_sizes[selectedGroup.getAttribute('data-value')];
+    }
+    setCost(nPeople, sms_cost);
+  });
 }
 
 export { setupSendAdhoc, setupSendGroup };

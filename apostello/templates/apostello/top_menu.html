@@ -1,5 +1,5 @@
 {% with profile=request.user.profile %}
-<div class="ui dropdown item" data-intro="Use this menu to switch between different pages." data-step="1" data-position="right">
+<div class="ui dropdown item" data-intro="Use this menu to switch between different pages." data-step="1" data-position="right" id="primary-menu">
   Menu <i class="dropdown icon"></i>
   <div class="ui vertical menu">
     <a href="/" class="item">Home</a>
@@ -29,7 +29,7 @@
   </div>
 </div>
 {% if profile.can_import or request.user.is_staff %}
-<div class="ui dropdown item">
+<div class="ui dropdown item" id="tools-menu">
   Tools <i class="dropdown icon"></i>
   <div class="menu">
     {% if request.user.is_staff %}

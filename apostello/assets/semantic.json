@@ -36,15 +36,12 @@
     "message",
     "table",
     "card",
-    "item",
     "checkbox",
     "dimmer",
     "dropdown",
-    "popup",
     "transition",
-    "form",
     "segment"
   ],
-  "version": "2.2.1",
+  "version": "2.2.2",
   "autoInstall": true
 }
