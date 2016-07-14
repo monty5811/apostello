@@ -32,7 +32,10 @@ export const LoadingComponent = ComposedComponent => class extends Component {
           localforage.setItem(url, data).then(() => {
             if (data.next) {
               // if there is another page, grab it
-              that.getPage(data.next);
+              // but let's first make sure we don't grab too many entries:
+              if (that.state.data.size < 2000) {
+                that.getPage(data.next);
+              }
             } else {
               // we have finished, let's wait, then update data again
               that.timers.push(
