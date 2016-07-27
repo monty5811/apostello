@@ -1,7 +1,7 @@
 apostello-form==0.0.1
 dj-database-url==0.4.1
 django-allauth==0.25.2
-django-debug-toolbar==1.4
+django-debug-toolbar==1.5
 django-extensions==1.6.7
 django-phonenumber-field==1.1.0
 django-q==0.7.18
