@@ -8,11 +8,11 @@ static/CACHE
 # front end
 dist/
 node_modules/
-apostello/assets/semantic/src/themes/
-apostello/assets/semantic/src/definitions/
-apostello/assets/semantic/src/semantic.less
-apostello/assets/semantic/tasks
-apostello/assets/semantic/gulpfile.js
+assets/semantic/src/themes/
+assets/semantic/src/definitions/
+assets/semantic/src/semantic.less
+assets/semantic/tasks
+assets/semantic/gulpfile.js
 *.map
 
 # Byte-compiled / optimized / DLL files

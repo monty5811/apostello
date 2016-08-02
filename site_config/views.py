@@ -9,13 +9,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.http import JsonResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.views.generic import View
 from django.views.generic.edit import UpdateView
 from django_twilio.client import twilio_client
 from twilio.rest.exceptions import TwilioRestException
 
 from apostello.mixins import ProfilePermsMixin
+from apostello.utils import ap_render as render
 from site_config.forms import DefaultResponsesForm, SiteConfigurationForm
 from site_config.models import DefaultResponses, SiteConfiguration
 

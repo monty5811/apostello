@@ -8,8 +8,8 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import View, TemplateView
+from django.shortcuts import get_object_or_404, redirect
+from django.views.generic import View
 from django.views.generic.edit import FormView, UpdateView
 from django_twilio.decorators import twilio_view
 from phonenumber_field.validators import validate_international_phonenumber
@@ -26,6 +26,8 @@ from apostello.mixins import ProfilePermsMixin
 from apostello.models import Keyword, Recipient, RecipientGroup, UserProfile
 from apostello.reply import InboundSms
 from apostello.utils import exists_and_archived
+from apostello.utils import ap_render as render
+from apostello.utils import ApTemplateView as TemplateView
 from site_config.models import SiteConfiguration
 
 
@@ -75,6 +77,12 @@ class SendView(LoginRequiredMixin, ProfilePermsMixin, FormView):
             form.initial['recipients'] = [prepopulated_recipient]
         form.user = self.request.user
         return form
+
+    def get_context_data(self, **kwargs):
+        """Inject not approved message into context."""
+        context = super(SendView, self).get_context_data(**kwargs)
+        context['js_path'] = self.template_name.replace('.html', '')
+        return context
 
 
 class SendAdhoc(SendView):

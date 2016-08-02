@@ -7,7 +7,7 @@
 		{% block morehead %}
     {% endblock %}
   </head>
-  <body>
+  <body data-js-view-name="{{ js_path }}">
     <div class="ui hidden divider"></div>
     <div class="ui stackable centered grid container">
       <div class="twelve wide column">
@@ -80,11 +80,8 @@
             async
             ></script>
     {% endif %}
-    <script>
-     var _url = '{{ request.path }}';
-    </script>
 		<script src="{% static 'js/vendor.js' %}"></script>
-		<script src="{% static 'js/main.js' %}"></script>
+		<script src="{% static 'js/app.js' %}"></script>
     {% csrf_token %}
 	</body>
 </html>

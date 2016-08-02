@@ -1,0 +1,13 @@
+{
+  "root": true,
+  "extends": "airbnb",
+    "rules": {
+      "global-require": [0],
+      "new-cap": [0],
+      "no-unused-vars": [1],
+      "react/prop-types": [0]
+    },
+  "env": {
+      "browser": true
+    }
+}
