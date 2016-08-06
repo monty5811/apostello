@@ -2,11 +2,14 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+## [v1.11.0]
 ### Added
 - View archived contacts, groups and keywords (only staff can view)
 
 ### Changed
 - Better performance when loading tables by using browser caching
+- Other misc refactorings and internal clean ups
 
 ## [v1.10.0]
 

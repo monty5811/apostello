@@ -11,7 +11,7 @@ try:
 except ImportError:
     from distutils.core import setup
 
-version = "1.10.0"
+version = "1.11.0"
 
 install_reqs = parse_requirements(
     'requirements_test.txt',
