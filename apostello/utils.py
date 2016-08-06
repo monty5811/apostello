@@ -2,8 +2,6 @@ import re
 
 import requests
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import render
-from django.views.generic import TemplateView
 
 from apostello.exceptions import ArchivedItemException
 
@@ -68,16 +66,3 @@ def retry_request(url, http_method, *args, **kwargs):
         break
 
     return resp
-
-
-def ap_render(request, template, dictionary):
-    dictionary.update({'js_path': template.replace('.html', '')})
-    return render(request, template, dictionary)
-
-
-class ApTemplateView(TemplateView):
-
-    def get(self, request, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
-        context['js_path'] = self.template_name.replace('.html', '')
-        return self.render_to_response(context)

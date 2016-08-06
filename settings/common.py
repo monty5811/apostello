@@ -48,6 +48,7 @@ SITE_ID = 1
 
 MIDDLEWARE_CLASSES = [
     'apostello.middleware.FirstRunRedirect',
+    'apostello.middleware.JsPathMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

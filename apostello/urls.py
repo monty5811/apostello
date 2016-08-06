@@ -5,9 +5,8 @@ from django.contrib import admin
 
 from apostello import views as v
 from apostello.decorators import keyword_access_check
-from apostello.forms import (
-    KeywordForm, ManageRecipientGroupForm, RecipientForm
-)
+from apostello.forms import (KeywordForm, ManageRecipientGroupForm,
+                             RecipientForm)
 from apostello.models import Keyword, Recipient, RecipientGroup
 
 admin.autodiscover()
@@ -249,7 +248,7 @@ urlpatterns += [
 # import urls
 urlpatterns += [
     url(r'^recipient/import/$',
-        v.import_recipients,
+        v.ImportRecipients.as_view(),
         name='import_recipients'),
 ]
 urlpatterns += [
@@ -299,3 +298,4 @@ urlpatterns += [
     url(r'^api/', include('api.urls', namespace='api')),
     url(r'^api-docs/', include('rest_framework_docs.urls')),
 ]
+

@@ -1,6 +1,5 @@
 import json
 
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -173,7 +172,7 @@ class ApiMember(APIView):
         return Response(serializer.data)
 
 
-class ElvantoPullButton(LoginRequiredMixin, ProfilePermsMixin, View):
+class ElvantoPullButton(ProfilePermsMixin, View):
     """View for elvanto pull button."""
     required_perms = ['can_import']
 
@@ -183,7 +182,7 @@ class ElvantoPullButton(LoginRequiredMixin, ProfilePermsMixin, View):
         return JsonResponse({'status': 'pulling'})
 
 
-class ElvantoFetchButton(LoginRequiredMixin, ProfilePermsMixin, View):
+class ElvantoFetchButton(ProfilePermsMixin, View):
     """View for elvanto fetch button."""
     required_perms = ['can_import']
 

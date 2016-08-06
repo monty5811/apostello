@@ -25,3 +25,22 @@ class FirstRunRedirect:
 
         if not request.path_info.startswith(('/sms', '/config')):
             return HttpResponseRedirect('/config/first_run/')
+
+
+class JsPathMiddleware:
+    """Inject template name into views so js can lookup file."""
+
+    def process_template_response(self, request, response):
+        """Inject the template name if it exists."""
+        template_name = response.template_name
+        if template_name is None:
+            return response
+
+        if type(template_name) is list and len(template_name) < 2:
+            template_name = template_name[0]
+
+        if type(template_name) is list and len(template_name) > 1:
+            raise Exception
+
+        response.context_data['js_path'] = template_name.replace('.html', '')
+        return response

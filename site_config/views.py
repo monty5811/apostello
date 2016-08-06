@@ -1,29 +1,26 @@
 import os
-import sys
 import traceback
 from collections import namedtuple
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.http import JsonResponse
 from django.shortcuts import redirect
-from django.views.generic import View
+from django.views.generic import TemplateView, View
 from django.views.generic.edit import UpdateView
 from django_twilio.client import twilio_client
 from twilio.rest.exceptions import TwilioRestException
 
 from apostello.mixins import ProfilePermsMixin
-from apostello.utils import ap_render as render
 from site_config.forms import DefaultResponsesForm, SiteConfigurationForm
 from site_config.models import DefaultResponses, SiteConfiguration
 
 EnvVarSetting = namedtuple('EnvVarSetting', ['env_var_name', 'info', 'val'])
 
 
-class SiteConfigView(LoginRequiredMixin, ProfilePermsMixin, UpdateView):
+class SiteConfigView(ProfilePermsMixin, UpdateView):
     """View to handle site config form."""
     template_name = 'site_config/edit_config.html'
     form_class = SiteConfigurationForm
@@ -40,7 +37,7 @@ class SiteConfigView(LoginRequiredMixin, ProfilePermsMixin, UpdateView):
         return super(SiteConfigView, self).form_valid(form)
 
 
-class ResponsesView(LoginRequiredMixin, ProfilePermsMixin, UpdateView):
+class ResponsesView(ProfilePermsMixin, UpdateView):
     """View to handle default responses form."""
     template_name = 'site_config/edit_responses.html'
     form_class = DefaultResponsesForm
@@ -57,15 +54,20 @@ class ResponsesView(LoginRequiredMixin, ProfilePermsMixin, UpdateView):
         return super(ResponsesView, self).form_valid(form)
 
 
-class FirstRunView(View):
+class FirstRunView(TemplateView):
     """View to make initial run experience easier."""
+    template_name = 'apostello/first_run.html'
 
     def get(self, request, *args, **kwargs):
-        """Handle the request."""
-        context = {}
+        """Deny access if already setup."""
         if User.objects.count() > 0:
             # once we have a user set up, deny access to this view
             return redirect('/')
+        return super(FirstRunView, self).get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        """Inject data into context."""
+        context = super(FirstRunView, self).get_context_data(**kwargs)
 
         try:
             numbers = twilio_client.phone_numbers.list(
@@ -159,7 +161,7 @@ class FirstRunView(View):
             ),
         ]
 
-        return render(request, 'apostello/first_run.html', context)
+        return context
 
 
 class TestSetupView(View):
