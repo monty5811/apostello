@@ -25,9 +25,9 @@ DATABASES = {
 }
 
 # overwrite static files (use white noise instead of runserver)
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
-] + MIDDLEWARE_CLASSES
+] + MIDDLEWARE
 STATIC_ROOT = BASE_DIR + '/static/'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 

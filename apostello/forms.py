@@ -57,6 +57,7 @@ class SendAdhocRecipientsForm(forms.Form):
         self.fields['content'].widget = forms.Textarea(
             attrs={'rows': get_content_rows()}
         )
+        self.use_required_attribute = False
 
 
 class SendRecipientGroupForm(forms.Form):
@@ -104,6 +105,7 @@ class SendRecipientGroupForm(forms.Form):
         self.fields['content'].widget = forms.Textarea(
             attrs={'rows': get_content_rows()}
         )
+        self.use_required_attribute = False
 
 
 class ManageRecipientGroupForm(forms.ModelForm):

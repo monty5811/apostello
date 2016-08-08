@@ -49,3 +49,9 @@ DJANGO_TWILIO_FORGERY_PROTECTION = False
 
 EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'
+
+import warnings
+warnings.filterwarnings(
+    'error', r"DateTimeField .* received a naive datetime",
+    RuntimeWarning, r'django\.db\.models\.fields',
+)

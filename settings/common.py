@@ -46,7 +46,7 @@ INSTALLED_APPS = [
 
 SITE_ID = 1
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'apostello.middleware.FirstRunRedirect',
     'apostello.middleware.JsPathMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

@@ -1,12 +1,13 @@
 import datetime
 
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 from django_q.models import Schedule
 
 
 def add_day_if_req(dt):
     """Check to see if the time has passsed already and adds a day if so."""
-    if dt > datetime.datetime.now():
+    if dt > timezone.now():
         return dt
 
     dt + datetime.timedelta(days=1)
@@ -20,7 +21,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Handle the command."""
-        now = datetime.datetime.now()
+        now = timezone.now()
         now = now.replace(minute=0, second=0)
         next_3am = add_day_if_req(now.replace(hour=3))
         next_230am = add_day_if_req(now.replace(hour=2, minute=30))

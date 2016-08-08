@@ -1,9 +1,10 @@
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.http import HttpResponseRedirect
+from django.utils.deprecation import MiddlewareMixin
 
 
-class FirstRunRedirect:
+class FirstRunRedirect(MiddlewareMixin):
     """
     This middleware will redirect all requests to the setup page (not /sms/).
 
@@ -27,7 +28,7 @@ class FirstRunRedirect:
             return HttpResponseRedirect('/config/first_run/')
 
 
-class JsPathMiddleware:
+class JsPathMiddleware(MiddlewareMixin):
     """Inject template name into views so js can lookup file."""
 
     def process_template_response(self, request, response):
@@ -40,7 +41,7 @@ class JsPathMiddleware:
             template_name = template_name[0]
 
         if type(template_name) is list and len(template_name) > 1:
-            raise Exception
+            template_name = template_name[-1]
 
         response.context_data['js_path'] = template_name.replace('.html', '')
         return response

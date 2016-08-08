@@ -1,11 +1,11 @@
 from datetime import datetime
 
 import pytest
+from tests.conftest import twilio_vcr
 from twilio.rest.exceptions import TwilioRestException
 
 from apostello.models import *
 from apostello.tasks import *
-from tests.conftest import twilio_vcr
 
 
 @pytest.mark.django_db
@@ -83,7 +83,7 @@ class TestTasks:
             'MessageSid': 'thisisreallyauuid',
             'From': calvin.number
         }
-        log_msg_in(p, datetime.now(), calvin.pk)
+        log_msg_in(p, timezone.now(), calvin.pk)
 
         assert SmsInbound.objects.filter(content="New test message"
                                          ).count() == 1

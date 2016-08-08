@@ -65,9 +65,9 @@ LOGGING = {
 if OPBEAT['ORGANIZATION_ID']:
     INSTALLED_APPS += ['opbeat.contrib.django', ]
 
-    MIDDLEWARE_CLASSES = [
+    MIDDLEWARE = [
         'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
-    ] + MIDDLEWARE_CLASSES
+    ] + MIDDLEWARE
 
     LOGGING['handlers']['opbeat'] = {
         'level': 'WARNING',

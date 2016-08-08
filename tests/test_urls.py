@@ -1,9 +1,10 @@
-from tests.conftest import twilio_vcr
+from collections import namedtuple
 
 import pytest
-from apostello import models
+from rest_framework.authtoken.models import Token
+from tests.conftest import twilio_vcr
 
-from collections import namedtuple
+from apostello import models
 
 StatusCode = namedtuple('StatusCode', 'anon, user, staff')
 
@@ -93,9 +94,6 @@ class TestUrls:
     ):
         """Test logged in as staff"""
         assert users['c_staff'].get(url).status_code == status_code.staff
-
-
-from rest_framework.authtoken.models import Token
 
 
 @pytest.mark.slow

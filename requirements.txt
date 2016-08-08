@@ -8,7 +8,7 @@ django-q==0.7.18
 django-redis==4.4.4
 django-solo==1.1.2
 django-twilio==0.8.0
-django<1.10
+django<1.11
 djangorestframework==3.4.1
 drfdocs==0.0.11
 fakeredis==0.7.0
