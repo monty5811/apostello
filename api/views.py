@@ -125,7 +125,7 @@ class ApiMember(APIView):
     def get(self, request, format=None, **kwargs):
         """Handle get requests."""
         obj = get_object_or_404(self.model_class, pk=kwargs['pk'])
-        serializer = self.serializer_class(obj)
+        serializer = self.serializer_class(obj, context={'request': request})
         return Response(serializer.data)
 
     def post(self, request, format=None, **kwargs):

@@ -124,6 +124,14 @@ class SmsOutboundSerializer(serializers.ModelSerializer):
 class RecipientSerializer(serializers.ModelSerializer):
     """Serialize apostello.models.Recipient for use in table."""
     url = serializers.CharField(source='get_absolute_url')
+    number = serializers.SerializerMethodField()
+
+    def get_number(self, obj):
+        user = self.context['request'].user
+        if user.userprofile.can_see_contact_nums or user.is_staff:
+            return str(obj.number)
+
+        return ''
 
     class Meta:
         model = Recipient
@@ -133,6 +141,7 @@ class RecipientSerializer(serializers.ModelSerializer):
             'pk',
             'url',
             'full_name',
+            'number',
             'is_archived',
             'is_blocking',
             'do_not_reply',

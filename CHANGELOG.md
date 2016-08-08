@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Changed
+- Move to Django 1.10
+- Serialize phone numbers in api if user should see them
+- Accept multiple recipients as url params in send SMS form
+
+### Fixed
+- Fix bug in js path middleware
 
 ## [v1.11.0]
 ### Added
