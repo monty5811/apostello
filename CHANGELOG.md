@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- Allow prefilling of sending forms using URL params
+
 ### Changed
 - Move to Django 1.10
 - Serialize phone numbers in api if user should see them

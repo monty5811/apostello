@@ -21,6 +21,11 @@ class SendView(ProfilePermsMixin, FormView):
         prepopulated_recipients = self.request.GET.getlist('recipient')
         if prepopulated_recipients:
             form.initial['recipients'] = prepopulated_recipients
+
+        prepopulated_message = self.request.GET.get('content')
+        if prepopulated_message is not None:
+            form.initial['content'] = prepopulated_message
+
         form.user = self.request.user
         return form
 
