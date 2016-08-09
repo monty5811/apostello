@@ -46,6 +46,11 @@ class ApiCollection(generics.ListAPIView):
             objs = objs.filter(**self.filters)
         return objs
 
+    def get_serializer_context(self):
+        context = super(ApiCollection, self).get_serializer_context()
+        context['request'] = self.request
+        return context
+
 
 class ApiCollectionRecentSms(ApiCollection):
     """SMS collection for a single recipient."""
@@ -168,7 +173,7 @@ class ApiMember(APIView):
             obj.delete()
             return r
 
-        serializer = self.serializer_class(obj)
+        serializer = self.serializer_class(obj, context={'request': request})
         return Response(serializer.data)
 
 

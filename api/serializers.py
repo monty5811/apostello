@@ -212,7 +212,7 @@ class QScheduleSerializer(serializers.ModelSerializer):
         pk = self._split_args(obj.args)[0]
         if pk is not None:
             grp = Recipient.objects.get(pk=pk)
-            serializer = RecipientSerializer(grp)
+            serializer = RecipientSerializer(grp, context=self.context)
             return serializer.data
         else:
             return {'url': '#', 'full_name': 'n/a'}
