@@ -1,7 +1,6 @@
 apostello-form==0.0.1
 dj-database-url==0.4.1
 django-allauth==0.26.1
-django-debug-toolbar==1.5
 django-extensions==1.7.1
 django-phonenumber-field==1.1.0
 django-q==0.7.18
@@ -11,7 +10,6 @@ django-twilio==0.8.0
 django~=1.10
 djangorestframework==3.4.3
 drfdocs==0.0.11
-fakeredis==0.7.0
 gunicorn==19.6.0
 ipython==5.0.0
 opbeat==3.3.4
@@ -22,4 +20,3 @@ redis==2.10.5
 requests==2.11.0
 twilio==5.4.0
 whitenoise==3.2
-yapf==0.11.0

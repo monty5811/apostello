@@ -1,4 +1,4 @@
--r requirements.txt
+-r requirements_dev.txt
 py==1.4.31
 pytest-cov==2.3.1
 pytest-django==2.9.1
