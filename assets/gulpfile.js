@@ -29,7 +29,7 @@ gulp.task('copyThemeImages', function() {
   .pipe(gulp.dest('./../apostello/static/css/themes/default/assets/images'));
 });
 
-gulp.task('css', ['uiBuildCss', 'webpack', 'copyThemeFonts', 'copyThemeImages'], function() {
+gulp.task('css', ['uiBuildCss', 'copyThemeFonts', 'copyThemeImages'], function() {
   gulp.src([
       './css/**/*.scss',
     ])
@@ -53,8 +53,11 @@ gulp.task('css', ['uiBuildCss', 'webpack', 'copyThemeFonts', 'copyThemeImages'],
       './../apostello/templates/**/*.html',
       './../elvanto/templates/**/*.html',
       './../site_config/templates/**/*.html',
-      './../apostello/static/js/**/*.js',
+      './js/**/*.js',
+      './js/**/*.jsx',
+      // './../apostello/static/js/**/*.js',
       './node_modules/datetimepicker/dist/*.js',
+      './node_modules/intro.js/intro.js',
     ],
     {info: true}
     ))

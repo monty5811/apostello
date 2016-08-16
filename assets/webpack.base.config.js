@@ -57,7 +57,7 @@ module.exports = {
         query: {
           compact: true,
           comments: false,
-          presets: ['babel-preset-es2015-webpack', 'react']
+          presets: ['babel-preset-es2015', 'react']
         }
       }, // to transform JSX into JS
     ],
