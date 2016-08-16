@@ -1,0 +1,9 @@
+include requirements.txt
+
+recursive-include apostello/static *
+
+recursive-include apostello/templates *
+recursive-include elvanto/templates *
+recursive-include graphs/templates *
+recursive-include site_config/templates *
+
