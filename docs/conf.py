@@ -17,20 +17,6 @@ import inspect
 import sys
 import os
 
-from django.utils.html import strip_tags
-
-sys.path.insert(0, os.path.abspath('..'))
-os.environ['ELVANTO_KEY'] = 'docs'
-os.environ['TWILIO_AUTH_TOKEN'] = 'docs'
-os.environ['TWILIO_ACCOUNT_SID'] = 'docs'
-os.environ['TWILIO_FROM_NUM'] = 'docs'
-os.environ['COUNTRY_CODE'] = '44'
-os.environ['DJANGO_SETTINGS_MODULE'] = 'settings.test'
-import django
-django.setup()
-
-import apostello
-
 # -- General configuration ------------------------------------------------
 # needs_sphinx = '1.0'
 extensions = ['sphinx.ext.autodoc', ]
@@ -48,7 +34,7 @@ version = '1.11.0'
 # The full version, including alpha/beta/rc tags.
 release = '0.1'
 language = None
-exclude_patterns = ['_build']
+exclude_patterns = ['_build', 'venv', ]
 # default_role = None
 # add_function_parentheses = True
 # add_module_names = True
@@ -125,46 +111,3 @@ texinfo_documents = [
 # texinfo_domain_indices = True
 # texinfo_show_urls = 'footnote'
 # texinfo_no_detailmenu = False
-
-
-def process_docstring(app, what, name, obj, options, lines):
-    # https://djangosnippets.org/snippets/2533/
-    # This causes import errors if left outside the function
-    from django.db import models
-
-    # Only look at objects that inherit from Django's base model class
-    if inspect.isclass(obj) and issubclass(obj, models.Model):
-        # Grab the field list from the meta class
-        fields = obj._meta.fields
-
-        for field in fields:
-            if field.name is 'id':
-                continue
-            # Decode and strip any html out of the field's help text
-            help_text = strip_tags(field.help_text)
-
-            # Decode and capitalize the verbose name, for use if there isn't
-            # any help text
-            verbose_name = field.verbose_name.capitalize()
-
-            if help_text:
-                # Add the model field to the end of the docstring as a param
-                # using the help text as the description
-                lines.append(u':param %s: %s' % (field.attname, help_text))
-            else:
-                # Add the model field to the end of the docstring as a param
-                # using the verbose name as the description
-                lines.append(u':param %s: %s' % (field.attname, verbose_name))
-
-            # Add the field's type to the docstring
-            lines.append(
-                u':type %s: %s' % (field.attname, type(field).__name__)
-            )
-
-    # Return the extended docstring
-    return lines
-
-
-def setup(app):
-    # Register the docstring processor with sphinx
-    app.connect('autodoc-process-docstring', process_docstring)
