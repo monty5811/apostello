@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+## [v1.12.0]
 ### Added
 - Allow prefilling of sending forms using URL params
 
@@ -12,6 +14,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - Fix bug in js path middleware
+- Other misc tweaks and clean ups
 
 ## [v1.11.0]
 ### Added
