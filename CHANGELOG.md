@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [v1.12.1]
+- Pin Django version
+
 ## [v1.12.0]
 ### Added
 - Allow prefilling of sending forms using URL params
