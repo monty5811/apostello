@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import KeywordStatus from './keyword_status';
 import ArchiveButton from './archive_button';
 
-const KeywordRow = (props) => (
+const KeywordRow = props => (
   <tr>
     <td>
       <a href={props.keyword.responses_url}>{props.keyword.keyword}</a>
@@ -28,5 +28,10 @@ const KeywordRow = (props) => (
     </td>
   </tr>
 );
+
+KeywordRow.propTypes = {
+  keyword: PropTypes.object.isRequired,
+  archiveKeyword: PropTypes.func.isRequired,
+};
 
 export default KeywordRow;

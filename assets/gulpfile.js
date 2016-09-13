@@ -49,18 +49,6 @@ gulp.task('css', ['uiBuildCss', 'copyThemeFonts', 'copyThemeImages'], function()
       suffix: '.min'
     }))
     .pipe(nano())
-    .pipe(purify([
-      './../apostello/templates/**/*.html',
-      './../elvanto/templates/**/*.html',
-      './../site_config/templates/**/*.html',
-      './js/**/*.js',
-      './js/**/*.jsx',
-      // './../apostello/static/js/**/*.js',
-      './node_modules/datetimepicker/dist/*.js',
-      './node_modules/intro.js/intro.js',
-    ],
-    {info: true}
-    ))
     .pipe(nano({
       discardComments: {removeAll: true}
     }))

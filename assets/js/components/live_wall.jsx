@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import LoadingComponent from './reloading_component';
 import ResponseCard from './response_card';
 
@@ -28,5 +28,9 @@ class LiveWall extends Component {
     );
   }
 }
+
+LiveWall.propTypes = {
+  data: PropTypes.array.isRequired,
+};
 
 export default LoadingComponent(LiveWall);

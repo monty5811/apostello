@@ -1,5 +1,4 @@
-import React, { Component } from 'react';
-import moment from 'moment';
+import React, { Component, PropTypes } from 'react';
 import post from '../utils/ajax_post';
 import LoadingComponent from './reloading_component';
 import FilteringComponent from './filtering_component';
@@ -21,13 +20,12 @@ class ScheduledSmsTable extends Component {
     const that = this;
     const rows = this.props.data.map(
       (task, index) => {
-        const t = moment(task.next_run);
-        if (moment(task.next_run).isBefore()) {
+        if (Date(task.next_run) < Date()) {
           return null;
         }
         return (<ScheduledSmsTableRow
           task={task}
-          sendTime={t.fromNow()}
+          sendTime={task.next_run_formatted}
           key={index}
           cancelTask={that.cancelTask}
         />);
@@ -52,5 +50,10 @@ class ScheduledSmsTable extends Component {
     );
   }
 }
+
+ScheduledSmsTable.propTypes = {
+  data: PropTypes.array.isRequired,
+  deleteItemUpdate: PropTypes.func.isRequired,
+};
 
 export default LoadingComponent(FilteringComponent(ScheduledSmsTable));

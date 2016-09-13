@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import biu from 'biu.js';
 
-const post = (url, data, success) => {
+const post = (url, data, success, failed) => {
   $.ajax({
     url,
     type: 'POST',
@@ -9,10 +9,11 @@ const post = (url, data, success) => {
     success(respData) {
       success(respData);
     },
-    error(xhr, errmsg, err) {
-      biu(err, { type: 'warning' });
-      console.log(`${xhr.status}: ${xhr.responseText}`);
-      console.log(err);
+    error() {
+      biu('Something went wrong there, sorry!', { type: 'warning' });
+      if (failed) {
+        failed();
+      }
     },
   });
 };

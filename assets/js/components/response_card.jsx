@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 
 const ResponseCard = (props) => {
   const resp = props.response;
@@ -17,6 +17,10 @@ const ResponseCard = (props) => {
       </div>
     </div>
   );
+};
+
+ResponseCard.propTypes = {
+  response: PropTypes.object.isRequired,
 };
 
 export default ResponseCard;

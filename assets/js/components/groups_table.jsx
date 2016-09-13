@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import post from '../utils/ajax_post';
 import LoadingComponent from './reloading_component';
 import FilteringComponent from './filtering_component';
@@ -42,5 +42,10 @@ class GroupsTable extends Component {
     );
   }
 }
+
+GroupsTable.propTypes = {
+  data: PropTypes.array.isRequired,
+  deleteItemUpdate: PropTypes.func.isRequired,
+};
 
 export default LoadingComponent(FilteringComponent(GroupsTable));

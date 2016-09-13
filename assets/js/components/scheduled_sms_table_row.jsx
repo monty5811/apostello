@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import CancelButton from './cancel_button';
 
-const ScheduledSmsTableRow = (props) => (
+const ScheduledSmsTableRow = props => (
   <tr>
     <td>{props.task.queued_by}</td>
     <td>
@@ -19,5 +19,11 @@ const ScheduledSmsTableRow = (props) => (
     </td>
   </tr>
 );
+
+ScheduledSmsTableRow.propTypes = {
+  task: PropTypes.object.isRequired,
+  sendTime: PropTypes.string.isRequired,
+  cancelTask: PropTypes.func.isRequired,
+};
 
 export default ScheduledSmsTableRow;

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 class ArchiveButton extends Component {
   constructor() {
@@ -20,5 +20,10 @@ class ArchiveButton extends Component {
     );
   }
 }
+
+ArchiveButton.propTypes = {
+  item: PropTypes.object.isRequired,
+  archiveFn: PropTypes.func.isRequired,
+};
 
 export default ArchiveButton;

@@ -18,3 +18,32 @@ class TestButtonPosts:
                         '/api/v1/' + endpoint + '/in/1',
                         {param: value}
                     )
+
+    def test_group_members_api(
+        self, recipients, groups, users
+    ):
+        # setup
+        grp = groups['empty_group']
+        url = grp.get_api_url
+        assert grp.all_recipients.count() == 0
+        initial_not_in_group = grp.all_recipients_not_in_group.count()
+        # add calvin to group
+        users['c_staff'].post(
+            url,
+            {
+                'member': 'false',
+                'contactPk': recipients['calvin'].pk
+            }
+        )
+        assert grp.all_recipients.count() == 1
+        assert initial_not_in_group - 1 == grp.all_recipients_not_in_group.count()
+        # remove calvin from group
+        users['c_staff'].post(
+            url,
+            {
+                'member': 'true',
+                'contactPk': recipients['calvin'].pk
+            }
+        )
+        assert grp.all_recipients.count() == 0
+        assert initial_not_in_group == grp.all_recipients_not_in_group.count()

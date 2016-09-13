@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import LoadingComponent from './reloading_component';
 import ElvantoGroupRow from './elvanto_group_row';
 import post from '../utils/ajax_post';
@@ -40,5 +40,10 @@ class ElvantoTable extends Component {
     );
   }
 }
+
+ElvantoTable.propTypes = {
+  data: PropTypes.array.isRequired,
+  loadfromserver: PropTypes.func.isRequired,
+};
 
 export default LoadingComponent(ElvantoTable);

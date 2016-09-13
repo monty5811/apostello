@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 
-const OutgoingTableRow = (props) => (
+const OutgoingTableRow = props => (
   <tr>
     <td>
       <a href={props.sms.recipient_url} style={{ color: '#212121' }}>
@@ -11,5 +11,9 @@ const OutgoingTableRow = (props) => (
     <td>{props.sms.time_sent}</td>
   </tr>
 );
+
+OutgoingTableRow.propTypes = {
+  sms: PropTypes.object.isRequired,
+};
 
 export default OutgoingTableRow;

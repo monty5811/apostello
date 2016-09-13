@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import post from '../utils/ajax_post';
 
 class ItemRemoveButton extends Component {
@@ -24,5 +24,11 @@ class ItemRemoveButton extends Component {
     return (<div className={className} onClick={this.archiveItem}>{txt}</div>);
   }
 }
+
+ItemRemoveButton.propTypes = {
+  url: PropTypes.string.isRequired,
+  redirect_url: PropTypes.string.isRequired,
+  is_archived: PropTypes.bool.isRequired,
+};
 
 export default ItemRemoveButton;

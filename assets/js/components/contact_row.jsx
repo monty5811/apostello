@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import ArchiveButton from './archive_button';
 
 const ContactRow = (props) => {
@@ -20,6 +20,12 @@ const ContactRow = (props) => {
       </td>
     </tr>
   );
+};
+
+ContactRow.propTypes = {
+  contact: PropTypes.object.isRequired,
+  is_blocking: PropTypes.bool.isRequired,
+  archiveContact: PropTypes.func.isRequired,
 };
 
 export default ContactRow;

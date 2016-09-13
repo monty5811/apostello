@@ -1,18 +1,45 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import $ from 'jquery';
-import localforage from 'localforage';
+import biu from 'biu.js';
 import Loader from './loader';
 
 const LoadingComponent = ComposedComponent => class extends Component {
+  static propTypes() {
+    return {
+      url: PropTypes.string.isRequired,
+    };
+  }
   constructor() {
     super();
-    this.cacheThenReq = this.cacheThenReq.bind(this);
     this.fetchPage = this.fetchPage.bind(this);
+    this.fetchNextPage = this.fetchNextPage.bind(this);
     this.loadFromServer = this.loadFromServer.bind(this);
     this.deleteItemUpdate = this.deleteItemUpdate.bind(this);
     this.state = { data: 'loading' };
     this.timers = [];
     this.fetches = [];
+  }
+  fetchNextPage(data) {
+    // by the time we are here, we know there are more items to fetch
+    // the first page should fetch 10 items so the page loads quickly
+    // then we increase to 100, then 1000
+    // once at 1000, we use the next page provided by the server
+    const numVals = data.results.length;
+    if (numVals < 11) {
+      // we have fetched the first page, let's bump page size to 100
+      this.fetchPage(`${this.props.url}?page_size=100`);
+      return;
+    }
+    if (numVals > 10 && numVals < 101) {
+      // we have used page size 100, let's up it to 1000
+      this.fetchPage(`${this.props.url}?page_size=1000`);
+      return;
+    }
+    if (numVals > 100) {
+      // we have used page size 1000, let's fetch server's "next"
+      this.fetchPage(data.next);
+      return;
+    }
   }
   fetchPage(url) {
     const that = this;
@@ -28,59 +55,35 @@ const LoadingComponent = ComposedComponent => class extends Component {
           // update state
           data.results.map(x => curData.set(x.pk, x));
           that.setState({ data: curData });
-          // cache the data
-          localforage.setItem(url, data).then(() => {
-            if (data.next) {
-              // if there is another page, grab it
-              // but let's first make sure we don't grab too many entries:
-              if (that.state.data.size < 2000) {
-                that.getPage(data.next);
-              }
-            } else {
-              // we have finished, let's wait, then update data again
-              that.timers.push(
-                setTimeout(that.loadFromServer, that.props.pollInterval)
-              );
-            }
-          });
+          if (data.next && curData.size < 3000) {
+            that.fetchNextPage(data);
+          } else {
+            // we have finished, let's wait, then update data again
+            that.timers.push(
+              setTimeout(that.loadFromServer, that.props.pollInterval)
+            );
+          }
         },
-        error(xhr, status, err) {
-          console.error(url, status, err.toString());
+        error(xhr, status) {
+          if (status !== 'abort') {
+            biu('Uh oh. Something went wrong when we tried to update...', { type: 'warning' });
+            that.timers.push(
+              setTimeout(that.loadFromServer, 10 * that.props.pollInterval)
+            );
+          }
         },
       })
     );
   }
-  cacheThenReq(url, useCache = true) {
-    if (!useCache) {
-      this.fetchPage(url);
-      return;
-    }
-    localforage.getItem(url).then((value) => {
-      if (value !== null) {
-        // cache hit, update state
-        let curData = this.state.data;
-        if (this.state.data === 'loading') {
-          curData = new Map();
-        }
-        value.results.map(x => curData.set(x.pk, x));
-        this.setState({ data: curData });
-      }
-      // then make the request, overwrite data and update cache
-      this.fetchPage(url);
-    });
-  }
-  getPage(url, useCache = true) {
-    this.cacheThenReq(url, useCache);
-  }
-  loadFromServer(useCache = true) {
+  loadFromServer() {
     // stop any existing fetches and timers
     // this function will be called when a button is pressed
     // we do not want multiple timers running at the same time
-    this.timers.forEach((t) => clearTimeout(t));
-    this.fetches.forEach((f) => f.abort());
+    this.timers.forEach(t => clearTimeout(t));
+    this.fetches.forEach(f => f.abort());
     this.fetches = [];
     // start reloading all data from server
-    this.getPage(this.props.url, useCache);
+    this.fetchPage(this.props.url);
   }
   deleteItemUpdate(data) {
     // remove item from Map and then pull from server
@@ -88,7 +91,7 @@ const LoadingComponent = ComposedComponent => class extends Component {
     curData.delete(data.pk);
     this.setState({ data: curData });
     // fetch from server again, but do not use local cache
-    this.loadFromServer(false);
+    this.loadFromServer();
   }
   componentDidMount() {
     this.loadFromServer();

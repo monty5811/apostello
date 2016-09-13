@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 class ActionCell extends Component {
   constructor() {
@@ -27,5 +27,10 @@ class ActionCell extends Component {
     );
   }
 }
+
+ActionCell.propTypes = {
+  grp: PropTypes.object.isRequired,
+  toggleSync: PropTypes.func.isRequired,
+};
 
 export default ActionCell;

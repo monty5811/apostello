@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import KeywordCell from './keyword_cell';
 import ReprocessButton from './reprocess_button';
 
-const IncomingTableRow = (props) => (
+const IncomingTableRow = props => (
   <tr style={{ backgroundColor: props.sms.matched_colour }}>
     <td>
       <a href={`/send/adhoc/?recipient=${props.sms.sender_pk}`}>
@@ -23,5 +23,10 @@ const IncomingTableRow = (props) => (
     </td>
   </tr>
 );
+
+IncomingTableRow.propTypes = {
+  sms: PropTypes.object.isRequired,
+  reprocessSms: PropTypes.func.isRequired,
+};
 
 export default IncomingTableRow;

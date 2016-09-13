@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import LoadingComponent from './reloading_component';
 import FilteringComponent from './filtering_component';
 import OutgoingTableRow from './outgoing_table_row';
@@ -24,6 +24,10 @@ const OutgoingTable = (props) => {
       </tbody>
     </table>
   );
+};
+
+OutgoingTable.propTypes = {
+  data: PropTypes.array.isRequired,
 };
 
 export default LoadingComponent(FilteringComponent(OutgoingTable));

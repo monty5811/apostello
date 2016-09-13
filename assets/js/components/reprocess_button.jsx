@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 class ReprocessButton extends Component {
   constructor() {
@@ -19,5 +19,10 @@ class ReprocessButton extends Component {
     );
   }
 }
+
+ReprocessButton.propTypes = {
+  sms: PropTypes.object.isRequired,
+  reprocessSms: PropTypes.func.isRequired,
+};
 
 export default ReprocessButton;

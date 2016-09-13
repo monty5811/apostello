@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 function obj2str(obj) {
   if (obj === null) {
     return '';
   }
   const vals = Object.keys(obj).map(
-    key => {
+    (key) => {
       let val = obj[key];
       if (typeof val === 'object') {
         val = obj2str(val);
@@ -17,6 +17,11 @@ function obj2str(obj) {
 }
 
 const FilteringComponent = ComposedComponent => class extends Component {
+  static propTypes() {
+    return {
+      data: PropTypes.array.isRequired,
+    };
+  }
   constructor() {
     super();
     this.onChange = this.onChange.bind(this);

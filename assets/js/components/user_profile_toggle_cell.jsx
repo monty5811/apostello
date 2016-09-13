@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 class BooleanButton extends Component {
   constructor() {
@@ -26,5 +26,11 @@ class BooleanButton extends Component {
     );
   }
 }
+
+BooleanButton.propTypes = {
+  user: PropTypes.object.isRequired,
+  field: PropTypes.string.isRequired,
+  postUpdate: PropTypes.func.isRequired,
+};
 
 export default BooleanButton;

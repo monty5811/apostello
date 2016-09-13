@@ -119,37 +119,6 @@ class ManageRecipientGroupForm(forms.ModelForm):
         model = RecipientGroup
         exclude = ['is_archived']
 
-    # Representing the many to many related field in SmsGroup
-    members = forms.ModelMultipleChoiceField(
-        queryset=Recipient.objects.filter(is_archived=False),
-        required=False,
-        widget=forms.SelectMultiple(
-            attrs={
-                "class": "ui fluid search dropdown",
-                "multiple": "",
-                "id": "members_dropdown",
-            }
-        ),
-    )
-
-    def __init__(self, *args, **kwargs):
-        """Override init method to pull in existing group members."""
-        if 'instance' in kwargs:
-            initial = kwargs.setdefault('initial', {})
-            # The widget for a ModelMultipleChoiceField expects a list of primary key for the selected data.
-            initial['members'] = [
-                t.pk for t in kwargs['instance'].recipient_set.all()
-            ]
-
-        forms.ModelForm.__init__(self, *args, **kwargs)
-
-    def save(self, *args, **kwargs):
-        """Override save method to update group members."""
-        instance = forms.ModelForm.save(self)
-        instance.recipient_set.clear()
-        for recipient in self.cleaned_data['members']:
-            instance.recipient_set.add(recipient)
-
 
 class RecipientForm(forms.ModelForm):
     """Handle Recipients."""

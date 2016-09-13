@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 
 const KeywordCell = (props) => {
   if (props.sms.matched_link === '#') {
@@ -13,6 +13,10 @@ const KeywordCell = (props) => {
       </b>
     </td>
   );
+};
+
+KeywordCell.propTypes = {
+  sms: PropTypes.object.isRequired,
 };
 
 export default KeywordCell;

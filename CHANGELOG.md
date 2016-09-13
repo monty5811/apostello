@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Changed
+- Nicer interface for managing groups (especially large ones)
+- Remove frontend data caching
+- Improve error messages when ajax call fails
 
 ## [v1.12.1]
 - Pin Django version

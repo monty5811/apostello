@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 class CancelButton extends Component {
   constructor() {
@@ -14,5 +14,10 @@ class CancelButton extends Component {
     );
   }
 }
+
+CancelButton.propTypes = {
+  item: PropTypes.object.isRequired,
+  cancelFn: PropTypes.func.isRequired,
+};
 
 export default CancelButton;

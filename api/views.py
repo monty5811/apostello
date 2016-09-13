@@ -20,7 +20,7 @@ from .serializers import SmsInboundSerializer, SmsInboundSimpleSerializer
 
 class StandardPagination(PageNumberPagination):
     """Base class for common pagination."""
-    page_size = 100
+    page_size = 10
     page_size_query_param = 'page_size'
     max_page_size = 1000
 
@@ -165,6 +165,17 @@ class ApiMember(APIView):
             user_profile.pop('pk')
             for x in user_profile:
                 setattr(obj, x, user_profile[x])
+            obj.save()
+
+        is_member = request.data.get('member')
+        if is_member is not None:
+            is_member = True if is_member == 'true' else False
+            contact = Recipient.objects.get(pk=request.data.get('contactPk'))
+            if is_member:
+                obj.recipient_set.remove(contact)
+            else:
+                obj.recipient_set.add(contact)
+
             obj.save()
 
         cancel_task = request.data.get('cancel_task')

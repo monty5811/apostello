@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import UserProfileToggleCell from './user_profile_toggle_cell';
 
-const UserProfileRow = (props) => (
+const UserProfileRow = props => (
   <tr className="center aligned">
     <td><a href={props.user.url}>{props.user.user.email}</a></td>
     <UserProfileToggleCell
@@ -46,5 +46,10 @@ const UserProfileRow = (props) => (
     />
   </tr>
 );
+
+UserProfileRow.propTypes = {
+  user: PropTypes.object.isRequired,
+  postUpdate: PropTypes.func.isRequired,
+};
 
 export default UserProfileRow;

@@ -211,3 +211,28 @@ class TestButton:
         assert 'another test message' not in browser_in.page_source
         assert 'Calvin' not in browser_in.page_source
         assert Schedule.objects.all().count() == 0
+
+    def test_group_membership_buttons(
+        self, live_server, browser_in, recipients, groups, driver_wait_time
+    ):
+        """Test editing group membership."""
+        grp = groups['empty_group']
+        browser_in.get(live_server + grp.get_absolute_url)
+        # check all recipient are displayed
+        cards = browser_in.find_elements_by_class_name('card')
+        assert len(cards) == models.Recipient.objects.filter(
+            is_archived=False
+        ).count()
+        # move all recipients into membership
+        for card in cards:
+            card.click()
+        sleep(driver_wait_time)
+        assert grp.all_recipients.count() == models.Recipient.objects.filter(
+            is_archived=False
+        ).count()
+        # remove them again:
+        cards = browser_in.find_elements_by_class_name('card')
+        for card in cards:
+            card.click()
+        sleep(driver_wait_time)
+        assert grp.all_recipients.count() == 0

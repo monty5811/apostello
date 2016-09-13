@@ -28,7 +28,10 @@ def add_recipient(b, wt):
     recip_box = b.find_elements_by_class_name('multiple')[0]
     recip_box.click()
     sleep(wt)
-    recipient = b.find_elements_by_class_name('item')[-1]
+    for x in b.find_elements_by_class_name('item'):
+        if x.text == 'John Calvin':
+            recipient = x
+            break
     recipient.click()
     sleep(wt)
     return b

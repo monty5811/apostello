@@ -70,6 +70,11 @@ class RecipientGroup(models.Model):
         """Returns queryset of all recipients in group."""
         return self.recipient_set.all()
 
+    @cached_property
+    def all_recipients_not_in_group(self):
+        """Returns queryset of all recipients not in group."""
+        return Recipient.objects.filter(is_archived=False).exclude(groups__pk=self.pk).all()
+
     @property
     def all_recipients_names(self):
         """List of the names of recipients."""

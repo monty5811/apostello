@@ -1,6 +1,7 @@
 import ast
 
 from django.contrib.auth.models import User
+from django.contrib.humanize.templatetags.humanize import naturaltime
 from rest_framework import serializers
 from django_q.models import Schedule
 
@@ -8,25 +9,6 @@ from apostello.models import (
     Keyword, Recipient, RecipientGroup, SmsInbound, SmsOutbound, UserProfile
 )
 from elvanto.models import ElvantoGroup
-
-
-class RecipientGroupSerializer(serializers.ModelSerializer):
-    """Serialize apostello.models.RecipientGroup for use in table."""
-    cost = serializers.CharField(source='calculate_cost')
-    url = serializers.CharField(source='get_absolute_url')
-    members = serializers.ListField(source='all_recipients_names')
-
-    class Meta:
-        model = RecipientGroup
-        fields = (
-            'name',
-            'pk',
-            'description',
-            'members',
-            'cost',
-            'url',
-            'is_archived',
-        )
 
 
 class ElvantoGroupSerializer(serializers.ModelSerializer):
@@ -149,6 +131,54 @@ class RecipientSerializer(serializers.ModelSerializer):
         )
 
 
+class RecipientSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recipient
+        fields = (
+            'full_name',
+            'pk',
+        )
+
+
+class RecipientGroupSerializer(serializers.ModelSerializer):
+    """Serialize apostello.models.RecipientGroup for use in table."""
+    cost = serializers.CharField(source='calculate_cost')
+    url = serializers.CharField(source='get_absolute_url')
+
+    class Meta:
+        model = RecipientGroup
+        fields = (
+            'name',
+            'pk',
+            'description',
+            'cost',
+            'url',
+            'is_archived',
+        )
+
+
+class RecipientGroupSerializerMember(serializers.ModelSerializer):
+    """Serialize apostello.models.RecipientGroup for use in edit page."""
+    cost = serializers.CharField(source='calculate_cost')
+    url = serializers.CharField(source='get_absolute_url')
+    members = RecipientSimpleSerializer(many=True, read_only=True, source='recipient_set')
+    nonmembers = RecipientSimpleSerializer(many=True, read_only=True, source='all_recipients_not_in_group')
+
+    class Meta:
+        model = RecipientGroup
+        fields = (
+            'name',
+            'pk',
+            'description',
+            'members',
+            'nonmembers',
+            'cost',
+            'url',
+            'is_archived',
+        )
+
+
+
 class UserSerializer(serializers.ModelSerializer):
     """Serialize user model."""
 
@@ -189,6 +219,7 @@ class QScheduleSerializer(serializers.ModelSerializer):
     """
 
     next_run = serializers.DateTimeField()
+    next_run_formatted = serializers.SerializerMethodField()
     message_body = serializers.SerializerMethodField()
     recipient = serializers.SerializerMethodField()
     recipient_group = serializers.SerializerMethodField()
@@ -235,6 +266,11 @@ class QScheduleSerializer(serializers.ModelSerializer):
             return None
         return self._split_args(obj.args)[3]
 
+    def get_next_run_formatted(self, obj):
+        """Next run time in humand friendly format."""
+        return naturaltime(obj.next_run)
+
+
     class Meta:
         model = Schedule
         fields = (
@@ -244,4 +280,5 @@ class QScheduleSerializer(serializers.ModelSerializer):
             'recipient_group',
             'queued_by',
             'next_run',
+            'next_run_formatted',
         )

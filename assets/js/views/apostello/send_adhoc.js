@@ -13,6 +13,7 @@ module.exports = class View extends CommonView {
 
     $('.field .dropdown').dropdown(
       {
+        forceSelection: false,
         fullTextSearch: true,
         onChange(text) {
           setCost(text.length, sms_cost);

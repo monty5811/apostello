@@ -3,10 +3,6 @@ import React, { Component } from 'react';
 import post from '../utils/ajax_post';
 
 class ElvantoPullButton extends Component {
-  constructor() {
-    super();
-    this.pullGroups = this.pullGroups.bind(this);
-  }
   pullGroups() {
     const success = () => {
       biu(

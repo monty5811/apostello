@@ -3,10 +3,6 @@ import React, { Component } from 'react';
 import post from '../utils/ajax_post';
 
 class ElvantoFetchButton extends Component {
-  constructor() {
-    super();
-    this.fetchGroups = this.fetchGroups.bind(this);
-  }
   fetchGroups() {
     const success = () => {
       biu(

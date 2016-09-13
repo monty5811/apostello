@@ -14,7 +14,7 @@
     <div class="divider"></div>
   {% endif %}
   {% if object %}
-  <div class="item" id="toggle_button"  postUrl="{{ object.get_api_url }}" redirectUrl="{{ object.get_table_url }}" viewingArchive={{ object.is_archived|yesno:"true,false" }}></div>
+  <div class="item" id="toggle_button"  postUrl="{{ object.get_api_url }}" redirectUrl="{{ object.get_table_url }}" viewingarchive={{ object.is_archived|yesno:"true,false" }}></div>
   {% endif %}
 {% endblock %}
 {% block content %}
@@ -34,5 +34,9 @@
       <h4>Recent Incoming History</h4>
       <div id="react_table" src="{{ object.get_recent_sms_table_url }}" pollInterval="20000"></div>
     {% endif %}
+  {% endif %}
+  {% if 'group' == identifier %}
+    <br>
+    <div id="react_members" src="{{ object.get_api_url }}"></div>
   {% endif %}
 {% endblock %}

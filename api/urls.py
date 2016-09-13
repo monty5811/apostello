@@ -158,7 +158,7 @@ urlpatterns = [
         r'^v1/groups/(?P<pk>[0-9]+)$',
         v.ApiMember.as_view(
             model_class=RecipientGroup,
-            serializer_class=s.RecipientGroupSerializer,
+            serializer_class=s.RecipientGroupSerializerMember,
             permission_classes=(IsAuthenticated, CanSeeGroups)
         ),
         name='group'

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import post from '../utils/ajax_post';
 import LoadingComponent from './reloading_component';
 import FilteringComponent from './filtering_component';
@@ -41,5 +41,10 @@ class CurateTable extends Component {
     );
   }
 }
+
+CurateTable.propTypes = {
+  data: PropTypes.array.isRequired,
+  loadfromserver: PropTypes.func.isRequired,
+};
 
 export default LoadingComponent(FilteringComponent(CurateTable));

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import post from '../utils/ajax_post';
 import LoadingComponent from './reloading_component';
 import FilteringComponent from './filtering_component';
@@ -31,7 +31,7 @@ class KeywordRespTable extends Component {
         sms={sms}
         key={index}
         archiveSms={that.archiveSms}
-        dealtWithSms={that.dealWithSms}
+        dealWithSms={that.dealWithSms}
         viewingArchive={that.viewingArchive}
       />
     );
@@ -53,5 +53,11 @@ class KeywordRespTable extends Component {
     );
   }
 }
+
+KeywordRespTable.propTypes = {
+  data: PropTypes.array.isRequired,
+  deleteItemUpdate: PropTypes.func.isRequired,
+  loadfromserver: PropTypes.func.isRequired,
+};
 
 export default LoadingComponent(FilteringComponent(KeywordRespTable));

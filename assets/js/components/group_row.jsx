@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import ArchiveButton from './archive_button';
 
-const GroupRow = (props) => (
+const GroupRow = props => (
   <tr>
     <td><a href={props.group.url}>{props.group.name}</a></td>
     <td>{props.group.description}</td>
@@ -11,5 +11,10 @@ const GroupRow = (props) => (
     </td>
   </tr>
 );
+
+GroupRow.propTypes = {
+  group: PropTypes.object.isRequired,
+  archiveGroup: PropTypes.func.isRequired,
+};
 
 export default GroupRow;

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 class DealWithButton extends Component {
   constructor() {
@@ -23,5 +23,10 @@ class DealWithButton extends Component {
     );
   }
 }
+
+DealWithButton.propTypes = {
+  sms: PropTypes.object.isRequired,
+  dealWithSms: PropTypes.func.isRequired,
+};
 
 export default DealWithButton;

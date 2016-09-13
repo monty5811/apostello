@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import ArchiveButton from './archive_button';
 import DealWithButton from './deal_with_button';
 
@@ -14,13 +14,19 @@ const KeywordRespRow = (props) => {
       <td>{props.sms.time_received}</td>
       <td>{props.sms.content}</td>
       <td>
-        <DealWithButton sms={props.sms} dealWithSms={props.dealtWithSms} />
+        <DealWithButton sms={props.sms} dealWithSms={props.dealWithSms} />
       </td>
       <td>
         <ArchiveButton item={props.sms} archiveFn={props.archiveSms} />
       </td>
     </tr>
   );
+};
+
+KeywordRespRow.propTypes = {
+  sms: PropTypes.object.isRequired,
+  archiveSms: PropTypes.func.isRequired,
+  dealWithSms: PropTypes.func.isRequired,
 };
 
 export default KeywordRespRow;
