@@ -14,8 +14,7 @@ my_vcr = vcr.VCR(record_mode='none', ignore_localhost=True)
 @pytest.mark.parametrize("uri", ['/elvanto/import/', ])
 class TestElvantoImport:
     @my_vcr.use_cassette(
-        'tests/fixtures/vcr_cass/elv.yaml',
-        filter_headers=['authorization']
+        'tests/fixtures/vcr_cass/elv.yaml', filter_headers=['authorization']
     )
     def test_page_load(self, uri, live_server, browser_in, driver_wait_time):
         """Test page loads and table renders."""
@@ -34,8 +33,7 @@ class TestElvantoImport:
         assert 'Disabled' in table.text
 
     @my_vcr.use_cassette(
-        'tests/fixtures/vcr_cass/elv.yaml',
-        filter_headers=['authorization']
+        'tests/fixtures/vcr_cass/elv.yaml', filter_headers=['authorization']
     )
     def test_pull_groups(self, uri, live_server, browser_in, driver_wait_time):
         """Test toggle syncing of a group and then pull groups."""
@@ -65,8 +63,7 @@ class TestElvantoImport:
         check_and_close_biu(browser_in, driver_wait_time)
 
     @my_vcr.use_cassette(
-        'tests/fixtures/vcr_cass/elv.yaml',
-        filter_headers=['authorization']
+        'tests/fixtures/vcr_cass/elv.yaml', filter_headers=['authorization']
     )
     def test_fetch_groups(
         self, uri, live_server, browser_in, driver_wait_time

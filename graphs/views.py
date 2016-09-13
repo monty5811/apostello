@@ -10,6 +10,5 @@ class GraphView(SimpleView):
     def get(self, request, *args, **kwargs):
         """Handle get requests."""
         return HttpResponse(
-            self.graph_renderer(),
-            content_type='image/svg+xml'
+            self.graph_renderer(), content_type='image/svg+xml'
         )

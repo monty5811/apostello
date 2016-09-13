@@ -19,9 +19,7 @@ class TestButtonPosts:
                         {param: value}
                     )
 
-    def test_group_members_api(
-        self, recipients, groups, users
-    ):
+    def test_group_members_api(self, recipients, groups, users):
         # setup
         grp = groups['empty_group']
         url = grp.get_api_url
@@ -36,7 +34,8 @@ class TestButtonPosts:
             }
         )
         assert grp.all_recipients.count() == 1
-        assert initial_not_in_group - 1 == grp.all_recipients_not_in_group.count()
+        assert initial_not_in_group - 1 == grp.all_recipients_not_in_group.count(
+        )
         # remove calvin from group
         users['c_staff'].post(
             url,

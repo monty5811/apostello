@@ -33,7 +33,9 @@ def keyword_responses(request, pk, archive=False):
                     )
                 )
 
-    return TemplateResponse(request, "apostello/keyword_responses.html", context)
+    return TemplateResponse(
+        request, "apostello/keyword_responses.html", context
+    )
 
 
 @keyword_access_check

@@ -66,8 +66,7 @@ if OPBEAT['ORGANIZATION_ID']:
     INSTALLED_APPS += ['opbeat.contrib.django', ]
 
     MIDDLEWARE = [
-        # 'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
-        'apostello.middleware.TempOpbeatMiddleware',
+        'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
     ] + MIDDLEWARE
 
     LOGGING['handlers']['opbeat'] = {

@@ -1,15 +1,15 @@
 -r requirements_dev.txt
 py==1.4.31
 pytest-cov==2.3.1
-pytest-django==2.9.1
+pytest-django==3.0.0
 pytest-env==0.6.0
 pytest-flakes==1.0.1
 pytest-isort==0.1.0
 pytest-pep8==1.0.6
 pytest-watch==4.1.0
-pytest-xdist==1.14
-pytest==2.9.2
-scandir==1.2
+pytest-xdist==1.15
+pytest==3.0.2
+scandir==1.3
 selenium==2.53.6
 tox==2.3.1
-vcrpy==1.9.0
+vcrpy==1.10.1

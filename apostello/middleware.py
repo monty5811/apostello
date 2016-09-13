@@ -2,11 +2,6 @@ from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.http import HttpResponseRedirect
 from django.utils.deprecation import MiddlewareMixin
-from opbeat.contrib.django.middleware import OpbeatAPMMiddleware
-
-
-class TempOpbeatMiddleware(MiddlewareMixin, OpbeatAPMMiddleware):
-    pass
 
 
 class FirstRunRedirect(MiddlewareMixin):
@@ -50,4 +45,3 @@ class JsPathMiddleware(MiddlewareMixin):
 
         response.context_data['js_path'] = template_name.replace('.html', '')
         return response
-

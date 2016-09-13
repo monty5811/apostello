@@ -67,8 +67,7 @@ class TestApi:
     """
 
     @my_vcr.use_cassette(
-        'tests/fixtures/vcr_cass/elv.yaml',
-        filter_headers=['authorization']
+        'tests/fixtures/vcr_cass/elv.yaml', filter_headers=['authorization']
     )
     def test_fetch_elvanto_groups(self):
         """Test fetching groups from elvanto."""
@@ -90,8 +89,7 @@ class TestApi:
         ).name == 'All'
 
     @my_vcr.use_cassette(
-        'tests/fixtures/vcr_cass/elv.yaml',
-        filter_headers=['authorization']
+        'tests/fixtures/vcr_cass/elv.yaml', filter_headers=['authorization']
     )
     def test_pull_elvanto_group(self):
         """Test pull individual group into apostello."""
@@ -104,8 +102,7 @@ class TestApi:
         assert str(a_group.recipient_set.all()[0].number) == '+447902546589'
 
     @my_vcr.use_cassette(
-        'tests/fixtures/vcr_cass/elv.yaml',
-        filter_headers=['authorization']
+        'tests/fixtures/vcr_cass/elv.yaml', filter_headers=['authorization']
     )
     def test_pull_all_groups(self):
         """Test pull all groups into apostello."""
@@ -131,8 +128,7 @@ class TestPostToUrls:
     """Test posting to elvanto api endpoints"""
 
     @my_vcr.use_cassette(
-        'tests/fixtures/vcr_cass/elv.yaml',
-        filter_headers=['authorization']
+        'tests/fixtures/vcr_cass/elv.yaml', filter_headers=['authorization']
     )
     def test_api_elvanto_posts(self, users):
         """Test posting to end points behind elvanto buttons."""

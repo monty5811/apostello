@@ -134,10 +134,8 @@ class RecipientSerializer(serializers.ModelSerializer):
 class RecipientSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipient
-        fields = (
-            'full_name',
-            'pk',
-        )
+        fields = ('full_name',
+                  'pk', )
 
 
 class RecipientGroupSerializer(serializers.ModelSerializer):
@@ -147,22 +145,24 @@ class RecipientGroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RecipientGroup
-        fields = (
-            'name',
-            'pk',
-            'description',
-            'cost',
-            'url',
-            'is_archived',
-        )
+        fields = ('name',
+                  'pk',
+                  'description',
+                  'cost',
+                  'url',
+                  'is_archived', )
 
 
 class RecipientGroupSerializerMember(serializers.ModelSerializer):
     """Serialize apostello.models.RecipientGroup for use in edit page."""
     cost = serializers.CharField(source='calculate_cost')
     url = serializers.CharField(source='get_absolute_url')
-    members = RecipientSimpleSerializer(many=True, read_only=True, source='recipient_set')
-    nonmembers = RecipientSimpleSerializer(many=True, read_only=True, source='all_recipients_not_in_group')
+    members = RecipientSimpleSerializer(
+        many=True, read_only=True, source='recipient_set'
+    )
+    nonmembers = RecipientSimpleSerializer(
+        many=True, read_only=True, source='all_recipients_not_in_group'
+    )
 
     class Meta:
         model = RecipientGroup
@@ -176,7 +176,6 @@ class RecipientGroupSerializerMember(serializers.ModelSerializer):
             'url',
             'is_archived',
         )
-
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -269,7 +268,6 @@ class QScheduleSerializer(serializers.ModelSerializer):
     def get_next_run_formatted(self, obj):
         """Next run time in humand friendly format."""
         return naturaltime(obj.next_run)
-
 
     class Meta:
         model = Schedule

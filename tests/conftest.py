@@ -47,9 +47,7 @@ def short_circuit_q(monkeypatch):
 def recipients():
     """Create a bunch of recipients for testing."""
     calvin = Recipient.objects.create(
-        first_name="John",
-        last_name="Calvin",
-        number='+447927401749'
+        first_name="John", last_name="Calvin", number='+447927401749'
     )
     house_lamp = Recipient.objects.create(
         first_name="Johannes",
@@ -69,14 +67,10 @@ def recipients():
         is_blocking=True
     )
     john_owen = Recipient.objects.create(
-        first_name="John",
-        last_name="Owen",
-        number='+15005550004'
+        first_name="John", last_name="Owen", number='+15005550004'
     )  # blacklisted magic num
     thomas_chalmers = Recipient.objects.create(
-        first_name="Thomas",
-        last_name="Chalmers",
-        number='+15005550009'
+        first_name="Thomas", last_name="Chalmers", number='+15005550009'
     )  # can't recieve
     beza = Recipient.objects.create(
         first_name="Theodore",
@@ -112,8 +106,7 @@ def groups(recipients):
     )
     archived_group.save()
     empty_group = RecipientGroup.objects.create(
-        name="Empty Group",
-        description="This is an empty group"
+        name="Empty Group", description="This is an empty group"
     )
     empty_group.save()
 
@@ -319,16 +312,13 @@ def keywords():
 def users(recipients, keywords):
     """Create apostello users."""
     user = User.objects.create_user(
-        username='test',
-        email='test@example.com',
-        password='top_secret'
+        username='test', email='test@example.com', password='top_secret'
     )
     user.profile.save()
     user.is_staff = True
     user.save()
     allauth_email = EmailAddress.objects.create(
-        user=user, email=user.email,
-        primary=True, verified=True
+        user=user, email=user.email, primary=True, verified=True
     )
     allauth_email.save()
     p = UserProfile.objects.get(user=user)
@@ -342,9 +332,7 @@ def users(recipients, keywords):
     c.login(username='test', password='top_secret')
 
     user2 = User.objects.create_user(
-        username='test2',
-        email='test2@example.com',
-        password='top2_secret'
+        username='test2', email='test2@example.com', password='top2_secret'
     )
     user2.save()
     user2.profile.save()
@@ -352,17 +340,13 @@ def users(recipients, keywords):
     p.approved = True
     p.save()
     allauth_email = EmailAddress.objects.create(
-        user=user2, email=user2.email,
-        primary=True,
-        verified=True
+        user=user2, email=user2.email, primary=True, verified=True
     )
     allauth_email.save()
     keywords['test'].owners.add(user2)
 
     user3 = User.objects.create_user(
-        username='test3',
-        email='test3@example.com',
-        password='top2_secret'
+        username='test3', email='test3@example.com', password='top2_secret'
     )
     user3.save()
     user3.profile.save()
@@ -372,9 +356,7 @@ def users(recipients, keywords):
     user3.profile.approved = True
     user3.profile.save()
     allauth_email = EmailAddress.objects.create(
-        user=user3, email=user3.email,
-        primary=True,
-        verified=True
+        user=user3, email=user3.email, primary=True, verified=True
     )
     allauth_email.save()
 

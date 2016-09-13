@@ -26,9 +26,7 @@ class ImportRecipients(ProfilePermsMixin, FormView):
         for row in data:
             try:
                 validate_international_phonenumber(row['number'])
-                obj = Recipient.objects.get_or_create(
-                    number=row['number']
-                )[0]
+                obj = Recipient.objects.get_or_create(number=row['number'])[0]
                 obj.first_name = row['first_name'].strip()
                 obj.last_name = row['last_name'].strip()
                 obj.is_archived = False

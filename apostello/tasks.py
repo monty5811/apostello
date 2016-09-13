@@ -20,10 +20,7 @@ def group_send_message_task(body, group_name, sent_by, eta):
 
     for recipient in Recipient.objects.filter(groups__in=group):
         recipient.send_message(
-            content=body,
-            group=group_name,
-            sent_by=sent_by,
-            eta=eta
+            content=body, group=group_name, sent_by=sent_by, eta=eta
         )
 
 
@@ -193,9 +190,8 @@ def send_keyword_digest():
                 async(
                     'apostello.tasks.send_async_mail',
                     'Daily update for "{0}" responses'.format(str(keyword)),
-                    "The following text messages have been received today:\n\n{0}".format(
-                        "\n".join([str(x) for x in new_responses])
-                    ),
+                    "The following text messages have been received today:\n\n{0}".
+                    format("\n".join([str(x) for x in new_responses])),
                     [subscriber.email]
                 )
 

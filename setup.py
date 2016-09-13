@@ -9,8 +9,7 @@ from setuptools import find_packages, setup
 version = "1.12.1"
 
 install_reqs = parse_requirements(
-    'requirements.txt',
-    session=pip.download.PipSession()
+    'requirements.txt', session=pip.download.PipSession()
 )
 reqs = [str(ir.req) for ir in install_reqs]
 
@@ -34,4 +33,3 @@ setup(
     ],
     keywords=('Python, twilio, sms, church, django, '),
 )
-

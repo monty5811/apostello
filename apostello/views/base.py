@@ -95,16 +95,13 @@ class ItemView(ProfilePermsMixin, View):
                 )
                 messages.info(
                     request, "'{0}' already exists."
-                    " You can open the menu to restore it.".format(
-                        str(new_instance)
-                    )
+                    " You can open the menu to restore it.".
+                    format(str(new_instance))
                 )
                 return redirect(new_instance.get_absolute_url)
             except ArchivedItemException:
                 return TemplateResponse(
-                    request,
-                    "apostello/item.html",
-                    {
+                    request, "apostello/item.html", {
                         'form': form,
                         'redirect_url': self.redirect_url,
                         'submit_text': "Submit",

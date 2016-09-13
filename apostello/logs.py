@@ -57,9 +57,7 @@ def handle_outgoing_sms(msg):
             return check_next_page
     except Exception:
         logger.error(
-            'Could not import sms.',
-            exc_info=True,
-            extra={
+            'Could not import sms.', exc_info=True, extra={
                 'msg': msg
             }
         )
@@ -78,15 +76,11 @@ def fetch_list(direction, page_id):
     """Fetch list from twilio."""
     if direction == 'in':
         return twilio_client.messages.list(
-            page=page_id,
-            page_size=50,
-            to=settings.TWILIO_FROM_NUM
+            page=page_id, page_size=50, to=settings.TWILIO_FROM_NUM
         )
     if direction == 'out':
         return twilio_client.messages.list(
-            page=page_id,
-            page_size=50,
-            from_=settings.TWILIO_FROM_NUM
+            page=page_id, page_size=50, from_=settings.TWILIO_FROM_NUM
         )
     return []
 

@@ -20,8 +20,8 @@ class TestTasks:
     @twilio_vcr
     def test_send_recipient_blacklist(self, recipients):
         recipient_send_message_task(
-            recipients['john_owen'].
-            id,  # doesn't actually test blacklisted number handling :(
+            recipients['john_owen']
+            .id,  # doesn't actually test blacklisted number handling :(
             "This is a test to a blacklisted number...",
             None,
             'test'
@@ -40,9 +40,7 @@ class TestTasks:
     def test_send_group(self):
         # test sending via group
         group_send_message_task(
-            "This is another test",
-            "Test group",
-            'test', eta=None
+            "This is another test", "Test group", 'test', eta=None
         )
 
     @twilio_vcr

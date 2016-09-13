@@ -219,8 +219,7 @@ class ArchiveKeywordResponses(forms.Form):
 class CsvImport(forms.Form):
     """Handle CSV imports."""
     csv_data = forms.CharField(
-        help_text='John, Calvin, +447095237960',
-        widget=forms.Textarea
+        help_text='John, Calvin, +447095237960', widget=forms.Textarea
     )
 
 

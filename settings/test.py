@@ -52,6 +52,8 @@ ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'
 
 import warnings
 warnings.filterwarnings(
-    'error', r"DateTimeField .* received a naive datetime",
-    RuntimeWarning, r'django\.db\.models\.fields',
+    'error',
+    r"DateTimeField .* received a naive datetime",
+    RuntimeWarning,
+    r'django\.db\.models\.fields',
 )

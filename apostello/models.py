@@ -46,7 +46,6 @@ class RecipientGroup(models.Model):
             'apostello.tasks.group_send_message_task', content, self.name,
             sent_by, eta
         )
-
     def archive(self):
         """Archive the group."""
         self.is_archived = True
@@ -60,9 +59,8 @@ class RecipientGroup(models.Model):
             return
         if limit < num_sms * self.calculate_cost():
             raise ValidationError(
-                'Sorry, you can only send messages that cost no more than ${0}.'.format(
-                    limit
-                )
+                'Sorry, you can only send messages that cost no more than ${0}.'.
+                format(limit)
             )
 
     @cached_property
@@ -73,7 +71,8 @@ class RecipientGroup(models.Model):
     @cached_property
     def all_recipients_not_in_group(self):
         """Returns queryset of all recipients not in group."""
-        return Recipient.objects.filter(is_archived=False).exclude(groups__pk=self.pk).all()
+        return Recipient.objects.filter(is_archived=False
+                                        ).exclude(groups__pk=self.pk).all()
 
     @property
     def all_recipients_names(self):
@@ -150,10 +149,7 @@ class Recipient(models.Model):
         return message.replace('%name%', self.first_name)
 
     def send_message(
-        self, content='test message',
-        group=None,
-        sent_by='',
-        eta=None
+        self, content='test message', group=None, sent_by='', eta=None
     ):
         """
         Send SMS to an individual.
@@ -192,9 +188,8 @@ class Recipient(models.Model):
             return
         if limit < len(recipients) * settings.TWILIO_SENDING_COST * num_sms:
             raise ValidationError(
-                'Sorry, you can only send messages that cost no more than ${0}.'.format(
-                    limit
-                )
+                'Sorry, you can only send messages that cost no more than ${0}.'.
+                format(limit)
             )
 
     @cached_property
@@ -244,7 +239,6 @@ class Recipient(models.Model):
         """Override save method to back date name change to SMS."""
         super(Recipient, self).save(*args, **kwargs)
         async('apostello.tasks.update_msgs_name', self.pk)
-
     def __str__(self):
         """Pretty representation."""
         return self.full_name
@@ -334,8 +328,7 @@ class Keyword(models.Model):
         'messages.'
     )
     last_email_sent_time = models.DateTimeField(
-        "Time of last sent email",
-        blank=True, null=True
+        "Time of last sent email", blank=True, null=True
     )
 
     def construct_reply(self, sender):
@@ -413,15 +406,13 @@ class Keyword(models.Model):
     def fetch_matches(self):
         """Fetch un-archived messages that match keyword."""
         return SmsInbound.objects.filter(
-            matched_keyword=self.keyword,
-            is_archived=False
+            matched_keyword=self.keyword, is_archived=False
         )
 
     def fetch_archived_matches(self):
         """Fetch archived messages that match keyword."""
         return SmsInbound.objects.filter(
-            matched_keyword=self.keyword,
-            is_archived=True
+            matched_keyword=self.keyword, is_archived=True
         )
 
     @property

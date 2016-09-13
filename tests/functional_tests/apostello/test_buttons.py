@@ -172,9 +172,8 @@ class TestButton:
         Schedule.objects.create(
             name='test1',
             func='apostello.tasks.recipient_send_message_task',
-            args='({0},"test message", None, "admin")'.format(
-                recipients['calvin'].pk
-            ),
+            args='({0},"test message", None, "admin")'.
+            format(recipients['calvin'].pk),
             schedule_type='ONCE',
             repeats=-1,
             next_run=timezone.make_aware(
@@ -185,9 +184,8 @@ class TestButton:
         Schedule.objects.create(
             name='test2',
             func='apostello.tasks.recipient_send_message_task',
-            args='({0},"another test message", "Test Group", "admin")'.format(
-                recipients['calvin'].pk
-            ),
+            args='({0},"another test message", "Test Group", "admin")'.
+            format(recipients['calvin'].pk),
             schedule_type='ONCE',
             repeats=-1,
             next_run=timezone.make_aware(

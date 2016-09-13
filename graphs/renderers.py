@@ -113,8 +113,7 @@ def outgoing_by_contact():
     )
     for con in Recipient.objects.filter(is_archived=False):
         treemap.add(
-            str(con),
-            SmsOutbound.objects.filter(recipient=con).count()
+            str(con), SmsOutbound.objects.filter(recipient=con).count()
         )
 
     return treemap.render(show_legend=False, )

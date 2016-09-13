@@ -29,9 +29,8 @@ def twilio_reserved(value):
         'name',
     ):
         raise ValidationError(
-            '{0} is a reserved keyword, please choose another.'.format(
-                value.lower()
-            )
+            '{0} is a reserved keyword, please choose another.'.
+            format(value.lower())
         )
 
 
@@ -54,9 +53,8 @@ def no_overlap_keyword(value):
     for keyword in keywords:
         if keyword.startswith(value) or value.startswith(keyword):
             raise ValidationError(
-                '{0} clashes with {1}, please choose another.'.format(
-                    value.lower(), keyword
-                )
+                '{0} clashes with {1}, please choose another.'.
+                format(value.lower(), keyword)
             )
 
 
@@ -72,7 +70,6 @@ def less_than_sms_char_limit(value):
 
     if len(value) > sms_char_lim:
         raise ValidationError(
-            'You have exceeded the maximum char limit of {0}.'.format(
-                sms_char_lim
-            )
+            'You have exceeded the maximum char limit of {0}.'.
+            format(sms_char_lim)
         )

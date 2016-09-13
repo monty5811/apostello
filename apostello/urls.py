@@ -5,8 +5,9 @@ from django.contrib import admin
 
 from apostello import views as v
 from apostello.decorators import keyword_access_check
-from apostello.forms import (KeywordForm, ManageRecipientGroupForm,
-                             RecipientForm)
+from apostello.forms import (
+    KeywordForm, ManageRecipientGroupForm, RecipientForm
+)
 from apostello.models import Keyword, Recipient, RecipientGroup
 
 admin.autodiscover()
@@ -16,19 +17,15 @@ urlpatterns = [
     url(
         r'^$',
         v.SimpleView.as_view(
-            template_name="apostello/index.html",
-            required_perms=[]
+            template_name="apostello/index.html", required_perms=[]
         ),
         name='index'
     ),
-    url(r'not_approved/$',
-        v.NotApprovedView.as_view(),
-        name='not_approved'),
+    url(r'not_approved/$', v.NotApprovedView.as_view(), name='not_approved'),
     url(
         r'^help/$',
         v.SimpleView.as_view(
-            template_name="apostello/help.html",
-            required_perms=[]
+            template_name="apostello/help.html", required_perms=[]
         ),
         name='help'
     ),
@@ -238,8 +235,7 @@ urlpatterns += [
     url(
         r'^scheduled/sms/$',
         v.SimpleView.as_view(
-            template_name='apostello/scheduled_sms.html',
-            required_perms=[]
+            template_name='apostello/scheduled_sms.html', required_perms=[]
         ),
         name='scheduled_sms'
     ),
@@ -247,13 +243,16 @@ urlpatterns += [
 
 # import urls
 urlpatterns += [
-    url(r'^recipient/import/$',
+    url(
+        r'^recipient/import/$',
         v.ImportRecipients.as_view(),
-        name='import_recipients'),
+        name='import_recipients'
+    ),
 ]
 urlpatterns += [
-    url(r'^elvanto/',
-        include('elvanto.urls', namespace='elvanto'))
+    url(r'^elvanto/', include(
+        'elvanto.urls', namespace='elvanto'
+    ))
 ]
 
 # twilio api url
@@ -264,11 +263,9 @@ urlpatterns += [
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', include(admin.site.urls)),
     # auth-setup
-    url(
-        r'^api-setup/$',
+    url(r'^api-setup/$',
         v.APISetupView.as_view(),
-        name='api-setup',
-    ),
+        name='api-setup', ),
     # edit user profiles
     url(
         r'^users/profiles/(?P<pk>\d+)/$',
@@ -292,10 +289,14 @@ urlpatterns += [
 ]
 # apps etc
 urlpatterns += [
-    url(r'^config/',
-        include('site_config.urls', namespace='site_config')),
-    url(r'^graphs/', include('graphs.urls', namespace='graphs')),
-    url(r'^api/', include('api.urls', namespace='api')),
+    url(r'^config/', include(
+        'site_config.urls', namespace='site_config'
+    )),
+    url(r'^graphs/', include(
+        'graphs.urls', namespace='graphs'
+    )),
+    url(r'^api/', include(
+        'api.urls', namespace='api'
+    )),
     url(r'^api-docs/', include('rest_framework_docs.urls')),
 ]
-

@@ -170,10 +170,7 @@ class TestSendAdhoc:
     ):
         """Test the multiple recipients in prepopulated field."""
         # load the incoming log
-        uri = '{0}?content={1}'.format(
-            ADHOC_URI,
-            'DO%20NOT%20REPLY'
-        )
+        uri = '{0}?content={1}'.format(ADHOC_URI, 'DO%20NOT%20REPLY')
         b = load_page(browser_in, driver_wait_time, live_server + uri)
         assert 'DO NOT REPLY' in b.page_source
 
