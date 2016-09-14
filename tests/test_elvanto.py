@@ -96,7 +96,7 @@ class TestApi:
         elv_models.ElvantoGroup.fetch_all_groups()
         e_group = elv_models.ElvantoGroup.objects.get(name='England')
         e_group.pull()
-        a_group = ap_models.RecipientGroup.objects.get(name='[E] England')
+        a_group = ap_models.RecipientGroup.objects.get(name='(E) England')
         assert 'John Owen' in a_group.all_recipients_names
         assert str(a_group.recipient_set.all()[0]) == 'John Owen'
         assert str(a_group.recipient_set.all()[0].number) == '+447902546589'
@@ -116,7 +116,7 @@ class TestApi:
         elv_models.ElvantoGroup.pull_all_groups()
         e_group = elv_models.ElvantoGroup.objects.get(name='England')
         e_group.pull()
-        a_group = ap_models.RecipientGroup.objects.get(name='[E] England')
+        a_group = ap_models.RecipientGroup.objects.get(name='(E) England')
         assert 'John Owen' in a_group.all_recipients_names
         assert str(a_group.recipient_set.all()[0]) == 'John Owen'
         assert str(a_group.recipient_set.all()[0].number) == '+447902546589'

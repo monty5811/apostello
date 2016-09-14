@@ -98,9 +98,9 @@ class ElvantoGroup(models.Model):
         """
         Name of internal group.
 
-        Just preprend an [E] before the group name.
+        Just preprend an (E) before the group name.
         """
-        return '[E] {0}'.format(self.name)
+        return '(E) {0}'.format(self.name)
 
     def __str__(self):
         """Pretty representation."""

@@ -7,6 +7,9 @@ All notable changes to this project will be documented in this file.
 - Remove frontend data caching
 - Improve error messages when ajax call fails
 
+## Fixed
+- Do not use [E] in Elvanto imported groups - use (E)
+
 ## [v1.12.1]
 - Pin Django version
 
