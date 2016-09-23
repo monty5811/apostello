@@ -1,4 +1,5 @@
 import json
+import logging
 
 import requests
 from django.conf import settings
@@ -9,6 +10,8 @@ from twilio.rest.exceptions import TwilioRestException
 
 from apostello.utils import fetch_default_reply
 from django_q.tasks import async
+
+logger = logging.getLogger('apostello')
 
 # sending messages
 
@@ -257,3 +260,17 @@ def pull_elvanto_groups(force=False):
     if force or config.sync_elvanto:
         from elvanto.models import ElvantoGroup
         ElvantoGroup.pull_all_groups()
+
+
+#
+def add_new_contact_to_groups(contact_pk):
+    """Add contact to any groups that are in "auto populate with new contacts."""
+    logger.info('Adding new person to designated groups')
+    from apostello.models import Recipient
+    from site_config.models import SiteConfiguration
+    contact = Recipient.objects.get(pk=contact_pk)
+    for grp in SiteConfiguration.get_solo().auto_add_new_groups.all():
+        logger.info('Adding %s to %s', contact.full_name, grp.name)
+        contact.groups.add(grp)
+        contact.save()
+        logger.info('Added %s to %s', contact.full_name, grp.name)

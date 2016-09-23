@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- Can now automatically add new contacts to a group or groups (choose groups on Site Config page)
+
 ### Changed
 - Nicer interface for managing groups (especially large ones)
 - Remove frontend data caching

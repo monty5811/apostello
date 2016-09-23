@@ -29,18 +29,6 @@ MIDDLEWARE = ['whitenoise.middleware.WhiteNoiseMiddleware', ] + MIDDLEWARE
 STATIC_ROOT = BASE_DIR + '/static/'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# overwrite cache backend
-import fakeredis
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": '127.0.0.1:6379',
-        "OPTIONS": {
-            "REDIS_CLIENT_CLASS": "fakeredis.FakeStrictRedis",
-        }
-    }
-}
-
 # don't send email, use console instead
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 

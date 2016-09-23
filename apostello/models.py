@@ -237,8 +237,13 @@ class Recipient(models.Model):
 
     def save(self, *args, **kwargs):
         """Override save method to back date name change to SMS."""
+        add_to_group_flag = self.pk is None
         super(Recipient, self).save(*args, **kwargs)
         async('apostello.tasks.update_msgs_name', self.pk)
+        if add_to_group_flag:
+            from apostello.tasks import add_new_contact_to_groups
+            async('apostello.tasks.add_new_contact_to_groups', self.pk)
+
     def __str__(self):
         """Pretty representation."""
         return self.full_name

@@ -88,3 +88,18 @@ class TestTasks:
 
     def test_warn_on_blacklist_receipt(self, recipients):
         blacklist_notify(recipients['wesley'].pk, 'stop it', 'stop')
+
+    def test_add_new_ppl_to_groups(self, groups):
+        from site_config.models import SiteConfiguration
+        config = SiteConfiguration.get_solo()
+        grp = groups['empty_group']
+        assert grp.recipient_set.count() == 0
+        config.auto_add_new_groups.add(grp)
+        config.save()
+        new_c = Recipient.objects.create(
+            first_name='test',
+            last_name='new',
+            number='+44715620857',
+        )
+        assert grp.recipient_set.count() == 1
+        assert new_c in grp.recipient_set.all()

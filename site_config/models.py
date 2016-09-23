@@ -32,6 +32,12 @@ class SiteConfiguration(SingletonModel):
         blank=True,
         help_text='Email address that receives important notifications.'
     )
+    auto_add_new_groups = models.ManyToManyField(
+        'apostello.RecipientGroup',
+        blank=True,
+        help_text='Any brand new people will be added to the groups'
+        ' selected here',
+    )
     slack_url = models.URLField(
         blank=True,
         help_text='Post all incoming messages to this slack hook.'
