@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+## [v1.13.0]
 ### Added
 - Can now automatically add new contacts to a group or groups (choose groups on Site Config page)
 
@@ -12,6 +14,7 @@ All notable changes to this project will be documented in this file.
 
 ## Fixed
 - Do not use [E] in Elvanto imported groups - use (E)
+- Fix Twilio complaining when we have no reply to send back
 
 ## [v1.12.1]
 - Pin Django version

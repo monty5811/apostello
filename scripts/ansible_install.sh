@@ -1,5 +1,5 @@
 set -e
-AP_VER=v1.12.1
+AP_VER=v1.13.0
 
 echo "Installing and upgrading packages"
 sudo apt-get update -qq

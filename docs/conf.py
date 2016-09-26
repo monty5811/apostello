@@ -30,7 +30,7 @@ project = 'apostello'
 copyright = '2015, Dean Montgomery'
 author = 'Dean Montgomery'
 
-version = '1.12.1'
+version = '1.13.0'
 # The full version, including alpha/beta/rc tags.
 release = '0.1'
 language = None
