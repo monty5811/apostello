@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import messages
 from django.views.generic.edit import FormView
 from django_twilio.decorators import twilio_view
@@ -8,6 +10,8 @@ from apostello.mixins import ProfilePermsMixin
 from apostello.models import RecipientGroup
 from apostello.reply import InboundSms
 from site_config.models import SiteConfiguration
+
+logger = logging.getLogger('apostello')
 
 
 class SendView(ProfilePermsMixin, FormView):
@@ -112,12 +116,15 @@ def sms(request):
 
     This is the start of the message processing pipeline.
     """
+    logger.info('Received new sms')
     r = twiml.Response()
     msg = InboundSms(request.POST)
     msg.start_bg_tasks()
 
     config = SiteConfiguration.get_solo()
-    if not config.disable_all_replies:
+    if msg.reply and not config.disable_all_replies:
+        logger.info('Add reply (%s) to response', msg.reply)
         r.message(msg.reply)
 
+    logger.info('Return response to Twilio')
     return r

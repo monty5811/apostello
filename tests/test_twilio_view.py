@@ -133,7 +133,7 @@ class TestTwilioViewBlockingContact:
         data['Body'] = u'Test'
         request = factory.post(uri, data=data)
         resp = sms(request)
-        assert '<Message><Body /></Message>' in str(resp.content)
+        assert '<Response />' in str(resp.content)
 
 
 @pytest.mark.slow

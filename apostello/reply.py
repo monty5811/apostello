@@ -9,7 +9,7 @@ from apostello.utils import fetch_default_reply
 from django_q.models import Schedule
 from django_q.tasks import async, schedule
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('apostello')
 
 
 class InboundSms:
@@ -20,9 +20,13 @@ class InboundSms:
         Find Recipient object for the sender of the message and determine if we
         should ask for the contact's name.
         """
+        logger.info('Looking contact for %s', self.contact_number)
         try:
             return Recipient.objects.get(number=self.contact_number), False
         except Recipient.DoesNotExist:
+            logger.info(
+                'Contact (%s) does not exist, creating', self.contact_number
+            )
             contact = Recipient.objects.create(
                 number=self.contact_number,
                 first_name='Unknown',
