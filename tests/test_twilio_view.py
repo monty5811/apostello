@@ -97,6 +97,7 @@ def test_request_data_blocked():
         (u"Test", u"Test custom response"),
         (u"2testing", u"your message has been received"),
         (u"name John", u"Something went wrong"),
+        (u"name John Calvin\nthis is a really really long surname now", u"John"),
         (u"name John Calvin", u"John"),
         (u"start", u"Thanks for signing up"),
     ]

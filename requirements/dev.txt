@@ -1,4 +1,4 @@
--r requirements.txt
+-r base.txt
 django-debug-toolbar==1.5
 fakeredis==0.8.1
 yapf==0.11.1

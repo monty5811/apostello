@@ -1,4 +1,4 @@
-<img src="/screenshot.png?raw=true">
+<img src="/docs/screenshot.png?raw=true">
 
 # apostello
 

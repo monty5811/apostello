@@ -1,22 +1,2 @@
-apostello-form==0.0.1
-dj-database-url==0.4.1
-django-allauth==0.27.0
-django-extensions==1.7.4
-django-phonenumber-field==1.1.0
-django-q==0.7.18
-django-redis==4.4.4
-django-solo==1.1.2
-django-twilio==0.8.0
-django==1.10.1
-djangorestframework==3.4.6
-drfdocs==0.0.11
-gunicorn==19.6.0
-ipython==5.1.0
-opbeat==3.4.0
-psycopg2==2.6.2
-pygal==2.3.0
-python-dotenv==0.6.0
-redis==2.10.5
-requests==2.11.1
-twilio==5.5.0
-whitenoise==3.2.1
+# here for heroku, etc
+-r requirements/base.txt
