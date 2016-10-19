@@ -90,10 +90,12 @@ class InboundSms:
         try:
             # update person's name:
             self.contact.first_name = self.sms_body.split()[1].strip()
-            self.contact.last_name = " ".join(self.sms_body.split()[2:]).strip(
-            )
-            if not self.contact.last_name:
+            last_name = " ".join(self.sms_body.split()[2:]).strip()
+            if not last_name:
                 raise ValidationError('No last name')
+            last_name = last_name.split('\n')[0]
+            last_name = last_name[0:40] # truncate last name
+            self.contact.last_name = last_name
             self.contact.save()
             # update old messages with this person's name
             async('apostello.tasks.update_msgs_name', self.contact.pk)
