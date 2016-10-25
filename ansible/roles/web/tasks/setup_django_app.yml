@@ -15,6 +15,6 @@
 
 - name: Setup clearsessions cron job
   cron: name="django {{application_name}} clearsessions"
-        weekday="0" 
+        weekday="0"
         user="root"
         job="{{virtualenv_path}}/bin/python {{ application_path}}/manage.py clearsessions --settings={{ django_settings_file }}"

@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- Better handle messages beginning with `name`
+- Pin ansible version so install does not fail
 
 ## [v1.13.0]
 ### Added

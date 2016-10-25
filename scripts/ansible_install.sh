@@ -19,7 +19,7 @@ if [ ! -d 'apostello-install' ]; then
     virtualenv venv --no-site-packages
     ./venv/bin/pip install -U pip
     ./venv/bin/pip install -U setuptools
-    ./venv/bin/pip install ansible
+    ./venv/bin/pip install ansible==2.1.1.0
 else
     cd apostello-install
     echo "Updating apostello..."
