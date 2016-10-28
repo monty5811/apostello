@@ -150,11 +150,6 @@ class FirstRunView(TemplateView):
                 settings.COUNTRY_CODE
             ),
             EnvVarSetting(
-                'CADDY_LE_EMAIL',
-                'This is the email address associated with youe Let\'s Encrypt certificate. This is only required with Docker deploys.',
-                os.environ.get('CADDY_LE_EMAIL')
-            ),
-            EnvVarSetting(
                 'LE_EMAIL',
                 'This is the email address associated with youe Let\'s Encrypt certificate. This is only required with Ansible deploys.',
                 os.environ.get('LE_EMAIL')

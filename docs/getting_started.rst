@@ -5,10 +5,9 @@ Getting Started
 
 There are a number of ways you can deploy apostello:
 
-* One click `Digital Ocean deploy <http://installer.71m.us/install?url=https://github.com/monty5811/apostello>`_ (recommended)
-* Deploy with :ref:`docker <deploy-docker>` (his is currently experimental, but may become the preferred method)
-* On your server using the :ref:`ansible playbook <deploy-ansible>` included in the repo
 * One click :ref:`Heroku <deploy-heroku>` deploy
+* *Recommended* Using the :ref:`ansible playbook <deploy-ansible>` included in the repo
+* One click `Digital Ocean deploy <http://installer.71m.us/install?url=https://github.com/monty5811/apostello>`_
 
 Prerequisites
 -------------

@@ -174,9 +174,9 @@ LOGIN_REDIRECT_URL = '/'
 ELVANTO_KEY = os.environ.get('ELVANTO_KEY', '')
 
 # Twilio credentials
-TWILIO_ACCOUNT_SID = os.environ['TWILIO_ACCOUNT_SID']
-TWILIO_AUTH_TOKEN = os.environ['TWILIO_AUTH_TOKEN']
-TWILIO_FROM_NUM = os.environ['TWILIO_FROM_NUM']
+TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID', 'no SID found')
+TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN', 'no auth token found')
+TWILIO_FROM_NUM = os.environ.get('TWILIO_FROM_NUM', 'no number found')
 TWILIO_SENDING_COST = float(os.environ.get('TWILIO_SENDING_COST', '0.04')
                             )  # cost in USD
 
@@ -186,7 +186,7 @@ SMS_CHAR_LIMIT = 160 - MAX_NAME_LENGTH + len('{name}')
 # Used for nomalising elvanto imports, use twilio to limit sending to
 # particular countries:
 # https://www.twilio.com/help/faq/voice/what-are-global-permissions-and-why-do-they-exist
-COUNTRY_CODE = os.environ['COUNTRY_CODE']
+COUNTRY_CODE = os.environ.get('COUNTRY_CODE', '44')
 
 NO_ACCESS_WARNING = 'You do not have access to this page. ' \
     'If you believe you are seeing it in error please contact the office'

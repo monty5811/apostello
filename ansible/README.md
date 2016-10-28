@@ -9,7 +9,7 @@ repo.
 ```
 virtualenv venv
 . venv/bin/activate
-pip install ansible
+pip install ansible==2.1.1.0
 ansible-playbook --ask-vault-pass -i sms.example.com,  production.yml
 ```
 

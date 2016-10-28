@@ -26,7 +26,7 @@ To run the playbook
     cd apostello
     virtualenv venv
     . venv/bin/activate
-    pip install ansible
+    pip install ansible==2.1.1.0
     cp env_vars/example.yml env_vars/my_site_name.yml
     # fill in the credentials in the new yml file
     ansible-vault encrypt my_site_name.yml
