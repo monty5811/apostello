@@ -64,6 +64,12 @@ def recipient_send_message_task(recipient_pk, body, group, sent_by):
         else:
             raise e
 
+def send_queued_sms():
+    """Check for and send any queued messages."""
+    from apostello.models import QueuedSms
+    for sms in QueuedSms.objects.filter(sent=False, time_to_send__lte=timezone.now()):
+        sms.send()
+
 
 def ask_for_name(person_from_pk, sms_body, ask_for_name):
     """Asks a contact to provide their name."""

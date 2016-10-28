@@ -1,7 +1,9 @@
+from datetime import datetime
 from tests.conftest import twilio_vcr
 
 import pytest
 from apostello import models
+from apostello import tasks
 
 
 @pytest.mark.slow
@@ -22,6 +24,7 @@ class TestSendingSmsForm:
     @twilio_vcr
     def test_send_adhoc_later(self, recipients, users):
         """Test sending a message later."""
+        num_sms = models.SmsOutbound.objects.count()
         users['c_staff'].post(
             '/send/adhoc/', {
                 'content': 'test',
@@ -29,6 +32,24 @@ class TestSendingSmsForm:
                 'scheduled_time': '2117-12-01 00:00'
             }
         )
+        tasks.send_queued_sms()
+        assert models.SmsOutbound.objects.count() == num_sms
+
+    @twilio_vcr
+    def test_send_adhoc_soon(self, recipients, users):
+        """Test sending a message later."""
+        num_sms = models.SmsOutbound.objects.count()
+        users['c_staff'].post(
+            '/send/adhoc/', {
+                'content': 'test',
+                'recipients': ['1'],
+                'scheduled_time': datetime.strftime(
+                    datetime.now(), '%Y-%m-%d %H:%M'
+                )
+            }
+        )
+        tasks.send_queued_sms()
+        assert models.SmsOutbound.objects.count() == num_sms + 1
 
     def test_send_adhoc_error(self, users):
         """Test missing field."""
@@ -56,6 +77,7 @@ class TestSendingSmsForm:
                 'scheduled_time': '2117-12-01 00:00'
             }
         )
+        tasks.send_queued_sms()
 
     def test_send_group_error(self, users):
         """Test missing field."""

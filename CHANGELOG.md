@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Changed
+- Improve handling of scheduled messages
+
 ## [v1.13.1]
 ### Fixed
 - Better handle messages beginning with `name`

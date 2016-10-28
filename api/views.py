@@ -178,10 +178,10 @@ class ApiMember(APIView):
 
             obj.save()
 
-        cancel_task = request.data.get('cancel_task')
-        if cancel_task is not None:
+        cancel_queued_sms = request.data.get('cancel_sms')
+        if cancel_queued_sms is not None:
             r = Response({'pk': obj.pk}, status=status.HTTP_200_OK)
-            obj.delete()
+            obj.cancel()
             return r
 
         serializer = self.serializer_class(obj, context={'request': request})

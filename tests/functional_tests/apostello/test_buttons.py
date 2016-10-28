@@ -163,35 +163,30 @@ class TestButton:
         sleep(driver_wait_time)
         check_and_close_biu(browser_in, driver_wait_time)
 
-    def test_cancel_tasks(
+    def test_cancel_sms(
         self, live_server, browser_in, recipients, groups, driver_wait_time
     ):
         """Test the scheduled messages table."""
-        # create a couple of scheduled tasks, we need to create the model
-        # objects directly as django_q.tasks.schedule is monkeypatched in tests
-        Schedule.objects.create(
-            name='test1',
-            func='apostello.tasks.recipient_send_message_task',
-            args='({0},"test message", None, "admin")'.
-            format(recipients['calvin'].pk),
-            schedule_type='ONCE',
-            repeats=-1,
-            next_run=timezone.make_aware(
+        # create a couple of scheduled sms
+        models.QueuedSms.objects.create(
+            recipient=recipients['calvin'],
+            content="test message",
+            recipient_group=None,
+            sent_by="admin",
+            time_to_send=timezone.make_aware(
                 datetime.strptime('Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'),
                 timezone.get_current_timezone()
-            ),
+            )
         )
-        Schedule.objects.create(
-            name='test2',
-            func='apostello.tasks.recipient_send_message_task',
-            args='({0},"another test message", "Test Group", "admin")'.
-            format(recipients['calvin'].pk),
-            schedule_type='ONCE',
-            repeats=-1,
-            next_run=timezone.make_aware(
+        models.QueuedSms.objects.create(
+            recipient=recipients['calvin'],
+            content="another test message",
+            recipient_group=groups['test_group'],
+            sent_by="admin",
+            time_to_send=timezone.make_aware(
                 datetime.strptime('Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'),
                 timezone.get_current_timezone()
-            ),
+            )
         )
         # verify tasks are shown in table
         uri = '/scheduled/sms/'
@@ -208,7 +203,7 @@ class TestButton:
         assert 'test message' not in browser_in.page_source
         assert 'another test message' not in browser_in.page_source
         assert 'Calvin' not in browser_in.page_source
-        assert Schedule.objects.all().count() == 0
+        assert models.QueuedSms.objects.all().count() == 0
 
     def test_group_membership_buttons(
         self, live_server, browser_in, recipients, groups, driver_wait_time

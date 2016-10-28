@@ -56,7 +56,7 @@ StatusCode = namedtuple('StatusCode', 'anon, user, staff')
         ('/api/v1/keywords/', StatusCode(403, 200, 200)),
         ('/api/v1/keywords_archive/', StatusCode(403, 403, 200)),
         ('/api/v1/keywords/1', StatusCode(403, 200, 200)),
-        ('/api/v1/q/scheduled/sms/', StatusCode(403, 403, 200)),
+        ('/api/v1/queued/sms/', StatusCode(403, 403, 200)),
         ('/api/v1/sms/live_wall/all/', StatusCode(403, 200, 200)),
         ('/graphs/recent/', StatusCode(302, 200, 200)),
         ('/graphs/contacts/', StatusCode(302, 302, 200)),

@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import post from '../utils/ajax_post';
 import LoadingComponent from './reloading_component';
 import FilteringComponent from './filtering_component';
-import GroupRow from './group_row.jsx';
+import GroupRow from './group_row';
 
 class GroupsTable extends Component {
   constructor() {

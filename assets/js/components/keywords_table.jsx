@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import post from '../utils/ajax_post';
 import LoadingComponent from './reloading_component';
 import FilteringComponent from './filtering_component';
-import KeywordRow from './keyword_row.jsx';
+import KeywordRow from './keyword_row';
 
 class KeywordsTable extends Component {
   constructor() {

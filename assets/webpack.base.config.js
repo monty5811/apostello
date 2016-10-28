@@ -41,18 +41,17 @@ module.exports = {
   ],
 
   module: {
-    preLoaders: [
+    rules: [
       {
+        enforce: 'pre',
         test: /\.jsx?$/,
         loader: "eslint-loader"
-      }
-    ],
-
-    loaders: [{
+      },
+      {
         test: /\.jsx?$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
-      }, // to transform JSX into JS
+      }
     ],
   },
 

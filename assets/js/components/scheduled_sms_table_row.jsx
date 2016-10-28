@@ -1,28 +1,40 @@
 import React, { PropTypes } from 'react';
 import CancelButton from './cancel_button';
 
+const GroupLink = (props) => {
+  if (props.group === null) {
+    return <div />;
+  }
+  return (
+    <a href={props.group.url}>
+      {props.group.name}
+    </a>
+  );
+};
+
+GroupLink.propTypes = {
+  group: PropTypes.object.isOptional,
+};
+
 const ScheduledSmsTableRow = props => (
-  <tr>
-    <td>{props.task.queued_by}</td>
+  <tr className={props.sms.failed ? 'negative' : ''}>
+    <td>{props.sms.sent_by}</td>
     <td>
-      <a href={props.task.recipient.url}>{props.task.recipient.full_name}</a>
+      <a href={props.sms.recipient.url}>{props.sms.recipient.full_name}</a>
     </td>
     <td>
-      <a href={props.task.recipient_group.url}>
-        {props.task.recipient_group.name}
-      </a>
+      <GroupLink group={props.sms.recipient_group} />
     </td>
-    <td>{props.task.message_body}</td>
-    <td>{props.sendTime}</td>
+    <td>{props.sms.content}</td>
+    <td>{props.sms.time_to_send_formatted}</td>
     <td>
-      <CancelButton item={props.task} cancelFn={props.cancelTask} />
+      <CancelButton item={props.sms} cancelFn={props.cancelTask} />
     </td>
   </tr>
 );
 
 ScheduledSmsTableRow.propTypes = {
-  task: PropTypes.object.isRequired,
-  sendTime: PropTypes.string.isRequired,
+  sms: PropTypes.object.isRequired,
   cancelTask: PropTypes.func.isRequired,
 };
 

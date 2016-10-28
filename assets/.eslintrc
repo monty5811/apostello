@@ -8,6 +8,7 @@
       "react/forbid-prop-types": [0],
       "jsx-a11y/no-static-element-interactions": [0],
       "class-methods-use-this": [0],
+      "import/no-dynamic-require": [0],
     },
   "env": {
       "browser": true

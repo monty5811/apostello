@@ -3,7 +3,7 @@ import $ from 'jquery';
 import biu from 'biu.js';
 import Loader from './loader';
 import post from '../utils/ajax_post';
-import Members from './group_members.jsx';
+import Members from './group_members';
 
 class GroupMemberSelect extends Component {
   constructor() {

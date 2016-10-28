@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-from datetime import datetime
-
 import pytest
+from django.utils import timezone
 
 from tests.conftest import twilio_vcr
 
@@ -31,7 +29,7 @@ class TestRecipient:
 
     @twilio_vcr
     def test_send_eta(self, recipients):
-        recipients['calvin'].send_message('test', eta=datetime.now())
+        recipients['calvin'].send_message('test', eta=timezone.now())
 
     @twilio_vcr
     def test_send_blacklist(self, recipients):

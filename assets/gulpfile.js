@@ -3,7 +3,6 @@ var gulp = require('gulp'),
   rename = require('gulp-rename'),
   nano = require('gulp-cssnano'),
   sass = require('gulp-sass'),
-  purify = require('gulp-purifycss'),
   gutil = require("gulp-util"),
   webpack = require("webpack"),
   // require tasks as dependencies

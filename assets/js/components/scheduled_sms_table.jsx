@@ -7,27 +7,26 @@ import ScheduledSmsTableRow from './scheduled_sms_table_row';
 class ScheduledSmsTable extends Component {
   constructor() {
     super();
-    this.cancelTask = this.cancelTask.bind(this);
+    this.cancelSms = this.cancelSms.bind(this);
   }
-  cancelTask(task) {
+  cancelSms(sms) {
     post(
-      `/api/v1/q/scheduled/sms/${task.pk}`,
-      { cancel_task: true },
+      `/api/v1/queued/sms/${sms.pk}`,
+      { cancel_sms: true },
       this.props.deleteItemUpdate
     );
   }
   render() {
     const that = this;
     const rows = this.props.data.map(
-      (task, index) => {
-        if (Date(task.next_run) < Date()) {
+      (sms, index) => {
+        if (Date(sms.time_to_send) < Date()) {
           return null;
         }
         return (<ScheduledSmsTableRow
-          task={task}
-          sendTime={task.next_run_formatted}
+          sms={sms}
           key={index}
-          cancelTask={that.cancelTask}
+          cancelTask={that.cancelSms}
         />);
       }
     );

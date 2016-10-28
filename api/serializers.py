@@ -3,10 +3,9 @@ import ast
 from django.contrib.auth.models import User
 from django.contrib.humanize.templatetags.humanize import naturaltime
 from rest_framework import serializers
-from django_q.models import Schedule
 
 from apostello.models import (
-    Keyword, Recipient, RecipientGroup, SmsInbound, SmsOutbound, UserProfile
+    Keyword, QueuedSms, Recipient, RecipientGroup, SmsInbound, SmsOutbound, UserProfile
 )
 from elvanto.models import ElvantoGroup
 
@@ -211,72 +210,26 @@ class UserProfileSerializer(serializers.ModelSerializer):
         )
 
 
-class QScheduleSerializer(serializers.ModelSerializer):
-    """Serialize scheduled django-q tasks.
+class QueuedSmsSerializer(serializers.ModelSerializer):
+    """Serialize queued messages"""
+    time_to_send_formatted = serializers.SerializerMethodField()
+    recipient = RecipientSerializer(read_only=True)
+    recipient_group = RecipientGroupSerializer(read_only=True)
 
-    Note - this will only work with scheduled message tasks.
-    """
-
-    next_run = serializers.DateTimeField()
-    next_run_formatted = serializers.SerializerMethodField()
-    message_body = serializers.SerializerMethodField()
-    recipient = serializers.SerializerMethodField()
-    recipient_group = serializers.SerializerMethodField()
-    queued_by = serializers.SerializerMethodField()
-
-    @staticmethod
-    def _split_args(sched_args):
-        """Convert the schedule's args value to tuple."""
-        return ast.literal_eval(sched_args)
-
-    def get_message_body(self, obj):
-        """Fetch the message body arg."""
-        if obj.args is None:
-            return None
-        return self._split_args(obj.args)[1]
-
-    def get_recipient(self, obj):
-        """Fetch the recipient arg and serialize."""
-        if obj.args is None:
-            return None
-        pk = self._split_args(obj.args)[0]
-        if pk is not None:
-            grp = Recipient.objects.get(pk=pk)
-            serializer = RecipientSerializer(grp, context=self.context)
-            return serializer.data
-        else:
-            return {'url': '#', 'full_name': 'n/a'}
-
-    def get_recipient_group(self, obj):
-        """Fetch the recipient group arg and serialize."""
-        if obj.args is None:
-            return None
-        grp_name = self._split_args(obj.args)[2]
-        if grp_name is not None:
-            grp = RecipientGroup.objects.get(name=grp_name)
-            serializer = RecipientGroupSerializer(grp)
-            return serializer.data
-        else:
-            return {'url': '#', 'name': 'n/a'}
-
-    def get_queued_by(self, obj):
-        """Fetch the queued by arg."""
-        if obj.args is None:
-            return None
-        return self._split_args(obj.args)[3]
-
-    def get_next_run_formatted(self, obj):
+    def get_time_to_send_formatted(self, obj):
         """Next run time in humand friendly format."""
-        return naturaltime(obj.next_run)
+        return naturaltime(obj.time_to_send)
 
     class Meta:
-        model = Schedule
+        model = QueuedSms
         fields = (
             'pk',
-            'message_body',
+            'time_to_send',
+            'time_to_send_formatted',
+            'sent',
+            'failed',
+            'content',
             'recipient',
             'recipient_group',
-            'queued_by',
-            'next_run',
-            'next_run_formatted',
+            'sent_by',
         )

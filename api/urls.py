@@ -1,5 +1,4 @@
 from django.conf.urls import url
-from django_q.models import Schedule
 from rest_framework.permissions import IsAuthenticated
 
 from api import serializers as s
@@ -9,7 +8,7 @@ from api.drf_permissions import (
     CanSeeKeywords, CanSeeOutgoing, IsStaff
 )
 from apostello.models import (
-    Keyword, Recipient, RecipientGroup, SmsInbound, SmsOutbound, UserProfile
+    Keyword, QueuedSms, Recipient, RecipientGroup, SmsInbound, SmsOutbound, UserProfile
 )
 from elvanto.models import ElvantoGroup
 
@@ -225,25 +224,25 @@ urlpatterns = [
         ),
         name='keyword'
     ),
-    # scheduled task views
+    # queued messages views
     url(
-        r'^v1/q/scheduled/sms/$',
+        r'^v1/queued/sms/$',
         v.ApiCollection.as_view(
-            model_class=Schedule,
-            serializer_class=s.QScheduleSerializer,
+            model_class=QueuedSms,
+            serializer_class=s.QueuedSmsSerializer,
             filter_list=True,
-            filters={'func__contains': 'send_message'},
+            filters={'sent': False},
             permission_classes=(IsAuthenticated, IsStaff)
         ),
-        name='q_schedules'
+        name='queued_smss'
     ),
     url(
-        r'^v1/q/scheduled/sms/(?P<pk>[0-9]+)$',
+        r'^v1/queued/sms/(?P<pk>[0-9]+)$',
         v.ApiMember.as_view(
-            model_class=Schedule,
-            serializer_class=s.QScheduleSerializer,
+            model_class=QueuedSms,
+            serializer_class=s.QueuedSmsSerializer,
             permission_classes=(IsAuthenticated, IsStaff)
         ),
-        name='q_schedule'
+        name='queued_sms'
     ),
 ]

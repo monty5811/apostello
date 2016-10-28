@@ -46,6 +46,7 @@ class RecipientGroup(models.Model):
             'apostello.tasks.group_send_message_task', content, self.name,
             sent_by, eta
         )
+
     def archive(self):
         """Archive the group."""
         self.is_archived = True
@@ -164,14 +165,16 @@ class Recipient(models.Model):
                 content, group, sent_by
             )
         else:
-            schedule(
-                'apostello.tasks.recipient_send_message_task',
-                self.pk,
-                content,
-                group,
-                sent_by,
-                schedule_type=Schedule.ONCE,
-                next_run=eta
+            try:
+                groupObj = RecipientGroup.objects.get(name=group)
+            except RecipientGroup.DoesNotExist as e:
+                groupObj = None
+            QueuedSms.objects.create(
+                time_to_send=eta,
+                content=content,
+                sent_by=sent_by,
+                recipient_group=groupObj,
+                recipient=self,
             )
 
     def archive(self):
@@ -625,6 +628,67 @@ class SmsInbound(models.Model):
 
     class Meta:
         ordering = ['-time_received']
+
+
+class QueuedSms(models.Model):
+    """And outbound SMS to be sent at a later time."""
+    time_to_send = models.DateTimeField()
+    sent = models.BooleanField(default=False)
+    failed = models.BooleanField(default=False)
+    content = models.CharField(
+        "Message",
+        max_length=1600,
+        validators=[gsm_validator],
+    )
+    sent_by = models.CharField(
+        "Sender",
+        max_length=200,
+        help_text='User that sent message. Stored for auditing purposes.'
+    )
+    recipient_group = models.ForeignKey(
+        RecipientGroup,
+        null=True,
+        blank=True,
+        help_text="Group (if any) that message was sent to"
+    )
+    recipient = models.ForeignKey(Recipient, blank=True, null=True)
+
+    def cancel(self):
+        """Cancel message."""
+        self.delete()
+
+    def send(self):
+        """Send the sms."""
+        if self.sent or self.failed:
+            # only try to send once
+            return
+
+        from apostello.tasks import recipient_send_message_task
+        try:
+            if self.recipient_group is not None:
+                group = self.recipient_group.name
+            else:
+                group = None
+            recipient_send_message_task(
+                self.recipient.pk, self.content, group, self.sent_by,
+            )
+            self.sent = True
+        except Exception as e:
+            self.failed = True
+
+        self.save()
+
+
+    def __str__(self):
+        """Pretty representation."""
+        status = "Sent" if self.sent else "Queued"
+        val = "[{status}] To: {recipient} Msg: {content}\nScheduled for {time}".format(
+            status=status,
+            recipient=self.recipient,
+            content=self.content,
+            time=self.time_to_send,
+        )
+        return val
 
 
 class SmsOutbound(models.Model):
