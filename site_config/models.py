@@ -1,7 +1,7 @@
 from django.db import models
 from solo.models import SingletonModel
 
-from apostello.validators import less_than_sms_char_limit
+from apostello.validators import less_than_sms_char_limit, validate_starts_with_plus
 
 
 class SiteConfiguration(SingletonModel):
@@ -17,6 +17,14 @@ class SiteConfiguration(SingletonModel):
         help_text='SMS length limit.'
         ' The sending forms use this value to limit the size of messages.'
         ' Check the Twilio pricing docs for pricing information.'
+    )
+    default_number_prefix = models.CharField(
+        max_length=5,
+        default='',
+        blank=True,
+        help_text='This value will be used to prepopulate the new contact form'
+        ' use this if you don\'t want to have to type +xx every time.',
+        validators=[validate_starts_with_plus]
     )
     disable_all_replies = models.BooleanField(
         default=False,

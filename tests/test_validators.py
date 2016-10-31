@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 
 from apostello.validators import (
     gsm_validator, less_than_sms_char_limit, no_overlap_keyword,
-    not_twilio_num, twilio_reserved, validate_lower
+    not_twilio_num, twilio_reserved, validate_lower, validate_starts_with_plus
 )
 from site_config.models import SiteConfiguration
 
@@ -95,3 +95,14 @@ class TestCharLimit:
                 't %name%' *
                 (s.sms_char_limit - settings.MAX_NAME_LENGTH + len('%name%'))
             )
+
+class TestStartswithPlus:
+    def test_no_plus(self):
+        with pytest.raises(ValidationError):
+            validate_starts_with_plus('nope')
+
+    def test_plus(self):
+        validate_starts_with_plus('+44')
+        validate_starts_with_plus('+1')
+        validate_starts_with_plus('+test')
+        validate_starts_with_plus('+yup')

@@ -6,7 +6,7 @@ from django.views.generic import View
 from apostello.exceptions import ArchivedItemException
 from apostello.mixins import ProfilePermsMixin
 from apostello.models import Keyword
-from apostello.utils import exists_and_archived
+from apostello.utils import exists_and_archived, get_default_number_prefix
 
 
 class SimpleView(ProfilePermsMixin, View):
@@ -60,7 +60,12 @@ class ItemView(ProfilePermsMixin, View):
                 context['sms_history'] = True
         except KeyError:
             # otherwise, use a blank form
-            form = self.form_class
+            if self.identifier == 'recipient':
+                form = self.form_class(
+                    initial={'number': get_default_number_prefix()}
+                )
+            else:
+                form = self.form_class()
             context['submit_text'] = "Submit"
 
         context['form'] = form

@@ -52,6 +52,13 @@ def fetch_default_reply(msg=''):
     return replies[msg]
 
 
+def get_default_number_prefix():
+    """Fetch default number prefix from database."""
+    from site_config.models import SiteConfiguration
+    site_config = SiteConfiguration.get_solo()
+    return site_config.default_number_prefix
+
+
 def retry_request(url, http_method, *args, **kwargs):
     """Make a http request and retry 3 times if it fails."""
     assert http_method in ['get', 'post', 'delete', 'patch', 'put']

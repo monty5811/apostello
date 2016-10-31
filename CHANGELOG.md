@@ -2,8 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- Default prefix for phone numbers (set at `/config/site/`) that prefills the new contact form
+
 ### Changed
-- Improve handling of scheduled messages
+- Improve handling of scheduled messages (**note**, already queued messages will be sent after upgrading, but their status can only be view in the admin panel, you may want to cancel queued messages before upgrading just in case)
 - Update dependencies
 
 ## [v1.13.1]

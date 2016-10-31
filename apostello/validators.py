@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
@@ -73,3 +72,10 @@ def less_than_sms_char_limit(value):
             'You have exceeded the maximum char limit of {0}.'.
             format(sms_char_lim)
         )
+
+
+def validate_starts_with_plus(value):
+    """Ensure value starts with a `+`."""
+    if value.startswith('+'):
+        return
+    raise ValidationError('Phone numbers must start with a "+".')
