@@ -7,6 +7,7 @@ module.exports = {
   entry: {
     app: './js/app',
     tour: './js/tour',
+    groupcomposer: './elm/groupcomposer',
     vendor: [
       'datetimepicker',
       'jquery',
@@ -51,6 +52,11 @@ module.exports = {
         test: /\.jsx?$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
+      },
+      {
+        test: /\.elm?$/,
+        exclude: [/elm-stuff/, /node_modules/],
+        loader: 'elm-webpack'
       }
     ],
   },

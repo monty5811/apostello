@@ -136,23 +136,7 @@ class RecipientSimpleSerializer(serializers.ModelSerializer):
         fields = ('full_name',
                   'pk', )
 
-
 class RecipientGroupSerializer(serializers.ModelSerializer):
-    """Serialize apostello.models.RecipientGroup for use in table."""
-    cost = serializers.CharField(source='calculate_cost')
-    url = serializers.CharField(source='get_absolute_url')
-
-    class Meta:
-        model = RecipientGroup
-        fields = ('name',
-                  'pk',
-                  'description',
-                  'cost',
-                  'url',
-                  'is_archived', )
-
-
-class RecipientGroupSerializerMember(serializers.ModelSerializer):
     """Serialize apostello.models.RecipientGroup for use in edit page."""
     cost = serializers.CharField(source='calculate_cost')
     url = serializers.CharField(source='get_absolute_url')

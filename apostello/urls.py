@@ -93,6 +93,15 @@ urlpatterns += [
         v.CreateAllGroupView.as_view(),
         name='group_create_all',
     ),
+    url(
+        r'^group/composer/$',
+        v.SimpleView.as_view(
+            template_name='apostello/group_composer.html',
+            rest_uri='/api/v1/groups/',
+            required_perms=['can_see_groups', 'can_see_contact_names']
+        ),
+        name='group_composer'
+    ),
 ]
 
 # recipient urls

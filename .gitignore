@@ -14,6 +14,7 @@ assets/semantic/src/semantic.less
 assets/semantic/tasks
 assets/semantic/gulpfile.js
 *.map
+elm-stuff/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

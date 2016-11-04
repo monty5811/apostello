@@ -12,6 +12,7 @@
     "biu.js": "1.2.0",
     "closure-compiler-webpack-plugin": "0.1.8",
     "datetimepicker": "0.1.36",
+    "elm-webpack-loader": "3.0.6",
     "eslint": "3.8.1",
     "eslint-config-airbnb": "12.0.0",
     "eslint-loader": "1.6.0",
@@ -33,8 +34,12 @@
     "webpack": "2.1.0-beta.25"
   },
   "scripts": {
+    "elm": "elm-make --yes",
+    "elm-test": "elm-test tests-elm/Main.elm",
+    "prebuild": "npm run elm",
+    "preprodjs": "npm run elm",
     "build": "gulp",
-    "prewatchjs": "gulp uiBuildJs",
+    "prewatchjs": "npm run elm && gulp uiBuildJs",
     "watchjs": "webpack --config webpack.base.config.js --color --watch",
     "prodjs": "webpack --config webpack.production.config.js --color --progress"
   },

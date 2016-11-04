@@ -21,6 +21,7 @@ StatusCode = namedtuple('StatusCode', 'anon, user, staff')
         ('/group/new/', StatusCode(302, 200, 200)),
         ('/group/edit/1/', StatusCode(302, 200, 200)),
         ('/group/create_all/', StatusCode(302, 302, 200)),
+        ('/group/composer/', StatusCode(200, 200, 200)),
         ('/recipient/all/', StatusCode(302, 200, 200)),
         ('/recipient/archive/', StatusCode(302, 302, 200)),
         ('/recipient/new/', StatusCode(302, 200, 200)),

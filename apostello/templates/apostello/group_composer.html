@@ -1,0 +1,18 @@
+{% extends "apostello/base.html" %}
+{% load staticfiles %}
+{% block title %}Group Composer{% endblock %}
+{% block side_bar %}
+<a class="item" href="{% url 'group' %}">New Group</a>
+<a class="item" href="{% url 'recipient_groups' %}">Groups</a>
+{% if request.user.is_staff %}
+<a class="item" href="{% url 'recipient_groups_archive' %}">Archived Groups</a>
+{% endif %}
+{% endblock %}
+{% block content %}
+<div class="ten wide column">
+  <div id="elm"></div>
+</div>
+{% endblock %}
+{% block morejs %}
+<script src="{% static 'js/groupcomposer.js' %}"></script>
+{% endblock %}
