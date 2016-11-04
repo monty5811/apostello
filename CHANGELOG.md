@@ -10,6 +10,9 @@ All notable changes to this project will be documented in this file.
 - Improve handling of scheduled messages (**note**, already queued messages will be sent after upgrading, but their status can only be view in the admin panel, you may want to cancel queued messages before upgrading just in case)
 - Update dependencies
 
+### Fixed
+- Fix rounding error on sending pages
+
 ## [v1.13.1]
 ### Fixed
 - Better handle messages beginning with `name`
