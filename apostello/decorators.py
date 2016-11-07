@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from functools import partial, wraps
+from urllib.parse import quote
 
 from django.conf import settings
 from django.contrib import messages
@@ -49,7 +50,9 @@ def check_user_perms(view=None, require=None):
             # check for anon users:
             # this hsould not be neccessary, but it works...
             if not request.user.is_authenticated():
-                return redirect(settings.LOGIN_URL)
+                redirect_url = settings.LOGIN_URL + '?next=' + quote(
+                    request.get_full_path())
+                return redirect(redirect_url)
             # check approval status:
             if not request.user.profile.approved:
                 return redirect(reverse('not_approved'))

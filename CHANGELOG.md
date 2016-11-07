@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - Fix rounding error on sending pages
+- Redirect to correct page after login
 
 ## [v1.13.1]
 ### Fixed
