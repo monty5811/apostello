@@ -35,12 +35,12 @@ zip of the source code from Github instead
 Before we begin, install the Heroku toolbelt and Git.
 Then run the command ``heroku login`` to login.
 
-The first time you update after deploying to Heroku you need to run the 
+The first time you update after deploying to Heroku you need to run the
 following commands:
 
 
 .. code-block:: bash
-    
+
     # install the builds plugin (you only need to do this once)
     heroku plugins:install heroku-builds
     # now, let's grab a copy of apostello
@@ -60,7 +60,7 @@ following commands:
 
     # you can check your build history:
     heroku builds -a <your-app-name-here>
-    # if a build fails, you can roll back to a previous build in the 
+    # if a build fails, you can roll back to a previous build in the
     # Heroku dashboard
 
 
@@ -68,7 +68,7 @@ Subsequent updates are quicker:
 
 
 .. code-block:: bash
-    
+
     # move to the apostello folder, then:
     git fetch origin
     # view the different releases:

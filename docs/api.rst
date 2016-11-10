@@ -19,16 +19,16 @@ Documentation
 
 Documentation of the API endpoints can be found at ``<your-apostello-url>/api-docs/``.
 
-The API key must be included in the ``Authorization`` HTTP header (``Authorization: Token <API-KEY>``). 
+The API key must be included in the ``Authorization`` HTTP header (``Authorization: Token <API-KEY>``).
 
 An example request might look like:
 
 .. code-block:: python
 
     import requests
-   
+
     r = requests.get(
-        url, 
+        url,
         headers={'Authorization': 'Token {0}'.format(API_KEY)}
     )
     print(r.json())

@@ -66,7 +66,7 @@ Emails are sent for a number of reasons by apostello:
 * Daily keyword digests
 * Warnings and notifications on some events are sent to the "office email"
 
-apostello needs a mail server to send these emails. 
+apostello needs a mail server to send these emails.
 We recommend using `Mailgun <https://www.mailgun.com/>`_ which allows you to send 10,000 emails for free each month.
 
 There are two ways to tell apostello about your mail server:
