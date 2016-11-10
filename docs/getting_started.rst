@@ -5,9 +5,9 @@ Getting Started
 
 There are a number of ways you can deploy apostello:
 
+* **Recommended**: Using the :ref:`ansible playbook <deploy-ansible>` included in the repo
 * One click :ref:`Heroku <deploy-heroku>` deploy
-* *Recommended* Using the :ref:`ansible playbook <deploy-ansible>` included in the repo
-* One click `Digital Ocean deploy <http://installer.71m.us/install?url=https://github.com/monty5811/apostello>`_
+* One click :ref:`Digital Ocean <deploy-do>` deploy
 
 Prerequisites
 -------------
@@ -18,6 +18,8 @@ Prerequisites
 * *Optional*: A web app registered for authentication with a Google account
 * *Optional*: An `Elvanto <https://www.elvanto.com/r_Y7HXKNE6>`_ API Key for importing Elvanto groups.
 * *Optional*: An `opbeat <https://opbeat.com/>`_ account for error logging. You can setup opbeat logging on the front and back ends in separate opbeat apps: one for the django app and one for the js front end.
+
+.. _first-run:
 
 First Run
 ---------
@@ -80,15 +82,3 @@ There are two ways to tell apostello about your mail server:
    * ``DJANGO_FROM_EMAIL``
 
 2. Use the `Site Configuration` form after getting apostello up and running. **N.B.** These values will override those set as environment variables.
-
-.. _misc-setup:
-
-Misc Setup
-----------
-
-The URLs in my emails are incorrect
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-You may need to let apostello know what your domain is.
-You can do this by opening ``<your domain>//admin/sites/site/``, click on the first entry and update the domain name field, then click save.
-

@@ -1,6 +1,7 @@
 set -e
 AP_VER=v1.13.1
 
+cd /home/apostello/
 echo "Installing and upgrading packages"
 sudo apt-get update -qq
 sudo apt-get upgrade -y
@@ -35,19 +36,21 @@ sed -i -e "s/server_name_replace_me/$IP/g" env_vars/example.yml
 echo "Running ansible deploy"
 ./../venv/bin/ansible-playbook -i 127.0.0.1, production.yml --connection=local
 
-echo "################################################################"
-echo "## apostello is now running on this server                    ##"
-echo "##                                                            ##"
-echo "## If this is your first time setup, you need edit            ##"
-echo "## apostello-install/ansible/env_vars/example.yml             ##"
-echo "##                                                            ##"
-echo "## You must set up your email settings, or apostello will not ##"
-echo "## function correctly!                                        ##"
-echo "##                                                            ##"
-echo "## Email setup: http://goo.gl/nkjPdy                          ##"
-echo "## Twilio setup: http://goo.gl/2lt8dX                         ##"
-echo "##                                                            ##"
-echo "## Then run the command:                                      ##"
-echo "## ./apostello-install/scripts/ansible_install.sh             ##"
-echo "##                                                            ##"
-echo "################################################################"
+echo "###################################################################"
+echo "## apostello is now running on this server                       ##"
+echo "##                                                               ##"
+echo "## If this is your first time setup, you need edit               ##"
+echo "## apostello-install/ansible/env_vars/example.yml                ##"
+echo "##                                                               ##"
+echo "## You must set up your email settings, or apostello will not    ##"
+echo "## function correctly!                                           ##"
+echo "##                                                               ##"
+echo "## Email setup: http://goo.gl/nkjPdy                             ##"
+echo "## Twilio setup: http://goo.gl/2lt8dX                            ##"
+echo "##                                                               ##"
+echo "## Then run the command:                                         ##"
+echo "## ./home/apostello/apostello-install/scripts/ansible_install.sh ##"
+echo "##                                                               ##"
+echo "## More info: https://goo.gl/WWFj3h                              ##"
+echo "##                                                               ##"
+echo "###################################################################"

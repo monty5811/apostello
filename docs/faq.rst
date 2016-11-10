@@ -32,3 +32,9 @@ How do I prepopulate the send SMS form?
 ---------------------------------------
 
 The send SMS form will read url parameters. So an URL ``apostello-demo.herokuapp.com/send/adhoc/?content=test&recipient=1&recipient=2`` will prepopulate the SMS form with ``test`` in the content box and the recipients ``1`` and ``2`` (you can get these numbers from the api or the url when editing a contact) in the send field.
+
+The URLs in my emails are incorrect
+-----------------------------------
+
+You may need to let apostello know what your domain is.
+You can do this by opening ``<your domain>/admin/sites/site/``, click on the first entry and update the domain name field, then click save.

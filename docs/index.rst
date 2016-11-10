@@ -19,14 +19,15 @@ Try out the :ref:`demo site <demo_site>` or the :ref:`getting started <getting-s
 Pull requests are encouraged. Please open an issue before working on anything other than minor bug fixes.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
+   :hidden:
    :glob:
 
    features
    getting_started
+   deployment
    faq
    demo_site
    screenshots
    api
    development
-

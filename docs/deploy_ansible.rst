@@ -24,7 +24,10 @@ To run the playbook
 
     git clone https://github.com/monty5811/apostello.git
     cd apostello
-    virtualenv venv
+    # checkout a specific version:
+    git checkout |vversion|
+    cd ansible
+    python2 -m virtualenv venv --no-site-packages
     . venv/bin/activate
     pip install ansible==2.1.1.0
     cp env_vars/example.yml env_vars/my_site_name.yml
