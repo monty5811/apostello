@@ -30,7 +30,8 @@ project = 'apostello'
 copyright = '2015, Dean Montgomery'
 author = 'Dean Montgomery'
 
-version = '1.13.1'
+with open('../VERSION', 'r') as f:
+    version = f.read().strip()
 # The full version, including alpha/beta/rc tags.
 release = '0.1'
 language = None

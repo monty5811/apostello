@@ -6,7 +6,8 @@ import pip
 from pip.req import parse_requirements
 from setuptools import find_packages, setup
 
-version = "1.13.1"
+with open('VERSION', 'r') as f:
+    version = f.read().strip()
 
 install_reqs = parse_requirements(
     'requirements.txt', session=pip.download.PipSession()
