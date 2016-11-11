@@ -29,7 +29,7 @@ Create a python virtualenv and install dependencies:
 .. code-block:: bash
 
     python3 -m venv venv
-    pip install -r requirements/test.txt
+    pip install -r requirements/dev.txt
 
 Create a development database (this uses sqlite, if you need to reset the database, just delete db.sqlite3 and run this command again):
 
@@ -50,6 +50,17 @@ Start the development server:
     ./manage.py runserver
 
 Open your browser and go to ``127.0.0.1:8000/admin`` and login.
+
+
+Running Tests
+~~~~~~~~~~~~~
+
+.. code-block:: bash
+
+    pip install tox
+    tox # you need firefox < 46 installed
+    tox -e py35 # runs tests only for py35
+    tox -e py35 -- -m \"not slow" # runs only quick tests on py35
 
 
 Frontend
