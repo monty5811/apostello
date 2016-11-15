@@ -30,4 +30,4 @@ Pull requests are encouraged. Please open an issue before working on anything ot
    demo_site
    screenshots
    api
-   development
+   contributing

@@ -1,8 +1,27 @@
-Development
-===========
+Contributing
+============
 
-Pull requests are encouraged. Please open an issue before working on anything other than minor bug fixes.
+Thank you for considering contributing to apostello, please read these guidelines so we can best manage things.
 
+There are many ways for you to contribute: writing tutorials, improving the documentation, submitting bug reports or feature requests and writing code.
+
+Code Contributions
+------------------
+
+Guidelines for code contributions:
+
+* Unless it is a small or trivial fix, please open an issue before starting
+* Any new features must include tests - if a feature requires interaction through the browser, please add selenium backed tests
+* Please do not hit the network in tests - see how vcrpy is used in the test suite for help with this
+* Please run ``./scripts/run_yapf.py`` before committing to maintain code style
+* Please ensure any changes to javascript code compile without warnings
+* Please add only a single feature per pull request
+
+Please do not hesitate to ask for help in our `chat <http://chat.church.io/>`_.
+
+
+Development Environment
+#######################
 
 Prerequisites
 ~~~~~~~~~~~~~
@@ -10,7 +29,8 @@ Prerequisites
 * `Python 3 <https://www.python.org/>`_
 * `Git <https://www.atlassian.com/git/tutorials/install-git/>`_
 * Optional: `Node <https://nodejs.org/>`_ for frontend development
-* Optional: Firefox to run integration tests
+* Optional: Java for minifying JS
+* Optional: Firefox (<46) to run integration tests
 
 Get Started
 ~~~~~~~~~~~
@@ -66,7 +86,7 @@ Running Tests
 Frontend
 ~~~~~~~~
 
-A significant portion of the frontend is uses `React <https://facebook.github.io/react/>_`.
+A significant portion of the frontend uses `React <https://facebook.github.io/react/>`_.
 
 Setup:
 
