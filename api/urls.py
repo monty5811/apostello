@@ -8,7 +8,8 @@ from api.drf_permissions import (
     CanSeeKeywords, CanSeeOutgoing, IsStaff
 )
 from apostello.models import (
-    Keyword, QueuedSms, Recipient, RecipientGroup, SmsInbound, SmsOutbound, UserProfile
+    Keyword, QueuedSms, Recipient, RecipientGroup, SmsInbound, SmsOutbound,
+    UserProfile
 )
 from elvanto.models import ElvantoGroup
 

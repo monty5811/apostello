@@ -13,7 +13,9 @@ IGNORE_DIRS = [
 def yapf_file(f):
     """Run yapf on file."""
     print(f.path)
-    subprocess.call("yapf -i {} --style scripts/.style.yapf".format(f.path), shell=True)
+    subprocess.call(
+        "yapf -i {} --style scripts/.style.yapf".format(f.path), shell=True
+    )
 
 
 def yapf_or_recr(f):

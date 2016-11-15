@@ -5,7 +5,8 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 from rest_framework import serializers
 
 from apostello.models import (
-    Keyword, QueuedSms, Recipient, RecipientGroup, SmsInbound, SmsOutbound, UserProfile
+    Keyword, QueuedSms, Recipient, RecipientGroup, SmsInbound, SmsOutbound,
+    UserProfile
 )
 from elvanto.models import ElvantoGroup
 
@@ -135,6 +136,7 @@ class RecipientSimpleSerializer(serializers.ModelSerializer):
         model = Recipient
         fields = ('full_name',
                   'pk', )
+
 
 class RecipientGroupSerializer(serializers.ModelSerializer):
     """Serialize apostello.models.RecipientGroup for use in edit page."""

@@ -51,7 +51,8 @@ def check_user_perms(view=None, require=None):
             # this hsould not be neccessary, but it works...
             if not request.user.is_authenticated():
                 redirect_url = settings.LOGIN_URL + '?next=' + quote(
-                    request.get_full_path())
+                    request.get_full_path()
+                )
                 return redirect(redirect_url)
             # check approval status:
             if not request.user.profile.approved:

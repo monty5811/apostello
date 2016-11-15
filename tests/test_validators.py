@@ -96,6 +96,7 @@ class TestCharLimit:
                 (s.sms_char_limit - settings.MAX_NAME_LENGTH + len('%name%'))
             )
 
+
 class TestStartswithPlus:
     def test_no_plus(self):
         with pytest.raises(ValidationError):

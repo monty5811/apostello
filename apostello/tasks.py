@@ -64,10 +64,13 @@ def recipient_send_message_task(recipient_pk, body, group, sent_by):
         else:
             raise e
 
+
 def send_queued_sms():
     """Check for and send any queued messages."""
     from apostello.models import QueuedSms
-    for sms in QueuedSms.objects.filter(sent=False, time_to_send__lte=timezone.now()):
+    for sms in QueuedSms.objects.filter(
+        sent=False, time_to_send__lte=timezone.now()
+    ):
         sms.send()
 
 

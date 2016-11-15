@@ -46,7 +46,6 @@ class RecipientGroup(models.Model):
             'apostello.tasks.group_send_message_task', content, self.name,
             sent_by, eta
         )
-
     def archive(self):
         """Archive the group."""
         self.is_archived = True
@@ -246,7 +245,6 @@ class Recipient(models.Model):
         if add_to_group_flag:
             from apostello.tasks import add_new_contact_to_groups
             async('apostello.tasks.add_new_contact_to_groups', self.pk)
-
     def __str__(self):
         """Pretty representation."""
         return self.full_name
@@ -670,14 +668,16 @@ class QueuedSms(models.Model):
             else:
                 group = None
             recipient_send_message_task(
-                self.recipient.pk, self.content, group, self.sent_by,
+                self.recipient.pk,
+                self.content,
+                group,
+                self.sent_by,
             )
             self.sent = True
         except Exception as e:
             self.failed = True
 
         self.save()
-
 
     def __str__(self):
         """Pretty representation."""

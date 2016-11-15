@@ -43,9 +43,8 @@ class TestSendingSmsForm:
             '/send/adhoc/', {
                 'content': 'test',
                 'recipients': ['1'],
-                'scheduled_time': datetime.strftime(
-                    datetime.now(), '%Y-%m-%d %H:%M'
-                )
+                'scheduled_time':
+                datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M')
             }
         )
         tasks.send_queued_sms()

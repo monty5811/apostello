@@ -94,7 +94,7 @@ class InboundSms:
             if not last_name:
                 raise ValidationError('No last name')
             last_name = last_name.split('\n')[0]
-            last_name = last_name[0:40] # truncate last name
+            last_name = last_name[0:40]  # truncate last name
             self.contact.last_name = last_name
             self.contact.save()
             # update old messages with this person's name
