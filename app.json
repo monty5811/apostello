@@ -37,7 +37,7 @@
     },
     "TWILIO_AUTH_TOKEN": {
       "description": "Your Twilio account Auth Token",
-      "value": ""    
+      "value": ""
     },
     "TWILIO_FROM_NUM": {
       "description": "The Twilio number you want to send from",
@@ -76,32 +76,13 @@
       "description": "Elvanto API Key",
       "value": "",
       "required": false
-    },
-    "OPBEAT_APP_ID": {
-      "value": "",
-      "required": false
-    },
-    "OPBEAT_ORGANIZATION_ID": {
-      "value": "",
-      "required": false
-    },
-    "OPBEAT_SECRET_TOKEN": {
-      "value": "",
-      "required": false
-    },
-    "OPBEAT_JS_APP_ID": {
-      "value": "",
-      "required": false
-    },
-    "OPBEAT_JS_ORG_ID": {
-      "value": "",
-      "required": false
     }
   },
   "addons": [
     "heroku-postgresql:hobby-dev",
     "heroku-redis",
     "papertrail:choklad",
+    "opbeat:free",
     "scheduler:standard"
   ]
 }
