@@ -1,16 +1,16 @@
 module Main exposing (..)
 
-import Models exposing (Flags, Model, initialModel)
 import Actions exposing (fetchData)
+import Html exposing (program)
 import Messages exposing (Msg)
+import Models exposing (Model, initialModel)
 import Update exposing (update)
 import View exposing (view)
-import Html.App exposing (programWithFlags)
 
 
-main : Program Flags
+main : Program Never Model Msg
 main =
-    programWithFlags
+    program
         { init = init
         , view = view
         , update = update
@@ -18,6 +18,6 @@ main =
         }
 
 
-init : Flags -> ( Model, Cmd Msg )
-init flags =
-    ( initialModel flags, fetchData flags.csrftoken )
+init : ( Model, Cmd Msg )
+init =
+    ( initialModel, fetchData )

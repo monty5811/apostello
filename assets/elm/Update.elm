@@ -1,9 +1,9 @@
 module Update exposing (update)
 
 import Actions exposing (fetchData)
+import Helpers exposing (collectPeople)
 import Messages exposing (..)
 import Models exposing (..)
-import Helpers exposing (collectPeople)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -11,9 +11,9 @@ update msg model =
     case msg of
         -- Load data
         LoadData ->
-            ( { model | loadingStatus = Waiting }, (fetchData model.csrftoken) )
+            ( { model | loadingStatus = Waiting }, fetchData )
 
-        LoadDataSuccess groups ->
+        LoadDataResp (Ok groups) ->
             ( { model
                 | groups = groups
                 , people = (collectPeople groups)
@@ -22,7 +22,7 @@ update msg model =
             , Cmd.none
             )
 
-        LoadDataError error ->
+        LoadDataResp (Err _) ->
             ( { model | loadingStatus = LoadingFailed }, Cmd.none )
 
         UpdateQueryString string ->

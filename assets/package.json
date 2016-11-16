@@ -12,6 +12,7 @@
     "biu.js": "1.2.0",
     "closure-compiler-webpack-plugin": "0.1.8",
     "datetimepicker": "0.1.36",
+    "elm-test": "^0.18.0",
     "elm-webpack-loader": "3.0.6",
     "eslint": "3.8.1",
     "eslint-config-airbnb": "12.0.0",

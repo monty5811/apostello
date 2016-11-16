@@ -1,29 +1,21 @@
 module Models exposing (..)
 
-import Json.Decode as Decode
 import ApostelloModels exposing (..)
-import DjangoSend exposing (CSRFToken)
-
-
-type alias Flags =
-    { csrftoken : CSRFToken
-    }
+import Json.Decode as Decode
 
 
 type alias Model =
     { groups : Groups
     , people : People
-    , csrftoken : CSRFToken
     , query : Maybe String
     , loadingStatus : LoadingStatus
     }
 
 
-initialModel : Flags -> Model
-initialModel flags =
+initialModel : Model
+initialModel =
     { groups = []
     , people = []
-    , csrftoken = flags.csrftoken
     , query = Nothing
     , loadingStatus = Waiting
     }

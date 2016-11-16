@@ -2,7 +2,6 @@ module Tests exposing (..)
 
 import Test exposing (..)
 import Expect
-import String
 import Set exposing (Set)
 import Helpers exposing (buildQuery, getPeoplePks)
 import ApostelloModels exposing (..)
@@ -56,5 +55,5 @@ all =
                 Expect.equal (testPeoplePks "100-2") (Set.fromList [ 1, 3 ])
         , test "More complicated query" <|
             \() ->
-                Expect.equal (testPeoplePks " 2 | 3 | 4 - 100") (Set.fromList [])
+                Expect.equal (testPeoplePks " 2 | 3 - 100") (Set.fromList [])
         ]

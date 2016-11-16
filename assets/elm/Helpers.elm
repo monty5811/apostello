@@ -1,12 +1,11 @@
 module Helpers exposing (..)
 
-import Models exposing (..)
 import ApostelloModels exposing (..)
-import Set exposing (Set)
-import String
 import Dict
-import Regex exposing (..)
 import List.Extra exposing (uncons)
+import Models exposing (..)
+import Regex exposing (..)
+import Set exposing (Set)
 
 
 -- Run the query to produce new group
@@ -141,4 +140,4 @@ collectPeople groups =
     in
         Dict.fromList people
             |> Dict.toList
-            |> List.map (\x -> snd x)
+            |> List.map (\x -> Tuple.second x)

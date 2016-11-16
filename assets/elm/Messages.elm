@@ -1,8 +1,8 @@
 module Messages exposing (..)
 
+import ApostelloModels exposing (..)
 import Http
 import Models exposing (..)
-import ApostelloModels exposing (..)
 
 
 -- MESSAGES
@@ -10,6 +10,5 @@ import ApostelloModels exposing (..)
 
 type Msg
     = LoadData
+    | LoadDataResp (Result Http.Error Groups)
     | UpdateQueryString String
-    | LoadDataSuccess Groups
-    | LoadDataError Http.Error

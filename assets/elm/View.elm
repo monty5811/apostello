@@ -1,12 +1,12 @@
 module View exposing (view)
 
-import Html exposing (..)
-import Html.Attributes exposing (class, href, placeholder, style, type', value)
-import Html.Events exposing (onInput, onClick)
+import ApostelloModels exposing (..)
 import Helpers exposing (buildGroupLink, runQuery)
+import Html exposing (..)
+import Html.Attributes exposing (class, href, placeholder, style, type_, value)
+import Html.Events exposing (onInput, onClick)
 import Messages exposing (..)
 import Models exposing (..)
-import ApostelloModels exposing (..)
 
 
 -- Main view
@@ -35,7 +35,7 @@ queryEntry model =
         [ div [ class "ui big fluid input" ]
             [ input
                 [ placeholder "Query goes here: e.g. 1 + 2 - 3"
-                , type' "text"
+                , type_ "text"
                 , onInput UpdateQueryString
                 , value (Maybe.withDefault "" model.query)
                 ]

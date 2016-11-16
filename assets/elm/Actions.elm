@@ -1,19 +1,28 @@
 module Actions exposing (..)
 
-import Task exposing (Task)
+import ApostelloModels exposing (Groups, groupsUrl)
+import Decoders exposing (groupDecoder)
 import Http
 import Json.Decode as Decode
-import DjangoSend exposing (csrfSend, CSRFToken)
-import Decoders exposing (groupDecoder)
-import Messages exposing (..)
-import ApostelloModels exposing (..)
+import Messages exposing (Msg(LoadDataResp))
 
 
 -- Fetch data from server
 
 
-fetchData : CSRFToken -> Cmd Msg
-fetchData csrftoken =
-    csrfSend groupsUrl "GET" Http.empty csrftoken
-        |> Http.fromJson (Decode.at [ "results" ] (Decode.list groupDecoder))
-        |> Task.perform LoadDataError LoadDataSuccess
+getGroups : Http.Request Groups
+getGroups =
+    Http.request
+        { method = "GET"
+        , headers = []
+        , url = groupsUrl
+        , body = Http.emptyBody
+        , expect = Http.expectJson (Decode.at [ "results" ] (Decode.list groupDecoder))
+        , timeout = Nothing
+        , withCredentials = True
+        }
+
+
+fetchData : Cmd Msg
+fetchData =
+    Http.send LoadDataResp getGroups
