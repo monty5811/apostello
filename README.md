@@ -8,7 +8,7 @@ Visit our [website](https://church.io) or view some [screenshots](https://aposte
 
 [![Chat with us](https://img.shields.io/badge/chat-slack-e01563.svg)](http://chat.church.io/)[![Stories in Ready](https://badge.waffle.io/monty5811/apostello.png?label=ready&title=Ready)](https://waffle.io/monty5811/apostello)
 
-[![Install on DigitalOcean](https://apostello-one-click.herokuapp.com/button.svg)](https://apostello-one-click.herokuapp.com/install?url=https://github.com/monty5811/apostello)[![Install with Ansible](https://img.shields.io/badge/install-ansible-blue.svg)](https://apostello.readthedocs.io/en/latest/deploy_ansible.html)[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)[![Install with Ansible](https://img.shields.io/badge/install-ansible-blue.svg)](https://apostello.readthedocs.io/en/latest/deploy_ansible.html)[![Install on DigitalOcean](https://img.shields.io/badge/install-Digital%20Ocean-blue.svg)](http://apostello.readthedocs.io/en/latest/deploy_do.html)
 
 For more information, please see the [documentation](https://apostello.readthedocs.org/).
 
