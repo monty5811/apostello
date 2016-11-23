@@ -1,5 +1,5 @@
 set -e
-AP_VER=v1.13.1
+AP_VER=v1.14.0
 
 cd /home/apostello/
 echo "Installing and upgrading packages"

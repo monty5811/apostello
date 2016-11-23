@@ -8,8 +8,8 @@ Install
 
 Assuming you have a `Digital Ocean <https://m.do.co/c/4afdc8b5be2e>`_ account with an SSH key setup, click the following button to deploy apostello:
 
-.. image:: https://apostello-one-click.herokuapp.com/button.svg
-    :target: https://apostello-one-click.herokuapp.com/install?url=https://github.com/monty5811/apostello
+.. image:: https://img.shields.io/badge/install-Digital%20Ocean-blue.svg
+    :target: https://apostello-do-install.netlify.com
 
 This will create a droplet, download apostello and run the :ref:`ansible playbook <deploy-ansible>` to setup apostello.
 
