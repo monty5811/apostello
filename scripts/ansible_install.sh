@@ -16,6 +16,10 @@ if [ ! -d 'apostello-install' ]; then
     git clone https://github.com/monty5811/apostello.git apostello-install
     cd apostello-install
     git checkout $VERSION
+    if [ -f /home/apostello/custom_vars.yml ]; then
+        echo "Moving custom file into place"
+        mv /home/apostello/custom_vars.yml /home/apostello/apostello-install/ansible/env_vars/example.yml
+    fi
     echo "Setting up virtualenv"
     virtualenv venv --no-site-packages
     ./venv/bin/pip install -U pip
