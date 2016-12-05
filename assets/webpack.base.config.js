@@ -1,6 +1,12 @@
 var path = require("path");
 var webpack = require('webpack');
 
+if (process.env.WATCH) {
+  elmLoader = 'elm-webpack?debug=true?warn=true';
+} else {
+  elmLoader = 'elm-webpack';
+}
+
 module.exports = {
   context: __dirname,
 
@@ -56,7 +62,7 @@ module.exports = {
       {
         test: /\.elm?$/,
         exclude: [/elm-stuff/, /node_modules/],
-        loader: 'elm-webpack'
+        loader: elmLoader,
       }
     ],
   },

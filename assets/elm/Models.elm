@@ -2,6 +2,7 @@ module Models exposing (..)
 
 import ApostelloModels exposing (..)
 import Json.Decode as Decode
+import Set exposing (Set)
 
 
 type alias Model =
@@ -27,14 +28,21 @@ type LoadingStatus
     | LoadingFailed
 
 
-type SetOp
+type QueryOp
     = Union
     | Intersect
     | Diff
+    | OpenBracket
+    | CloseBracket
+    | G (Set Int)
     | NoOp
 
 
 type alias Query =
-    { groupPks : List GroupPk
-    , ops : List SetOp
+    List QueryOp
+
+
+type alias ParenLoc =
+    { open : Maybe Int
+    , close : Maybe Int
     }

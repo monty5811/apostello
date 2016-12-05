@@ -16,7 +16,7 @@ view : Model -> Html Msg
 view model =
     let
         ( activePeople, activeGroupPks ) =
-            runQuery model
+            runQuery model.groups model.people (Maybe.withDefault "" model.query)
     in
         div [ class "ui grid" ]
             [ div [ class "row" ] [ helpView ]
