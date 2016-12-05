@@ -178,7 +178,7 @@ helpView =
             , li [] [ b [] [ text "+" ], text " : Keep members that are in both (intersect)" ]
             , li [] [ b [] [ text "-" ], text " : Keep member that do not exist on right hand side (diff)" ]
             ]
-        , p [] [ text "The operators are applied from left to right, bracketed expressions are not supported." ]
+        , p [] [ text "The operators are applied from left to right. Use brackets to build more complex queries." ]
         , p [] [ text "The best thing to do is experiment and use the live preview." ]
         , br [] []
         , p [] [ text "Click the refresh button to reload the groups." ]
