@@ -47,12 +47,12 @@ class InboundSms:
             * Schedules a task to check the outgoing log one minute from now
         """
         async(
-            'apostello.tasks.log_msg_in', self.msg_params, timezone.now(),
-            self.contact.pk
+            'apostello.tasks.log_msg_in', self.msg_params,
+            timezone.now(), self.contact.pk
         )
         async(
-            'apostello.tasks.sms_to_slack', self.sms_body, str(self.contact),
-            str(self.keyword)
+            'apostello.tasks.sms_to_slack', self.sms_body,
+            str(self.contact), str(self.keyword)
         )
         async(
             'apostello.tasks.blacklist_notify', self.contact.pk, self.sms_body,

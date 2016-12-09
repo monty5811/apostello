@@ -17,10 +17,12 @@ class ElvantoGroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ElvantoGroup
-        fields = ('name',
-                  'pk',
-                  'sync',
-                  'last_synced', )
+        fields = (
+            'name',
+            'pk',
+            'sync',
+            'last_synced',
+        )
 
 
 class KeywordSerializer(serializers.ModelSerializer):
@@ -134,8 +136,10 @@ class RecipientSerializer(serializers.ModelSerializer):
 class RecipientSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipient
-        fields = ('full_name',
-                  'pk', )
+        fields = (
+            'full_name',
+            'pk',
+        )
 
 
 class RecipientGroupSerializer(serializers.ModelSerializer):
@@ -168,8 +172,10 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email',
-                  'username', )
+        fields = (
+            'email',
+            'username',
+        )
 
 
 class UserProfileSerializer(serializers.ModelSerializer):

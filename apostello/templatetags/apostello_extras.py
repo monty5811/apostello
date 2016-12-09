@@ -17,7 +17,8 @@ def fab_button(href, text, icon_name):
     '''.format(
         href=href,
         text=text,
-        icon_name=icon_name, )
+        icon_name=icon_name,
+    )
     return mark_safe(result)
 
 
@@ -32,7 +33,8 @@ def fab_new_contact():
 @register.simple_tag
 def fab_contacts_archive():
     return fab_button(
-        reverse('recipients_archive'), 'Archived Contacts', 'table')
+        reverse('recipients_archive'), 'Archived Contacts', 'table'
+    )
 
 
 # Groups
@@ -46,7 +48,8 @@ def fab_new_group():
 @register.simple_tag
 def fab_groups_archive():
     return fab_button(
-        reverse('recipient_groups_archive'), 'Archived Groups', 'table')
+        reverse('recipient_groups_archive'), 'Archived Groups', 'table'
+    )
 
 
 @register.simple_tag
@@ -65,7 +68,8 @@ def fab_incoming_wall():
 @register.simple_tag
 def fab_incoming_wall_curator():
     return fab_button(
-        reverse('incoming_wall_curator'), 'Live Curator', 'table')
+        reverse('incoming_wall_curator'), 'Live Curator', 'table'
+    )
 
 
 # Keywords
@@ -84,16 +88,19 @@ def fab_keywords():
 @register.simple_tag
 def fab_keywords_archive():
     return fab_button(
-        reverse('keywords_archive'), 'Archived Keywords', 'table')
+        reverse('keywords_archive'), 'Archived Keywords', 'table'
+    )
 
 
 @register.simple_tag
 def fab_keyword_csv(keyword):
     return fab_button(
         reverse(
-            'keyword_csv', args=[keyword.pk]),
+            'keyword_csv', args=[keyword.pk]
+        ),
         'Export {k} responses'.format(k=keyword.keyword),
-        'download')
+        'download'
+    )
 
 
 @register.simple_tag
@@ -105,15 +112,19 @@ def fab_keyword_edit(keyword):
 def fab_keyword_responses(keyword):
     return fab_button(
         reverse(
-            'keyword_responses', args=[keyword.pk]),
+            'keyword_responses', args=[keyword.pk]
+        ),
         'Replies ({n})'.format(n=keyword.num_matches),
-        'inbox')
+        'inbox'
+    )
 
 
 @register.simple_tag
 def fab_keyword_responses_archive(keyword):
     return fab_button(
         reverse(
-            'keyword_responses_archive', args=[keyword.pk]),
+            'keyword_responses_archive', args=[keyword.pk]
+        ),
         'Archived Replies ({n})'.format(n=keyword.num_archived_matches),
-        'inbox')
+        'inbox'
+    )

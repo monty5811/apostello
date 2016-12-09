@@ -84,8 +84,10 @@ class FirstRunView(TemplateView):
             sms_url = 'Uh oh, something went wrong, please refresh the page.'
             sms_method = sms_url
 
-        context['number'] = {'sms_url': sms_url,
-                             'sms_method': sms_method, }
+        context['number'] = {
+            'sms_url': sms_url,
+            'sms_method': sms_method,
+        }
 
         context['variables'] = [
             EnvVarSetting(
@@ -179,8 +181,10 @@ class TestSetupView(View):
             return JsonResponse({'status': 'success'})
         except Exception:
             tb = ''.join(traceback.format_exc())
-            response = JsonResponse({'status': 'failed',
-                                     'error': tb, })
+            response = JsonResponse({
+                'status': 'failed',
+                'error': tb,
+            })
             response.status_code = 400
             return response
 

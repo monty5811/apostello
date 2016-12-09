@@ -15,10 +15,8 @@ class TestSendingSmsForm:
     def test_send_adhoc_now(self, recipients, users):
         """Test sending a message now."""
         users['c_staff'].post(
-            '/send/adhoc/', {
-                'content': 'test',
-                'recipients': ['1']
-            }
+            '/send/adhoc/', {'content': 'test',
+                             'recipients': ['1']}
         )
 
     @twilio_vcr
@@ -60,10 +58,8 @@ class TestSendingSmsForm:
         """Test sending a message now."""
         users['c_staff'].post(
             '/send/group/',
-            {
-                'content': 'test',
-                'recipient_group': groups['test_group'].pk
-            }
+            {'content': 'test',
+             'recipient_group': groups['test_group'].pk}
         )
 
     @twilio_vcr
@@ -91,10 +87,9 @@ class TestGroupForm:
     def test_new_group(self, users):
         """Test creating a new group."""
         users['c_staff'].post(
-            '/group/new/', {
-                'name': 'test_group',
-                'description': 'this is a test'
-            }
+            '/group/new/',
+            {'name': 'test_group',
+             'description': 'this is a test'}
         )
         test_group = models.RecipientGroup.objects.get(name='test_group')
         assert 'test_group' == str(test_group)
@@ -102,10 +97,9 @@ class TestGroupForm:
     def test_bring_group_from_archive(self, groups, users):
         """Test creating a group that exists in the archive."""
         users['c_staff'].post(
-            '/group/new/', {
-                'name': 'Archived Group',
-                'description': 'this is a test'
-            }
+            '/group/new/',
+            {'name': 'Archived Group',
+             'description': 'this is a test'}
         )
 
     def test_edit_group(self, users):
@@ -116,10 +110,9 @@ class TestGroupForm:
         new_group.save()
         pk = new_group.pk
         users['c_staff'].post(
-            new_group.get_absolute_url, {
-                'name': 'test_group_changed',
-                'description': 'this is a test'
-            }
+            new_group.get_absolute_url,
+            {'name': 'test_group_changed',
+             'description': 'this is a test'}
         )
         assert 'test_group_changed' == str(
             models.RecipientGroup.objects.get(pk=pk)
@@ -128,19 +121,15 @@ class TestGroupForm:
     def test_invalid_group_form(self, users):
         """Test submitting an invalid form."""
         resp = users['c_staff'].post(
-            '/group/new/', {
-                'name': '',
-                'description': 'this is a test'
-            }
+            '/group/new/', {'name': '',
+                            'description': 'this is a test'}
         )
         assert 'This field is required.' in str(resp.content)
 
     def test_create_all_group_form(self, users, recipients):
         """Test the form to create a group composed of all recipients."""
         resp = users['c_staff'].post(
-            '/group/create_all/', {
-                'group_name': 'test',
-            }
+            '/group/create_all/', {'group_name': 'test', }
         )
         assert resp.status_code == 302
         assert resp.url == '/group/all/'
@@ -153,9 +142,7 @@ class TestGroupForm:
         Test populating an already existing group.
         """
         resp = users['c_staff'].post(
-            '/group/create_all/', {
-                'group_name': 'Empty Group',
-            }
+            '/group/create_all/', {'group_name': 'Empty Group', }
         )
         assert resp.status_code == 302
         assert resp.url == '/group/all/'

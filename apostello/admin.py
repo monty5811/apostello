@@ -8,11 +8,13 @@ from apostello import models
 @admin.register(models.SmsOutbound)
 class SmsOutboundAdmin(admin.ModelAdmin):
     """Admin class for apostello.models.SmsOutbound."""
-    list_display = ('content',
-                    'recipient',
-                    'time_sent',
-                    'sent_by',
-                    'sid', )
+    list_display = (
+        'content',
+        'recipient',
+        'time_sent',
+        'sent_by',
+        'sid',
+    )
 
 
 @admin.register(models.SmsInbound)
@@ -58,9 +60,11 @@ class RecipientAdmin(admin.ModelAdmin):
 @admin.register(models.RecipientGroup)
 class RecipientGroupAdmin(admin.ModelAdmin):
     """Admin class for apostello.models.RecipientGroup."""
-    list_display = ('name',
-                    'description',
-                    'is_archived', )
+    list_display = (
+        'name',
+        'description',
+        'is_archived',
+    )
 
 
 admin.site.unregister(User)

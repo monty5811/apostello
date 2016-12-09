@@ -24,10 +24,9 @@ class TestFirstRun:
         assert 'error' in data
 
         resp = c.post(
-            '/config/send_test_email/', {
-                'to_': 'test@example.com',
-                'body_': 'test message'
-            }
+            '/config/send_test_email/',
+            {'to_': 'test@example.com',
+             'body_': 'test message'}
         )
         assert resp.status_code == 200
         assert len(mail.outbox) == 1
@@ -45,10 +44,9 @@ class TestFirstRun:
         assert 'error' in data
 
         resp = c.post(
-            '/config/send_test_sms/', {
-                'to_': str(recipients['calvin'].number),
-                'body_': 'test'
-            }
+            '/config/send_test_sms/',
+            {'to_': str(recipients['calvin'].number),
+             'body_': 'test'}
         )
         assert resp.status_code == 200
 
@@ -64,10 +62,9 @@ class TestFirstRun:
         assert 'error' in data
 
         resp = c.post(
-            '/config/create_admin_user/', {
-                'email_': 'test@example.com',
-                'pass_': 'testpass'
-            }
+            '/config/create_admin_user/',
+            {'email_': 'test@example.com',
+             'pass_': 'testpass'}
         )
         assert resp.status_code == 200
 

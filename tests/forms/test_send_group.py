@@ -67,15 +67,19 @@ class TestSendGroupsInvalid():
 
     def test_empty_content(self, groups):
         """Test empty content"""
-        form_data = {'content': '',
-                     'recipient_group': '1', }
+        form_data = {
+            'content': '',
+            'recipient_group': '1',
+        }
         form = SendRecipientGroupForm(data=form_data, user=UserMock())
         assert form.is_valid() is False
 
     def test_empty_group(self):
         """Test empty group"""
-        form_data = {'content': 'Hi!',
-                     'recipient_group': '', }
+        form_data = {
+            'content': 'Hi!',
+            'recipient_group': '',
+        }
         form = SendRecipientGroupForm(data=form_data)
         assert form.is_valid() is False
 
@@ -90,14 +94,18 @@ class TestSendGroupsInvalid():
 
     def test_max_length(self, groups):
         """Test message far too long"""
-        form_data = {'content': 50 * "test",
-                     'recipient': ['1'], }
+        form_data = {
+            'content': 50 * "test",
+            'recipient': ['1'],
+        }
         form = SendRecipientGroupForm(data=form_data)
         assert form.is_valid() is False
 
     def test_archived(self, groups):
         """Test archived group"""
-        form_data = {'content': 'This is a message',
-                     'recipient_group': '2', }
+        form_data = {
+            'content': 'This is a message',
+            'recipient_group': '2',
+        }
         form = SendRecipientGroupForm(data=form_data)
         assert form.is_valid() is False

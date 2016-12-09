@@ -94,6 +94,7 @@ def ask_for_name(person_from_pk, sms_body, ask_for_name):
             ' asked for their name.'.format(sms_body, str(contact)),
         )
 
+
 # SMS logging and consistency checks
 
 
@@ -137,6 +138,7 @@ def update_msgs_name(person_pk):
     for sms in SmsInbound.objects.filter(sender_num=number):
         sms.sender_name = name
         sms.save()
+
 
 # notifications, email, slack etc
 

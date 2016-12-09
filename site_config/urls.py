@@ -3,23 +3,31 @@ from django.conf.urls import url
 from site_config import views
 
 urlpatterns = [
-    url(r'^site/',
+    url(
+        r'^site/',
         views.SiteConfigView.as_view(),
-        name='site', ),
-    url(r'^responses/',
+        name='site',
+    ),
+    url(
+        r'^responses/',
         views.ResponsesView.as_view(),
-        name='responses', ),
-    url(r'^first_run/',
+        name='responses',
+    ),
+    url(
+        r'^first_run/',
         views.FirstRunView.as_view(),
-        name='first_run', ),
+        name='first_run',
+    ),
     url(
         r'send_test_email/',
         views.TestEmailView.as_view(),
         name='test_email',
     ),
-    url(r'send_test_sms/',
+    url(
+        r'send_test_sms/',
         views.TestSmsView.as_view(),
-        name='test_sms', ),
+        name='test_sms',
+    ),
     url(
         r'create_admin_user/',
         views.CreateSuperUser.as_view(),

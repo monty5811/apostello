@@ -25,8 +25,10 @@ with open('../VERSION', 'r') as f:
 # The full version, including alpha/beta/rc tags.
 release = '0.1'
 language = None
-exclude_patterns = ['_build',
-                    'venv', ]
+exclude_patterns = [
+    '_build',
+    'venv',
+]
 # default_role = None
 # add_function_parentheses = True
 # add_module_names = True

@@ -57,9 +57,7 @@ def handle_outgoing_sms(msg):
             return check_next_page
     except Exception:
         logger.error(
-            'Could not import sms.', exc_info=True, extra={
-                'msg': msg
-            }
+            'Could not import sms.', exc_info=True, extra={'msg': msg}
         )
 
 

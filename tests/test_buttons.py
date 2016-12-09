@@ -28,10 +28,8 @@ class TestButtonPosts:
         # add calvin to group
         users['c_staff'].post(
             url,
-            {
-                'member': 'false',
-                'contactPk': recipients['calvin'].pk
-            }
+            {'member': 'false',
+             'contactPk': recipients['calvin'].pk}
         )
         assert grp.all_recipients.count() == 1
         assert initial_not_in_group - 1 == grp.all_recipients_not_in_group.count(
@@ -39,10 +37,8 @@ class TestButtonPosts:
         # remove calvin from group
         users['c_staff'].post(
             url,
-            {
-                'member': 'true',
-                'contactPk': recipients['calvin'].pk
-            }
+            {'member': 'true',
+             'contactPk': recipients['calvin'].pk}
         )
         assert grp.all_recipients.count() == 0
         assert initial_not_in_group == grp.all_recipients_not_in_group.count()

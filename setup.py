@@ -29,8 +29,6 @@ setup(
     license='MIT',
     zip_safe=False,
     include_package_data=True,
-    classifiers=[
-        "Private :: Do Not Upload"
-    ],
+    classifiers=["Private :: Do Not Upload"],
     keywords=('Python, twilio, sms, church, django, '),
 )

@@ -18,9 +18,8 @@ class TestRecipientGroup:
         )
 
     def test_all_recipients_names(self, groups):
-        assert [
-            'John Calvin', 'Johannes Oecolampadius'
-        ] == groups['test_group'].all_recipients_names
+        assert ['John Calvin', 'Johannes Oecolampadius'
+                ] == groups['test_group'].all_recipients_names
         assert [] == groups['empty_group'].all_recipients_names
 
     def test_get_abs_url(self, groups):
