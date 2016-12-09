@@ -7,13 +7,13 @@ class ElvantoFetchButton extends Component {
     const success = () => {
       biu(
         'Groups are being fetched, it may take a couple of minutes',
-        { type: 'info', autoHide: false }
+        { type: 'info', autoHide: false },
       );
     };
     post(
       '/api/v1/elvanto/group_fetch/',
       {},
-      success
+      success,
     );
   }
   render() {

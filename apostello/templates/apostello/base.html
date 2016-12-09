@@ -1,43 +1,49 @@
 {% load staticfiles %}{% load cache %}
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		{% include 'apostello/includes/head.html' %}
+  <head>
+    {% include 'apostello/includes/head.html' %}
     <title>apostello - {% block title %}apostello{% endblock %}</title>
-		{% block morehead %}
-		{% endblock %}
-	</head>
+    {% block morehead %}
+    {% endblock %}
+  </head>
   <body data-js-view-name="{{ js_path }}">
-		<div class="ui top attached inverted violet menu">
-			<div class="ui simple dropdown icon item" data-intro="Use this menu for page specific actions, e.g. exporting the responses for a keyword." data-step="2" data-position="right">
-				<i class="wrench icon"></i>
-				<div class="menu">
-					{% block side_bar %} {% endblock %}
-				</div>
-			</div>
-			{% cache 1800 topbar request.user %}
-			{% include 'apostello/top_menu.html' %}
-			{% endcache %}
-		</div>
-		<div class="ui hidden divider"></div>
-		<div class="ui stackable grid container">
-			<div class="fourteen wide centered column">
-				<div class="ui stackable grid container">
-					<div class="sixteen wide centered column">
-						{% if messages %}
-						{% for message in messages %}
-						<div class="ui {{ message.tags }} message">
-							{{ message }}
-						</div>
-						{% endfor %}
-						{% endif %}
-						{% block content %} {% endblock %}
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="ui hidden divider"></div>
-		</div>
+    <div class="ui top attached inverted violet menu">
+      <a href="/" class="item">Home</a>
+      {% cache 1800 topbar request.user %}
+      {% include 'apostello/top_menu.html' %}
+      {% endcache %}
+    </div>
+    <div class="ui hidden divider"></div>
+    <div class="ui stackable grid container">
+      <div class="fourteen wide centered column">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="ui {{ message.tags }} message">
+              {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% block content %} {% endblock %}
+      </div>
+    </div>
+    <div class="ui hidden divider"></div>
+      <div id="fabDim"></div>
+      <div class="fabContainer">
+        <div class="fabDropdown" style="display: none;">
+          <div class="ui fab large very relaxed inverted list">
+          {% block fab %}{% include 'apostello/includes/default_fab.html' %}{% endblock %}
+          </div>
+        </div>
+        <br/>
+        <br/>
+        <div class="faButton" id="fab" data-intro="Use this menu for page specific actions, e.g. exporting the responses for a keyword." data-step="2" data-position="left">
+          <div class="fabb ui circular violet icon button">
+            <i class="large wrench icon"></i>
+          </div>
+        </div>
+      </div>
+    </div>
     {% if OPBEAT_JS_APP_ID %}
     <script src="https://d3tvtfb6518e3e.cloudfront.net/1/opbeat.min.js"
             data-org-id="{{ OPBEAT_JS_ORG_ID }}"
@@ -45,8 +51,8 @@
             async
             ></script>
     {% endif %}
-		<script src="{% static 'js/vendor.js' %}"></script>
-		<script src="{% static 'js/app.js' %}"></script>
-		{% block morejs %}{% endblock %}
-	</body>
+    <script src="{% static 'js/vendor.js' %}"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+    {% block morejs %}{% endblock %}
+  </body>
 </html>

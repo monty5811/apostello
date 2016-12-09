@@ -17,7 +17,7 @@ module.exports = class View extends CommonView {
       React.createElement(ElvantoFetchButton, {
         url: fetchDiv.getAttribute('postUrl'),
       }),
-      fetchDiv
+      fetchDiv,
     );
 
     const pullDiv = document.getElementById('elvanto_pull_button');
@@ -25,7 +25,7 @@ module.exports = class View extends CommonView {
       React.createElement(ElvantoPullButton, {
         url: pullDiv.getAttribute('postUrl'),
       }),
-      pullDiv
+      pullDiv,
     );
   }
 };

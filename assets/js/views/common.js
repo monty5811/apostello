@@ -1,8 +1,7 @@
 import $ from 'jquery';
 import { csrfSafeMethod, getCookie, sameOrigin } from '../utils/django_cookies';
-import dropdownOptions from '../utils/dropdown_options';
 
-export default class MainView {
+const MainView = class {
   mount() {
     // setup ajax
     $.ajaxSetup({
@@ -13,8 +12,7 @@ export default class MainView {
         }
       },
     });
-    // setup menu
-    $('#primary-menu').dropdown(dropdownOptions);
-    $('#tools-menu').dropdown(dropdownOptions);
   }
-}
+};
+
+export default MainView;

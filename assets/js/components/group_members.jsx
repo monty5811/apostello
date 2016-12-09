@@ -22,7 +22,7 @@ const Members = (props) => {
       contact={contact}
       postUpdate={props.postUpdate}
       isMember={props.isMember}
-    />
+    />,
   );
   return (
     <div>

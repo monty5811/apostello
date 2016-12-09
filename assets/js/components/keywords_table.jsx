@@ -13,7 +13,7 @@ class KeywordsTable extends Component {
     post(
       `/api/v1/keywords/${keyword.pk}`,
       { archived: keyword.is_archived },
-      this.props.deleteItemUpdate
+      this.props.deleteItemUpdate,
     );
   }
   render() {
@@ -23,7 +23,7 @@ class KeywordsTable extends Component {
         keyword={keyword}
         key={index}
         archiveKeyword={that.archiveKeyword}
-      />
+      />,
     );
     return (
       <table className="ui striped definition table">

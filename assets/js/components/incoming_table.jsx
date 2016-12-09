@@ -13,7 +13,7 @@ class IncomingTable extends Component {
     post(
       `/api/v1/sms/in/${sms.pk}`,
       { reingest: true },
-      this.props.loadfromserver
+      this.props.loadfromserver,
     );
   }
   render() {
@@ -23,7 +23,7 @@ class IncomingTable extends Component {
         sms={sms}
         key={index}
         reprocessSms={that.reprocessSms}
-      />
+      />,
     );
     return (
       <table className="ui table">

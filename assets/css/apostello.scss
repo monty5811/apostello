@@ -17,3 +17,50 @@
   border: none !important;
   box-shadow: none !important;
 }
+// biu
+.biu-instance{
+  z-index: 11;
+}
+// fab:
+.fabContainer{
+  position: fixed;
+  right: 50px;
+  bottom: 50px;
+  background: none;
+  border: none;
+  text-align: right;
+  z-index: 10;
+}
+.fabDimOn{
+  background: #5b599c;
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  opacity: 0.8;
+  z-index: 9;
+};
+.fabDimOff{
+  background: #fff;
+  transition: 0;
+  opacity: 0;
+  z-index: -1000;
+};
+/* Backward */
+/* https://github.com/IanLunn/Hover/blob/master/css/hover.css */
+.hvr-backward {
+  display: inline-block;
+  vertical-align: middle;
+  -webkit-transform: perspective(1px) translateZ(0);
+  transform: perspective(1px) translateZ(0);
+  box-shadow: 0 0 1px transparent;
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-property: transform;
+  transition-property: transform;
+}
+.hvr-backward:hover, .hvr-backward:focus, .hvr-backward:active {
+  -webkit-transform: translateX(-8px);
+  transform: translateX(-8px);
+}

@@ -1,9 +1,6 @@
 {% extends "apostello/base.html" %}
 {% load semanticui %}
 {% block title %}CSV Import{% endblock %}
-{% block side_bar %}
-{% include 'apostello/includes/default_sidebar.html' %}
-{% endblock %}
 {% block content %}
 {% if bad_rows %}
 <p>The following inputs failed, please re-add them to the input box and correct them. Or manually add them to diagnose the issue.

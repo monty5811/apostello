@@ -38,7 +38,6 @@ const LoadingComponent = ComposedComponent => class extends Component {
     if (numVals > 100) {
       // we have used page size 1000, let's fetch server's "next"
       this.fetchPage(data.next);
-      return;
     }
   }
   fetchPage(url) {
@@ -60,7 +59,7 @@ const LoadingComponent = ComposedComponent => class extends Component {
           } else {
             // we have finished, let's wait, then update data again
             that.timers.push(
-              setTimeout(that.loadFromServer, that.props.pollInterval)
+              setTimeout(that.loadFromServer, that.props.pollInterval),
             );
           }
         },
@@ -68,11 +67,11 @@ const LoadingComponent = ComposedComponent => class extends Component {
           if (status !== 'abort') {
             biu('Uh oh. Something went wrong when we tried to update...', { type: 'warning' });
             that.timers.push(
-              setTimeout(that.loadFromServer, 10 * that.props.pollInterval)
+              setTimeout(that.loadFromServer, 10 * that.props.pollInterval),
             );
           }
         },
-      })
+      }),
     );
   }
   loadFromServer() {

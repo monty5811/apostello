@@ -1,5 +1,6 @@
 {% extends "apostello/base.html" %}
 {% load semanticui %}
+{% load apostello_extras %}
 {% block title %}
   {% if not object %}
     New {{identifier}}
@@ -7,14 +8,15 @@
     {{object}}
   {% endif %}
 {% endblock %}
-{% block side_bar %}
+{% block fab %}
   {% if keyword %}
-    <a class="item" href="{% url 'keyword_responses' keyword.id %}">Replies ({{ keyword.fetch_matches.count }})</a>
-    <a class="item" href="{% url 'keyword_responses_archive' keyword.id %}">Archived Replies ({{ keyword.num_archived_matches }})</a>
-    <div class="divider"></div>
+    {% fab_keyword_responses keyword %}
+    {% fab_keyword_responses_archive keyword %}
   {% endif %}
   {% if object %}
-  <div class="item" id="toggle_button"  postUrl="{{ object.get_api_url }}" redirectUrl="{{ object.get_table_url }}" viewingarchive={{ object.is_archived|yesno:"true,false" }}></div>
+    <div id="toggle_button" postUrl="{{ object.get_api_url }}" redirectUrl="{{ object.get_table_url }}" viewingarchive={{ object.is_archived|yesno:"true,false" }}></div>
+  {% else %}
+    {% include 'apostello/includes/default_fab.html' %}
   {% endif %}
 {% endblock %}
 {% block content %}

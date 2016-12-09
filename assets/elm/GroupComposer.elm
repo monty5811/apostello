@@ -1,4 +1,4 @@
-module Main exposing (..)
+module GroupComposer exposing (..)
 
 import Actions exposing (fetchData)
 import Html exposing (program)

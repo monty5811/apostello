@@ -11,7 +11,7 @@ function renderTable(TableClass) {
       pollInterval: tableDiv.getAttribute('pollInterval'),
       viewingArchive,
     }),
-    tableDiv
+    tableDiv,
   );
 }
 

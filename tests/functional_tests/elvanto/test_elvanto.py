@@ -60,6 +60,10 @@ class TestElvantoImport:
         buttons = browser_in.find_elements_by_class_name('fluid')
         pull_button = buttons[1]
         pull_button.click()
+        sleep(driver_wait_time)
+        fab_dim = browser_in.find_elements_by_id('fabDim')[0]
+        fab_dim.click()
+        sleep(driver_wait_time)
         check_and_close_biu(browser_in, driver_wait_time)
 
     @my_vcr.use_cassette(
@@ -76,5 +80,8 @@ class TestElvantoImport:
         buttons = browser_in.find_elements_by_class_name('fluid')
         fetch_button = buttons[0]
         fetch_button.click()
+        sleep(driver_wait_time)
+        fab_dim = browser_in.find_elements_by_id('fabDim')[0]
+        fab_dim.click()
         sleep(driver_wait_time)
         check_and_close_biu(browser_in, driver_wait_time)

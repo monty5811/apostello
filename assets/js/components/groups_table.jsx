@@ -13,7 +13,7 @@ class GroupsTable extends Component {
     post(
       `/api/v1/groups/${group.pk}`,
       { archived: group.is_archived },
-      this.props.deleteItemUpdate
+      this.props.deleteItemUpdate,
     );
   }
   render() {
@@ -23,7 +23,7 @@ class GroupsTable extends Component {
         group={group}
         key={index}
         archiveGroup={that.archiveGroup}
-      />
+      />,
     );
     return (
       <table className="ui very basic striped table">

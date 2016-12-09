@@ -11,7 +11,7 @@ function obj2str(obj) {
         val = obj2str(val);
       }
       return val;
-    }
+    },
   );
   return vals.join();
 }
@@ -36,7 +36,7 @@ const FilteringComponent = ComposedComponent => class extends Component {
       (el) => {
         const valsStr = obj2str(el);
         return valsStr.search(this.state.filterRegex) > -1;
-      }
+      },
     );
     return (
       <div>

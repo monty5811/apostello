@@ -7,13 +7,13 @@ class ElvantoPullButton extends Component {
     const success = () => {
       biu(
         'Groups are being synced, it may take a couple of minutes',
-        { type: 'info', autoHide: false }
+        { type: 'info', autoHide: false },
       );
     };
     post(
       '/api/v1/elvanto/group_pull/',
       {},
-      success
+      success,
     );
   }
   render() {

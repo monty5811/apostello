@@ -18,7 +18,7 @@ module.exports = class View extends CommonView {
         onChange(text) {
           setCost(text.length, sms_cost);
         },
-      }
+      },
     );
 
     $('#id_content').keyup(() => {

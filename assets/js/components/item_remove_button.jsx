@@ -11,15 +11,15 @@ class ItemRemoveButton extends Component {
     post(
       this.props.url,
       { archived: this.props.is_archived },
-      success
+      success,
     );
   }
   render() {
     let txt = 'Remove';
-    let className = 'ui negative button';
+    let className = 'ui fluid negative button';
     if (this.props.is_archived) {
       txt = 'Restore';
-      className = 'ui positive button';
+      className = 'ui fluid positive button';
     }
     return (<div className={className} onClick={this.archiveItem}>{txt}</div>);
   }

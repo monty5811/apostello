@@ -13,7 +13,7 @@ class UserProfilesTable extends Component {
     post(
       `/api/v1/users/profiles/${user.pk}`,
       { user_profile: JSON.stringify(user) },
-      this.props.loadfromserver
+      this.props.loadfromserver,
     );
   }
   render() {
@@ -23,7 +23,7 @@ class UserProfilesTable extends Component {
         user={user}
         key={index}
         postUpdate={that.postUpdate}
-      />
+      />,
     );
     return (
       <table className="ui collapsing celled very basic table">

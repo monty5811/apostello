@@ -17,7 +17,7 @@ module.exports = class View extends CommonView {
         onChange(text) {
           setCost(group_sizes[text], sms_cost);
         },
-      }
+      },
     );
 
     $('#id_content').keyup(() => {

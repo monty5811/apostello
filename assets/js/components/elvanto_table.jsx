@@ -12,7 +12,7 @@ class ElvantoTable extends Component {
     post(
       `/api/v1/elvanto/group/${grp.pk}`,
       { sync: grp.sync },
-      this.props.loadfromserver
+      this.props.loadfromserver,
     );
   }
   render() {
@@ -22,7 +22,7 @@ class ElvantoTable extends Component {
         grp={grp}
         key={index}
         toggleSync={that.toggleSync}
-      />
+      />,
     );
     return (
       <table className="ui striped compact definition table">

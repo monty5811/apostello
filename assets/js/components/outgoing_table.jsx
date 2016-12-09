@@ -8,7 +8,7 @@ const OutgoingTable = (props) => {
     (sms, index) => <OutgoingTableRow
       sms={sms}
       key={index}
-    />
+    />,
   );
   return (
     <table className="ui table">

@@ -29,7 +29,7 @@ module.exports = class View extends CommonView {
         redirect_url: buttonDiv.getAttribute('redirectUrl'),
         is_archived: JSON.parse(buttonDiv.getAttribute('viewingarchive')),
       }),
-      buttonDiv
+      buttonDiv,
     );
 
     // are we rendering the group selector or the incoming table?
@@ -43,9 +43,9 @@ module.exports = class View extends CommonView {
           GroupMemberSelect,
           {
             url: tableDiv.getAttribute('src'),
-          }
+          },
         ),
-        tableDiv
+        tableDiv,
       );
     }
   }

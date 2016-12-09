@@ -13,7 +13,7 @@ class CurateTable extends Component {
     post(
       `/api/v1/sms/in/${sms.pk}`,
       { display_on_wall: sms.display_on_wall },
-      this.props.loadfromserver
+      this.props.loadfromserver,
     );
   }
   render() {
@@ -23,7 +23,7 @@ class CurateTable extends Component {
         sms={sms}
         key={index}
         toggleSms={that.toggleSms}
-      />
+      />,
     );
     return (
       <table className="ui table">

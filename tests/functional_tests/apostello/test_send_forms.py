@@ -41,7 +41,7 @@ def add_group(b, wt):
     group_box = b.find_elements_by_class_name('selection')[0]
     group_box.click()
     sleep(wt)
-    group = b.find_elements_by_class_name('item')[-1]
+    group = b.find_elements_by_xpath('/html/body/div[3]/div/form/div[2]/div/div[2]/div')[-1]
     group.click()
     sleep(wt)
     return b

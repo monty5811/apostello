@@ -13,7 +13,7 @@ class ScheduledSmsTable extends Component {
     post(
       `/api/v1/queued/sms/${sms.pk}`,
       { cancel_sms: true },
-      this.props.deleteItemUpdate
+      this.props.deleteItemUpdate,
     );
   }
   render() {
@@ -28,7 +28,7 @@ class ScheduledSmsTable extends Component {
           key={index}
           cancelTask={that.cancelSms}
         />);
-      }
+      },
     );
     return (
       <table className="ui table">

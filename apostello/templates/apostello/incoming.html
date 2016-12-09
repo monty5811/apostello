@@ -1,9 +1,10 @@
 {% extends "apostello/base.html" %}
 {% load staticfiles %}
+{% load apostello_extras %}
 {% block title %}Incoming{% endblock %}
-{% block side_bar %}
-<a class="item" href="{% url 'incoming_wall' %}">Live Updates</a>
-<a class="item" href="{% url 'incoming_wall_curator' %}">Live Curator</a>
+{% block fab %}
+{% fab_incoming_wall %}
+{% fab_incoming_wall_curator %}
 {% endblock %}
 {% block content %}
 <div id="react_table" src="/api/v1/sms/in/" pollInterval="20000"></div>

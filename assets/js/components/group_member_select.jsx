@@ -34,7 +34,7 @@ class GroupMemberSelect extends Component {
         // return the state to prev value on failed request
         state[membersKey].set(payload.contactPk, changedContact);
         this.setState(state);
-      }
+      },
     );
   }
   loadFromServer() {
@@ -52,7 +52,7 @@ class GroupMemberSelect extends Component {
           {
             members,
             nonmembers,
-          }
+          },
         );
       },
       error(xhr, errmsg) {

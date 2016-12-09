@@ -1,10 +1,13 @@
 {% extends "apostello/base.html" %}
 {% load staticfiles %}
+{% load apostello_extras %}
 {% block title %}Keywords{% endblock %}
-{% block side_bar %}
-<a class="item" href="{% url 'keyword' %}">New Keyword</a>
+{% block fab %}
+{% url 'keyword' as k %}
+{% fab_new_keyword %}
+{% fab_keywords %}
 {% if request.user.is_staff %}
-<a class="item" href="{% url 'keywords_archive' %}">Archived Keywords</a>
+  {% fab_keywords_archive %}
 {% endif %}
 {% endblock %}
 {% block content %}

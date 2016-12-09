@@ -2,9 +2,9 @@ var path = require("path");
 var webpack = require('webpack');
 
 if (process.env.WATCH) {
-  elmLoader = 'elm-webpack?debug=true?warn=true';
+  elmLoader = 'elm-webpack-loader?debug=true?warn=true';
 } else {
-  elmLoader = 'elm-webpack';
+  elmLoader = 'elm-webpack-loader';
 }
 
 module.exports = {
@@ -13,7 +13,6 @@ module.exports = {
   entry: {
     app: './js/app',
     tour: './js/tour',
-    groupcomposer: './elm/groupcomposer',
     vendor: [
       'datetimepicker',
       'jquery',
@@ -44,7 +43,12 @@ module.exports = {
     new webpack.ProvidePlugin({
       $: "jquery",
       jQuery: "jquery"
-    })
+    }),
+    //
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor',
+      filename: 'vendor.js'
+    }),
   ],
 
   module: {

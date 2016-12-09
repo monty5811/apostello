@@ -1,17 +1,16 @@
 {% extends "apostello/base.html" %}
 {% load staticfiles %}
 {% load semanticui %}
+{% load apostello_extras %}
 {% block title %}{{keyword}}{% endblock %}
-{% block side_bar %}
-<a class="item" href="{% url 'keyword' keyword.id %}">Edit</a>
-<div class="divider"></div>
-{%if archive%}
-<a class="item" href="{% url 'keyword_responses' keyword.id %}">Replies ({{ keyword.fetch_matches|length }})</a>
-{%else%}
-<a class="item" href="{% url 'keyword_responses_archive' keyword.id %}">Archived Replies ({{ keyword.num_archived_matches }})</a>
-{%endif%}
-<div class="divider"></div>
-<a class="item" href="{% url 'keyword_csv' keyword.id %}">Export "{{ keyword.keyword }}" responses</a>
+{% block fab %}
+{% fab_keyword_edit keyword %}
+{% if archive %}
+  {% fab_keyword_responses keyword %}
+{% else %}
+  {% fab_keyword_responses_archive keyword %}
+{% endif %}
+{% fab_keyword_csv keyword %}
 {% endblock %}
 {% block content %}
 <h2>{{keyword}} {%if archive%}(Archived){%endif%}</h2>

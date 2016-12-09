@@ -1,9 +1,6 @@
 {% extends "apostello/base.html" %}
 {% load staticfiles %}
 {% block title %}Scheduled Messages{% endblock %}
-{% block side_bar %}
-{% include 'apostello/includes/default_sidebar.html' %}
-{% endblock %}
 {% block content %}
 <div id="react_table" src="/api/v1/queued/sms/" pollInterval="20000"></div>
 {% endblock %}

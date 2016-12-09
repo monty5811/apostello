@@ -15,7 +15,7 @@ class LiveWall extends Component {
             key={index}
           />
         );
-      }
+      },
     );
     return (
       <div className="ui stackable grid fluid container">

@@ -14,14 +14,14 @@ class KeywordRespTable extends Component {
     post(
       `/api/v1/sms/in/${sms.pk}`,
       { archived: sms.is_archived },
-      this.props.deleteItemUpdate
+      this.props.deleteItemUpdate,
     );
   }
   dealWithSms(sms) {
     post(
       `/api/v1/sms/in/${sms.pk}`,
       { dealt_with: sms.dealt_with },
-      this.props.loadfromserver
+      this.props.loadfromserver,
     );
   }
   render() {
@@ -33,7 +33,7 @@ class KeywordRespTable extends Component {
         archiveSms={that.archiveSms}
         dealWithSms={that.dealWithSms}
         viewingArchive={that.viewingArchive}
-      />
+      />,
     );
     return (
       <table className="ui table">

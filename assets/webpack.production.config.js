@@ -11,11 +11,6 @@ config.plugins = config.plugins.concat([
       'NODE_ENV': JSON.stringify('production')
     }
   }),
-  //
-  new webpack.optimize.CommonsChunkPlugin({
-    name: 'vendor',
-    filename: 'vendor.js'
-  }),
   // minifies code
   new ClosureCompilerPlugin()
 ]);

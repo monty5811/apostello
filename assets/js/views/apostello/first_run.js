@@ -12,19 +12,19 @@ module.exports = class View extends CommonView {
     const adminDiv = document.getElementById('create_admin_user');
     ReactDOM.render(
       React.createElement(AdminUserForm),
-      adminDiv
+      adminDiv,
     );
 
     const smsDiv = document.getElementById('send_test_sms');
     ReactDOM.render(
       React.createElement(TestSmsForm),
-      smsDiv
+      smsDiv,
     );
 
     const emailDiv = document.getElementById('send_test_email');
     ReactDOM.render(
       React.createElement(TestEmailForm),
-      emailDiv
+      emailDiv,
     );
   }
 };

@@ -13,7 +13,7 @@ class ContactsTable extends Component {
     post(
       `/api/v1/recipients/${contact.pk}`,
       { archived: contact.is_archived },
-      this.props.deleteItemUpdate
+      this.props.deleteItemUpdate,
     );
   }
   render() {
@@ -23,7 +23,7 @@ class ContactsTable extends Component {
         contact={contact}
         key={index}
         archiveContact={that.archiveContact}
-      />
+      />,
     );
     return (
       <table className="ui padded table">

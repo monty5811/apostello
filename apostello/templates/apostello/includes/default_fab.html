@@ -1,0 +1,15 @@
+{% load cache %}
+{% load apostello_extras %}
+{% cache 1800 index_fab request.user %}
+  {% with profile=request.user.profile %}
+    {% if profile.can_see_keywords or request.user.is_staff %}
+      {% fab_new_keyword %}
+    {% endif %}
+    {% if profile.can_see_contact_names or request.user.is_staff %}
+      {% fab_new_contact %}
+    {% endif %}
+    {% if profile.can_see_groups or request.user.is_staff %}
+      {% fab_new_group %}
+    {% endif %}
+  {% endwith %}
+{% endcache %}
