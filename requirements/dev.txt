@@ -1,4 +1,4 @@
 -r base.txt
 django-debug-toolbar==1.6
-fakeredis==0.8.1
-yapf==0.13.2
+fakeredis==0.8.2
+yapf==0.14.0
