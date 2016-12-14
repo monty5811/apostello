@@ -16,8 +16,8 @@ module.exports = {
     vendor: [
       'datetimepicker',
       'jquery',
-      'react',
-      'react-dom',
+      'inferno-compat',
+      'inferno',
       './semantic/dist/semantic.js',
     ]
   },
@@ -30,7 +30,9 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.jsx'],
     alias: {
-      jquery: 'jquery/src/jquery',
+			jquery: 'jquery/src/jquery',
+			'react': 'inferno-compat',
+			'react-dom': 'inferno-compat',
     },
   },
 
@@ -69,6 +71,10 @@ module.exports = {
         loader: elmLoader,
       }
     ],
+  },
+
+  performance: {
+    hints: false,
   },
 
   devtool: 'cheap-module-source-map',
