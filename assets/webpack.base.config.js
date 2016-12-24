@@ -18,7 +18,8 @@ module.exports = {
       'jquery',
       'inferno-compat',
       'inferno',
-      './semantic/dist/semantic.js',
+      './semantic/dist/components/transition.js',
+      './semantic/dist/components/dropdown.js',
     ]
   },
 
