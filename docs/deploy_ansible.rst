@@ -29,7 +29,7 @@ To run the playbook
     cd ansible
     python2 -m virtualenv venv --no-site-packages
     . venv/bin/activate
-    pip install ansible==2.1.1.0
+    pip install ansible==2.2.0.0
     cp env_vars/example.yml env_vars/my_site_name.yml
     # fill in the credentials in the new yml file
     ansible-vault encrypt my_site_name.yml

@@ -1,7 +1,9 @@
 ---
 
 - name: Install packages required by the Django app inside virtualenv
-  pip: virtualenv={{ virtualenv_path }} requirements={{ requirements_file }}
+  pip:
+    requirements: "{{ requirements_file }}"
+    executable: "{{ virtualenv_path }}/bin/pip"
 
 - name: Run the Django migrate command
   command: '{{virtualenv_path}}/bin/python {{ application_path}}/manage.py migrate --settings={{ django_settings_file}}'

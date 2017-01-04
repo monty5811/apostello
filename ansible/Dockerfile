@@ -15,7 +15,7 @@ RUN pip install \
     Jinja2 \
     httplib2 \
     six
-RUN pip install ansible==2.1.1.0
+RUN pip install ansible==2.2.0.0
 RUN apt-get update && apt-get install -y locales && rm -rf /var/lib/apt/lists/* \
     && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 ENV LANG en_US.utf8

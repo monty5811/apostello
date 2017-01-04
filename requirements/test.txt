@@ -1,5 +1,4 @@
 -r dev.txt
-py==1.4.31
 pytest-cov==2.4.0
 pytest-django==3.1.2
 pytest-env==0.6.0
@@ -12,4 +11,4 @@ pytest==3.0.5
 scandir==1.4
 selenium==2.53.6
 tox==2.5.0
-vcrpy==1.10.3
+vcrpy==1.10.4

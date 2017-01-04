@@ -67,7 +67,7 @@ Set up:
     python2 -m virtualenv venv --no-site-packages
     . venv/bin/activate
     # install ansible
-    pip install ansible==2.1.1.0
+    pip install ansible==2.2.0.0
 
 Now you need to copy your secrets into ``env_vars/example.yml`` (or copy the file from
 your existing server).

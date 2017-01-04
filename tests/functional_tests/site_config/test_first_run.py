@@ -29,13 +29,15 @@ class TestFirstRun:
             '#send_test_email > div > form > div.fields > div.four.wide.field > input[type="email"]'
         )[0]
         email_input_box.clear()
-        email_input_box.send_keys('test@example.com')
+        for k in 'test@example.com':
+            email_input_box.send_keys(k)
 
         body_input_box = browser.find_elements_by_css_selector(
             '#send_test_email > div > form > div.fields > div.twelve.wide.field > input[type="text"]'
         )[0]
         body_input_box.clear()
-        body_input_box.send_keys('test message')
+        for k in 'test message':
+            body_input_box.send_keys(k)
 
         submit_button = browser.find_elements_by_css_selector(
             '#send_test_email > div > form > button'
