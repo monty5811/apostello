@@ -1,56 +1,91 @@
 module Helpers exposing (..)
 
-import ApostelloModels exposing (..)
+import Decoders exposing (..)
 import Dict
-import Set exposing (Set)
-import Array
-import Parser exposing (..)
+import Http
+import Json.Decode as Decode
+import Json.Encode as Encode
+import Models exposing (..)
+import Regex
 
 
--- Run the query to produce new group
-
-
-runQuery : Groups -> People -> String -> ( People, List GroupPk )
-runQuery groups people queryString =
-    let
-        selectedGroups =
-            selectGroups queryString
-
-        peoplePks =
-            parseQueryString groups queryString
-                |> applyQuery Set.empty
-
-        result =
-            people
-                |> List.filter (\p -> Set.member p.pk peoplePks)
-    in
-        ( result, selectedGroups )
+encodeBody : List ( String, Encode.Value ) -> Http.Body
+encodeBody data =
+    data
+        |> Encode.object
+        |> Http.jsonBody
 
 
 
--- Build the Link
+-- Fetch data from server
 
 
-buildGroupLink : People -> String
-buildGroupLink people =
-    people
-        |> List.map (\p -> "recipient=" ++ (toString p.pk))
-        |> String.join "&"
-        |> String.append "/send/adhoc/?"
+getData : String -> Decode.Decoder a -> Http.Request a
+getData url decoder =
+    Http.request
+        { method = "GET"
+        , headers = [ Http.header "Accept" "application/json" ]
+        , url = url
+        , body = Http.emptyBody
+        , expect = Http.expectJson decoder
+        , timeout = Nothing
+        , withCredentials = True
+        }
+
+
+getApostelloResponse : String -> Decode.Decoder a -> Http.Request (ApostelloResponse a)
+getApostelloResponse url decoder =
+    getData url (decodeApostelloResponse decoder)
 
 
 
--- Collect people pks from groups into single list
+-- determine loading status
 
 
-collectPeople : Groups -> People
-collectPeople groups =
-    let
-        people =
-            groups
-                |> List.concatMap (\x -> x.members)
-                |> List.map (\x -> ( x.pk, x ))
-    in
-        Dict.fromList people
-            |> Dict.toList
-            |> List.map (\x -> Tuple.second x)
+determineLoadingStatus : ApostelloResponse a -> LoadingStatus
+determineLoadingStatus resp =
+    case resp.next of
+        Nothing ->
+            Finished
+
+        _ ->
+            WaitingForSubsequent
+
+
+
+-- increase page size gor next response
+
+
+increasePageSize : String -> String
+increasePageSize url =
+    case Regex.contains (Regex.regex "page_size") url of
+        True ->
+            Regex.replace (Regex.AtMost 1) (Regex.regex "page=2&page_size=100$") (\_ -> "page_size=1000") url
+
+        False ->
+            Regex.replace (Regex.AtMost 1) (Regex.regex "page=2$") (\_ -> "page_size=100") url
+
+
+
+-- merge new items with existing
+
+
+mergeItems : List { a | pk : Int } -> List { a | pk : Int } -> List { a | pk : Int }
+mergeItems existingItems newItems =
+    existingItems
+        |> List.map (\x -> ( x.pk, x ))
+        |> Dict.fromList
+        |> addNewItems newItems
+        |> Dict.toList
+        |> List.map (\x -> Tuple.second x)
+
+
+addNewItems : List { a | pk : Int } -> Dict.Dict Int { a | pk : Int } -> Dict.Dict Int { a | pk : Int }
+addNewItems newItems existingItemsDict =
+    newItems
+        |> List.foldl addItemToDic existingItemsDict
+
+
+addItemToDic : { a | pk : Int } -> Dict.Dict Int { a | pk : Int } -> Dict.Dict Int { a | pk : Int }
+addItemToDic item existingItems =
+    Dict.insert item.pk item existingItems

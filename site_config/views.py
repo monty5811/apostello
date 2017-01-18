@@ -11,6 +11,7 @@ from django.shortcuts import redirect
 from django.views.generic import TemplateView, View
 from django.views.generic.edit import UpdateView
 from django_twilio.client import twilio_client
+from rest_framework.parsers import JSONParser
 from twilio.rest.exceptions import TwilioRestException
 
 from apostello.mixins import ProfilePermsMixin
@@ -177,7 +178,8 @@ class TestSetupView(View):
             return response
 
         try:
-            self.run_test(request, *args, **kwargs)
+            data = JSONParser().parse(request)
+            self.run_test(data, *args, **kwargs)
             return JsonResponse({'status': 'success'})
         except Exception:
             tb = ''.join(traceback.format_exc())
@@ -192,35 +194,28 @@ class TestSetupView(View):
 class TestEmailView(TestSetupView):
     """Send a test email."""
 
-    def run_test(self, request, *args, **kwargs):
+    def run_test(self, data, *args, **kwargs):
         """Send message to posted address."""
         from apostello.tasks import send_async_mail
-        send_async_mail(
-            'apostello test email', request.POST['body_'],
-            [request.POST['to_']]
-        )
+        send_async_mail('apostello test email', data['body_'], [data['to_']])
 
 
 class TestSmsView(TestSetupView):
     """Send a test SMS."""
 
-    def run_test(self, request, *args, **kwargs):
+    def run_test(self, data, *args, **kwargs):
         """Send message to posted number."""
         twilio_client.messages.create(
-            body=request.POST['body_'],
-            to=request.POST['to_'],
-            from_=settings.TWILIO_FROM_NUM
+            body=data['body_'], to=data['to_'], from_=settings.TWILIO_FROM_NUM
         )
 
 
 class CreateSuperUser(TestSetupView):
     """Create a superuser."""
 
-    def run_test(self, request, *args, **kwargs):
+    def run_test(self, data, *args, **kwargs):
         """Create a new user and grant them full access rights."""
-        user = User.objects.create_user(
-            'admin', request.POST['email_'], request.POST['pass_']
-        )
+        user = User.objects.create_user('admin', data['email_'], data['pass_'])
         user.is_staff = True
         user.is_superuser = True
         user.save()
@@ -233,12 +228,12 @@ class CreateSuperUser(TestSetupView):
         from allauth.account.models import EmailAddress, EmailConfirmation
         email = EmailAddress.objects.create(
             user=user,
-            email=request.POST['email_'],
+            email=data['email_'],
         )
         email.save()
         email_confirm = EmailConfirmation.create(email_address=email)
         email_confirm.save()
-        email = EmailAddress.objects.get(email=request.POST['email_'])
+        email = EmailAddress.objects.get(email=data['email_'])
         email.verified = True
         email.primary = True
         email.save()

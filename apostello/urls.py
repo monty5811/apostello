@@ -55,7 +55,7 @@ urlpatterns += [
         v.SimpleView.as_view(
             template_name='apostello/groups.html',
             required_perms=['can_see_groups'],
-            rest_uri='/api/v1/groups/',
+            rest_uri='/api/v1/groups/?fields!=members,nonmembers',
         ),
         name='recipient_groups'
     ),
@@ -63,7 +63,7 @@ urlpatterns += [
         r'^group/archive/$',
         v.SimpleView.as_view(
             template_name='apostello/groups.html',
-            rest_uri='/api/v1/groups_archive/',
+            rest_uri='/api/v1/groups_archive/?fields!=members,nonmembers',
         ),
         name='recipient_groups_archive'
     ),
@@ -98,7 +98,7 @@ urlpatterns += [
         r'^group/composer/$',
         v.SimpleView.as_view(
             template_name='apostello/group_composer.html',
-            rest_uri='/api/v1/groups/',
+            rest_uri='/api/v1/groups/?fields!=nonmembers',
             required_perms=['can_see_groups', 'can_see_contact_names']
         ),
         name='group_composer'

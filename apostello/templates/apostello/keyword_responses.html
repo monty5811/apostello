@@ -15,7 +15,7 @@
 {% block content %}
 <h2>{{keyword}} {%if archive%}(Archived){%endif%}</h2>
 
-<div id="react_table" {% if archive %}src="{% url 'api:keyword_sms_archive' keyword.id %}"{% else %}src="{%url 'api:keyword_sms' keyword.id %}"{% endif %} pollInterval="20000"></div>
+<div id="elmContainer" {% if archive %}src="{% url 'api:keyword_sms_archive' keyword.id %}"{% else %}src="{%url 'api:keyword_sms' keyword.id %}"{% endif %}></div>
 
 {%if form%}
 <br>

@@ -86,14 +86,13 @@ Running Tests
 Frontend
 ~~~~~~~~
 
-A significant portion of the frontend uses `React <https://facebook.github.io/react/>`_.
+A significant portion of the frontend uses `Elm <https://elm-lang.org>`_.
 
 Setup:
 
 .. code-block:: bash
 
     cd assets/
-    npm install -g elm # some of the site also uses elm
     npm install # this may take a while
 
 Changes must then be compiled:

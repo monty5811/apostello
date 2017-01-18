@@ -1,3 +1,5 @@
+import json
+
 from django import template
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -7,19 +9,14 @@ register = template.Library()
 
 @register.simple_tag
 def fab_button(href, text, icon_name):
-    """Output a formatted fab link"""
-    result = '''
-    <a class="hvr-backward item" href="{href}">
-	<i class="large {icon_name} icon"></i>
-	<div class="content"><div class="header">{text}</div>
-	</div>
-    </a>
-    '''.format(
-        href=href,
-        text=text,
-        icon_name=icon_name,
+    """Output fab link json"""
+    return mark_safe(
+        json.dumps({
+            'url': href,
+            'linkText': text,
+            'iconType': icon_name,
+        }) + ','
     )
-    return mark_safe(result)
 
 
 # Contacts

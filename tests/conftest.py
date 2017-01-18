@@ -1,4 +1,5 @@
 import os
+import json
 from datetime import datetime
 
 import pytest
@@ -393,6 +394,12 @@ def browser(request, driver_wait_time):
     driver.implicitly_wait(driver_wait_time)
 
     def fin():
+        try:
+            driver.get_screenshot_as_file(
+                '/tmp/tmp-selenium-' + request.node.name + '.png'
+            )
+        except:
+            pass
         driver.quit()
 
     request.addfinalizer(fin)
@@ -418,6 +425,12 @@ def browser_in(request, live_server, users, driver_wait_time):
     )
     driver.implicitly_wait(driver_wait_time)
     yield driver
+    try:
+        driver.get_screenshot_as_file(
+            '/tmp/tmp-selenium-' + request.node.name + '.png'
+        )
+    except:
+        pass
     driver.quit()
 
 
@@ -427,3 +440,11 @@ twilio_vcr = base_vcr.use_cassette(
     filter_headers=['authorization'],
     match_on=['method', 'scheme', 'host', 'port', 'path', 'query', 'body']
 )
+
+
+def post_json(client, url, data):
+    return client.post(
+        url,
+        json.dumps(data),
+        content_type="application/json",
+    )

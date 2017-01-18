@@ -25,23 +25,17 @@ class TestFirstRun:
         browser.get(live_server + URI)
         assert URI in browser.current_url
         sleep(driver_wait_time)
-        email_input_box = browser.find_elements_by_css_selector(
-            '#send_test_email > div > form > div.fields > div.four.wide.field > input[type="email"]'
-        )[0]
+        email_input_box = browser.find_elements_by_id('email_to')[0]
         email_input_box.clear()
         for k in 'test@example.com':
             email_input_box.send_keys(k)
 
-        body_input_box = browser.find_elements_by_css_selector(
-            '#send_test_email > div > form > div.fields > div.twelve.wide.field > input[type="text"]'
-        )[0]
+        body_input_box = browser.find_elements_by_id('email_body')[0]
         body_input_box.clear()
         for k in 'test message':
             body_input_box.send_keys(k)
 
-        submit_button = browser.find_elements_by_css_selector(
-            '#send_test_email > div > form > button'
-        )[0]
+        submit_button = browser.find_elements_by_id('email_send_button')[0]
         submit_button.click()
 
         sleep(driver_wait_time)
@@ -55,52 +49,39 @@ class TestFirstRun:
         browser.get(live_server + URI)
         assert URI in browser.current_url
         sleep(driver_wait_time)
-        to_input_box = browser.find_elements_by_css_selector(
-            '#send_test_sms > div > form > div > div.four.wide.field > input[type="text"]'
-        )[0]
+        to_input_box = browser.find_elements_by_id('sms_to')[0]
         to_input_box.clear()
         to_input_box.send_keys(str(recipients['calvin'].number))
 
-        body_input_box = browser.find_elements_by_css_selector(
-            '#send_test_sms > div > form > div > div.twelve.wide.field > input[type="text"]'
-        )[0]
+        body_input_box = browser.find_elements_by_id('sms_body')[0]
         body_input_box.clear()
         body_input_box.send_keys('test')
 
-        submit_button = browser.find_elements_by_css_selector(
-            '#send_test_sms > div > form > button'
-        )[0]
+        submit_button = browser.find_elements_by_id('sms_send_button')[0]
         submit_button.click()
 
         sleep(driver_wait_time)
         assert 'AC00000000000000000000000000000000' in browser.page_source
-        assert 'Twilio returned the following information:' in browser.page_source
+        assert 'Error:' in browser.page_source
+        assert 'Twilio returned the following information:'
 
     def test_user_form(self, live_server, browser, driver_wait_time):
         browser.get(live_server + URI)
         assert URI in browser.current_url
         sleep(driver_wait_time)
-        email_input_box = browser.find_elements_by_css_selector(
-            '#create_admin_user > div > form > div > div.eight.wide.field > input[type="email"]'
-        )[0]
+        email_input_box = browser.find_elements_by_id('admin_email')[0]
         email_input_box.clear()
         email_input_box.send_keys('test@example.com')
 
-        pass1_input_box = browser.find_elements_by_css_selector(
-            '#create_admin_user > div > form > div > div:nth-child(2) > input[type="password"]'
-        )[0]
+        pass1_input_box = browser.find_elements_by_id('admin_pass1')[0]
         pass1_input_box.clear()
         pass1_input_box.send_keys('password')
 
-        pass2_input_box = browser.find_elements_by_css_selector(
-            '#create_admin_user > div > form > div > div:nth-child(3) > input[type="password"]'
-        )[0]
+        pass2_input_box = browser.find_elements_by_id('admin_pass2')[0]
         pass2_input_box.clear()
         pass2_input_box.send_keys('password')
 
-        submit_button = browser.find_elements_by_css_selector(
-            '#create_admin_user > div > form > button'
-        )[0]
+        submit_button = browser.find_elements_by_id('create_admin_button')[0]
         submit_button.click()
 
         sleep(driver_wait_time)

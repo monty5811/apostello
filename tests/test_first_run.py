@@ -1,6 +1,6 @@
 from django.core import mail
 from django.test import Client
-from tests.conftest import twilio_vcr
+from tests.conftest import post_json, twilio_vcr
 
 import pytest
 
@@ -23,8 +23,8 @@ class TestFirstRun:
         assert data['status'] == 'failed'
         assert 'error' in data
 
-        resp = c.post(
-            '/config/send_test_email/',
+        resp = post_json(
+            c, '/config/send_test_email/',
             {'to_': 'test@example.com',
              'body_': 'test message'}
         )
@@ -43,8 +43,8 @@ class TestFirstRun:
         assert data['status'] == 'failed'
         assert 'error' in data
 
-        resp = c.post(
-            '/config/send_test_sms/',
+        resp = post_json(
+            c, '/config/send_test_sms/',
             {'to_': str(recipients['calvin'].number),
              'body_': 'test'}
         )
@@ -53,7 +53,7 @@ class TestFirstRun:
     def test_send_test_sms_with_user(self, users):
         users['c_in'].post('/config/send_test_sms/').status_code == 400
 
-    def test_create_su_no_user(self):
+    def test_create_su(self):
         c = Client()
         resp = c.post('/config/create_admin_user/')
         assert resp.status_code == 400
@@ -61,8 +61,8 @@ class TestFirstRun:
         assert data['status'] == 'failed'
         assert 'error' in data
 
-        resp = c.post(
-            '/config/create_admin_user/',
+        resp = post_json(
+            c, '/config/create_admin_user/',
             {'email_': 'test@example.com',
              'pass_': 'testpass'}
         )
@@ -72,5 +72,5 @@ class TestFirstRun:
         assert resp.status_code == 302
         assert '/' == resp.url
 
-    def test_create_su_with_user(self, users):
+    def test_create_su_no_user(self, users):
         users['c_in'].post('/config/create_admin_user/').status_code == 400

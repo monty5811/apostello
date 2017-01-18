@@ -3,15 +3,5 @@
     "comments": false,
     "presets": [
         ["es2015", { "modules": false }],
-        "react"
     ],
-    "plugins": [
-        ["module-resolver", {
-            "root": ["."],
-            "alias": {
-                "react": "inferno-compat",
-                "react-dom": "inferno-compat"
-            }
-        }]
-    ]
 }

@@ -20,7 +20,7 @@
         <p><b>Note:</b> once a user has been created, this page will no longer be accessible for security reasons.</p>
         <div class="ui raised segment">
           <h3>Twilio Incoming Setup</h3>
-          
+
           <p>Twilio sends any incoming messages to the URL below, this URL should be your domain name, followed by "/sms/", and the method should be "POST".</p>
 
           <p>If you do not see these values below, then you need to update your settings in Twilio.</p>
@@ -60,15 +60,7 @@
           </table>
         </div>
         </br>
-        <div id="send_test_email"></div>
-        </br>
-        
-        <div id="send_test_sms"></div>
-        </br>
-        
-        <div id="create_admin_user"></div>
-        </br>
-
+        <div id="elmContainer" src=""></div>
       </div>
     </div>
     <div class="ui hidden divider"></div>
@@ -80,6 +72,9 @@
             async
             ></script>
     {% endif %}
+		<script src="https://code.jquery.com/jquery-3.1.0.js"
+					integrity="sha256-slogkvB1K3VOkzAI8QITxV3VzpOnkeNVsKvtkYLMjfk="
+		 crossorigin="anonymous"></script>
 		<script src="{% static 'js/vendor.js' %}"></script>
 		<script src="{% static 'js/app.js' %}"></script>
     {% csrf_token %}

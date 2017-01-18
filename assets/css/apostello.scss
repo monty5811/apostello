@@ -31,7 +31,7 @@
   text-align: right;
   z-index: 10;
 }
-.fabDimOn{
+.fabDim{
   background: #5b599c;
   height: 100vh;
   width: 100vw;
@@ -40,12 +40,6 @@
   left: 0;
   opacity: 0.8;
   z-index: 9;
-};
-.fabDimOff{
-  background: #fff;
-  transition: 0;
-  opacity: 0;
-  z-index: -1000;
 };
 /* Backward */
 /* https://github.com/IanLunn/Hover/blob/master/css/hover.css */

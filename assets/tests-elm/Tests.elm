@@ -1,37 +1,37 @@
 module Tests exposing (..)
 
-import ApostelloModels exposing (..)
+import Common.Models exposing (..)
 import Expect
-import Helpers exposing (..)
-import Models exposing (..)
-import Parser exposing (..)
+import GroupComposer.Helpers exposing (..)
+import GroupComposer.Models exposing (..)
+import GroupComposer.Parser exposing (..)
 import Set exposing (Set)
 import Test exposing (..)
 import Fuzz exposing (..)
 
 
-john : Person
+john : RecipientSimple
 john =
-    Person "John" 1
+    RecipientSimple "John" 1
 
 
-bob : Person
+bob : RecipientSimple
 bob =
-    Person "Bob" 2
+    RecipientSimple "Bob" 2
 
 
-bill : Person
+bill : RecipientSimple
 bill =
-    Person "Bill" 3
+    RecipientSimple "Bill" 3
 
 
 testGroups : Groups
 testGroups =
-    [ Group 123 "all" [ john, bob, bill ]
-    , Group 1 "john" [ john ]
-    , Group 2 "bob" [ bob ]
-    , Group 3 "bill" [ bill ]
-    , Group 12 "john,bob" [ john, bob ]
+    [ RecipientGroup "all" 123 "" [ john, bob, bill ] [] "" "" False
+    , RecipientGroup "john" 1 "" [ john ] [] "" "" False
+    , RecipientGroup "bob" 2 "" [ bob ] [] "" "" False
+    , RecipientGroup "bill" 3 "" [ bill ] [] "" "" False
+    , RecipientGroup "john,bob" 12 "" [ john, bob ] [] "" "" False
     ]
 
 
@@ -66,7 +66,7 @@ testParenPairs =
 
 all : Test
 all =
-    describe "Group Composer Test Suite"
+    describe "RecipientGroup Composer Test Suite"
         ([ test "Union" <|
             \() ->
                 Expect.equal (testPeoplePks "2|3") (Set.fromList [ 2, 3 ])

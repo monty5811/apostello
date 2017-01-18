@@ -28,22 +28,12 @@
       </div>
     </div>
     <div class="ui hidden divider"></div>
-      <div id="fabDim"></div>
-      <div class="fabContainer">
-        <div class="fabDropdown" style="display: none;">
-          <div class="ui fab large very relaxed inverted list">
-          {% block fab %}{% include 'apostello/includes/default_fab.html' %}{% endblock %}
-          </div>
-        </div>
-        <br/>
-        <br/>
-        <div class="faButton" id="fab" data-intro="Use this menu for page specific actions, e.g. exporting the responses for a keyword." data-step="2" data-position="left">
-          <div class="fabb ui circular violet icon button">
-            <i class="large wrench icon"></i>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div id="fabContainer"></div>
+    <script>
+      var fabLinks = [
+        {% block fab %}{% include 'apostello/includes/default_fab.html' %}{% endblock %}
+      ];
+    </script>
     {% if OPBEAT_JS_APP_ID %}
     <script src="https://d3tvtfb6518e3e.cloudfront.net/1/opbeat.min.js"
             data-org-id="{{ OPBEAT_JS_ORG_ID }}"
@@ -51,6 +41,9 @@
             async
             ></script>
     {% endif %}
+		<script src="https://code.jquery.com/jquery-3.1.0.js"
+					integrity="sha256-slogkvB1K3VOkzAI8QITxV3VzpOnkeNVsKvtkYLMjfk="
+		 crossorigin="anonymous"></script>
     <script src="{% static 'js/vendor.js' %}"></script>
     <script src="{% static 'js/app.js' %}"></script>
     {% block morejs %}{% endblock %}

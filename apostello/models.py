@@ -615,6 +615,7 @@ class SmsInbound(models.Model):
         self.is_archived = False
         self.dealt_with = False
         self.save()
+        return self
 
     def save(self, *args, **kwargs):
         """Override save method to invalidate cache."""

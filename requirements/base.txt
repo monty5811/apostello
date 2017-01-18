@@ -9,6 +9,7 @@ django-solo==1.1.2
 django-twilio==0.8.0
 django==1.10.4
 djangorestframework==3.5.3
+djangorestframework-queryfields==1.0.0
 drfdocs==0.0.11
 gunicorn==19.6.0
 ipython==5.1.0

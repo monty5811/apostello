@@ -1,8 +1,7 @@
-import ast
-
 from django.contrib.auth.models import User
 from django.contrib.humanize.templatetags.humanize import naturaltime
 from rest_framework import serializers
+from drf_queryfields import QueryFieldsMixin
 
 from apostello.models import (
     Keyword, QueuedSms, Recipient, RecipientGroup, SmsInbound, SmsOutbound,
@@ -11,7 +10,11 @@ from apostello.models import (
 from elvanto.models import ElvantoGroup
 
 
-class ElvantoGroupSerializer(serializers.ModelSerializer):
+class BaseModelSerializer(QueryFieldsMixin, serializers.ModelSerializer):
+    pass
+
+
+class ElvantoGroupSerializer(BaseModelSerializer):
     """Serialize apostello.models.ElvantoGroup."""
     last_synced = serializers.DateTimeField(format='%d %b %H:%M')
 
@@ -25,7 +28,7 @@ class ElvantoGroupSerializer(serializers.ModelSerializer):
         )
 
 
-class KeywordSerializer(serializers.ModelSerializer):
+class KeywordSerializer(BaseModelSerializer):
     """Serialize apostello.models.Keyword for use in table."""
     url = serializers.CharField(source='get_absolute_url')
     responses_url = serializers.CharField(source='get_responses_url')
@@ -49,7 +52,7 @@ class KeywordSerializer(serializers.ModelSerializer):
         )
 
 
-class SmsInboundSerializer(serializers.ModelSerializer):
+class SmsInboundSerializer(BaseModelSerializer):
     """Serialize apostello.models.SmsInbound for use in logs and wall."""
     time_received = serializers.DateTimeField(format='%d %b %H:%M')
 
@@ -72,7 +75,7 @@ class SmsInboundSerializer(serializers.ModelSerializer):
         )
 
 
-class SmsInboundSimpleSerializer(serializers.ModelSerializer):
+class SmsInboundSimpleSerializer(BaseModelSerializer):
     """Serialize apostello.models.SmsInbound for use in log and wall."""
     time_received = serializers.DateTimeField(format='%d %b %H:%M')
 
@@ -88,24 +91,7 @@ class SmsInboundSimpleSerializer(serializers.ModelSerializer):
         )
 
 
-class SmsOutboundSerializer(serializers.ModelSerializer):
-    """Serialize apostello.models.SmsOutbound for use in log."""
-    time_sent = serializers.DateTimeField(format='%d %b %H:%M')
-    recipient = serializers.StringRelatedField()
-
-    class Meta:
-        model = SmsOutbound
-        fields = (
-            'content',
-            'pk',
-            'time_sent',
-            'sent_by',
-            'recipient',
-            'recipient_url',
-        )
-
-
-class RecipientSerializer(serializers.ModelSerializer):
+class RecipientSerializer(BaseModelSerializer):
     """Serialize apostello.models.Recipient for use in table."""
     url = serializers.CharField(source='get_absolute_url')
     number = serializers.SerializerMethodField()
@@ -133,7 +119,7 @@ class RecipientSerializer(serializers.ModelSerializer):
         )
 
 
-class RecipientSimpleSerializer(serializers.ModelSerializer):
+class RecipientSimpleSerializer(BaseModelSerializer):
     class Meta:
         model = Recipient
         fields = (
@@ -142,7 +128,23 @@ class RecipientSimpleSerializer(serializers.ModelSerializer):
         )
 
 
-class RecipientGroupSerializer(serializers.ModelSerializer):
+class SmsOutboundSerializer(BaseModelSerializer):
+    """Serialize apostello.models.SmsOutbound for use in log."""
+    time_sent = serializers.DateTimeField(format='%d %b %H:%M')
+    recipient = RecipientSimpleSerializer()
+
+    class Meta:
+        model = SmsOutbound
+        fields = (
+            'content',
+            'pk',
+            'time_sent',
+            'sent_by',
+            'recipient',
+        )
+
+
+class RecipientGroupSerializer(BaseModelSerializer):
     """Serialize apostello.models.RecipientGroup for use in edit page."""
     cost = serializers.CharField(source='calculate_cost')
     url = serializers.CharField(source='get_absolute_url')
@@ -167,7 +169,7 @@ class RecipientGroupSerializer(serializers.ModelSerializer):
         )
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(BaseModelSerializer):
     """Serialize user model."""
 
     class Meta:
@@ -178,7 +180,7 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
+class UserProfileSerializer(BaseModelSerializer):
     """Serialize apostello.models.UserProfile for use in table."""
     user = UserSerializer(read_only=True)
     url = serializers.CharField(source='get_absolute_url')
@@ -202,15 +204,21 @@ class UserProfileSerializer(serializers.ModelSerializer):
         )
 
 
-class QueuedSmsSerializer(serializers.ModelSerializer):
+class QueuedSmsSerializer(BaseModelSerializer):
     """Serialize queued messages"""
     time_to_send_formatted = serializers.SerializerMethodField()
-    recipient = RecipientSerializer(read_only=True)
+    recipient = serializers.SerializerMethodField()
     recipient_group = RecipientGroupSerializer(read_only=True)
 
     def get_time_to_send_formatted(self, obj):
         """Next run time in humand friendly format."""
         return naturaltime(obj.time_to_send)
+
+    def get_recipient(self, obj):
+        recip = RecipientSerializer(
+            instance=obj.recipient, read_only=True, context=self.context
+        )
+        return recip.data
 
     class Meta:
         model = QueuedSms

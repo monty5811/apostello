@@ -1,4 +1,5 @@
 -r dev.txt
+ipdb==0.10.1
 pytest-cov==2.4.0
 pytest-django==3.1.2
 pytest-env==0.6.0

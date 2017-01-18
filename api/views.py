@@ -31,17 +31,18 @@ class ApiCollection(generics.ListAPIView):
     model_class = None
     serializer_class = None
     related_field = None
+    prefetch_fields = None
     filter_list = False
     filters = {}
     pagination_class = StandardPagination
 
     def get_queryset(self):
         """Handle get requests."""
-        if self.related_field is None:
-            objs = self.model_class.objects.all()
-        else:
-            objs = self.model_class.objects.all(
-            ).select_related(self.related_field)
+        objs = self.model_class.objects.all()
+        if self.related_field is not None:
+            objs = objs.select_related(self.related_field)
+        if self.prefetch_fields is not None:
+            objs = objs.prefetch_related(*self.prefetch_fields)
         if self.filter_list:
             objs = objs.filter(**self.filters)
         return objs
@@ -93,7 +94,6 @@ class ApiCollectionAllWall(ApiCollection):
         if objs is None:
             objs = SmsInbound.objects.filter(is_archived=False)
             cache.set(cache_key, objs, 120)
-
         return objs
 
 
@@ -104,26 +104,14 @@ class ApiMember(APIView):
     serializer_class = None
 
     @staticmethod
-    def get_val(request, val_name):
-        """Pull `val_name` from the request data and convert to a boolean or None."""
-        val = request.data.get(val_name)
-        if val is None:
-            return val
-        val = True if val == 'true' else False
-        return val
-
-    @staticmethod
     def simple_update(request, obj, attr_name):
         """Switch the value of a supplied field.
 
         e.g. toggles the dealt with status of a keyword
         """
-        attr_val = ApiMember.get_val(request, attr_name)
+        attr_val = request.data.get(attr_name)
         if attr_val is not None:
-            if attr_val:
-                setattr(obj, attr_name, False)
-            else:
-                setattr(obj, attr_name, True)
+            setattr(obj, attr_name, not attr_val)
         obj.save()
         return obj
 
@@ -142,7 +130,7 @@ class ApiMember(APIView):
         obj = self.simple_update(request, obj, 'display_on_wall')
         obj = self.simple_update(request, obj, 'sync')
 
-        archived = self.get_val(request, 'archived')
+        archived = request.data.get('archived')
         if archived is not None:
             if archived:
                 obj.is_archived = False
@@ -154,13 +142,11 @@ class ApiMember(APIView):
                 else:
                     return Response({}, status=status.HTTP_403_FORBIDDEN)
 
-        reingest_sms = self.get_val(request, 'reingest')
-        if reingest_sms:
-            obj.reimport()
+        if request.data.get('reingest'):
+            obj = obj.reimport()
 
         user_profile = request.data.get('user_profile')
         if user_profile is not None:
-            user_profile = json.loads(user_profile)
             user_profile.pop('user')
             user_profile.pop('pk')
             for x in user_profile:
@@ -169,7 +155,6 @@ class ApiMember(APIView):
 
         is_member = request.data.get('member')
         if is_member is not None:
-            is_member = True if is_member == 'true' else False
             contact = Recipient.objects.get(pk=request.data.get('contactPk'))
             if is_member:
                 obj.recipient_set.remove(contact)

@@ -139,7 +139,8 @@ urlpatterns = [
             serializer_class=s.RecipientGroupSerializer,
             filter_list=True,
             filters={'is_archived': False},
-            permission_classes=(IsAuthenticated, CanSeeGroups)
+            permission_classes=(IsAuthenticated, CanSeeGroups),
+            prefetch_fields=['recipient_set'],
         ),
         name='recipient_groups'
     ),
@@ -150,7 +151,7 @@ urlpatterns = [
             serializer_class=s.RecipientGroupSerializer,
             filter_list=True,
             filters={'is_archived': True},
-            permission_classes=(IsAuthenticated, IsStaff)
+            permission_classes=(IsAuthenticated, IsStaff),
         ),
         name='recipient_groups_archive'
     ),

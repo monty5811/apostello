@@ -6,7 +6,10 @@
 <title>apostello - Wall</title>
 </head>
 <body style="background-color: #5c569c"  data-js-view-name="{{ js_path }}">
-<div id="react_table" src="/api/v1/sms/live_wall/all/" pollInterval="2000"></div>
+<div id="elmContainer" src="/api/v1/sms/live_wall/all/"></div>
+<script src="https://code.jquery.com/jquery-3.1.0.js"
+        integrity="sha256-slogkvB1K3VOkzAI8QITxV3VzpOnkeNVsKvtkYLMjfk="
+        crossorigin="anonymous"></script>
 <script src="{% static 'js/vendor.js' %}"></script>
 <script src="{% static 'js/app.js' %}"></script>
 </body>

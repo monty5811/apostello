@@ -45,7 +45,7 @@ class TestElvantoImport:
         # enable a group
         sleep(driver_wait_time)
         group_button = browser_in.find_elements_by_xpath(
-            '//*[@id="react_table"]/table/tbody/tr[1]/td[3]/a'
+            '//*[@id="elmContainer"]/div[1]/div[2]/table/tbody/tr[1]/td[3]/a'
         )[0]
         group_button.click()
         sleep(driver_wait_time)
@@ -55,14 +55,8 @@ class TestElvantoImport:
         browser_in.get(live_server + uri)
         assert uri in browser_in.current_url
         sleep(driver_wait_time)
-        wrench = browser_in.find_elements_by_class_name('wrench')[0]
-        wrench.click()
-        buttons = browser_in.find_elements_by_class_name('fluid')
-        pull_button = buttons[1]
+        pull_button = browser_in.find_elements_by_id('pull_button')[0]
         pull_button.click()
-        sleep(driver_wait_time)
-        fab_dim = browser_in.find_elements_by_id('fabDim')[0]
-        fab_dim.click()
         sleep(driver_wait_time)
         check_and_close_biu(browser_in, driver_wait_time)
 
@@ -75,13 +69,7 @@ class TestElvantoImport:
         "Test fetch group button." ""
         # fetch groups
         browser_in.get(live_server + uri)
-        wrench = browser_in.find_elements_by_class_name('wrench')[0]
-        wrench.click()
-        buttons = browser_in.find_elements_by_class_name('fluid')
-        fetch_button = buttons[0]
+        fetch_button = browser_in.find_elements_by_id('fetch_button')[0]
         fetch_button.click()
-        sleep(driver_wait_time)
-        fab_dim = browser_in.find_elements_by_id('fabDim')[0]
-        fab_dim.click()
         sleep(driver_wait_time)
         check_and_close_biu(browser_in, driver_wait_time)

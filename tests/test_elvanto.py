@@ -7,6 +7,7 @@ from elvanto.elvanto import fix_elvanto_numbers, try_both_num_fields
 from elvanto.exceptions import NotValidPhoneNumber
 from elvanto import models as elv_models
 from site_config import models as sc_models
+from tests.conftest import post_json
 
 my_vcr = vcr.VCR(record_mode='none', ignore_localhost=True)
 
@@ -136,16 +137,20 @@ class TestPostToUrls:
         config = sc_models.SiteConfiguration.get_solo()
         config.sync_elvanto = True
         config.save()
-        r = users['c_staff'].post('/api/v1/elvanto/group_fetch/', {})
-        users['c_staff'].post('/api/v1/elvanto/group_pull/', {})
+        r = post_json(users['c_staff'], '/api/v1/elvanto/group_fetch/', {})
+        post_json(users['c_staff'], '/api/v1/elvanto/group_pull/', {})
         r = users['c_staff'].get('/api/v1/elvanto/groups/')
         assert len(r.data) == 4
         r = users['c_staff'].get('/api/v1/elvanto/group/1')
         assert r.data['name'] == 'Geneva'
         assert r.data['pk'] == 1
-        r = users['c_staff'].post('/api/v1/elvanto/group/1', {'sync': 'false'})
+        r = post_json(
+            users['c_staff'], '/api/v1/elvanto/group/1', {'sync': False}
+        )
         assert r.data['sync']
         assert elv_models.ElvantoGroup.objects.get(pk=1).sync
-        r = users['c_staff'].post('/api/v1/elvanto/group/1', {'sync': 'true'})
+        r = post_json(
+            users['c_staff'], '/api/v1/elvanto/group/1', {'sync': True}
+        )
         assert r.data['sync'] is False
         assert elv_models.ElvantoGroup.objects.get(pk=1).sync is False

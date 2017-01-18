@@ -15,13 +15,14 @@ module.exports = {
     tour: './js/tour',
     vendor: [
       'datetimepicker',
-      'jquery',
-      'inferno-compat',
-      'inferno',
       './semantic/dist/components/transition.js',
       './semantic/dist/components/dropdown.js',
     ]
   },
+
+	externals: {
+		jquery: 'jQuery'
+	},
 
   output: {
     path: path.resolve('./../apostello/static/js/'),
@@ -29,11 +30,9 @@ module.exports = {
   },
 
   resolve: {
-    extensions: ['.js', '.jsx'],
+    extensions: ['.js', '.elm'],
     alias: {
 			jquery: 'jquery/src/jquery',
-			'react': 'inferno-compat',
-			'react-dom': 'inferno-compat',
     },
   },
 
@@ -72,6 +71,8 @@ module.exports = {
         loader: elmLoader,
       }
     ],
+
+    noParse: /\.elm$/,
   },
 
   performance: {

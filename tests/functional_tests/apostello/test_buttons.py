@@ -209,23 +209,28 @@ class TestButton:
         self, live_server, browser_in, recipients, groups, driver_wait_time
     ):
         """Test editing group membership."""
+        non_member_xpath = '//*[@id="elmContainer"]/div/div/div[1]/div/div[2]/div/div'
+        member_xpath = '//*[@id="elmContainer"]/div/div/div[2]/div/div[2]/div/div'
         grp = groups['empty_group']
         browser_in.get(live_server + grp.get_absolute_url)
         # check all recipient are displayed
-        cards = browser_in.find_elements_by_class_name('card')
+        cards = browser_in.find_elements_by_xpath(non_member_xpath)
         assert len(cards) == models.Recipient.objects.filter(
             is_archived=False
         ).count()
         # move all recipients into membership
-        for card in cards:
-            card.click()
-        sleep(driver_wait_time)
+        while len(cards) > 0:
+            cards[0].click()
+            sleep(driver_wait_time)
+            cards = browser_in.find_elements_by_xpath(non_member_xpath)
         assert grp.all_recipients.count() == models.Recipient.objects.filter(
             is_archived=False
         ).count()
         # remove them again:
-        cards = browser_in.find_elements_by_class_name('card')
-        for card in cards:
-            card.click()
+        cards = browser_in.find_elements_by_xpath(member_xpath)
+        while len(cards) > 0:
+            cards[0].click()
+            sleep(driver_wait_time)
+            cards = browser_in.find_elements_by_xpath(member_xpath)
         sleep(driver_wait_time)
         assert grp.all_recipients.count() == 0
