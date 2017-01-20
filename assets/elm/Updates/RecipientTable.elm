@@ -1,10 +1,9 @@
 module Updates.RecipientTable exposing (update)
 
 import Actions exposing (determineRespCmd)
-import Biu exposing (..)
 import Decoders exposing (recipientDecoder)
 import DjangoSend exposing (post)
-import Helpers exposing (mergeItems, determineLoadingStatus, encodeBody)
+import Helpers exposing (..)
 import Http
 import Json.Encode as Encode
 import Messages exposing (..)
@@ -23,7 +22,7 @@ update msg model =
             )
 
         LoadRecipientTableResp (Err _) ->
-            ( { model | loadingStatus = Finished }, biuLoadingFailed )
+            handleLoadingFailed model
 
         ToggleRecipientArchive isArchived pk ->
             ( { model | recipientTable = optRemoveRecipient model.recipientTable pk }
@@ -34,7 +33,7 @@ update msg model =
             ( model, Cmd.none )
 
         ReceiveRecipientToggleArchive (Err _) ->
-            ( model, biuNotSaved )
+            handleNotSaved model
 
 
 updateRecipients : RecipientTableModel -> List Recipient -> RecipientTableModel

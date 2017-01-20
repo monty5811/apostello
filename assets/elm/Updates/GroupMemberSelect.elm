@@ -1,9 +1,8 @@
 module Updates.GroupMemberSelect exposing (update)
 
-import Biu exposing (..)
 import Decoders exposing (recipientgroupDecoder)
 import DjangoSend exposing (post)
-import Helpers exposing (encodeBody, getData)
+import Helpers exposing (..)
 import Http
 import Json.Encode as Encode
 import Messages exposing (..)
@@ -23,7 +22,7 @@ update msg model =
             )
 
         LoadGroupMemberSelectResp (Err _) ->
-            ( { model | loadingStatus = Finished }, biuLoadingFailed )
+            handleLoadingFailed model
 
         UpdateMemberFilter text ->
             ( { model | groupSelect = updateMemberFilter model.groupSelect text }, Cmd.none )
@@ -49,7 +48,7 @@ update msg model =
             )
 
         ReceiveToggleMembership (Err _) ->
-            ( { model | loadingStatus = Finished }, biuLoadingFailed )
+            handleNotSaved model
 
 
 updateMemberFilter : GroupMemberSelectModel -> String -> GroupMemberSelectModel

@@ -1,10 +1,9 @@
 module Updates.KeywordTable exposing (update)
 
-import Biu exposing (..)
-import Helpers exposing (mergeItems, determineLoadingStatus, encodeBody)
 import Actions exposing (determineRespCmd)
 import Decoders exposing (keywordDecoder)
 import DjangoSend exposing (post)
+import Helpers exposing (..)
 import Http
 import Json.Encode as Encode
 import Messages exposing (..)
@@ -23,7 +22,7 @@ update msg model =
             )
 
         LoadKeywordTableResp (Err _) ->
-            ( { model | loadingStatus = Finished }, biuLoadingFailed )
+            handleLoadingFailed model
 
         ToggleKeywordArchive isArchived pk ->
             ( { model
@@ -32,8 +31,11 @@ update msg model =
             , toggleKeywordArchive model.csrftoken isArchived pk
             )
 
-        ReceiveToggleKeywordArchive keyword ->
+        ReceiveToggleKeywordArchive (Ok _) ->
             ( model, Cmd.none )
+
+        ReceiveToggleKeywordArchive (Err _) ->
+            handleNotSaved model
 
 
 optArchiveKeyword : KeywordTableModel -> Int -> KeywordTableModel

@@ -1,15 +1,15 @@
 module Updates.ElvantoImport exposing (update)
 
 import Actions exposing (determineRespCmd)
-import Biu exposing (..)
 import Decoders exposing (elvantogroupDecoder)
 import DjangoSend exposing (post)
-import Helpers exposing (mergeItems, determineLoadingStatus, encodeBody)
+import Helpers exposing (..)
 import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Messages exposing (..)
 import Models exposing (..)
+import Updates.Notification exposing (createInfoNotification, createSuccessNotification)
 
 
 update : ElvantoMsg -> Model -> ( Model, Cmd Msg )
@@ -24,7 +24,7 @@ update msg model =
             )
 
         LoadElvantoResp (Err _) ->
-            ( { model | loadingStatus = Finished }, biuLoadingFailed )
+            handleLoadingFailed model
 
         ToggleGroupSync group ->
             ( { model | elvantoImport = optToggleGroup group model.elvantoImport }
@@ -39,29 +39,23 @@ update msg model =
             )
 
         ReceiveToggleGroupSync (Err _) ->
-            ( model, biuNotSaved )
+            handleNotSaved model
 
         PullGroups ->
-            ( model
-            , Cmd.batch
-                [ biuInfo "Groups are being imported, it may take a couple of minutes"
-                , pullGroups model.csrftoken
-                ]
+            ( createInfoNotification model "Groups are being imported, it may take a couple of minutes"
+            , pullGroups model.csrftoken
             )
 
         FetchGroups ->
-            ( model
-            , Cmd.batch
-                [ biuSuccess "Groups are being fetched, it may take a couple of minutes"
-                , fetchGroups model.csrftoken
-                ]
+            ( createSuccessNotification model "Groups are being fetched, it may take a couple of minutes"
+            , fetchGroups model.csrftoken
             )
 
         ReceiveButtonResp (Ok _) ->
             ( model, Cmd.none )
 
         ReceiveButtonResp (Err _) ->
-            ( model, biuNotSaved )
+            handleNotSaved model
 
 
 updateGroups : ElvantoImportModel -> ElvantoGroups -> ElvantoImportModel

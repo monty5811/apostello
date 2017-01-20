@@ -1,6 +1,5 @@
 @import "./../semantic/dist/semantic";
 @import "./../node_modules/datetimepicker/dist/DateTimePicker";
-@import "./../node_modules/biu.js/dist/biu";
 
 // tour:
 @import "./../node_modules/intro.js/introjs";
@@ -16,10 +15,6 @@
   background-color: rgba(255,255,255,0);
   border: none !important;
   box-shadow: none !important;
-}
-// biu
-.biu-instance{
-  z-index: 11;
 }
 // fab:
 .fabContainer{

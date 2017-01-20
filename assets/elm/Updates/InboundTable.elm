@@ -1,10 +1,9 @@
 module Updates.InboundTable exposing (update)
 
 import Actions exposing (determineRespCmd)
-import Biu exposing (..)
 import Decoders exposing (smsinboundDecoder)
 import DjangoSend exposing (post)
-import Helpers exposing (mergeItems, determineLoadingStatus, encodeBody)
+import Helpers exposing (..)
 import Http
 import Json.Encode as Encode
 import Messages exposing (..)
@@ -22,8 +21,8 @@ update msg model =
             , determineRespCmd InboundTable resp
             )
 
-        LoadInboundTableResp (Err e) ->
-            ( { model | loadingStatus = Finished }, biuWarning (toString e) )
+        LoadInboundTableResp (Err _) ->
+            handleLoadingFailed model
 
         ReprocessSms pk ->
             ( model, reprocessSms model.csrftoken pk )
@@ -32,7 +31,7 @@ update msg model =
             ( { model | inboundTable = updateSms model.inboundTable [ sms ] }, Cmd.none )
 
         ReceiveReprocessSms (Err _) ->
-            ( model, biuNotSaved )
+            handleNotSaved model
 
 
 updateSms : InboundTableModel -> SmsInbounds -> InboundTableModel

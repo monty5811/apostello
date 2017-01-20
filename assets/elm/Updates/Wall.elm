@@ -1,10 +1,9 @@
 module Updates.Wall exposing (update)
 
 import Actions exposing (determineRespCmd)
-import Biu exposing (..)
 import Decoders exposing (smsinboundsimpleDecoder)
 import DjangoSend exposing (post)
-import Helpers exposing (mergeItems, determineLoadingStatus, encodeBody)
+import Helpers exposing (..)
 import Http
 import Json.Encode as Encode
 import Messages exposing (..)
@@ -23,7 +22,7 @@ update msg model =
             )
 
         LoadWallResp (Err _) ->
-            ( { model | loadingStatus = Finished }, biuLoadingFailed )
+            handleLoadingFailed model
 
         ToggleWallDisplay isDisplayed pk ->
             ( model, toggleWallDisplay model.csrftoken isDisplayed pk )
@@ -32,7 +31,7 @@ update msg model =
             ( { model | wall = updateSms model.wall [ sms ] }, Cmd.none )
 
         ReceiveToggleWallDisplay (Err _) ->
-            ( model, biuNotSaved )
+            handleNotSaved model
 
 
 updateSms : WallModel -> List SmsInboundSimple -> WallModel

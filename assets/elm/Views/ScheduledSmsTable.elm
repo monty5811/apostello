@@ -14,7 +14,7 @@ import Views.FilteringTable exposing (filteringTable)
 -- Main view
 
 
-view : Regex.Regex -> Maybe Time.Time -> ScheduledSmsTableModel -> Html Msg
+view : Regex.Regex -> Time.Time -> ScheduledSmsTableModel -> Html Msg
 view filterRegex currentTime model =
     let
         head =
@@ -36,14 +36,9 @@ view filterRegex currentTime model =
         filteringTable filterRegex smsRow sms head "ui table"
 
 
-onlyFuture : Maybe Time.Time -> QueuedSms -> Bool
+onlyFuture : Time.Time -> QueuedSms -> Bool
 onlyFuture t sms =
-    case t of
-        Nothing ->
-            True
-
-        Just t ->
-            t > (Date.toTime sms.time_to_send)
+    t < (Date.toTime sms.time_to_send)
 
 
 smsRow : QueuedSms -> Html Msg

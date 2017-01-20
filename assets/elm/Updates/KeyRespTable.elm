@@ -1,10 +1,9 @@
 module Updates.KeyRespTable exposing (update)
 
 import Actions exposing (determineRespCmd)
-import Biu exposing (..)
 import Decoders exposing (smsinboundDecoder)
 import DjangoSend exposing (post)
-import Helpers exposing (mergeItems, determineLoadingStatus, encodeBody)
+import Helpers exposing (..)
 import Http
 import Json.Encode as Encode
 import Messages exposing (..)
@@ -23,7 +22,7 @@ update msg model =
             )
 
         LoadKeyRespTableResp (Err _) ->
-            ( { model | loadingStatus = Finished }, biuLoadingFailed )
+            handleLoadingFailed model
 
         ToggleInboundSmsArchive isArchived pk ->
             ( { model | keyRespTable = optArchiveSms model.keyRespTable pk }, toggleSmsArchive model.csrftoken isArchived pk )
@@ -32,7 +31,7 @@ update msg model =
             ( model, Cmd.none )
 
         ReceiveToggleInboundSmsArchive (Err _) ->
-            ( model, biuNotSaved )
+            handleNotSaved model
 
         ToggleInboundSmsDealtWith isDealtWith pk ->
             ( { model | keyRespTable = optToggleDealtWith model.keyRespTable pk }, toggleSmsDealtWith model.csrftoken isDealtWith pk )
@@ -41,7 +40,7 @@ update msg model =
             ( { model | keyRespTable = updateSms model.keyRespTable [ sms ] }, Cmd.none )
 
         ReceiveToggleInboundSmsDealtWith (Err _) ->
-            ( model, biuNotSaved )
+            handleNotSaved model
 
 
 updateSms : KeyRespTableModel -> SmsInbounds -> KeyRespTableModel

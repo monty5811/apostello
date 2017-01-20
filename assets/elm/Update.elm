@@ -12,6 +12,7 @@ import Updates.GroupTable
 import Updates.InboundTable
 import Updates.KeyRespTable
 import Updates.KeywordTable
+import Updates.Notification
 import Updates.OutboundTable
 import Updates.RecipientTable
 import Updates.ScheduledSmsTable
@@ -29,6 +30,9 @@ update msg model =
 
         FabMsg subMsg ->
             Updates.Fab.update subMsg model
+
+        NotificationMsg subMsg ->
+            Updates.Notification.update subMsg model
 
         FirstRunMsg subMsg ->
             Updates.FirstRun.update subMsg model
@@ -74,4 +78,4 @@ update msg model =
             ( { model | filterRegex = (FT.textToRegex filterText) }, Cmd.none )
 
         CurrentTime t ->
-            ( { model | currentTime = Just t }, Cmd.none )
+            ( { model | currentTime = t }, Cmd.none )

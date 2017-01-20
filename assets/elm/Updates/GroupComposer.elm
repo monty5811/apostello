@@ -1,7 +1,6 @@
 module Updates.GroupComposer exposing (update)
 
-import Biu exposing (..)
-import Helpers exposing (mergeItems, determineLoadingStatus, encodeBody)
+import Helpers exposing (..)
 import Actions exposing (determineRespCmd)
 import Dict
 import Messages exposing (..)
@@ -20,7 +19,7 @@ update msg model =
             )
 
         LoadGroupComposerResp (Err _) ->
-            ( { model | loadingStatus = Finished }, biuLoadingFailed )
+            handleLoadingFailed model
 
         UpdateQueryString text ->
             ( { model | groupComposer = updateQueryString text model.groupComposer }, Cmd.none )

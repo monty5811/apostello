@@ -5,7 +5,9 @@ import Dict
 import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
+import Messages exposing (..)
 import Models exposing (..)
+import Updates.Notification exposing (createLoadingFailedNotification, createNotSavedNotification)
 import Regex
 
 
@@ -53,7 +55,7 @@ determineLoadingStatus resp =
 
 
 
--- increase page size gor next response
+-- increase page size for next response
 
 
 increasePageSize : String -> String
@@ -89,3 +91,17 @@ addNewItems newItems existingItemsDict =
 addItemToDic : { a | pk : Int } -> Dict.Dict Int { a | pk : Int } -> Dict.Dict Int { a | pk : Int }
 addItemToDic item existingItems =
     Dict.insert item.pk item existingItems
+
+
+
+-- update model after http errors:
+
+
+handleLoadingFailed : Model -> ( Model, Cmd Msg )
+handleLoadingFailed model =
+    ( { model | loadingStatus = Finished } |> createLoadingFailedNotification, Cmd.none )
+
+
+handleNotSaved : Model -> ( Model, Cmd Msg )
+handleNotSaved model =
+    ( createNotSavedNotification model, Cmd.none )

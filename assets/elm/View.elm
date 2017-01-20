@@ -17,6 +17,7 @@ import Views.KeywordTable as KT
 import Views.OutboundTable as OT
 import Views.RecipientTable as RT
 import Views.ScheduledSmsTable as SST
+import Views.Notification as T
 import Views.UserProfileTable as UPT
 import Views.Wall as W
 
@@ -26,18 +27,22 @@ import Views.Wall as W
 
 view : Model -> Html Msg
 view model =
-    case model.loadingStatus of
-        NotAsked ->
-            loadingView
+    let
+        mainView =
+            case model.loadingStatus of
+                NotAsked ->
+                    loadingView
 
-        WaitingForFirst ->
-            loadingView
+                WaitingForFirst ->
+                    loadingView
 
-        WaitingForSubsequent ->
-            loadingCompleteView model
+                WaitingForSubsequent ->
+                    loadingCompleteView model
 
-        Finished ->
-            loadingCompleteView model
+                Finished ->
+                    loadingCompleteView model
+    in
+        div [] ((T.view model) ++ [ mainView ])
 
 
 loadingCompleteView : Model -> Html Msg

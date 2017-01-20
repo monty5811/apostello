@@ -7,7 +7,7 @@ from django_q.models import Schedule
 
 import pytest
 from apostello import models
-from tests.functional_tests.utils import check_and_close_biu
+from tests.functional_tests.utils import check_and_close_msg
 
 
 @pytest.mark.django_db(transaction=True)
@@ -161,7 +161,7 @@ class TestButton:
         toggle_buttons = browser_in.find_elements_by_class_name('grey')
         toggle_buttons[0].click()
         sleep(driver_wait_time)
-        check_and_close_biu(browser_in, driver_wait_time)
+        check_and_close_msg(browser_in, driver_wait_time)
 
     def test_cancel_sms(
         self, live_server, browser_in, recipients, groups, driver_wait_time
@@ -209,8 +209,8 @@ class TestButton:
         self, live_server, browser_in, recipients, groups, driver_wait_time
     ):
         """Test editing group membership."""
-        non_member_xpath = '//*[@id="elmContainer"]/div/div/div[1]/div/div[2]/div/div'
-        member_xpath = '//*[@id="elmContainer"]/div/div/div[2]/div/div[2]/div/div'
+        non_member_xpath = '//*[@id="elmContainer"]/div/div/div/div[1]/div/div[2]/div/div'
+        member_xpath = '//*[@id="elmContainer"]/div/div/div/div[2]/div/div[2]/div/div'
         grp = groups['empty_group']
         browser_in.get(live_server + grp.get_absolute_url)
         # check all recipient are displayed

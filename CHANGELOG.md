@@ -7,7 +7,6 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Move wrench menu out of top menu and into a "floating action button"
-- Trim js/css payload
 
 ## [v1.14.0]
 ### Added

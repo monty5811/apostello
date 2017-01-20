@@ -1,10 +1,9 @@
 module Updates.ScheduledSmsTable exposing (update)
 
 import Actions exposing (determineRespCmd)
-import Biu exposing (..)
 import Decoders exposing (decodeAlwaysTrue)
 import DjangoSend exposing (post)
-import Helpers exposing (mergeItems, determineLoadingStatus, encodeBody)
+import Helpers exposing (..)
 import Http
 import Json.Encode as Encode
 import Messages exposing (..)
@@ -23,7 +22,7 @@ update msg model =
             )
 
         LoadScheduledSmsTableResp (Err _) ->
-            ( { model | loadingStatus = Finished }, biuLoadingFailed )
+            handleLoadingFailed model
 
         CancelSms pk ->
             ( { model | scheduledSmsTable = optCancelSms model.scheduledSmsTable pk }, cancelSms model.csrftoken pk )
@@ -32,7 +31,7 @@ update msg model =
             ( model, Cmd.none )
 
         ReceiveCancelSms (Err _) ->
-            ( model, biuNotSaved )
+            handleNotSaved model
 
 
 updateSms : ScheduledSmsTableModel -> List QueuedSms -> ScheduledSmsTableModel

@@ -8,19 +8,20 @@ import Time exposing (Time, second)
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ queuedSmsTime model.page
-        , reloadData model.page model.loadingStatus
+        [ reloadData model.page model.loadingStatus
+        , getCurrentTime
+        , cleanOldNotifications
         ]
 
 
-queuedSmsTime : Page -> Sub Msg
-queuedSmsTime page =
-    case page of
-        ScheduledSmsTable ->
-            Time.every (10 * second) (\t -> CurrentTime t)
+getCurrentTime : Sub Msg
+getCurrentTime =
+    Time.every second (\t -> CurrentTime t)
 
-        _ ->
-            Sub.none
+
+cleanOldNotifications : Sub Msg
+cleanOldNotifications =
+    Time.every second (\t -> NotificationMsg (CleanOldNotifications t))
 
 
 reloadData : Page -> LoadingStatus -> Sub Msg

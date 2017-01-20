@@ -1,10 +1,9 @@
 module Updates.GroupTable exposing (update)
 
 import Actions exposing (determineRespCmd)
-import Biu exposing (..)
 import Decoders exposing (recipientgroupDecoder)
 import DjangoSend exposing (post)
-import Helpers exposing (mergeItems, determineLoadingStatus, encodeBody)
+import Helpers exposing (..)
 import Http
 import Json.Encode as Encode
 import Messages exposing (..)
@@ -23,15 +22,18 @@ update msg model =
             )
 
         LoadGroupTableResp (Err _) ->
-            ( { model | loadingStatus = Finished }, biuLoadingFailed )
+            handleLoadingFailed model
 
         ToggleGroupArchive isArchived pk ->
             ( { model | groupTable = optArchiveGroup model.groupTable pk }
             , toggleRecipientGroupArchive model.csrftoken isArchived pk
             )
 
-        ReceiveToggleGroupArchive recipient ->
+        ReceiveToggleGroupArchive (Ok _) ->
             ( model, Cmd.none )
+
+        ReceiveToggleGroupArchive (Err _) ->
+            handleNotSaved model
 
 
 updateGroups : GroupTableModel -> ApostelloResponse RecipientGroup -> GroupTableModel

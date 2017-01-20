@@ -1,4 +1,3 @@
-import biu from 'biu.js';
 import Cookies from 'js-cookie';
 
 function renderElm() {
@@ -11,16 +10,12 @@ function renderElm() {
     }
 
     const Elm = require('../../elm/Main.elm');
-    const app = Elm.Main.embed(node,
+    Elm.Main.embed(node,
       { pageId,
         dataUrl: node.getAttribute('src'),
         csrftoken: Cookies.get('csrftoken'),
         fabData: null,
       },
-    );
-    // setup ports
-    app.ports.showMessage.subscribe(
-      msg => biu(msg.content, { type: msg.msgType, autoHide: false }),
     );
   }
 }

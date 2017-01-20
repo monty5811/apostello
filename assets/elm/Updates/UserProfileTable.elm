@@ -1,10 +1,9 @@
 module Updates.UserProfileTable exposing (update)
 
 import Actions exposing (determineRespCmd)
-import Biu exposing (..)
 import Decoders exposing (userprofileDecoder)
 import DjangoSend exposing (post)
-import Helpers exposing (mergeItems, determineLoadingStatus, encodeBody)
+import Helpers exposing (..)
 import Http
 import Json.Encode as Encode
 import Messages exposing (..)
@@ -23,7 +22,7 @@ update msg model =
             )
 
         LoadUserProfileTableResp (Err _) ->
-            ( { model | loadingStatus = Finished }, biuLoadingFailed )
+            handleLoadingFailed model
 
         ToggleField profile ->
             ( { model
@@ -40,7 +39,7 @@ update msg model =
             )
 
         ReceiveToggleProfile (Err _) ->
-            ( model, biuNotSaved )
+            handleNotSaved model
 
 
 updateUserProfiles : UserProfileTableModel -> List UserProfile -> UserProfileTableModel

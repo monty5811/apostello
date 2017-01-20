@@ -4,7 +4,6 @@
   "description": "",
   "main": "gulpfile.js",
   "dependencies": {
-    "biu.js": "1.2.0",
     "datetimepicker": "0.1.37",
     "elm": "0.18.0",
     "intro.js": "2.4.0",

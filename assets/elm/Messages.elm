@@ -25,7 +25,14 @@ type Msg
     | KeyRespTableMsg KeyRespTableMsg
     | FirstRunMsg FirstRunMsg
     | FabMsg FabMsg
+    | NotificationMsg NotificationMsg
     | CurrentTime Time.Time
+
+
+type NotificationMsg
+    = NewNotification NotificationType String
+    | RemoveNotification Notification
+    | CleanOldNotifications Time.Time
 
 
 type FabMsg

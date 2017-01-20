@@ -1,8 +1,7 @@
 module Updates.OutboundTable exposing (update)
 
 import Actions exposing (determineRespCmd)
-import Biu exposing (..)
-import Helpers exposing (mergeItems, determineLoadingStatus, encodeBody)
+import Helpers exposing (..)
 import Messages exposing (..)
 import Models exposing (..)
 
@@ -19,7 +18,7 @@ update msg model =
             )
 
         LoadOutboundTableResp (Err _) ->
-            ( { model | loadingStatus = Finished }, biuLoadingFailed )
+            handleLoadingFailed model
 
 
 updateSms : OutboundTableModel -> ApostelloResponse SmsOutbound -> OutboundTableModel

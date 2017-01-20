@@ -29,7 +29,8 @@ type alias Model =
     , keyRespTable : KeyRespTableModel
     , firstRun : FirstRunModel
     , fabModel : FabModel
-    , currentTime : Maybe Time.Time
+    , notifications : List Notification
+    , currentTime : Time.Time
     }
 
 
@@ -53,8 +54,9 @@ initialModel csrftoken page incomingUrl fabFlags =
     , keyRespTable = initialKeyRespModel
     , firstRun = initialFirstRunModel
     , fabModel = initialFabModel fabFlags
+    , notifications = []
     , dataUrl = incomingUrl
-    , currentTime = Nothing
+    , currentTime = 0
     }
 
 
@@ -77,6 +79,21 @@ type alias Flags =
     , dataUrl : String
     , fabData : Maybe FabFlags
     }
+
+
+type alias Notification =
+    { type_ : NotificationType
+    , text : String
+    , id : Int
+    , created : Time.Time
+    }
+
+
+type NotificationType
+    = InfoNotification
+    | SuccessNotification
+    | WarningNotification
+    | ErrorNotification
 
 
 type alias FabFlags =

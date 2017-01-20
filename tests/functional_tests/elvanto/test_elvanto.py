@@ -3,7 +3,7 @@ from time import sleep
 import pytest
 import vcr
 from elvanto.models import ElvantoGroup
-from tests.functional_tests.utils import check_and_close_biu
+from tests.functional_tests.utils import check_and_close_msg
 
 my_vcr = vcr.VCR(record_mode='none', ignore_localhost=True)
 
@@ -45,7 +45,7 @@ class TestElvantoImport:
         # enable a group
         sleep(driver_wait_time)
         group_button = browser_in.find_elements_by_xpath(
-            '//*[@id="elmContainer"]/div[1]/div[2]/table/tbody/tr[1]/td[3]/a'
+            '//*[@id="elmContainer"]/div/div/div[2]/table/tbody/tr[1]/td[3]/a'
         )[0]
         group_button.click()
         sleep(driver_wait_time)
@@ -57,8 +57,8 @@ class TestElvantoImport:
         sleep(driver_wait_time)
         pull_button = browser_in.find_elements_by_id('pull_button')[0]
         pull_button.click()
-        sleep(driver_wait_time)
-        check_and_close_biu(browser_in, driver_wait_time)
+        # sleep(driver_wait_time)
+        check_and_close_msg(browser_in, driver_wait_time)
 
     @my_vcr.use_cassette(
         'tests/fixtures/vcr_cass/elv.yaml', filter_headers=['authorization']
@@ -71,5 +71,5 @@ class TestElvantoImport:
         browser_in.get(live_server + uri)
         fetch_button = browser_in.find_elements_by_id('fetch_button')[0]
         fetch_button.click()
-        sleep(driver_wait_time)
-        check_and_close_biu(browser_in, driver_wait_time)
+        # sleep(driver_wait_time)
+        check_and_close_msg(browser_in, driver_wait_time)
