@@ -1,13 +1,13 @@
 module Tests exposing (..)
 
-import Common.Models exposing (..)
 import Expect
-import GroupComposer.Helpers exposing (..)
-import GroupComposer.Models exposing (..)
+import Fuzz exposing (..)
 import GroupComposer.Parser exposing (..)
+import Views.GroupComposer exposing (..)
+import Helpers exposing (..)
+import Models exposing (..)
 import Set exposing (Set)
 import Test exposing (..)
-import Fuzz exposing (..)
 
 
 john : RecipientSimple

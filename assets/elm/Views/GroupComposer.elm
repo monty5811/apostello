@@ -1,4 +1,4 @@
-module Views.GroupComposer exposing (view)
+module Views.GroupComposer exposing (view, runQuery)
 
 import GroupComposer.Parser exposing (..)
 import Html exposing (..)
