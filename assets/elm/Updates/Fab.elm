@@ -1,4 +1,4 @@
-port module Updates.Fab exposing (update)
+module Updates.Fab exposing (update)
 
 import Decoders exposing (decodeAlwaysTrue)
 import DjangoSend exposing (post)
@@ -7,6 +7,7 @@ import Http
 import Json.Encode as Encode
 import Messages exposing (..)
 import Models exposing (..)
+import Navigation
 
 
 update : FabMsg -> Model -> ( Model, Cmd Msg )
@@ -26,7 +27,7 @@ update msg model =
         ReceiveArchiveResp (Ok _) ->
             case model.fabModel.archiveButton of
                 Just ab ->
-                    ( model, redirectToUrl ab.redirectUrl )
+                    ( model, Navigation.load ab.redirectUrl )
 
                 Nothing ->
                     ( model, Cmd.none )
@@ -53,6 +54,3 @@ archiveItem csrftoken r =
     in
         post r.postUrl body csrftoken decodeAlwaysTrue
             |> Http.send (FabMsg << ReceiveArchiveResp)
-
-
-port redirectToUrl : String -> Cmd msg

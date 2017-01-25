@@ -23,7 +23,7 @@ function renderElm() {
 
   if (node !== null) {
     const Elm = require('../../elm/Main.elm');
-    const app = Elm.Main.embed(node,
+    Elm.Main.embed(node,
       { pageId: 'fab',
         dataUrl: '',
         csrftoken: Cookies.get('csrftoken'),
@@ -33,8 +33,6 @@ function renderElm() {
         },
       },
     );
-    // setup ports
-    app.ports.redirectToUrl.subscribe(url => redirect(url));
   }
 }
 
