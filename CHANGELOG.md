@@ -3,12 +3,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [v1.16.0]
+
 ### Added
 - Support for brackets in group composer e.g. `(1|2) - (3|4)` now works
 
 ### Changed
 - Move wrench menu out of top menu and into a "floating action button"
 - Replace react with elm on frontend
+
+
+*Note* v1.15.0 failed to deploy and has been removed.
 
 ## [v1.14.0]
 ### Added
