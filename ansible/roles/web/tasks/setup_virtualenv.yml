@@ -7,8 +7,11 @@
   command: pyvenv-3.4 "{{ virtualenv_path }}"
            creates={{ virtualenv_path }}/bin/activate
 
+- name: Update pip and setuptools
+  command: "{{ virtualenv_path }}/bin/pip install -U pip setuptools"
+
 - name: Ensure gunicorn is installed
-  pip: virtualenv={{ virtualenv_path }} name=gunicorn
+  command: "{{ virtualenv_path }}/bin/pip install gunicorn"
 
 - name: Create the Gunicorn script file
   template: src=gunicorn_start.j2
