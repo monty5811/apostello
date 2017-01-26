@@ -45,8 +45,9 @@ def keyword_csv(request, pk):
     keyword = get_object_or_404(Keyword, pk=pk)
     # Create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'
-             ] = 'attachment; filename="{0}.csv"'.format(keyword.keyword)
+    response['Content-Disposition'] = 'attachment; filename="{0}.csv"'.format(
+        keyword.keyword
+    )
     writer = csv.writer(response)
     writer.writerow(['From', 'Time', 'Keyword', 'Message'])
     # write response rows

@@ -532,8 +532,8 @@ class Keyword(models.Model):
         elif keyword == 'No Match':
             return "#B6B6B6"
         else:
-            return "#" + hashlib.md5(str(keyword).encode('utf-8')).hexdigest(
-            )[:6]
+            return "#" + hashlib.md5(str(keyword).encode('utf-8')
+                                     ).hexdigest()[:6]
 
     @staticmethod
     def get_log_link(k):

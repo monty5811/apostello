@@ -85,8 +85,8 @@ def login(d):
     email_box.send_keys('test@example.com')
     password_box = d.find_elements_by_name('password')[0]
     password_box.send_keys('apostello')
-    login_button = d.find_elements_by_xpath('/html/body/div/div/form/button')[0
-                                                                              ]
+    login_button = d.find_elements_by_xpath('/html/body/div/div/form/button'
+                                            )[0]
     login_button.click()
 
 
