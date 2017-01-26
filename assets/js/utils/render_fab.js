@@ -2,10 +2,6 @@ import Cookies from 'js-cookie';
 
 /* global fabLinks */
 
-function redirect(url) {
-  window.location.href = url;
-}
-
 function getArchiveButtonData() {
   const buttonDiv = document.getElementById('toggle_button');
   if (buttonDiv === null) {
