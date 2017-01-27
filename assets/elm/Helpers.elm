@@ -1,6 +1,7 @@
 module Helpers exposing (..)
 
 import Decoders exposing (..)
+import Date
 import Dict
 import Http
 import Json.Decode as Decode
@@ -105,3 +106,17 @@ handleLoadingFailed model =
 handleNotSaved : Model -> ( Model, Cmd Msg )
 handleNotSaved model =
     ( createNotSavedNotification model, Cmd.none )
+
+
+compareByTR : { a | time_received : String } -> Float
+compareByTR sms =
+    let
+        date =
+            Date.fromString sms.time_received
+    in
+        case date of
+            Ok d ->
+                Date.toTime d
+
+            Err _ ->
+                toFloat 1

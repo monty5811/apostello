@@ -32,8 +32,8 @@ updateGroups resp model =
             mergeItems model.groups resp.results
     in
         { model
-            | groups = newGroups
-            , people = (collectPeople newGroups)
+            | groups = newGroups |> List.sortBy .name
+            , people = (collectPeople newGroups) |> List.sortBy .full_name
         }
 
 

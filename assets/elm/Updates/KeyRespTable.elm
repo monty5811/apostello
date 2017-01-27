@@ -45,7 +45,12 @@ update msg model =
 
 updateSms : KeyRespTableModel -> SmsInbounds -> KeyRespTableModel
 updateSms model newSms =
-    { model | sms = mergeItems model.sms newSms }
+    { model
+        | sms =
+            mergeItems model.sms newSms
+                |> List.sortBy compareByTR
+                |> List.reverse
+    }
 
 
 optToggleDealtWith : KeyRespTableModel -> Int -> KeyRespTableModel

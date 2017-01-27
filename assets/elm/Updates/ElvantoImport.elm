@@ -60,7 +60,11 @@ update msg model =
 
 updateGroups : ElvantoImportModel -> ElvantoGroups -> ElvantoImportModel
 updateGroups model newGroups =
-    { model | groups = mergeItems model.groups newGroups }
+    { model
+        | groups =
+            mergeItems model.groups newGroups
+                |> List.sortBy .name
+    }
 
 
 pullGroups : String -> Cmd Msg

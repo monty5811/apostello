@@ -36,7 +36,12 @@ update msg model =
 
 updateSms : WallModel -> List SmsInboundSimple -> WallModel
 updateSms model newSms =
-    { model | sms = mergeItems model.sms newSms }
+    { model
+        | sms =
+            mergeItems model.sms newSms
+                |> List.sortBy compareByTR
+                |> List.reverse
+    }
 
 
 toggleWallDisplay : CSRFToken -> Bool -> Int -> Cmd Msg

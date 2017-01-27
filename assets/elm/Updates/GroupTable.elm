@@ -38,7 +38,11 @@ update msg model =
 
 updateGroups : GroupTableModel -> ApostelloResponse RecipientGroup -> GroupTableModel
 updateGroups model resp =
-    { model | groups = mergeItems model.groups resp.results }
+    { model
+        | groups =
+            mergeItems model.groups resp.results
+                |> List.sortBy .name
+    }
 
 
 optArchiveGroup : GroupTableModel -> Int -> GroupTableModel

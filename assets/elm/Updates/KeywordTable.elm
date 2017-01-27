@@ -45,7 +45,7 @@ optArchiveKeyword model pk =
 
 updateKeywords : KeywordTableModel -> ApostelloResponse Keyword -> KeywordTableModel
 updateKeywords model resp =
-    { model | keywords = mergeItems model.keywords resp.results }
+    { model | keywords = mergeItems model.keywords resp.results |> List.sortBy .keyword }
 
 
 toggleKeywordArchive : CSRFToken -> Bool -> Int -> Cmd Msg

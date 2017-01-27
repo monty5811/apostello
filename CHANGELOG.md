@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [v1.16.1]
+
+### Fixed
+
+- Sort tables properly 
+
 ## [v1.16.0]
 
 ### Added

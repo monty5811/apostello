@@ -38,7 +38,11 @@ update msg model =
 
 updateRecipients : RecipientTableModel -> List Recipient -> RecipientTableModel
 updateRecipients model newRecipients =
-    { model | recipients = mergeItems model.recipients newRecipients }
+    { model
+        | recipients =
+            mergeItems model.recipients newRecipients
+                |> List.sortBy .last_name
+    }
 
 
 optRemoveRecipient : RecipientTableModel -> Int -> RecipientTableModel

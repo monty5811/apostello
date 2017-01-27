@@ -36,7 +36,12 @@ update msg model =
 
 updateSms : InboundTableModel -> SmsInbounds -> InboundTableModel
 updateSms model newSms =
-    { model | sms = mergeItems model.sms newSms }
+    { model
+        | sms =
+            mergeItems model.sms newSms
+                |> List.sortBy compareByTR
+                |> List.reverse
+    }
 
 
 reprocessSms : CSRFToken -> Int -> Cmd Msg

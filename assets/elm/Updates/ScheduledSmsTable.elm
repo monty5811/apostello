@@ -1,6 +1,7 @@
 module Updates.ScheduledSmsTable exposing (update)
 
 import Actions exposing (determineRespCmd)
+import Date
 import Decoders exposing (decodeAlwaysTrue)
 import DjangoSend exposing (post)
 import Helpers exposing (..)
@@ -36,7 +37,11 @@ update msg model =
 
 updateSms : ScheduledSmsTableModel -> List QueuedSms -> ScheduledSmsTableModel
 updateSms model newSms =
-    { model | sms = mergeItems model.sms newSms }
+    { model
+        | sms =
+            mergeItems model.sms newSms
+                |> List.sortBy (Date.toTime << .time_to_send)
+    }
 
 
 optCancelSms : ScheduledSmsTableModel -> Int -> ScheduledSmsTableModel

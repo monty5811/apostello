@@ -44,7 +44,11 @@ update msg model =
 
 updateUserProfiles : UserProfileTableModel -> List UserProfile -> UserProfileTableModel
 updateUserProfiles model profiles =
-    { model | userprofiles = mergeItems model.userprofiles profiles }
+    { model
+        | userprofiles =
+            mergeItems model.userprofiles profiles
+                |> List.sortBy (.email << .user)
+    }
 
 
 toggleField : CSRFToken -> UserProfile -> Cmd Msg
