@@ -6,7 +6,7 @@ import Html.Events exposing (onClick)
 import Messages exposing (..)
 import Models exposing (..)
 import Regex
-import Views.FilteringTable exposing (filteringTable)
+import Views.FilteringTable exposing (uiTable)
 
 
 -- Main view
@@ -24,7 +24,7 @@ view filterRegex model =
                     ]
                 ]
     in
-        filteringTable filterRegex smsRow model.sms head "ui table"
+        uiTable head filterRegex smsRow model.sms
 
 
 smsRow : SmsInboundSimple -> Html Msg

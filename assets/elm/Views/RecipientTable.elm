@@ -6,7 +6,7 @@ import Messages exposing (..)
 import Models exposing (..)
 import Regex
 import Views.Common exposing (archiveCell)
-import Views.FilteringTable exposing (filteringTable)
+import Views.FilteringTable exposing (uiTable)
 
 
 -- Main view
@@ -25,7 +25,7 @@ view filterRegex model =
                     ]
                 ]
     in
-        filteringTable filterRegex recipientRow model.recipients head "ui table"
+        uiTable head filterRegex recipientRow model.recipients
 
 
 recipientRow : Recipient -> Html Msg

@@ -101,10 +101,9 @@ toggleGroupMembership : CSRFToken -> String -> Int -> Bool -> Cmd Msg
 toggleGroupMembership csrftoken url pk isMember =
     let
         body =
-            encodeBody
-                [ ( "member", Encode.bool isMember )
-                , ( "contactPk", Encode.int pk )
-                ]
+            [ ( "member", Encode.bool isMember )
+            , ( "contactPk", Encode.int pk )
+            ]
     in
-        post url body csrftoken recipientgroupDecoder
+        post csrftoken url body recipientgroupDecoder
             |> Http.send (GroupMemberSelectMsg << ReceiveToggleMembership)

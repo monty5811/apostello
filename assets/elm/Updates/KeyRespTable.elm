@@ -2,12 +2,13 @@ module Updates.KeyRespTable exposing (update)
 
 import Actions exposing (determineRespCmd)
 import Decoders exposing (smsinboundDecoder)
-import DjangoSend exposing (post)
+import DjangoSend exposing (archivePost, post)
 import Helpers exposing (..)
 import Http
 import Json.Encode as Encode
 import Messages exposing (..)
 import Models exposing (..)
+import Urls exposing (..)
 
 
 update : KeyRespTableMsg -> Model -> ( Model, Cmd Msg )
@@ -48,8 +49,7 @@ updateSms model newSms =
     { model
         | sms =
             mergeItems model.sms newSms
-                |> List.sortBy compareByTR
-                |> List.reverse
+                |> sortByTimeReceived
     }
 
 
@@ -78,25 +78,18 @@ optArchiveSms model pk =
 
 toggleSmsArchive : CSRFToken -> Bool -> Int -> Cmd Msg
 toggleSmsArchive csrftoken isArchived pk =
-    let
-        url =
-            "/api/v1/sms/in/" ++ (toString pk)
-
-        body =
-            encodeBody [ ( "archived", Encode.bool isArchived ) ]
-    in
-        post url body csrftoken smsinboundDecoder
-            |> Http.send (KeyRespTableMsg << ReceiveToggleInboundSmsArchive)
+    archivePost csrftoken (smsInboundUrl pk) isArchived smsinboundDecoder
+        |> Http.send (KeyRespTableMsg << ReceiveToggleInboundSmsArchive)
 
 
 toggleSmsDealtWith : CSRFToken -> Bool -> Int -> Cmd Msg
 toggleSmsDealtWith csrftoken isDealtWith pk =
     let
         url =
-            "/api/v1/sms/in/" ++ (toString pk)
+            smsInboundUrl pk
 
         body =
-            encodeBody [ ( "dealt_with", Encode.bool isDealtWith ) ]
+            [ ( "dealt_with", Encode.bool isDealtWith ) ]
     in
-        post url body csrftoken smsinboundDecoder
+        post csrftoken url body smsinboundDecoder
             |> Http.send (KeyRespTableMsg << ReceiveToggleInboundSmsDealtWith)

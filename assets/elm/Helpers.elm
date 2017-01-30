@@ -5,19 +5,10 @@ import Date
 import Dict
 import Http
 import Json.Decode as Decode
-import Json.Encode as Encode
 import Messages exposing (..)
 import Models exposing (..)
 import Updates.Notification exposing (createLoadingFailedNotification, createNotSavedNotification)
 import Regex
-
-
-encodeBody : List ( String, Encode.Value ) -> Http.Body
-encodeBody data =
-    data
-        |> Encode.object
-        |> Http.jsonBody
-
 
 
 -- Fetch data from server
@@ -108,11 +99,18 @@ handleNotSaved model =
     ( createNotSavedNotification model, Cmd.none )
 
 
-compareByTR : { a | time_received : String } -> Float
-compareByTR sms =
+sortByTimeReceived : List { a | time_received : String } -> List { a | time_received : String }
+sortByTimeReceived items =
+    items
+        |> List.sortBy compareTR
+        |> List.reverse
+
+
+compareTR : { a | time_received : String } -> Float
+compareTR item =
     let
         date =
-            Date.fromString sms.time_received
+            Date.fromString item.time_received
     in
         case date of
             Ok d ->

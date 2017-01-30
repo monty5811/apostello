@@ -8,6 +8,7 @@ import Http
 import Json.Encode as Encode
 import Messages exposing (..)
 import Models exposing (..)
+import Urls exposing (..)
 
 
 update : UserProfileTableMsg -> Model -> ( Model, Cmd Msg )
@@ -55,21 +56,13 @@ toggleField : CSRFToken -> UserProfile -> Cmd Msg
 toggleField csrftoken profile =
     let
         url =
-            "/api/v1/users/profiles/" ++ (toString profile.pk)
+            userprofileUrl profile.pk
 
         body =
-            encodeUserProfile profile
-                |> Http.jsonBody
+            [ ( "user_profile", encodeUserProfileUser_profile <| profile ) ]
     in
-        post url body csrftoken userprofileDecoder
+        post csrftoken (userprofileUrl profile.pk) body userprofileDecoder
             |> Http.send (UserProfileTableMsg << ReceiveToggleProfile)
-
-
-encodeUserProfile : UserProfile -> Encode.Value
-encodeUserProfile record =
-    Encode.object
-        [ ( "user_profile", encodeUserProfileUser_profile <| record )
-        ]
 
 
 encodeUserProfileUser_profileUser : UserProfileUser_profileUser -> Encode.Value

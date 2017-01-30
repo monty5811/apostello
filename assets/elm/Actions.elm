@@ -7,17 +7,6 @@ import Messages exposing (..)
 import Models exposing (..)
 
 
--- handle receive apostello data
-
-
-receiveResp : ApostelloResponse a -> (ApostelloResponse a -> Model -> Model) -> Model -> ( Model, Cmd Msg )
-receiveResp resp updateModelWithData model =
-    ( { model | loadingStatus = determineLoadingStatus resp }
-        |> updateModelWithData resp
-    , determineRespCmd model.page resp
-    )
-
-
 fetchData : Page -> String -> Cmd Msg
 fetchData page dataUrl =
     case page of

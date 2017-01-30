@@ -8,6 +8,7 @@ import Http
 import Json.Encode as Encode
 import Messages exposing (..)
 import Models exposing (..)
+import Urls exposing (..)
 
 
 update : WallMsg -> Model -> ( Model, Cmd Msg )
@@ -39,8 +40,7 @@ updateSms model newSms =
     { model
         | sms =
             mergeItems model.sms newSms
-                |> List.sortBy compareByTR
-                |> List.reverse
+                |> sortByTimeReceived
     }
 
 
@@ -48,10 +48,10 @@ toggleWallDisplay : CSRFToken -> Bool -> Int -> Cmd Msg
 toggleWallDisplay csrftoken isDisplayed pk =
     let
         url =
-            "/api/v1/sms/in/" ++ (toString pk)
+            smsInboundUrl pk
 
         body =
-            encodeBody [ ( "display_on_wall", Encode.bool isDisplayed ) ]
+            [ ( "display_on_wall", Encode.bool isDisplayed ) ]
     in
-        post url body csrftoken smsinboundsimpleDecoder
+        post csrftoken url body smsinboundsimpleDecoder
             |> Http.send (WallMsg << ReceiveToggleWallDisplay)

@@ -8,7 +8,7 @@ import Messages exposing (..)
 import Models exposing (..)
 import Regex
 import Time
-import Views.FilteringTable exposing (filteringTable)
+import Views.FilteringTable exposing (uiTable)
 
 
 -- Main view
@@ -33,7 +33,7 @@ view filterRegex currentTime model =
             model.sms
                 |> List.filter (onlyFuture currentTime)
     in
-        filteringTable filterRegex smsRow sms head "ui table"
+        uiTable head filterRegex smsRow sms
 
 
 onlyFuture : Time.Time -> QueuedSms -> Bool

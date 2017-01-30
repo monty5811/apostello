@@ -6,7 +6,7 @@ import Messages exposing (..)
 import Models exposing (..)
 import Regex
 import Views.Common exposing (archiveCell)
-import Views.FilteringTable exposing (filteringTable)
+import Views.FilteringTable exposing (uiTable)
 
 
 -- Main view
@@ -25,7 +25,7 @@ view filterRegex model =
                     ]
                 ]
     in
-        filteringTable filterRegex groupRow model.groups head "ui table"
+        uiTable head filterRegex groupRow model.groups
 
 
 groupRow : RecipientGroup -> Html Msg

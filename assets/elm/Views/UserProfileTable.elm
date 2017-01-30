@@ -30,7 +30,7 @@ view filterRegex model =
                     ]
                 ]
     in
-        filteringTable filterRegex userprofileRow model.userprofiles head "ui collapsing celled very basic table"
+        filteringTable "ui collapsing celled very basic table" head filterRegex userprofileRow model.userprofiles
 
 
 userprofileRow : UserProfile -> Html Msg

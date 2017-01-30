@@ -10,6 +10,7 @@ import Json.Encode as Encode
 import Messages exposing (..)
 import Models exposing (..)
 import Updates.Notification exposing (createInfoNotification, createSuccessNotification)
+import Urls exposing (..)
 
 
 update : ElvantoMsg -> Model -> ( Model, Cmd Msg )
@@ -43,12 +44,12 @@ update msg model =
 
         PullGroups ->
             ( createInfoNotification model "Groups are being imported, it may take a couple of minutes"
-            , pullGroups model.csrftoken
+            , buttonReq model.csrftoken "/api/v1/elvanto/group_pull/"
             )
 
         FetchGroups ->
             ( createSuccessNotification model "Groups are being fetched, it may take a couple of minutes"
-            , fetchGroups model.csrftoken
+            , buttonReq model.csrftoken "/api/v1/elvanto/group_fetch/"
             )
 
         ReceiveButtonResp (Ok _) ->
@@ -67,15 +68,9 @@ updateGroups model newGroups =
     }
 
 
-pullGroups : String -> Cmd Msg
-pullGroups csrftoken =
-    post "/api/v1/elvanto/group_pull/" (encodeBody []) csrftoken (Decode.succeed True)
-        |> Http.send (ElvantoMsg << ReceiveButtonResp)
-
-
-fetchGroups : String -> Cmd Msg
-fetchGroups csrftoken =
-    post "/api/v1/elvanto/group_fetch/" (encodeBody []) csrftoken (Decode.succeed True)
+buttonReq : CSRFToken -> String -> Cmd Msg
+buttonReq csrftoken url =
+    post csrftoken url [] (Decode.succeed True)
         |> Http.send (ElvantoMsg << ReceiveButtonResp)
 
 
@@ -83,12 +78,12 @@ toggleElvantoGroupSync : CSRFToken -> ElvantoGroup -> Cmd Msg
 toggleElvantoGroupSync csrftoken group =
     let
         url =
-            "/api/v1/elvanto/group/" ++ (toString group.pk)
+            elvantoGroupUrl group.pk
 
         body =
-            encodeBody [ ( "sync", Encode.bool group.sync ) ]
+            [ ( "sync", Encode.bool group.sync ) ]
     in
-        post url body csrftoken elvantogroupDecoder
+        post csrftoken url body elvantogroupDecoder
             |> Http.send (ElvantoMsg << ReceiveToggleGroupSync)
 
 

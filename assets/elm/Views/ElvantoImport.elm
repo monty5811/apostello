@@ -30,7 +30,7 @@ view filterRegex model =
                 , pullButton
                 ]
             , br [] []
-            , filteringTable filterRegex groupRow model.groups head "ui striped compact definition table"
+            , filteringTable "ui striped compact definition table" head filterRegex groupRow model.groups
             ]
 
 

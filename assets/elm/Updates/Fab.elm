@@ -1,10 +1,8 @@
 module Updates.Fab exposing (update)
 
 import Decoders exposing (decodeAlwaysTrue)
-import DjangoSend exposing (post)
-import Helpers exposing (encodeBody)
+import DjangoSend exposing (archivePost)
 import Http
-import Json.Encode as Encode
 import Messages exposing (..)
 import Models exposing (..)
 import Navigation
@@ -48,9 +46,5 @@ toggleFabView model =
 
 archiveItem : CSRFToken -> ArchiveButton -> Cmd Msg
 archiveItem csrftoken r =
-    let
-        body =
-            encodeBody [ ( "archived", Encode.bool r.isArchived ) ]
-    in
-        post r.postUrl body csrftoken decodeAlwaysTrue
-            |> Http.send (FabMsg << ReceiveArchiveResp)
+    archivePost csrftoken r.postUrl r.isArchived decodeAlwaysTrue
+        |> Http.send (FabMsg << ReceiveArchiveResp)

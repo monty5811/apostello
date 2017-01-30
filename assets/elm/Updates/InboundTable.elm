@@ -8,6 +8,7 @@ import Http
 import Json.Encode as Encode
 import Messages exposing (..)
 import Models exposing (..)
+import Urls exposing (..)
 
 
 update : InboundTableMsg -> Model -> ( Model, Cmd Msg )
@@ -39,8 +40,7 @@ updateSms model newSms =
     { model
         | sms =
             mergeItems model.sms newSms
-                |> List.sortBy compareByTR
-                |> List.reverse
+                |> sortByTimeReceived
     }
 
 
@@ -48,10 +48,10 @@ reprocessSms : CSRFToken -> Int -> Cmd Msg
 reprocessSms csrftoken pk =
     let
         url =
-            "/api/v1/sms/in/" ++ (toString pk)
+            smsInboundUrl pk
 
         body =
-            encodeBody [ ( "reingest", Encode.bool True ) ]
+            [ ( "reingest", Encode.bool True ) ]
     in
-        post url body csrftoken smsinboundDecoder
+        post csrftoken url body smsinboundDecoder
             |> Http.send (InboundTableMsg << ReceiveReprocessSms)

@@ -28,7 +28,7 @@ view filterRegex model =
                     ]
                 ]
     in
-        filteringTable filterRegex keywordRow model.keywords head "ui striped definition table"
+        filteringTable "ui striped definition table" head filterRegex keywordRow model.keywords
 
 
 keywordRow : Keyword -> Html Msg

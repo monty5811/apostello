@@ -20,8 +20,8 @@ textToRegex text =
         |> Regex.caseInsensitive
 
 
-filteringTable : Regex.Regex -> (a -> Html Msg) -> List a -> Html Msg -> String -> Html Msg
-filteringTable filterRegex rowConstructor data tableHead tableClass =
+filteringTable : String -> Html Msg -> Regex.Regex -> (a -> Html Msg) -> List a -> Html Msg
+filteringTable tableClass tableHead filterRegex rowConstructor data =
     let
         rows =
             data
@@ -43,3 +43,8 @@ filteringTable filterRegex rowConstructor data tableHead tableClass =
                 , tbody [] rows
                 ]
             ]
+
+
+uiTable : Html Msg -> Regex.Regex -> (a -> Html Msg) -> List a -> Html Msg
+uiTable tableHead filterRegex rowConstructor data =
+    filteringTable "ui table" tableHead filterRegex rowConstructor data

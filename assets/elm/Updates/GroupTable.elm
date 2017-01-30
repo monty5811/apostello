@@ -2,12 +2,12 @@ module Updates.GroupTable exposing (update)
 
 import Actions exposing (determineRespCmd)
 import Decoders exposing (recipientgroupDecoder)
-import DjangoSend exposing (post)
+import DjangoSend exposing (archivePost)
 import Helpers exposing (..)
 import Http
-import Json.Encode as Encode
 import Messages exposing (..)
 import Models exposing (..)
+import Urls exposing (..)
 
 
 update : GroupTableMsg -> Model -> ( Model, Cmd Msg )
@@ -52,12 +52,5 @@ optArchiveGroup model pk =
 
 toggleRecipientGroupArchive : CSRFToken -> Bool -> Int -> Cmd Msg
 toggleRecipientGroupArchive csrftoken isArchived pk =
-    let
-        url =
-            "/api/v1/groups/" ++ (toString pk) ++ "?fields!members,nonmembers"
-
-        body =
-            encodeBody [ ( "archived", Encode.bool isArchived ) ]
-    in
-        post url body csrftoken recipientgroupDecoder
-            |> Http.send (GroupTableMsg << ReceiveToggleGroupArchive)
+    archivePost csrftoken (groupsUrl_quick pk) isArchived recipientgroupDecoder
+        |> Http.send (GroupTableMsg << ReceiveToggleGroupArchive)

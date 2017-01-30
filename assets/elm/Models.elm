@@ -34,12 +34,12 @@ type alias Model =
     }
 
 
-initialModel : CSRFToken -> Page -> String -> Maybe FabFlags -> Model
+initialModel : String -> Page -> String -> Maybe FabFlags -> Model
 initialModel csrftoken page incomingUrl fabFlags =
     { page = page
     , loadingStatus = initialLoadingStatus page
     , filterRegex = Regex.regex ""
-    , csrftoken = csrftoken
+    , csrftoken = CSRFToken csrftoken
     , outboundTable = initialOutboundTableModel
     , inboundTable = initialInboundTableModel
     , groupTable = initialGroupTableModel
@@ -75,7 +75,7 @@ initialLoadingStatus page =
 
 type alias Flags =
     { pageId : String
-    , csrftoken : CSRFToken
+    , csrftoken : String
     , dataUrl : String
     , fabData : Maybe FabFlags
     }
@@ -127,8 +127,8 @@ type LoadingStatus
     | Finished
 
 
-type alias CSRFToken =
-    String
+type CSRFToken
+    = CSRFToken String
 
 
 type alias FabModel =

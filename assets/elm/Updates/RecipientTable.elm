@@ -2,12 +2,12 @@ module Updates.RecipientTable exposing (update)
 
 import Actions exposing (determineRespCmd)
 import Decoders exposing (recipientDecoder)
-import DjangoSend exposing (post)
+import DjangoSend exposing (archivePost)
 import Helpers exposing (..)
 import Http
-import Json.Encode as Encode
 import Messages exposing (..)
 import Models exposing (..)
+import Urls exposing (..)
 
 
 update : RecipientTableMsg -> Model -> ( Model, Cmd Msg )
@@ -52,12 +52,5 @@ optRemoveRecipient model pk =
 
 toggleRecipientArchive : CSRFToken -> Bool -> Int -> Cmd Msg
 toggleRecipientArchive csrftoken isArchived pk =
-    let
-        url =
-            "/api/v1/recipients/" ++ (toString pk)
-
-        body =
-            encodeBody [ ( "archived", Encode.bool isArchived ) ]
-    in
-        post url body csrftoken recipientDecoder
-            |> Http.send (RecipientTableMsg << ReceiveRecipientToggleArchive)
+    archivePost csrftoken (recipientUrl pk) isArchived recipientDecoder
+        |> Http.send (RecipientTableMsg << ReceiveRecipientToggleArchive)

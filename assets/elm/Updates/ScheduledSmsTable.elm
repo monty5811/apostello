@@ -9,6 +9,7 @@ import Http
 import Json.Encode as Encode
 import Messages exposing (..)
 import Models exposing (..)
+import Urls exposing (..)
 
 
 update : ScheduledSmsTableMsg -> Model -> ( Model, Cmd Msg )
@@ -53,10 +54,10 @@ cancelSms : CSRFToken -> Int -> Cmd Msg
 cancelSms csrftoken pk =
     let
         url =
-            "/api/v1/queued/sms/" ++ (toString pk)
+            queuedSmsUrl pk
 
         body =
-            encodeBody [ ( "cancel_sms", Encode.bool True ) ]
+            [ ( "cancel_sms", Encode.bool True ) ]
     in
-        post url body csrftoken decodeAlwaysTrue
+        post csrftoken url body decodeAlwaysTrue
             |> Http.send (ScheduledSmsTableMsg << ReceiveCancelSms)

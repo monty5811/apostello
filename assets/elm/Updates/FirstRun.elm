@@ -2,7 +2,6 @@ module Updates.FirstRun exposing (update)
 
 import Decoders exposing (..)
 import DjangoSend exposing (post)
-import Helpers exposing (encodeBody)
 import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -100,12 +99,11 @@ createAdminUser : CSRFToken -> FirstRunModel -> Cmd Msg
 createAdminUser csrftoken model =
     let
         body =
-            encodeBody
-                [ ( "email_", Encode.string model.adminEmail )
-                , ( "pass_", Encode.string model.adminPass1 )
-                ]
+            [ ( "email_", Encode.string model.adminEmail )
+            , ( "pass_", Encode.string model.adminPass1 )
+            ]
     in
-        post "/config/create_admin_user/" body csrftoken decodeFirstRunResp
+        post csrftoken "/config/create_admin_user/" body decodeFirstRunResp
             |> Http.send (FirstRunMsg << ReceiveCreateAdminUser)
 
 
@@ -113,12 +111,11 @@ sendTestSms : CSRFToken -> FirstRunModel -> Cmd Msg
 sendTestSms csrftoken model =
     let
         body =
-            encodeBody
-                [ ( "to_", Encode.string model.testSmsTo )
-                , ( "body_", Encode.string model.testSmsBody )
-                ]
+            [ ( "to_", Encode.string model.testSmsTo )
+            , ( "body_", Encode.string model.testSmsBody )
+            ]
     in
-        post "/config/send_test_sms/" body csrftoken decodeFirstRunResp
+        post csrftoken "/config/send_test_sms/" body decodeFirstRunResp
             |> Http.send (FirstRunMsg << ReceiveSendTestSms)
 
 
@@ -126,10 +123,9 @@ sendTestEmail : CSRFToken -> FirstRunModel -> Cmd Msg
 sendTestEmail csrftoken model =
     let
         body =
-            encodeBody
-                [ ( "to_", Encode.string model.testEmailTo )
-                , ( "body_", Encode.string model.testEmailBody )
-                ]
+            [ ( "to_", Encode.string model.testEmailTo )
+            , ( "body_", Encode.string model.testEmailBody )
+            ]
     in
-        post "/config/send_test_email/" body csrftoken decodeFirstRunResp
+        post csrftoken "/config/send_test_email/" body decodeFirstRunResp
             |> Http.send (FirstRunMsg << ReceiveSendTestEmail)
