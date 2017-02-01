@@ -98,16 +98,16 @@ def ask_for_name(person_from_pk, sms_body, ask_for_name):
 # SMS logging and consistency checks
 
 
-def check_incoming_log(page_id=0, fetch_all=False):
+def check_incoming_log():
     """Update incoming log."""
     from apostello.logs import check_incoming_log
-    check_incoming_log(page_id=page_id, fetch_all=fetch_all)
+    check_incoming_log()
 
 
-def check_outgoing_log(page_id=0, fetch_all=False):
+def check_outgoing_log():
     """Update outgoing log."""
     from apostello.logs import check_outgoing_log
-    check_outgoing_log(page_id=page_id, fetch_all=fetch_all)
+    check_outgoing_log()
 
 
 def log_msg_in(p, t, from_pk):

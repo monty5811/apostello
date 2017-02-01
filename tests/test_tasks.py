@@ -45,13 +45,11 @@ class TestTasks:
 
     @twilio_vcr
     def test_check_log_consistent(self):
-        check_incoming_log(page_id=0, fetch_all=False)
-        check_incoming_log(fetch_all=True)
+        check_incoming_log()
 
     @twilio_vcr
     def test_check_outgoing_log_consistent(self):
-        check_outgoing_log(page_id=0, fetch_all=False)
-        check_outgoing_log(fetch_all=True)
+        check_outgoing_log()
 
     def test_send_keyword_digest(self, keywords, smsin, users):
         send_keyword_digest()

@@ -30,19 +30,12 @@ class TestImportLogs:
 
     @twilio_vcr
     def test_all_incoming(self):
-        logs.check_incoming_log(fetch_all=True)
+        logs.check_incoming_log()
 
-    @twilio_vcr
-    def test_incoming_consistent(self):
-        logs.check_incoming_log(fetch_all=False)
 
     @twilio_vcr
     def test_all_outgoing(self):
-        logs.check_outgoing_log(fetch_all=True)
-
-    @twilio_vcr
-    def test_outgoing_consistent(self):
-        logs.check_outgoing_log(fetch_all=False)
+        logs.check_outgoing_log()
 
 
 @pytest.mark.django_db
@@ -85,15 +78,3 @@ class TestFetchingClients:
     @twilio_vcr
     def test_fetch_all_bad(self):
         assert isinstance(logs.fetch_generator('nope'), list)
-
-    @twilio_vcr
-    def test_fetch_page_in(self):
-        assert isinstance(logs.fetch_list('in', 0), list)
-
-    @twilio_vcr
-    def test_fetch_page_out(self):
-        assert isinstance(logs.fetch_list('out', 0), list)
-
-    @twilio_vcr
-    def test_fetch_page_bad(self):
-        assert isinstance(logs.fetch_list('nope', 0), list)

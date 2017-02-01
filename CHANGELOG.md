@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [v1.16.2]
+
+### Fixed
+
+ - Fix fetching logs from Twilio
+
 ## [v1.16.1]
 
 ### Fixed

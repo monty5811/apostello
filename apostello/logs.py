@@ -70,71 +70,25 @@ def fetch_generator(direction):
     return []
 
 
-def fetch_list(direction, page_id):
-    """Fetch list from twilio."""
-    if direction == 'in':
-        return twilio_client.messages.list(
-            page=page_id, page_size=50, to=settings.TWILIO_FROM_NUM
-        )
-    if direction == 'out':
-        return twilio_client.messages.list(
-            page=page_id, page_size=50, from_=settings.TWILIO_FROM_NUM
-        )
-    return []
-
-
-def check_log(direction, page_id, fetch_all):
+def check_log(direction):
     """Abstract check log function."""
     if direction == 'in':
         sms_handler = handle_incoming_sms
     elif direction == 'out':
         sms_handler = handle_outgoing_sms
 
-    check_next_page = False
-    if fetch_all:
-        # we want to iterate over all the incoming messages
-        sms_page = fetch_generator(direction)
-    else:
-        # we only want to iterate over the most recent messages to begin with
-        try:
-            sms_page = fetch_list(direction, page_id)
-        except TwilioRestException as e:
-            if e.msg == "Page number out of range":
-                # last page
-                return []
-            else:
-                raise e
+    # we want to iterate over all the incoming messages
+    sms_page = fetch_generator(direction)
 
     for msg in sms_page:
         check_next_page = sms_handler(msg) or check_next_page
 
-    if fetch_all:
-        # have looped over all messages and we are done
-        return
 
-    if check_next_page:
-        check_log(direction, page_id + 1, fetch_all)
+def check_incoming_log():
+    """Check Twilio's logs for messages that have been sent to our number."""
+    check_log('in')
 
 
-def check_incoming_log(page_id=0, fetch_all=False):
-    """
-    Check Twilio's logs for messages that have been sent to our number.
-
-    page_id: Twilio log page to start with.
-    fetch_all: If set to True, all messages on Twilio will be checked. If False,
-    only the first 50 messages will be checked. If a missing message is found in
-    these 50, the next 50 will also be checked.
-    """
-    check_log('in', page_id, fetch_all)
-
-
-def check_outgoing_log(page_id=0, fetch_all=False):
-    """
-    Check Twilio's logs for messages that we have sent.
-
-    page_id: Twilio log page to start with.
-    fetch_all: If set to True, all messages on Twilio will be checked. If False,
-    only the first 50 messages will be checked. If a missing message is found in
-    these 50, the next 50 will also be checked.
-    """
-    check_log('out', page_id, fetch_all)
+def check_outgoing_log():
+    """Check Twilio's logs for messages that we have sent."""
+    check_log('out')

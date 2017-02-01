@@ -14,4 +14,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Handle the command."""
-        check_outgoing_log(fetch_all=True)
+        check_outgoing_log()
