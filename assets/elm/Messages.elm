@@ -10,10 +10,10 @@ import Time
 
 type Msg
     = LoadData LoadingStatus
+    | ReceiveRawResp (Result Http.Error RawResponse)
     | UpdateTableFilter String
     | ElvantoMsg ElvantoMsg
     | InboundTableMsg InboundTableMsg
-    | OutboundTableMsg OutboundTableMsg
     | RecipientTableMsg RecipientTableMsg
     | KeywordTableMsg KeywordTableMsg
     | GroupTableMsg GroupTableMsg
@@ -58,8 +58,7 @@ type FirstRunMsg
 
 
 type ElvantoMsg
-    = LoadElvantoResp (Result Http.Error (ApostelloResponse ElvantoGroup))
-    | ToggleGroupSync ElvantoGroup
+    = ToggleGroupSync ElvantoGroup
     | ReceiveToggleGroupSync (Result Http.Error ElvantoGroup)
     | PullGroups
     | FetchGroups
@@ -67,67 +66,53 @@ type ElvantoMsg
 
 
 type InboundTableMsg
-    = LoadInboundTableResp (Result Http.Error (ApostelloResponse SmsInbound))
-    | ReprocessSms Int
+    = ReprocessSms Int
     | ReceiveReprocessSms (Result Http.Error SmsInbound)
 
 
 type GroupMemberSelectMsg
-    = LoadGroupMemberSelectResp (Result Http.Error RecipientGroup)
-    | UpdateMemberFilter String
+    = UpdateMemberFilter String
     | UpdateNonMemberFilter String
     | ToggleMembership RecipientSimple
     | ReceiveToggleMembership (Result Http.Error RecipientGroup)
 
 
 type WallMsg
-    = LoadWallResp (Result Http.Error (ApostelloResponse SmsInboundSimple))
-    | ToggleWallDisplay Bool Int
+    = ToggleWallDisplay Bool Int
     | ReceiveToggleWallDisplay (Result Http.Error SmsInboundSimple)
 
 
 type UserProfileTableMsg
-    = LoadUserProfileTableResp (Result Http.Error (ApostelloResponse UserProfile))
-    | ToggleField UserProfile
+    = ToggleField UserProfile
     | ReceiveToggleProfile (Result Http.Error UserProfile)
 
 
 type RecipientTableMsg
-    = LoadRecipientTableResp (Result Http.Error (ApostelloResponse Recipient))
-    | ToggleRecipientArchive Bool Int
+    = ToggleRecipientArchive Bool Int
     | ReceiveRecipientToggleArchive (Result Http.Error Recipient)
 
 
 type KeywordTableMsg
-    = LoadKeywordTableResp (Result Http.Error (ApostelloResponse Keyword))
-    | ToggleKeywordArchive Bool Int
+    = ToggleKeywordArchive Bool Int
     | ReceiveToggleKeywordArchive (Result Http.Error Keyword)
 
 
 type GroupTableMsg
-    = LoadGroupTableResp (Result Http.Error (ApostelloResponse RecipientGroup))
-    | ToggleGroupArchive Bool Int
+    = ToggleGroupArchive Bool Int
     | ReceiveToggleGroupArchive (Result Http.Error RecipientGroup)
-
-
-type OutboundTableMsg
-    = LoadOutboundTableResp (Result Http.Error (ApostelloResponse SmsOutbound))
 
 
 type GroupComposerMsg
     = UpdateQueryString String
-    | LoadGroupComposerResp (Result Http.Error (ApostelloResponse RecipientGroup))
 
 
 type ScheduledSmsTableMsg
-    = LoadScheduledSmsTableResp (Result Http.Error (ApostelloResponse QueuedSms))
-    | CancelSms Int
+    = CancelSms Int
     | ReceiveCancelSms (Result Http.Error Bool)
 
 
 type KeyRespTableMsg
-    = LoadKeyRespTableResp (Result Http.Error (ApostelloResponse SmsInbound))
-    | ToggleInboundSmsArchive Bool Int
+    = ToggleInboundSmsArchive Bool Int
     | ToggleInboundSmsDealtWith Bool Int
     | ReceiveToggleInboundSmsArchive (Result Http.Error SmsInbound)
     | ReceiveToggleInboundSmsDealtWith (Result Http.Error SmsInbound)

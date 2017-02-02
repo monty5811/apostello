@@ -15,7 +15,7 @@ keywordUrl pk =
 
 smsInboundUrl : Int -> String
 smsInboundUrl pk =
-    print (s "/api/v1/sms/in" <> int) pk
+    print (s "/api/v1/sms/in/" <> int) pk
 
 
 groupsUrl_quick : Int -> String

@@ -1,6 +1,5 @@
-module Updates.InboundTable exposing (update)
+module Updates.InboundTable exposing (update, updateSms)
 
-import Actions exposing (determineRespCmd)
 import Decoders exposing (smsinboundDecoder)
 import DjangoSend exposing (post)
 import Helpers exposing (..)
@@ -14,17 +13,6 @@ import Urls exposing (..)
 update : InboundTableMsg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadInboundTableResp (Ok resp) ->
-            ( { model
-                | loadingStatus = determineLoadingStatus resp
-                , inboundTable = updateSms model.inboundTable resp.results
-              }
-            , determineRespCmd InboundTable resp
-            )
-
-        LoadInboundTableResp (Err _) ->
-            handleLoadingFailed model
-
         ReprocessSms pk ->
             ( model, reprocessSms model.csrftoken pk )
 

@@ -1,6 +1,5 @@
-module Updates.GroupTable exposing (update)
+module Updates.GroupTable exposing (update, updateGroups)
 
-import Actions exposing (determineRespCmd)
 import Decoders exposing (recipientgroupDecoder)
 import DjangoSend exposing (archivePost)
 import Helpers exposing (..)
@@ -13,17 +12,6 @@ import Urls exposing (..)
 update : GroupTableMsg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadGroupTableResp (Ok resp) ->
-            ( { model
-                | loadingStatus = determineLoadingStatus resp
-                , groupTable = updateGroups model.groupTable resp
-              }
-            , determineRespCmd GroupTable resp
-            )
-
-        LoadGroupTableResp (Err _) ->
-            handleLoadingFailed model
-
         ToggleGroupArchive isArchived pk ->
             ( { model | groupTable = optArchiveGroup model.groupTable pk }
             , toggleRecipientGroupArchive model.csrftoken isArchived pk
@@ -36,11 +24,11 @@ update msg model =
             handleNotSaved model
 
 
-updateGroups : GroupTableModel -> ApostelloResponse RecipientGroup -> GroupTableModel
-updateGroups model resp =
+updateGroups : GroupTableModel -> List RecipientGroup -> GroupTableModel
+updateGroups model groups =
     { model
         | groups =
-            mergeItems model.groups resp.results
+            mergeItems model.groups groups
                 |> List.sortBy .name
     }
 

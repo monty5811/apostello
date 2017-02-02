@@ -81,6 +81,12 @@ type alias Flags =
     }
 
 
+type alias RawResponse =
+    { body : String
+    , next : Maybe String
+    }
+
+
 type alias Notification =
     { type_ : NotificationType
     , text : String
@@ -364,14 +370,6 @@ initialKeyRespModel =
 
 
 -- Apostello Models
-
-
-type alias ApostelloResponse a =
-    { next : Maybe String
-    , previous : Maybe String
-    , count : Int
-    , results : List a
-    }
 
 
 type alias GroupPk =

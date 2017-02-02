@@ -1,8 +1,7 @@
 module Main exposing (..)
 
-import Actions exposing (fetchData)
 import Html exposing (programWithFlags)
-import Messages exposing (Msg)
+import Messages exposing (..)
 import Models exposing (..)
 import Subscriptions exposing (subscriptions)
 import Update exposing (update)
@@ -28,7 +27,7 @@ init flags =
         model =
             initialModel flags.csrftoken page flags.dataUrl flags.fabData
     in
-        ( model, fetchData page flags.dataUrl )
+        update (LoadData (initialLoadingStatus page)) model
 
 
 decodePage : String -> Page

@@ -1,6 +1,5 @@
-module Updates.ScheduledSmsTable exposing (update)
+module Updates.ScheduledSmsTable exposing (update, updateSms)
 
-import Actions exposing (determineRespCmd)
 import Date
 import Decoders exposing (decodeAlwaysTrue)
 import DjangoSend exposing (post)
@@ -15,17 +14,6 @@ import Urls exposing (..)
 update : ScheduledSmsTableMsg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadScheduledSmsTableResp (Ok resp) ->
-            ( { model
-                | loadingStatus = determineLoadingStatus resp
-                , scheduledSmsTable = updateSms model.scheduledSmsTable resp.results
-              }
-            , determineRespCmd InboundTable resp
-            )
-
-        LoadScheduledSmsTableResp (Err _) ->
-            handleLoadingFailed model
-
         CancelSms pk ->
             ( { model | scheduledSmsTable = optCancelSms model.scheduledSmsTable pk }, cancelSms model.csrftoken pk )
 

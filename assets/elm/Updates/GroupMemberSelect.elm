@@ -1,4 +1,4 @@
-module Updates.GroupMemberSelect exposing (update)
+module Updates.GroupMemberSelect exposing (update, updateGroup)
 
 import Decoders exposing (recipientgroupDecoder)
 import DjangoSend exposing (post)
@@ -13,17 +13,6 @@ import Views.FilteringTable as FT
 update : GroupMemberSelectMsg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadGroupMemberSelectResp (Ok group) ->
-            ( { model
-                | loadingStatus = Finished
-                , groupSelect = updateGroup model.groupSelect group
-              }
-            , Cmd.none
-            )
-
-        LoadGroupMemberSelectResp (Err _) ->
-            handleLoadingFailed model
-
         UpdateMemberFilter text ->
             ( { model | groupSelect = updateMemberFilter model.groupSelect text }, Cmd.none )
 

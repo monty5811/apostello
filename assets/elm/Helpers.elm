@@ -1,50 +1,11 @@
 module Helpers exposing (..)
 
-import Decoders exposing (..)
 import Date
 import Dict
-import Http
-import Json.Decode as Decode
 import Messages exposing (..)
 import Models exposing (..)
 import Updates.Notification exposing (createLoadingFailedNotification, createNotSavedNotification)
 import Regex
-
-
--- Fetch data from server
-
-
-getData : String -> Decode.Decoder a -> Http.Request a
-getData url decoder =
-    Http.request
-        { method = "GET"
-        , headers = [ Http.header "Accept" "application/json" ]
-        , url = url
-        , body = Http.emptyBody
-        , expect = Http.expectJson decoder
-        , timeout = Nothing
-        , withCredentials = True
-        }
-
-
-getApostelloResponse : String -> Decode.Decoder a -> Http.Request (ApostelloResponse a)
-getApostelloResponse url decoder =
-    getData url (decodeApostelloResponse decoder)
-
-
-
--- determine loading status
-
-
-determineLoadingStatus : ApostelloResponse a -> LoadingStatus
-determineLoadingStatus resp =
-    case resp.next of
-        Nothing ->
-            Finished
-
-        _ ->
-            WaitingForSubsequent
-
 
 
 -- increase page size for next response
@@ -70,8 +31,7 @@ mergeItems existingItems newItems =
         |> List.map (\x -> ( x.pk, x ))
         |> Dict.fromList
         |> addNewItems newItems
-        |> Dict.toList
-        |> List.map (\x -> Tuple.second x)
+        |> Dict.values
 
 
 addNewItems : List { a | pk : Int } -> Dict.Dict Int { a | pk : Int } -> Dict.Dict Int { a | pk : Int }
@@ -97,6 +57,10 @@ handleLoadingFailed model =
 handleNotSaved : Model -> ( Model, Cmd Msg )
 handleNotSaved model =
     ( createNotSavedNotification model, Cmd.none )
+
+
+
+-- sorting functions
 
 
 sortByTimeReceived : List { a | time_received : String } -> List { a | time_received : String }

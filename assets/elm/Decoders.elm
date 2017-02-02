@@ -2,7 +2,7 @@ module Decoders exposing (..)
 
 import Json.Decode as Decode
 import Json.Decode.Extra exposing (date)
-import Json.Decode.Pipeline exposing (optional, required, decode)
+import Json.Decode.Pipeline exposing (optional, required, decode, requiredAt)
 import Models exposing (..)
 
 
@@ -11,20 +11,25 @@ decodeAlwaysTrue =
     Decode.succeed True
 
 
+dataFromResp : Decode.Decoder a -> RawResponse -> List a
+dataFromResp decoder rawResp =
+    rawResp.body
+        |> Decode.decodeString (Decode.field "results" (Decode.list decoder))
+        |> Result.withDefault []
+
+
+itemFromResp : a -> Decode.Decoder a -> RawResponse -> a
+itemFromResp defaultCallback decoder rawResp =
+    rawResp.body
+        |> Decode.decodeString decoder
+        |> Result.withDefault defaultCallback
+
+
 decodeFirstRunResp : Decode.Decoder FirstRunResp
 decodeFirstRunResp =
     decode FirstRunResp
         |> required "status" Decode.string
         |> optional "error" Decode.string ""
-
-
-decodeApostelloResponse : Decode.Decoder a -> Decode.Decoder (ApostelloResponse a)
-decodeApostelloResponse resultsDecoder =
-    decode ApostelloResponse
-        |> required "next" (Decode.maybe Decode.string)
-        |> required "previous" (Decode.maybe Decode.string)
-        |> required "count" Decode.int
-        |> required "results" (Decode.list resultsDecoder)
 
 
 elvantogroupDecoder : Decode.Decoder ElvantoGroup

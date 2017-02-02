@@ -1,6 +1,5 @@
-module Updates.KeyRespTable exposing (update)
+module Updates.KeyRespTable exposing (update, updateSms)
 
-import Actions exposing (determineRespCmd)
 import Decoders exposing (smsinboundDecoder)
 import DjangoSend exposing (archivePost, post)
 import Helpers exposing (..)
@@ -14,17 +13,6 @@ import Urls exposing (..)
 update : KeyRespTableMsg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadKeyRespTableResp (Ok resp) ->
-            ( { model
-                | loadingStatus = determineLoadingStatus resp
-                , keyRespTable = updateSms model.keyRespTable resp.results
-              }
-            , determineRespCmd KeyRespTable resp
-            )
-
-        LoadKeyRespTableResp (Err _) ->
-            handleLoadingFailed model
-
         ToggleInboundSmsArchive isArchived pk ->
             ( { model | keyRespTable = optArchiveSms model.keyRespTable pk }, toggleSmsArchive model.csrftoken isArchived pk )
 

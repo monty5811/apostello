@@ -1,7 +1,6 @@
-module Updates.GroupComposer exposing (update)
+module Updates.GroupComposer exposing (update, updateGroups)
 
 import Helpers exposing (..)
-import Actions exposing (determineRespCmd)
 import Dict
 import Messages exposing (..)
 import Models exposing (..)
@@ -10,26 +9,15 @@ import Models exposing (..)
 update : GroupComposerMsg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadGroupComposerResp (Ok resp) ->
-            ( { model
-                | loadingStatus = Finished
-                , groupComposer = updateGroups resp model.groupComposer
-              }
-            , determineRespCmd GroupComposer resp
-            )
-
-        LoadGroupComposerResp (Err _) ->
-            handleLoadingFailed model
-
         UpdateQueryString text ->
             ( { model | groupComposer = updateQueryString text model.groupComposer }, Cmd.none )
 
 
-updateGroups : ApostelloResponse RecipientGroup -> GroupComposerModel -> GroupComposerModel
-updateGroups resp model =
+updateGroups : GroupComposerModel -> List RecipientGroup -> GroupComposerModel
+updateGroups model groups =
     let
         newGroups =
-            mergeItems model.groups resp.results
+            mergeItems model.groups groups
     in
         { model
             | groups = newGroups |> List.sortBy .name

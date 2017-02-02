@@ -1,32 +1,15 @@
-module Updates.OutboundTable exposing (update)
+module Updates.OutboundTable exposing (updateModel)
 
-import Actions exposing (determineRespCmd)
 import Date
 import Helpers exposing (..)
-import Messages exposing (..)
 import Models exposing (..)
 
 
-update : OutboundTableMsg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        LoadOutboundTableResp (Ok resp) ->
-            ( { model
-                | loadingStatus = determineLoadingStatus resp
-                , outboundTable = updateSms model.outboundTable resp
-              }
-            , determineRespCmd OutboundTable resp
-            )
-
-        LoadOutboundTableResp (Err _) ->
-            handleLoadingFailed model
-
-
-updateSms : OutboundTableModel -> ApostelloResponse SmsOutbound -> OutboundTableModel
-updateSms model resp =
+updateModel : OutboundTableModel -> List SmsOutbound -> OutboundTableModel
+updateModel model sms =
     { model
         | sms =
-            mergeItems model.sms resp.results
+            mergeItems model.sms sms
                 |> List.sortBy compareByTS
                 |> List.reverse
     }

@@ -1,6 +1,5 @@
-module Updates.KeywordTable exposing (update)
+module Updates.KeywordTable exposing (update, updateKeywords)
 
-import Actions exposing (determineRespCmd)
 import Decoders exposing (keywordDecoder)
 import DjangoSend exposing (archivePost)
 import Helpers exposing (..)
@@ -13,17 +12,6 @@ import Urls exposing (..)
 update : KeywordTableMsg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadKeywordTableResp (Ok resp) ->
-            ( { model
-                | loadingStatus = determineLoadingStatus resp
-                , keywordTable = updateKeywords model.keywordTable resp
-              }
-            , determineRespCmd KeywordTable resp
-            )
-
-        LoadKeywordTableResp (Err _) ->
-            handleLoadingFailed model
-
         ToggleKeywordArchive isArchived pk ->
             ( { model
                 | keywordTable = optArchiveKeyword model.keywordTable pk
@@ -38,14 +26,14 @@ update msg model =
             handleNotSaved model
 
 
+updateKeywords : KeywordTableModel -> List Keyword -> KeywordTableModel
+updateKeywords model keywords =
+    { model | keywords = mergeItems model.keywords keywords |> List.sortBy .keyword }
+
+
 optArchiveKeyword : KeywordTableModel -> Int -> KeywordTableModel
 optArchiveKeyword model pk =
     { model | keywords = List.filter (\r -> not (r.pk == pk)) model.keywords }
-
-
-updateKeywords : KeywordTableModel -> ApostelloResponse Keyword -> KeywordTableModel
-updateKeywords model resp =
-    { model | keywords = mergeItems model.keywords resp.results |> List.sortBy .keyword }
 
 
 toggleKeywordArchive : CSRFToken -> Bool -> Int -> Cmd Msg

@@ -1,6 +1,5 @@
-module Updates.UserProfileTable exposing (update)
+module Updates.UserProfileTable exposing (update, updateUserProfiles)
 
-import Actions exposing (determineRespCmd)
 import Decoders exposing (userprofileDecoder)
 import DjangoSend exposing (post)
 import Helpers exposing (..)
@@ -14,17 +13,6 @@ import Urls exposing (..)
 update : UserProfileTableMsg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadUserProfileTableResp (Ok resp) ->
-            ( { model
-                | loadingStatus = determineLoadingStatus resp
-                , userProfileTable = updateUserProfiles model.userProfileTable resp.results
-              }
-            , determineRespCmd UserProfileTable resp
-            )
-
-        LoadUserProfileTableResp (Err _) ->
-            handleLoadingFailed model
-
         ToggleField profile ->
             ( { model
                 | userProfileTable = updateUserProfiles model.userProfileTable [ profile ]

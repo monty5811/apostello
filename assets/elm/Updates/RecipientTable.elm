@@ -1,6 +1,5 @@
-module Updates.RecipientTable exposing (update)
+module Updates.RecipientTable exposing (update, updateRecipients)
 
-import Actions exposing (determineRespCmd)
 import Decoders exposing (recipientDecoder)
 import DjangoSend exposing (archivePost)
 import Helpers exposing (..)
@@ -13,17 +12,6 @@ import Urls exposing (..)
 update : RecipientTableMsg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadRecipientTableResp (Ok resp) ->
-            ( { model
-                | loadingStatus = determineLoadingStatus resp
-                , recipientTable = updateRecipients model.recipientTable resp.results
-              }
-            , determineRespCmd RecipientTable resp
-            )
-
-        LoadRecipientTableResp (Err _) ->
-            handleLoadingFailed model
-
         ToggleRecipientArchive isArchived pk ->
             ( { model | recipientTable = optRemoveRecipient model.recipientTable pk }
             , toggleRecipientArchive model.csrftoken isArchived pk

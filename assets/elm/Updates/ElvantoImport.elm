@@ -1,6 +1,5 @@
-module Updates.ElvantoImport exposing (update)
+module Updates.ElvantoImport exposing (update, updateGroups)
 
-import Actions exposing (determineRespCmd)
 import Decoders exposing (elvantogroupDecoder)
 import DjangoSend exposing (post)
 import Helpers exposing (..)
@@ -16,17 +15,6 @@ import Urls exposing (..)
 update : ElvantoMsg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadElvantoResp (Ok resp) ->
-            ( { model
-                | loadingStatus = determineLoadingStatus resp
-                , elvantoImport = updateGroups model.elvantoImport resp.results
-              }
-            , determineRespCmd ElvantoImport resp
-            )
-
-        LoadElvantoResp (Err _) ->
-            handleLoadingFailed model
-
         ToggleGroupSync group ->
             ( { model | elvantoImport = optToggleGroup group model.elvantoImport }
             , toggleElvantoGroupSync model.csrftoken group

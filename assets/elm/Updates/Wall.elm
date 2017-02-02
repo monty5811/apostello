@@ -1,6 +1,5 @@
-module Updates.Wall exposing (update)
+module Updates.Wall exposing (update, updateSms)
 
-import Actions exposing (determineRespCmd)
 import Decoders exposing (smsinboundsimpleDecoder)
 import DjangoSend exposing (post)
 import Helpers exposing (..)
@@ -14,17 +13,6 @@ import Urls exposing (..)
 update : WallMsg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadWallResp (Ok resp) ->
-            ( { model
-                | loadingStatus = determineLoadingStatus resp
-                , wall = updateSms model.wall resp.results
-              }
-            , determineRespCmd Wall resp
-            )
-
-        LoadWallResp (Err _) ->
-            handleLoadingFailed model
-
         ToggleWallDisplay isDisplayed pk ->
             ( model, toggleWallDisplay model.csrftoken isDisplayed pk )
 
