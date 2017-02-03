@@ -17,13 +17,9 @@ updateModel model sms =
 
 compareByTS : SmsOutbound -> Float
 compareByTS sms =
-    let
-        date =
-            Date.fromString sms.time_sent
-    in
-        case date of
-            Ok d ->
-                Date.toTime d
+    case sms.time_sent of
+        Just d ->
+            Date.toTime d
 
-            Err _ ->
-                toFloat 1
+        Nothing ->
+            toFloat 1

@@ -409,7 +409,7 @@ type alias Keyword =
 
 type alias QueuedSms =
     { pk : Int
-    , time_to_send : Date.Date
+    , time_to_send : Maybe Date.Date
     , time_to_send_formatted : String
     , sent : Bool
     , failed : Bool
@@ -457,7 +457,7 @@ type alias SmsInbound =
     , pk : Int
     , sender_name : String
     , content : String
-    , time_received : String
+    , time_received : Maybe Date.Date
     , dealt_with : Bool
     , is_archived : Bool
     , display_on_wall : Bool
@@ -476,7 +476,7 @@ type alias SmsInbounds =
 type alias SmsInboundSimple =
     { pk : Int
     , content : String
-    , time_received : String
+    , time_received : Maybe Date.Date
     , is_archived : Bool
     , display_on_wall : Bool
     , matched_keyword : String
@@ -509,7 +509,7 @@ type alias User =
 type alias SmsOutbound =
     { content : String
     , pk : Int
-    , time_sent : String
+    , time_sent : Maybe Date.Date
     , sent_by : String
     , recipient : Maybe RecipientSimple
     }
@@ -523,7 +523,7 @@ type alias ElvantoGroup =
     { name : String
     , pk : Int
     , sync : Bool
-    , last_synced : String
+    , last_synced : Maybe Date.Date
     }
 
 

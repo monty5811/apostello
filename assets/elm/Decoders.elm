@@ -38,7 +38,7 @@ elvantogroupDecoder =
         |> required "name" Decode.string
         |> required "pk" Decode.int
         |> required "sync" Decode.bool
-        |> optional "last_synced" Decode.string ""
+        |> required "last_synced" (Decode.maybe date)
 
 
 keywordDecoder : Decode.Decoder Keyword
@@ -60,7 +60,7 @@ queuedsmsDecoder : Decode.Decoder QueuedSms
 queuedsmsDecoder =
     decode QueuedSms
         |> required "pk" Decode.int
-        |> required "time_to_send" date
+        |> required "time_to_send" (Decode.maybe date)
         |> required "time_to_send_formatted" Decode.string
         |> required "sent" Decode.bool
         |> required "failed" Decode.bool
@@ -112,7 +112,7 @@ smsinboundDecoder =
         |> required "pk" Decode.int
         |> required "sender_name" Decode.string
         |> required "content" Decode.string
-        |> optional "time_received" Decode.string ""
+        |> required "time_received" (Decode.maybe date)
         |> required "dealt_with" Decode.bool
         |> required "is_archived" Decode.bool
         |> required "display_on_wall" Decode.bool
@@ -128,7 +128,7 @@ smsinboundsimpleDecoder =
     decode SmsInboundSimple
         |> required "pk" Decode.int
         |> required "content" Decode.string
-        |> required "time_received" Decode.string
+        |> required "time_received" (Decode.maybe date)
         |> required "is_archived" Decode.bool
         |> required "display_on_wall" Decode.bool
         |> required "matched_keyword" Decode.string
@@ -139,7 +139,7 @@ smsoutboundDecoder =
     decode SmsOutbound
         |> required "content" Decode.string
         |> required "pk" Decode.int
-        |> required "time_sent" Decode.string
+        |> required "time_sent" (Decode.maybe date)
         |> required "sent_by" Decode.string
         |> required "recipient" (Decode.maybe recipientsimpleDecoder)
 

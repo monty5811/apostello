@@ -1,5 +1,6 @@
 module Views.KeyRespTable exposing (view)
 
+import Helpers exposing (formatDate)
 import Html exposing (..)
 import Html.Attributes exposing (class, href, style)
 import Html.Events exposing (onClick)
@@ -43,7 +44,7 @@ smsRow sms =
     in
         tr [ class className ]
             [ recipientCell sms
-            , td [ class "collapsing" ] [ text sms.time_received ]
+            , td [ class "collapsing" ] [ text (formatDate sms.time_received) ]
             , td [] [ text sms.content ]
             , td [ class "collapsing" ] [ dealtWithButton sms ]
             , archiveCell sms.is_archived (KeyRespTableMsg (ToggleInboundSmsArchive sms.is_archived sms.pk))

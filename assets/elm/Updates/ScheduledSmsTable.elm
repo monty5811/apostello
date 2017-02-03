@@ -29,8 +29,18 @@ updateSms model newSms =
     { model
         | sms =
             mergeItems model.sms newSms
-                |> List.sortBy (Date.toTime << .time_to_send)
+                |> List.sortBy compareByT2S
     }
+
+
+compareByT2S : { a | time_to_send : Maybe Date.Date } -> Float
+compareByT2S sms =
+    case sms.time_to_send of
+        Just d ->
+            Date.toTime d
+
+        Nothing ->
+            toFloat 1
 
 
 optCancelSms : ScheduledSmsTableModel -> Int -> ScheduledSmsTableModel

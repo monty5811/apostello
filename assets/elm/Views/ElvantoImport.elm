@@ -1,5 +1,6 @@
 module Views.ElvantoImport exposing (view)
 
+import Helpers exposing (formatDate)
 import Html exposing (..)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
@@ -48,7 +49,7 @@ groupRow : ElvantoGroup -> Html Msg
 groupRow group =
     tr []
         [ td [] [ text group.name ]
-        , td [] [ text group.last_synced ]
+        , td [] [ text (formatDate group.last_synced) ]
         , td [] [ toggleSyncButton group ]
         ]
 

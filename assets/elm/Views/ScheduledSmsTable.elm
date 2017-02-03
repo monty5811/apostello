@@ -38,7 +38,12 @@ view filterRegex currentTime model =
 
 onlyFuture : Time.Time -> QueuedSms -> Bool
 onlyFuture t sms =
-    t < (Date.toTime sms.time_to_send)
+    case sms.time_to_send of
+        Just time_to_send ->
+            t < (Date.toTime time_to_send)
+
+        Nothing ->
+            False
 
 
 smsRow : QueuedSms -> Html Msg

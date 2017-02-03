@@ -1,5 +1,6 @@
 module Views.InboundTable exposing (view)
 
+import Helpers exposing (formatDate)
 import Html exposing (..)
 import Html.Attributes exposing (class, href, style)
 import Html.Events exposing (onClick)
@@ -35,7 +36,7 @@ smsRow sms =
         [ recipientCell sms
         , keywordCell sms
         , td [] [ text sms.content ]
-        , td [ class "collapsing" ] [ text sms.time_received ]
+        , td [ class "collapsing" ] [ text (formatDate sms.time_received) ]
         , reprocessCell sms
         ]
 

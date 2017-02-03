@@ -2,10 +2,11 @@ module Helpers exposing (..)
 
 import Date
 import Dict
+import Formatting exposing (..)
 import Messages exposing (..)
 import Models exposing (..)
-import Updates.Notification exposing (createLoadingFailedNotification, createNotSavedNotification)
 import Regex
+import Updates.Notification exposing (createLoadingFailedNotification, createNotSavedNotification)
 
 
 -- increase page size for next response
@@ -63,22 +64,47 @@ handleNotSaved model =
 -- sorting functions
 
 
-sortByTimeReceived : List { a | time_received : String } -> List { a | time_received : String }
+sortByTimeReceived : List { a | time_received : Maybe Date.Date } -> List { a | time_received : Maybe Date.Date }
 sortByTimeReceived items =
     items
         |> List.sortBy compareTR
         |> List.reverse
 
 
-compareTR : { a | time_received : String } -> Float
+compareTR : { a | time_received : Maybe Date.Date } -> Float
 compareTR item =
-    let
-        date =
-            Date.fromString item.time_received
-    in
-        case date of
-            Ok d ->
-                Date.toTime d
+    case item.time_received of
+        Just d ->
+            Date.toTime d
 
-            Err _ ->
-                toFloat 1
+        Nothing ->
+            toFloat 1
+
+
+
+-- Pretty date format
+
+
+dateFormat : Format r (Int -> String -> Int -> Int -> r)
+dateFormat =
+    padLeft 2 '0' int
+        <> s "  "
+        <> string
+        <> s "  "
+        <> padLeft 2 '0' int
+        <> s ":"
+        <> padLeft 2 '0' int
+
+
+formatDate : Maybe Date.Date -> String
+formatDate date =
+    case date of
+        Just d ->
+            print dateFormat
+                (Date.day d)
+                (Date.month d |> toString)
+                (Date.hour d)
+                (Date.minute d)
+
+        Nothing ->
+            ""

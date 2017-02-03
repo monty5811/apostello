@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [v1.16.3]
+
+### Fixed
+
+ - Fix incorrect sorting by timestamp
+
 ## [v1.16.2]
 
 ### Fixed

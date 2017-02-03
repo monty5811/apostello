@@ -1,5 +1,6 @@
 module Views.Curator exposing (view)
 
+import Helpers exposing (formatDate)
 import Html exposing (..)
 import Html.Attributes exposing (class, href, style)
 import Html.Events exposing (onClick)
@@ -31,7 +32,7 @@ smsRow : SmsInboundSimple -> Html Msg
 smsRow sms =
     tr []
         [ td [] [ text sms.content ]
-        , td [ class "collapsing" ] [ text sms.time_received ]
+        , td [ class "collapsing" ] [ text (formatDate sms.time_received) ]
         , curateToggleCell sms
         ]
 

@@ -16,7 +16,7 @@ class BaseModelSerializer(QueryFieldsMixin, serializers.ModelSerializer):
 
 class ElvantoGroupSerializer(BaseModelSerializer):
     """Serialize apostello.models.ElvantoGroup."""
-    last_synced = serializers.DateTimeField(format='%d %b %H:%M')
+    last_synced = serializers.DateTimeField()
 
     class Meta:
         model = ElvantoGroup
@@ -54,7 +54,7 @@ class KeywordSerializer(BaseModelSerializer):
 
 class SmsInboundSerializer(BaseModelSerializer):
     """Serialize apostello.models.SmsInbound for use in logs and wall."""
-    time_received = serializers.DateTimeField(format='%d %b %H:%M')
+    time_received = serializers.DateTimeField()
 
     class Meta:
         model = SmsInbound
@@ -77,7 +77,7 @@ class SmsInboundSerializer(BaseModelSerializer):
 
 class SmsInboundSimpleSerializer(BaseModelSerializer):
     """Serialize apostello.models.SmsInbound for use in log and wall."""
-    time_received = serializers.DateTimeField(format='%d %b %H:%M')
+    time_received = serializers.DateTimeField()
 
     class Meta:
         model = SmsInbound
@@ -130,7 +130,7 @@ class RecipientSimpleSerializer(BaseModelSerializer):
 
 class SmsOutboundSerializer(BaseModelSerializer):
     """Serialize apostello.models.SmsOutbound for use in log."""
-    time_sent = serializers.DateTimeField(format='%d %b %H:%M')
+    time_sent = serializers.DateTimeField()
     recipient = RecipientSimpleSerializer()
 
     class Meta:

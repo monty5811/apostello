@@ -1,5 +1,6 @@
 module Views.RecipientTable exposing (view)
 
+import Helpers exposing (formatDate)
 import Html exposing (..)
 import Html.Attributes exposing (class, href)
 import Messages exposing (..)
@@ -45,7 +46,7 @@ recipientRow recipient =
                     sms
 
                 Nothing ->
-                    SmsInboundSimple 0 "" "" False False ""
+                    SmsInboundSimple 0 "" Nothing False False ""
     in
         tr [ class className ]
             [ td []
@@ -53,7 +54,7 @@ recipientRow recipient =
                 , doNotReplyIndicator recipient.do_not_reply
                 ]
             , td [] [ text lastSms.content ]
-            , td [] [ text lastSms.time_received ]
+            , td [] [ text (formatDate lastSms.time_received) ]
             , archiveCell recipient.is_archived (RecipientTableMsg (ToggleRecipientArchive recipient.is_archived recipient.pk))
             ]
 

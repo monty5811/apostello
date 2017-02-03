@@ -1,5 +1,6 @@
 module Views.OutboundTable exposing (view)
 
+import Helpers exposing (formatDate)
 import Html exposing (..)
 import Html.Attributes exposing (class, href, style)
 import Messages exposing (..)
@@ -40,5 +41,5 @@ smsRow sms =
         tr []
             [ td [ class "collapsing" ] [ a [ href ("/recipient/edit/" ++ (toString recipient.pk)), style [ ( "color", "#212121" ) ] ] [ text recipient.full_name ] ]
             , td [] [ text sms.content ]
-            , td [ class "collapsing" ] [ text sms.time_sent ]
+            , td [ class "collapsing" ] [ text (formatDate sms.time_sent) ]
             ]
