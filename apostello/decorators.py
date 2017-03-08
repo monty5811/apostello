@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from functools import partial, wraps
 from urllib.parse import quote
 
@@ -18,11 +17,11 @@ def keyword_access_check(method):
         if request.user.is_staff:
             return method(request, *args, **kwargs)
         try:
-            keyword = Keyword.objects.get(pk=kwargs['pk'])
+            keyword = Keyword.objects.get(keyword=kwargs['keyword'])
             if keyword.is_locked:
                 if not keyword.can_user_access(request.user):
                     messages.warning(request, settings.NO_ACCESS_WARNING)
-                    return redirect(reverse('keywords'))
+                    return redirect('/keyword/all/')
         except Keyword.DoesNotExist:
             pass
 

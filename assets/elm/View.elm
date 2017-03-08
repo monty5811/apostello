@@ -1,118 +1,131 @@
 module View exposing (view)
 
 import Html exposing (..)
-import Html.Attributes exposing (class)
-import Messages exposing (Msg(..))
+import Messages exposing (..)
 import Models exposing (..)
+import Views.AccessDenied as AD
 import Views.Curator as C
 import Views.ElvantoImport as EI
+import Views.Error404 as E404
+import Views.Fab as F
 import Views.Fab as F
 import Views.FirstRun as FR
 import Views.GroupComposer as GC
 import Views.GroupMemberSelect as GMS
 import Views.GroupTable as GT
+import Views.Home as H
 import Views.InboundTable as IT
 import Views.KeyRespTable as KRT
 import Views.KeywordTable as KT
 import Views.OutboundTable as OT
 import Views.RecipientTable as RT
 import Views.ScheduledSmsTable as SST
-import Views.Notification as T
+import Views.SendAdhoc as SA
+import Views.SendGroup as SG
+import Views.Shell as Shell
 import Views.UserProfileTable as UPT
 import Views.Wall as W
-
-
--- Main view
 
 
 view : Model -> Html Msg
 view model =
     let
-        mainView =
-            case model.loadingStatus of
-                NotAsked ->
-                    loadingView
+        fab =
+            F.view model.dataStore model.page model.fabModel
 
-                WaitingForFirst ->
-                    loadingView
+        shell =
+            Shell.view model
 
-                WaitingForSubsequent ->
-                    loadingCompleteView model
-
-                Finished ->
-                    loadingCompleteView model
+        mainContent =
+            content model
     in
-        div [] ((T.view model) ++ [ mainView ])
+        shell mainContent fab
 
 
-loadingCompleteView : Model -> Html Msg
-loadingCompleteView model =
+content : Model -> Html Msg
+content model =
     case model.page of
         OutboundTable ->
-            OT.view model.filterRegex model.outboundTable
+            OT.view model.filterRegex model.dataStore.outboundSms
 
         InboundTable ->
-            IT.view model.filterRegex model.inboundTable
+            IT.view model.filterRegex model.dataStore.inboundSms
 
-        GroupTable ->
-            GT.view model.filterRegex model.groupTable
+        GroupTable viewingArchive ->
+            GT.view model.filterRegex (filterArchived viewingArchive model.dataStore.groups)
 
         GroupComposer ->
-            GC.view model.groupComposer
+            GC.view model.groupComposer (filterArchived False model.dataStore.groups)
 
-        GroupSelect ->
-            GMS.view model.groupSelect
+        RecipientTable viewingArchive ->
+            RT.view model.filterRegex <| filterArchived viewingArchive model.dataStore.recipients
 
-        RecipientTable ->
-            RT.view model.filterRegex model.recipientTable
-
-        KeywordTable ->
-            KT.view model.filterRegex model.keywordTable
+        KeywordTable viewingArchive ->
+            KT.view model.filterRegex <| filterArchived viewingArchive model.dataStore.keywords
 
         ElvantoImport ->
-            EI.view model.filterRegex model.elvantoImport
+            EI.view model.filterRegex model.dataStore.elvantoGroups
 
         Wall ->
-            W.view model.wall
+            W.view (model.dataStore.inboundSimpleSms |> filterArchived False |> List.filter (\s -> s.display_on_wall))
 
         Curator ->
-            C.view model.filterRegex model.wall
+            C.view model.filterRegex (model.dataStore.inboundSimpleSms |> filterArchived False)
 
         UserProfileTable ->
-            UPT.view model.filterRegex model.userProfileTable
+            UPT.view model.filterRegex model.dataStore.userprofiles
 
         ScheduledSmsTable ->
-            SST.view model.filterRegex model.currentTime model.scheduledSmsTable
+            SST.view model.filterRegex model.currentTime model.dataStore.queuedSms
 
-        KeyRespTable ->
-            KRT.view model.filterRegex model.keyRespTable
+        KeyRespTable viewingArchive currentKeyword ->
+            KRT.view viewingArchive model.filterRegex (model.dataStore.inboundSms |> filterArchived viewingArchive |> filterByMatchedKeyword currentKeyword) model.keyRespTable currentKeyword
 
         FirstRun ->
             FR.view model.firstRun
 
-        Fab ->
-            F.view model.fabModel
+        AccessDenied ->
+            AD.view
+
+        SendAdhoc _ _ ->
+            SA.view model.loadingStatus model.settings model.sendAdhoc <| filterArchived False model.dataStore.recipients
+
+        SendGroup _ _ ->
+            SG.view model.loadingStatus model.settings model.sendGroup <| List.filter (\x -> x.cost > 0) <| filterArchived False model.dataStore.groups
+
+        Error404 ->
+            E404.view
+
+        Home ->
+            H.view
+
+        EditGroup pk ->
+            GMS.view (model.dataStore.groups |> List.filter (\x -> x.pk == pk) |> List.head) model.groupSelect
+
+        EditContact pk ->
+            IT.view model.filterRegex (model.dataStore.inboundSms |> filterBySenderPk pk)
+
+        FabOnlyPage _ ->
+            text ""
 
 
 
--- Misc
+-- filter data for display
 
 
-loadingView : Html Msg
-loadingView =
-    div [ class "row" ]
-        [ div [ class "ui active loader" ] []
-        ]
+filterArchived : Bool -> List { a | is_archived : Bool } -> List { a | is_archived : Bool }
+filterArchived viewingArchive data =
+    data
+        |> List.filter (\x -> x.is_archived == viewingArchive)
 
 
-errorView : String -> Html Msg
-errorView err =
-    div [ class "row" ]
-        [ div [ class "ui error message" ]
-            [ p [] [ text "Uh, oh, something went seriously wrong there." ]
-            , p [] [ text "You may not have an internet connection." ]
-            , p [] [ text "Please try refreshing the page." ]
-            , p [] []
-            , p [] [ text err ]
-            ]
-        ]
+filterByMatchedKeyword : String -> List { a | matched_keyword : String } -> List { a | matched_keyword : String }
+filterByMatchedKeyword currentKeyword data =
+    data
+        |> List.filter (\x -> x.matched_keyword == currentKeyword)
+
+
+filterBySenderPk : Int -> List { a | sender_pk : Maybe Int } -> List { a | sender_pk : Maybe Int }
+filterBySenderPk pk data =
+    data
+        |> List.filter (\x -> (Maybe.withDefault 0 x.sender_pk) == pk)

@@ -12,6 +12,9 @@ class TestFirstRun:
 
     def test_first_run_page(self):
         c = Client()
+        resp = c.get('/')
+        assert resp.status_code == 302
+        assert resp.url == '/config/first_run/'
         resp = c.get('/config/first_run/')
         assert resp.status_code == 200
 

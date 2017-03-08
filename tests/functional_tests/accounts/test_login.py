@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db
 @pytest.mark.slow
 @pytest.mark.selenium
 class TestLogin:
@@ -20,17 +20,13 @@ class TestLogin:
         email_box.send_keys(users['staff'].email)
         password_box = browser.find_elements_by_name('password')[0]
         password_box.send_keys('top_secret')
-        login_button = browser.find_elements_by_xpath(
-            '/html/body/div/div/form/button'
-        )[0]
+        login_button = browser.find_element_by_id('login_button')
         login_button.click()
         # check we have been redirected
         assert live_server + uri in browser.current_url
 
         # log out again
-        browser.get(live_server + '/accounts/logout')
-        logout_confirm = browser.find_elements_by_xpath(
-            '/html/body/div/div/form/button'
-        )[0]
+        browser.get(live_server + '/accounts/logout/')
+        logout_confirm = browser.find_element_by_id('logout_button')
         logout_confirm.click()
         assert 'accounts/login' in browser.current_url

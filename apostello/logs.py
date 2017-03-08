@@ -14,7 +14,6 @@ def handle_incoming_sms(msg):
     """Add incoming sms to log."""
     sms, created = SmsInbound.objects.get_or_create(sid=msg.sid)
     if created:
-        check_next_page = True
         sender, s_created = Recipient.objects.get_or_create(number=msg.from_)
         if s_created:
             sender.first_name = 'Unknown'
@@ -32,7 +31,6 @@ def handle_incoming_sms(msg):
         sms.matched_colour = Keyword.lookup_colour(msg.body)
         sms.matched_link = Keyword.get_log_link(matched_keyword)
         sms.save()
-        return check_next_page
 
 
 def handle_outgoing_sms(msg):
@@ -40,7 +38,6 @@ def handle_outgoing_sms(msg):
     try:
         sms, created = SmsOutbound.objects.get_or_create(sid=msg.sid)
         if created:
-            check_next_page = True
             recip, r_created = Recipient.objects.get_or_create(number=msg.to)
             if r_created:
                 recip.first_name = 'Unknown'
@@ -54,7 +51,6 @@ def handle_outgoing_sms(msg):
             sms.sent_by = "[Imported]"
             sms.recipient = recip
             sms.save()
-            return check_next_page
     except Exception:
         logger.error(
             'Could not import sms.', exc_info=True, extra={'msg': msg}
@@ -81,7 +77,7 @@ def check_log(direction):
     sms_page = fetch_generator(direction)
 
     for msg in sms_page:
-        check_next_page = sms_handler(msg) or check_next_page
+        sms_handler(msg)
 
 
 def check_incoming_log():

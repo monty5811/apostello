@@ -1,9 +1,8 @@
-{% load staticfiles %}
+{% load staticfiles %}{% load apostello_extras %}
 <!DOCTYPE html>
 <html lang="en">
 	<head>
 		{% include 'apostello/includes/head.html' %}
-    <title>apostello - First Run Setup</title>
 		{% block morehead %}
     {% endblock %}
   </head>
@@ -60,11 +59,14 @@
           </table>
         </div>
         </br>
-        <div id="elmContainer" src=""></div>
+        <div id="elmContainer"></div>
       </div>
     </div>
     <div class="ui hidden divider"></div>
     </div>
+    <script>
+      var elmSettings = {% elm_settings request.user %};
+    </script>
     {% if OPBEAT_JS_APP_ID %}
     <script src="https://d3tvtfb6518e3e.cloudfront.net/1/opbeat.min.js"
             data-org-id="{{ OPBEAT_JS_ORG_ID }}"

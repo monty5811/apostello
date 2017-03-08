@@ -12,7 +12,6 @@ module.exports = {
 
   entry: {
     app: './js/app',
-    tour: './js/tour',
     vendor: [
       'datetimepicker',
       './semantic/dist/components/transition.js',

@@ -7,7 +7,7 @@ from django.core import mail
 from site_config.models import SiteConfiguration
 
 
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db
 @pytest.mark.slow
 @pytest.mark.selenium
 class TestSignup:
@@ -21,7 +21,7 @@ class TestSignup:
         config.office_email = 'test@apostello.ninja'
         config.save()
         # signup
-        uri = '/accounts/signup'
+        uri = '/accounts/signup/'
         browser.get(live_server + uri)
         email_box = browser.find_elements_by_name('email')[0]
         email_box.send_keys('testsignupemail@example.com')

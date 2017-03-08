@@ -1,42 +1,52 @@
-module Updates.KeywordTable exposing (update, updateKeywords)
+module Updates.KeywordTable exposing (update)
 
-import Decoders exposing (keywordDecoder)
 import DjangoSend exposing (archivePost)
 import Helpers exposing (..)
 import Http
 import Messages exposing (..)
 import Models exposing (..)
-import Urls exposing (..)
+import Urls
 
 
-update : KeywordTableMsg -> Model -> ( Model, Cmd Msg )
+update : KeywordTableMsg -> Model -> ( Model, List (Cmd Msg) )
 update msg model =
     case msg of
-        ToggleKeywordArchive isArchived pk ->
+        ToggleKeywordArchive isArchived k ->
             ( { model
-                | keywordTable = optArchiveKeyword model.keywordTable pk
+                | dataStore = optArchiveKeyword model.dataStore k
               }
-            , toggleKeywordArchive model.csrftoken isArchived pk
+            , [ toggleKeywordArchive model.settings.csrftoken isArchived k ]
             )
 
         ReceiveToggleKeywordArchive (Ok _) ->
-            ( model, Cmd.none )
+            ( model, [] )
 
         ReceiveToggleKeywordArchive (Err _) ->
             handleNotSaved model
 
 
-updateKeywords : KeywordTableModel -> List Keyword -> KeywordTableModel
-updateKeywords model keywords =
-    { model | keywords = mergeItems model.keywords keywords |> List.sortBy .keyword }
+optArchiveKeyword : DataStore -> String -> DataStore
+optArchiveKeyword ds k =
+    { ds | keywords = optArchiveKeywordHelper ds.keywords k }
 
 
-optArchiveKeyword : KeywordTableModel -> Int -> KeywordTableModel
-optArchiveKeyword model pk =
-    { model | keywords = List.filter (\r -> not (r.pk == pk)) model.keywords }
+optArchiveKeywordHelper : List { a | keyword : String, is_archived : Bool } -> String -> List { a | keyword : String, is_archived : Bool }
+optArchiveKeywordHelper recs k =
+    recs
+        |> List.map (toggleIsArchived k)
 
 
-toggleKeywordArchive : CSRFToken -> Bool -> Int -> Cmd Msg
-toggleKeywordArchive csrftoken isArchived pk =
-    archivePost csrftoken (keywordUrl pk) isArchived keywordDecoder
+toggleIsArchived : String -> { a | keyword : String, is_archived : Bool } -> { a | keyword : String, is_archived : Bool }
+toggleIsArchived k rec =
+    case k == rec.keyword of
+        True ->
+            { rec | is_archived = not rec.is_archived }
+
+        False ->
+            rec
+
+
+toggleKeywordArchive : CSRFToken -> Bool -> String -> Cmd Msg
+toggleKeywordArchive csrftoken isArchived k =
+    archivePost csrftoken (Urls.keyword k) isArchived keywordDecoder
         |> Http.send (KeywordTableMsg << ReceiveToggleKeywordArchive)

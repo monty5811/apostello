@@ -14,8 +14,8 @@ import Views.FilteringTable exposing (uiTable)
 -- Main view
 
 
-view : Regex.Regex -> Time.Time -> ScheduledSmsTableModel -> Html Msg
-view filterRegex currentTime model =
+view : Regex.Regex -> Time.Time -> List QueuedSms -> Html Msg
+view filterRegex currentTime sms =
     let
         head =
             thead []
@@ -29,11 +29,11 @@ view filterRegex currentTime model =
                     ]
                 ]
 
-        sms =
-            model.sms
+        smsFiltered =
+            sms
                 |> List.filter (onlyFuture currentTime)
     in
-        uiTable head filterRegex smsRow sms
+        uiTable head filterRegex smsRow smsFiltered
 
 
 onlyFuture : Time.Time -> QueuedSms -> Bool

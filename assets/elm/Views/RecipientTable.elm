@@ -6,15 +6,15 @@ import Html.Attributes exposing (class, href)
 import Messages exposing (..)
 import Models exposing (..)
 import Regex
-import Views.Common exposing (archiveCell)
+import Views.Helpers exposing (archiveCell)
 import Views.FilteringTable exposing (uiTable)
 
 
 -- Main view
 
 
-view : Regex.Regex -> RecipientTableModel -> Html Msg
-view filterRegex model =
+view : Regex.Regex -> List Recipient -> Html Msg
+view filterRegex recipients =
     let
         head =
             thead []
@@ -26,7 +26,7 @@ view filterRegex model =
                     ]
                 ]
     in
-        uiTable head filterRegex recipientRow model.recipients
+        uiTable head filterRegex recipientRow recipients
 
 
 recipientRow : Recipient -> Html Msg

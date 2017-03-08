@@ -1,13 +1,10 @@
-module Tests exposing (..)
+module TestGroupComposer exposing (suite)
 
 import Expect
-import Fuzz exposing (..)
-import GroupComposer.Parser exposing (..)
-import Views.GroupComposer exposing (..)
-import Helpers exposing (..)
 import Models exposing (..)
 import Set exposing (Set)
 import Test exposing (..)
+import Views.GroupComposer exposing (..)
 
 
 john : RecipientSimple
@@ -27,11 +24,11 @@ bill =
 
 testGroups : Groups
 testGroups =
-    [ RecipientGroup "all" 123 "" [ john, bob, bill ] [] "" "" False
-    , RecipientGroup "john" 1 "" [ john ] [] "" "" False
-    , RecipientGroup "bob" 2 "" [ bob ] [] "" "" False
-    , RecipientGroup "bill" 3 "" [ bill ] [] "" "" False
-    , RecipientGroup "john,bob" 12 "" [ john, bob ] [] "" "" False
+    [ RecipientGroup "all" 123 "" [ john, bob, bill ] [] 0 "" False
+    , RecipientGroup "john" 1 "" [ john ] [] 0 "" False
+    , RecipientGroup "bob" 2 "" [ bob ] [] 0 "" False
+    , RecipientGroup "bill" 3 "" [ bill ] [] 0 "" False
+    , RecipientGroup "john,bob" 12 "" [ john, bob ] [] 0 "" False
     ]
 
 
@@ -64,8 +61,8 @@ testParenPairs =
     ]
 
 
-all : Test
-all =
+suite : Test
+suite =
     describe "RecipientGroup Composer Test Suite"
         ([ test "Union" <|
             \() ->

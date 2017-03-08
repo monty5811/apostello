@@ -9,12 +9,19 @@ import Models exposing (..)
 -- Main view
 
 
-view : WallModel -> Html Msg
-view model =
-    div [ class "ui stackable grid container" ]
-        [ div [ class "sixteen wide centered column" ]
+view : List SmsInboundSimple -> Html Msg
+view sms =
+    div
+        [ class "ui grid"
+        , style
+            [ ( "background-color", "#5c569c" )
+            , ( "height", "100vh" )
+            , ( "width", "100vw" )
+            ]
+        ]
+        [ div [ class "twelve wide centered column" ]
             [ div [ class "ui one cards" ]
-                (model.sms
+                (sms
                     |> List.filter (\s -> s.display_on_wall)
                     |> List.map smsCard
                 )

@@ -93,7 +93,7 @@ Setup:
 .. code-block:: bash
 
     cd assets/
-    npm install # this may take a while
+    yarn install # this may take a while
 
 Changes must then be compiled:
 

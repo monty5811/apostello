@@ -1,51 +1,23 @@
 {% load staticfiles %}{% load cache %}
+{% load apostello_extras %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     {% include 'apostello/includes/head.html' %}
-    <title>apostello - {% block title %}apostello{% endblock %}</title>
     {% block morehead %}
     {% endblock %}
   </head>
-  <body data-js-view-name="{{ js_path }}">
-    <div class="ui top attached inverted violet menu">
-      <a href="/" class="item">Home</a>
-      {% cache 1800 topbar request.user %}
-      {% include 'apostello/top_menu.html' %}
-      {% endcache %}
-    </div>
-    <div class="ui hidden divider"></div>
-    <div class="ui stackable grid container">
-      <div class="fourteen wide centered column">
-            {% if messages %}
-            {% for message in messages %}
-            <div class="ui {{ message.tags }} message">
-              {{ message }}
-            </div>
-            {% endfor %}
-            {% endif %}
-            {% block content %} {% endblock %}
-      </div>
-    </div>
-    <div class="ui hidden divider"></div>
-    <div id="fabContainer"></div>
+  <body>
+    {% block main %}
+    {% endblock %}
+    <div id="elmContainer"></div>
+    {% cache 1800 elmSettings request.user %}
     <script>
-      var fabLinks = [
-        {% block fab %}{% include 'apostello/includes/default_fab.html' %}{% endblock %}
-      ];
+      var elmSettings = {% elm_settings request.user %};
     </script>
-    {% if OPBEAT_JS_APP_ID %}
-    <script src="https://d3tvtfb6518e3e.cloudfront.net/1/opbeat.min.js"
-            data-org-id="{{ OPBEAT_JS_ORG_ID }}"
-            data-app-id="{{ OPBEAT_JS_APP_ID }}"
-            async
-            ></script>
-    {% endif %}
-		<script src="https://code.jquery.com/jquery-3.1.0.js"
-					integrity="sha256-slogkvB1K3VOkzAI8QITxV3VzpOnkeNVsKvtkYLMjfk="
-		 crossorigin="anonymous"></script>
-    <script src="{% static 'js/vendor.js' %}"></script>
-    <script src="{% static 'js/app.js' %}"></script>
+    {% endcache %}
+    {% include 'apostello/includes/js.html' %}
     {% block morejs %}{% endblock %}
+    <div id="dtBox"></div>
   </body>
 </html>

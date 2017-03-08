@@ -12,7 +12,7 @@ def load_page(b, wt, url):
     return b
 
 
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db
 @pytest.mark.slow
 @pytest.mark.selenium
 class TestDefaultPrefix:

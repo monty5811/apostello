@@ -1,15 +1,12 @@
 {% load staticfiles %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-{% include 'apostello/includes/head.html' %}
-<title>apostello - Wall</title>
-</head>
-<body style="background-color: #5c569c"  data-js-view-name="{{ js_path }}">
-<div id="elmContainer" src="/api/v1/sms/live_wall/all/"></div>
+{% if OPBEAT_JS_APP_ID %}
+<script src="https://d3tvtfb6518e3e.cloudfront.net/1/opbeat.min.js"
+        data-org-id="{{ OPBEAT_JS_ORG_ID }}"
+        data-app-id="{{ OPBEAT_JS_APP_ID }}"
+        async></script>
+{% endif %}
 <script src="https://code.jquery.com/jquery-3.1.0.js"
         integrity="sha256-slogkvB1K3VOkzAI8QITxV3VzpOnkeNVsKvtkYLMjfk="
         crossorigin="anonymous"></script>
 <script src="{% static 'js/vendor.js' %}"></script>
 <script src="{% static 'js/app.js' %}"></script>
-</body>

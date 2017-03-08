@@ -1,6 +1,5 @@
 module Updates.Fab exposing (update)
 
-import Decoders exposing (decodeAlwaysTrue)
 import DjangoSend exposing (archivePost)
 import Http
 import Messages exposing (..)
@@ -8,43 +7,33 @@ import Models exposing (..)
 import Navigation
 
 
-update : FabMsg -> Model -> ( Model, Cmd Msg )
+update : FabMsg -> Model -> ( Model, List (Cmd Msg) )
 update msg model =
     case msg of
-        ArchiveItem ->
-            case model.fabModel.archiveButton of
-                Just ab ->
-                    ( model, archiveItem model.csrftoken ab )
+        ArchiveItem redirectUrl url isArchived ->
+            ( model, [ archiveItem model.settings.csrftoken redirectUrl url isArchived ] )
 
-                Nothing ->
-                    ( model, Cmd.none )
+        ReceiveArchiveResp _ (Err _) ->
+            ( model, [] )
 
-        ReceiveArchiveResp (Err _) ->
-            ( model, Cmd.none )
-
-        ReceiveArchiveResp (Ok _) ->
-            case model.fabModel.archiveButton of
-                Just ab ->
-                    ( model, Navigation.load ab.redirectUrl )
-
-                Nothing ->
-                    ( model, Cmd.none )
+        ReceiveArchiveResp url (Ok _) ->
+            ( model, [ Navigation.load url ] )
 
         ToggleFabView ->
-            ( { model | fabModel = toggleFabView model.fabModel }, Cmd.none )
+            ( { model | fabModel = toggleFabView model.fabModel }, [] )
 
 
 toggleFabView : FabModel -> FabModel
 toggleFabView model =
-    case model.fabState of
+    case model of
         MenuHidden ->
-            { model | fabState = MenuVisible }
+            MenuVisible
 
         MenuVisible ->
-            { model | fabState = MenuHidden }
+            MenuHidden
 
 
-archiveItem : CSRFToken -> ArchiveButton -> Cmd Msg
-archiveItem csrftoken r =
-    archivePost csrftoken r.postUrl r.isArchived decodeAlwaysTrue
-        |> Http.send (FabMsg << ReceiveArchiveResp)
+archiveItem : CSRFToken -> String -> String -> Bool -> Cmd Msg
+archiveItem csrftoken redirectUrl url isArchived =
+    archivePost csrftoken url isArchived decodeAlwaysTrue
+        |> Http.send (FabMsg << ReceiveArchiveResp redirectUrl)

@@ -2,6 +2,7 @@ module Messages exposing (..)
 
 import Http
 import Models exposing (..)
+import Navigation
 import Time
 
 
@@ -9,8 +10,10 @@ import Time
 
 
 type Msg
-    = LoadData LoadingStatus
-    | ReceiveRawResp (Result Http.Error RawResponse)
+    = LoadData
+    | ReceiveRawResp RemoteDataType (Result Http.Error RawResponse)
+    | UrlChange Navigation.Location
+    | NewUrl String
     | UpdateTableFilter String
     | ElvantoMsg ElvantoMsg
     | InboundTableMsg InboundTableMsg
@@ -24,21 +27,44 @@ type Msg
     | ScheduledSmsTableMsg ScheduledSmsTableMsg
     | KeyRespTableMsg KeyRespTableMsg
     | FirstRunMsg FirstRunMsg
+    | SendAdhocMsg SendAdhocMsg
+    | SendGroupMsg SendGroupMsg
     | FabMsg FabMsg
     | NotificationMsg NotificationMsg
     | CurrentTime Time.Time
+    | LoadDataStore String
+    | Nope
 
 
 type NotificationMsg
     = NewNotification NotificationType String
     | RemoveNotification Notification
-    | CleanOldNotifications Time.Time
 
 
 type FabMsg
-    = ArchiveItem
-    | ReceiveArchiveResp (Result Http.Error Bool)
+    = ArchiveItem String String Bool
+    | ReceiveArchiveResp String (Result Http.Error Bool)
     | ToggleFabView
+
+
+type SendAdhocMsg
+    = UpdateContent String
+    | UpdateDate String
+    | PostForm
+    | ReceiveFormResp (Result Http.Error { body : String, code : Int })
+    | ToggleSelectAdhocModal Bool
+    | ToggleSelectedContact Int
+    | UpdateAdhocFilter String
+
+
+type SendGroupMsg
+    = UpdateSGContent String
+    | UpdateSGDate String
+    | PostSGForm
+    | ReceiveSGFormResp (Result Http.Error { body : String, code : Int })
+    | ToggleSelectGroupModal Bool
+    | SelectGroup Int
+    | UpdateGroupFilter String
 
 
 type FirstRunMsg
@@ -73,7 +99,7 @@ type InboundTableMsg
 type GroupMemberSelectMsg
     = UpdateMemberFilter String
     | UpdateNonMemberFilter String
-    | ToggleMembership RecipientSimple
+    | ToggleMembership RecipientGroup RecipientSimple
     | ReceiveToggleMembership (Result Http.Error RecipientGroup)
 
 
@@ -93,7 +119,7 @@ type RecipientTableMsg
 
 
 type KeywordTableMsg
-    = ToggleKeywordArchive Bool Int
+    = ToggleKeywordArchive Bool String
     | ReceiveToggleKeywordArchive (Result Http.Error Keyword)
 
 
@@ -116,3 +142,6 @@ type KeyRespTableMsg
     | ToggleInboundSmsDealtWith Bool Int
     | ReceiveToggleInboundSmsArchive (Result Http.Error SmsInbound)
     | ReceiveToggleInboundSmsDealtWith (Result Http.Error SmsInbound)
+    | ArchiveAllButtonClick String
+    | ArchiveAllCheckBoxClick
+    | ReceiveArchiveAllResp (Result Http.Error Bool)

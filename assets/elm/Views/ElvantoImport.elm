@@ -13,8 +13,8 @@ import Views.FilteringTable exposing (filteringTable)
 -- Main view
 
 
-view : Regex.Regex -> ElvantoImportModel -> Html Msg
-view filterRegex model =
+view : Regex.Regex -> List ElvantoGroup -> Html Msg
+view filterRegex groups =
     let
         head =
             thead []
@@ -31,7 +31,7 @@ view filterRegex model =
                 , pullButton
                 ]
             , br [] []
-            , filteringTable "ui striped compact definition table" head filterRegex groupRow model.groups
+            , filteringTable "ui striped compact definition table" head filterRegex groupRow groups
             ]
 
 

@@ -13,21 +13,10 @@ class SimpleView(ProfilePermsMixin, View):
     """Simple view that can ensure user is logged in and has permissions."""
     template_name = ''
     required_perms = []
-    rest_uri = None
 
     def get(self, request, *args, **kwargs):
         """Handle get requests."""
-        user_profile = self.request.user.profile
-        context = {'show_tour': user_profile.show_tour}
-        if user_profile.show_tour:
-            # first run, disable tour on subsequent loads
-            user_profile.show_tour = False
-            user_profile.save()
-
-        if self.rest_uri is not None:
-            context['rest_uri'] = self.rest_uri
-
-        return TemplateResponse(request, self.template_name, context)
+        return TemplateResponse(request, self.template_name, {})
 
 
 class ItemView(ProfilePermsMixin, View):
@@ -49,13 +38,19 @@ class ItemView(ProfilePermsMixin, View):
         context['identifier'] = self.identifier
         try:
             # if editing, form needs to be populated
-            pk = kwargs['pk']
-            instance = get_object_or_404(self.model_class, pk=pk)
+            if self.identifier == 'keyword':
+                instance = get_object_or_404(
+                    self.model_class, keyword=kwargs.pop('keyword')
+                )
+            else:
+                instance = get_object_or_404(
+                    self.model_class, pk=kwargs.pop('pk')
+                )
             context['object'] = instance
             form = self.form_class(instance=instance)
             context['submit_text'] = "Update"
             if self.identifier == "keyword":
-                context['keyword'] = Keyword.objects.get(pk=pk)
+                context['keyword'] = instance
             if self.identifier == 'recipient':
                 context['sms_history'] = True
         except KeyError:
@@ -81,8 +76,13 @@ class ItemView(ProfilePermsMixin, View):
         the archived object.
         """
         try:
-            instance = self.model_class.objects.get(pk=kwargs['pk']
-                                                    )  # original instance
+            if self.identifier == 'keyword':
+                instance = self.model_class.objects.get(
+                    keyword=kwargs['keyword']
+                )
+            else:
+                instance = self.model_class.objects.get(pk=kwargs['pk']
+                                                        )  # original instance
             form = self.form_class(request.POST, instance=instance)
         except KeyError:
             form = self.form_class(request.POST)

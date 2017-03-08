@@ -2,7 +2,9 @@ from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
+from django.template.loader import get_template
 from django.template.response import TemplateResponse
+from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView, View
 from django.views.generic.edit import UpdateView
 from rest_framework.authtoken.models import Token
@@ -11,6 +13,13 @@ from apostello.forms import UserProfileForm
 from apostello.mixins import ProfilePermsMixin
 from apostello.models import UserProfile
 from site_config.models import SiteConfiguration
+
+
+@never_cache
+def sw_js(request, js):
+    return TemplateResponse(
+        request, 'apostello/sw.js', content_type='application/x-javascript'
+    )
 
 
 class NotApprovedView(TemplateView):

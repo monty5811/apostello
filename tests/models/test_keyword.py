@@ -107,9 +107,8 @@ class TestKeywords():
         assert Keyword.match("nope") == 'No Match'
 
     def test_get_log_link_keyword(self, keywords):
-        assert Keyword.get_log_link(
-            keywords['test']
-        ) == '/keyword/responses/{0}/'.format(keywords['test'].pk)
+        assert Keyword.get_log_link(keywords['test']
+                                    ) == '/keyword/responses/test/'
 
     def test_lookup_colour_test(self, keywords):
         assert Keyword.lookup_colour('test') == '#098f6b'

@@ -2,10 +2,10 @@ module Views.FirstRun exposing (view)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onInput, onWithOptions)
-import Json.Decode as Decode
+import Html.Events exposing (onInput)
 import Messages exposing (..)
 import Models exposing (..)
+import Views.Helpers exposing (..)
 
 
 view : FirstRunModel -> Html Msg
@@ -140,22 +140,6 @@ createAdminView model =
         ]
 
 
-formClass : FormStatus -> String
-formClass status =
-    case status of
-        NoAction ->
-            "ui form"
-
-        InProgress ->
-            "ui loading form"
-
-        Success ->
-            "ui success form"
-
-        Failed _ ->
-            "ui error form"
-
-
 formMsg : FormStatus -> Html Msg -> Html Msg
 formMsg status successDiv =
     case status of
@@ -199,14 +183,3 @@ smsSuccessMsg =
         [ div [ class "header" ] [ text "SMS Sending!" ]
         , p [] [ text "Check your phone to confirm!" ]
         ]
-
-
-onClick : msg -> Attribute msg
-onClick message =
-    let
-        options =
-            { stopPropagation = True
-            , preventDefault = True
-            }
-    in
-        onWithOptions "click" options (Decode.succeed message)

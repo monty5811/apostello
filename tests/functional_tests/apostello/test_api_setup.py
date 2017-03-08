@@ -5,7 +5,7 @@ import pytest
 URI = '/api-setup/'
 
 
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db
 @pytest.mark.slow
 @pytest.mark.selenium
 class TestAPISetup:

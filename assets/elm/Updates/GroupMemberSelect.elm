@@ -1,6 +1,5 @@
-module Updates.GroupMemberSelect exposing (update, updateGroup)
+module Updates.GroupMemberSelect exposing (update)
 
-import Decoders exposing (recipientgroupDecoder)
 import DjangoSend exposing (post)
 import Helpers exposing (..)
 import Http
@@ -8,33 +7,31 @@ import Json.Encode as Encode
 import Messages exposing (..)
 import Models exposing (..)
 import Views.FilteringTable as FT
+import Urls
+import Updates.DataStore exposing (updateGroups)
 
 
-update : GroupMemberSelectMsg -> Model -> ( Model, Cmd Msg )
+update : GroupMemberSelectMsg -> Model -> ( Model, List (Cmd Msg) )
 update msg model =
     case msg of
         UpdateMemberFilter text ->
-            ( { model | groupSelect = updateMemberFilter model.groupSelect text }, Cmd.none )
+            ( { model | groupSelect = updateMemberFilter model.groupSelect text }, [] )
 
         UpdateNonMemberFilter text ->
-            ( { model | groupSelect = updateNonMemberFilter model.groupSelect text }, Cmd.none )
+            ( { model | groupSelect = updateNonMemberFilter model.groupSelect text }, [] )
 
-        ToggleMembership contact ->
-            ( { model | groupSelect = optToggleMember model.groupSelect contact }
-            , toggleGroupMembership
-                model.csrftoken
-                model.dataUrl
-                contact.pk
-                (memberInList model.groupSelect.members contact)
+        ToggleMembership group contact ->
+            ( { model | dataStore = optToggleMember group model.dataStore contact }
+            , [ toggleGroupMembership
+                    model.settings.csrftoken
+                    group.pk
+                    contact.pk
+                    (memberInList group.members contact)
+              ]
             )
 
         ReceiveToggleMembership (Ok group) ->
-            ( { model
-                | loadingStatus = Finished
-                , groupSelect = updateGroup model.groupSelect group
-              }
-            , Cmd.none
-            )
+            ( { model | dataStore = updateGroups model.dataStore [ group ] }, [] )
 
         ReceiveToggleMembership (Err _) ->
             handleNotSaved model
@@ -50,23 +47,16 @@ updateNonMemberFilter model text =
     { model | nonmembersFilterRegex = FT.textToRegex text }
 
 
-updateGroup : GroupMemberSelectModel -> RecipientGroup -> GroupMemberSelectModel
-updateGroup model group =
-    { model
-        | pk = group.pk
-        , description = group.description
-        , members = group.members
-        , nonmembers = group.nonmembers
-        , url = group.url
-    }
-
-
-optToggleMember : GroupMemberSelectModel -> RecipientSimple -> GroupMemberSelectModel
-optToggleMember model contact =
-    { model
-        | members = optUpdateMembers model.members contact
-        , nonmembers = optUpdateMembers model.nonmembers contact
-    }
+optToggleMember : RecipientGroup -> DataStore -> RecipientSimple -> DataStore
+optToggleMember group ds contact =
+    let
+        updatedGroup =
+            { group
+                | members = optUpdateMembers group.members contact
+                , nonmembers = optUpdateMembers group.nonmembers contact
+            }
+    in
+        updateGroups ds [ updatedGroup ]
 
 
 optUpdateMembers : List RecipientSimple -> RecipientSimple -> List RecipientSimple
@@ -86,13 +76,16 @@ memberInList existingList contact =
         |> List.member contact.pk
 
 
-toggleGroupMembership : CSRFToken -> String -> Int -> Bool -> Cmd Msg
-toggleGroupMembership csrftoken url pk isMember =
+toggleGroupMembership : CSRFToken -> Int -> Int -> Bool -> Cmd Msg
+toggleGroupMembership csrftoken groupPk contactPk isMember =
     let
         body =
             [ ( "member", Encode.bool isMember )
-            , ( "contactPk", Encode.int pk )
+            , ( "contactPk", Encode.int contactPk )
             ]
+
+        url =
+            Urls.group groupPk
     in
         post csrftoken url body recipientgroupDecoder
             |> Http.send (GroupMemberSelectMsg << ReceiveToggleMembership)

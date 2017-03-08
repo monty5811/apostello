@@ -3,36 +3,139 @@ module Urls exposing (..)
 import Formatting exposing (..)
 
 
-recipientUrl : Int -> String
-recipientUrl pk =
-    print (s "/api/v1/recipients/" <> int) pk
+recipient : Int -> String
+recipient pk =
+    print (s "/api/v1/recipients/" <> int <> s "/") pk
 
 
-keywordUrl : Int -> String
-keywordUrl pk =
-    print (s "/api/v1/keywords/" <> int) pk
+recipients : String
+recipients =
+    "/api/v1/recipients/"
 
 
-smsInboundUrl : Int -> String
-smsInboundUrl pk =
-    print (s "/api/v1/sms/in/" <> int) pk
+recipientsArchive : String
+recipientsArchive =
+    "/api/v1/recipients_archive/"
 
 
-groupsUrl_quick : Int -> String
-groupsUrl_quick pk =
-    print (s "/api/v1/groups/" <> int <> s "?fields!members,nonmembers") pk
+keyword : String -> String
+keyword k =
+    print (s "/api/v1/keywords/" <> string <> s "/") k
 
 
-elvantoGroupUrl : Int -> String
-elvantoGroupUrl pk =
-    print (s "/api/v1/elvanto/group/" <> int) pk
+keywordArchiveResps : String -> String
+keywordArchiveResps k =
+    print (s "/api/v1/keywords/" <> string <> s "/archive_resps/") k
 
 
-userprofileUrl : Int -> String
-userprofileUrl pk =
-    print (s "/api/v1/users/profiles/" <> int) pk
+smsInbounds : String
+smsInbounds =
+    "/api/v1/sms/in/"
 
 
-queuedSmsUrl : Int -> String
-queuedSmsUrl pk =
-    print (s "/api/v1/queued/sms/" <> int) pk
+smsInbound : Int -> String
+smsInbound pk =
+    print (s "/api/v1/sms/in/" <> int <> s "/") pk
+
+
+smsInboundsWall : String
+smsInboundsWall =
+    "/api/v1/sms/live_wall/all/"
+
+
+smsInboundsKeyword : String -> String
+smsInboundsKeyword keyword =
+    print (s "/api/v1/sms/in/keyword/" <> string <> s "/") keyword
+
+
+smsInboundsKeywordArchive : String -> String
+smsInboundsKeywordArchive keyword =
+    print (s "/api/v1/sms/in/keyword/" <> string <> s "/archive/") keyword
+
+
+elvantoGroup : Int -> String
+elvantoGroup pk =
+    print (s "/api/v1/elvanto/group/" <> int <> s "/") pk
+
+
+userprofile : Int -> String
+userprofile pk =
+    print (s "/api/v1/users/profiles/" <> int <> s "/") pk
+
+
+queuedSms : Int -> String
+queuedSms pk =
+    print (s "/api/v1/queued/sms/" <> int <> s "/") pk
+
+
+queuedSmss : String
+queuedSmss =
+    "/api/v1/queued/sms/"
+
+
+group : Int -> String
+group pk =
+    print (s "/api/v1/groups/" <> int <> s "/") pk
+
+
+smsOutbounds : String
+smsOutbounds =
+    "/api/v1/sms/out/"
+
+
+groups : String
+groups =
+    "/api/v1/groups/"
+
+
+groupsArchive : String
+groupsArchive =
+    "/api/v1/groups_archive/"
+
+
+keywords : String
+keywords =
+    "/api/v1/keywords/"
+
+
+keywordsArchive : String
+keywordsArchive =
+    "/api/v1/keywords_archive/"
+
+
+elvantoGroups : String
+elvantoGroups =
+    "/api/v1/elvanto/groups/"
+
+
+userProfiles : String
+userProfiles =
+    "/api/v1/users/profiles/"
+
+
+
+-- sending
+
+
+sendGroup : String
+sendGroup =
+    "/api/v1/sms/send/group/"
+
+
+sendAdhoc : String
+sendAdhoc =
+    "/api/v1/sms/send/adhoc/"
+
+
+
+-- elvanto actions
+
+
+elvantoPullGroups : String
+elvantoPullGroups =
+    "/api/v1/elvanto/group_pull/"
+
+
+elvantoFetchGroups : String
+elvantoFetchGroups =
+    "/api/v1/elvanto/group_fetch/"

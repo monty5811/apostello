@@ -2,59 +2,59 @@ module Updates.Notification exposing (..)
 
 import Messages exposing (..)
 import Models exposing (..)
-import Time
 
 
-update : NotificationMsg -> Model -> ( Model, Cmd Msg )
+update : NotificationMsg -> Model -> Model
 update msg model =
     case msg of
         NewNotification type_ text ->
-            ( createNotification model text type_, Cmd.none )
+            createNotification model text type_
 
         RemoveNotification notif ->
-            ( { model | notifications = removeNotification model.notifications notif.id }, Cmd.none )
-
-        CleanOldNotifications t ->
-            ( { model | notifications = cleanOldNotifications model.notifications t }, Cmd.none )
+            { model | notifications = removeNotification model.notifications notif }
 
 
-getNewId : List Notification -> Int
-getNewId notifs =
+removeNotification : List Notification -> Notification -> List Notification
+removeNotification notifs notif =
     notifs
-        |> List.map .id
-        |> List.maximum
-        |> Maybe.withDefault 0
-        |> (+) 1
-
-
-newNotification : List Notification -> Time.Time -> String -> NotificationType -> List Notification
-newNotification notifs currentTime text type_ =
-    let
-        newId =
-            getNewId notifs
-    in
-        (Notification type_ text newId currentTime) :: notifs
-
-
-removeNotification : List Notification -> Int -> List Notification
-removeNotification notifs id =
-    notifs
-        |> List.filter (\n -> (not (n.id == id)))
-
-
-cleanOldNotifications : List Notification -> Time.Time -> List Notification
-cleanOldNotifications notifs t =
-    List.filter (isNewerThan20s t) notifs
-
-
-isNewerThan20s : Time.Time -> Notification -> Bool
-isNewerThan20s t notif =
-    (t - notif.created) < (20 * Time.second)
+        |> List.filter (\n -> (not (n.text == notif.text)))
 
 
 createNotification : Model -> String -> NotificationType -> Model
 createNotification model text type_ =
-    { model | notifications = newNotification model.notifications model.currentTime text type_ }
+    let
+        existing =
+            model.notifications |> List.map .text
+    in
+        case List.member text existing of
+            False ->
+                { model | notifications = (Notification type_ text) :: model.notifications }
+
+            True ->
+                model
+
+
+createNotificationFromDjangoMessage : DjangoMessage -> Model -> Model
+createNotificationFromDjangoMessage dm model =
+    let
+        type_ =
+            case dm.type_ of
+                "info" ->
+                    InfoNotification
+
+                "success" ->
+                    SuccessNotification
+
+                "warning" ->
+                    WarningNotification
+
+                "error" ->
+                    ErrorNotification
+
+                _ ->
+                    WarningNotification
+    in
+        createNotification model dm.text type_
 
 
 createWarningNotification : Model -> String -> Model

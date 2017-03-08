@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 """Common settings module."""
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+APPEND_SLASH = True
 
 # Django settings
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -56,7 +56,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'apostello.middleware.FirstRunRedirect',
-    'apostello.middleware.JsPathMiddleware',
 ]
 
 TEMPLATES = [

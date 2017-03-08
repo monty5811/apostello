@@ -24,7 +24,7 @@
   background: none;
   border: none;
   text-align: right;
-  z-index: 10;
+  z-index: 7;
 }
 .fabDim{
   background: #5b599c;
@@ -34,7 +34,7 @@
   top: 0;
   left: 0;
   opacity: 0.8;
-  z-index: 9;
+  z-index: 6;
 };
 /* Backward */
 /* https://github.com/IanLunn/Hover/blob/master/css/hover.css */
@@ -52,4 +52,9 @@
 .hvr-backward:hover, .hvr-backward:focus, .hvr-backward:active {
   -webkit-transform: translateX(-8px);
   transform: translateX(-8px);
+}
+
+// override search input
+.ui.multiple.search.dropdown > input.search {
+  width: 100%;
 }

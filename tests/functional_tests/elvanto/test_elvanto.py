@@ -45,7 +45,7 @@ class TestElvantoImport:
         # enable a group
         sleep(driver_wait_time)
         group_button = browser_in.find_elements_by_xpath(
-            '//*[@id="elmContainer"]/div/div/div[2]/table/tbody/tr[1]/td[3]/a'
+            '//*[@id="elmContainer"]/div/div[3]/div/div/div[2]/table/tbody/tr[1]/td[3]/a'
         )[0]
         group_button.click()
         sleep(driver_wait_time)
@@ -57,7 +57,6 @@ class TestElvantoImport:
         sleep(driver_wait_time)
         pull_button = browser_in.find_elements_by_id('pull_button')[0]
         pull_button.click()
-        # sleep(driver_wait_time)
         check_and_close_msg(browser_in, driver_wait_time)
 
     @my_vcr.use_cassette(

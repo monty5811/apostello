@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.contrib.auth.mixins import LoginRequiredMixin
 from apostello.decorators import check_user_perms
 

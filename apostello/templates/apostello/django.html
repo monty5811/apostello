@@ -1,0 +1,24 @@
+{% extends "apostello/base.html" %}
+{% load cache %}
+{% block main %}
+<div class="ui top attached inverted violet menu">
+  <a href="/" class="item">Home</a>
+  {% cache 1800 topbar request.user %}
+  {% include 'apostello/top_menu.html' %}
+  {% endcache %}
+</div>
+<div class="ui hidden divider"></div>
+<div class="ui stackable grid container">
+  <div class="fourteen wide centered column">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="ui {{ message.tags }} message">
+          {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% block content %} {% endblock %}
+  </div>
+</div>
+<div class="ui hidden divider"></div>
+{% endblock %}

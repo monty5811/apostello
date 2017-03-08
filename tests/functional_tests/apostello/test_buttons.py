@@ -10,7 +10,7 @@ from apostello import models
 from tests.functional_tests.utils import check_and_close_msg
 
 
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db
 @pytest.mark.slow
 @pytest.mark.selenium
 class TestButton:
@@ -18,9 +18,9 @@ class TestButton:
 
     @pytest.mark.parametrize(
         "uri,query_set", [
-            ('/keyword/all', models.Keyword.objects.all()),
-            ('/recipient/all', models.Recipient.objects.all()),
-            ('/group/all', models.RecipientGroup.objects.all()),
+            ('/keyword/all/', models.Keyword.objects.all()),
+            ('/recipient/all/', models.Recipient.objects.all()),
+            ('/group/all/', models.RecipientGroup.objects.all()),
         ]
     )
     def test_archive_all(
@@ -38,10 +38,13 @@ class TestButton:
         assert 'Archive' in table.text
         # toggle a permission
         toggle_buttons = browser_in.find_elements_by_class_name('grey')
-        while len(toggle_buttons) > 0:
+        num_buttons = len(toggle_buttons)
+        while num_buttons > 0:
             toggle_buttons[0].click()
             sleep(driver_wait_time)
             toggle_buttons = browser_in.find_elements_by_class_name('grey')
+            assert num_buttons - 1 == len(toggle_buttons)
+            num_buttons = len(toggle_buttons)
 
         for obj in query_set:
             assert obj.is_archived
@@ -67,8 +70,10 @@ class TestButton:
         k.save()
         uri = k.get_absolute_url
         browser_in.get(live_server + uri)
+        sleep(driver_wait_time)
         wrench = browser_in.find_elements_by_class_name('wrench')[0]
         wrench.click()
+        sleep(driver_wait_time)
         button = browser_in.find_elements_by_class_name('positive')[0]
         button.click()
         sleep(driver_wait_time)
@@ -89,20 +94,27 @@ class TestButton:
         table = tables[0]
         assert 'Hidden' in table.text
         hidden_buttons = browser_in.find_elements_by_class_name('red')
-        while len(hidden_buttons) > 0:
+        num_buttons = len(hidden_buttons)
+        while num_buttons > 0:
             hidden_buttons[0].click()
             sleep(driver_wait_time)
             hidden_buttons = browser_in.find_elements_by_class_name('red')
+            assert num_buttons - 1 == len(hidden_buttons)
+            num_buttons = len(hidden_buttons)
+
         sleep(driver_wait_time)
         sms.refresh_from_db()
         assert sms.display_on_wall
         displaying_buttons = browser_in.find_elements_by_class_name('green')
+        num_buttons = len(displaying_buttons)
         while len(displaying_buttons) > 0:
             displaying_buttons[0].click()
             sleep(driver_wait_time)
             displaying_buttons = browser_in.find_elements_by_class_name(
                 'green'
             )
+            assert num_buttons - 1 == len(displaying_buttons)
+            num_buttons = len(displaying_buttons)
         sleep(driver_wait_time)
         sms.refresh_from_db()
         assert sms.display_on_wall is False
@@ -197,9 +209,14 @@ class TestButton:
         assert 'another test message' in browser_in.page_source
         assert 'Calvin' in browser_in.page_source
         # delete tasks
-        while len(browser_in.find_elements_by_class_name('grey')) > 0:
-            browser_in.find_elements_by_class_name('grey')[0].click()
+        cancel_buttons = browser_in.find_elements_by_class_name('grey')
+        num_buttons = len(cancel_buttons)
+        while num_buttons > 0:
+            cancel_buttons[0].click()
             sleep(driver_wait_time)
+            cancel_buttons = browser_in.find_elements_by_class_name('grey')
+            assert num_buttons - 1 == len(cancel_buttons)
+            num_buttons = len(cancel_buttons)
         assert 'test message' not in browser_in.page_source
         assert 'another test message' not in browser_in.page_source
         assert 'Calvin' not in browser_in.page_source

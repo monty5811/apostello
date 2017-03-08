@@ -86,17 +86,7 @@ class RecipientGroup(models.Model):
     @cached_property
     def get_absolute_url(self):
         """Url for this group."""
-        return reverse('group', args=[str(self.pk)])
-
-    @cached_property
-    def get_api_url(self):
-        """Url for group list api end point."""
-        return reverse('api:group', args=[str(self.pk)])
-
-    @cached_property
-    def get_table_url(self):
-        """Url for group list page."""
-        return reverse('recipient_groups')
+        return '/group/edit/{}/'.format(self.pk)
 
     def __str__(self):
         """Pretty representation."""
@@ -198,21 +188,6 @@ class Recipient(models.Model):
     def get_absolute_url(self):
         """Url for this recipient."""
         return reverse('recipient', args=[str(self.pk)])
-
-    @cached_property
-    def get_api_url(self):
-        """Url for recipient list api end point."""
-        return reverse('api:recipient', args=[str(self.pk)])
-
-    @cached_property
-    def get_table_url(self):
-        """Url for recipient list page."""
-        return reverse('recipients')
-
-    @cached_property
-    def get_recent_sms_table_url(self):
-        """Url for recipient edit recent sms."""
-        return reverse('api:contact_recent_sms', args=[str(self.pk)])
 
     @cached_property
     def full_name(self):
@@ -473,22 +448,12 @@ class Keyword(models.Model):
     @cached_property
     def get_absolute_url(self):
         """Url for this group."""
-        return reverse('keyword', kwargs={'pk': str(self.pk)})
-
-    @cached_property
-    def get_api_url(self):
-        """Url for keyword list api end point."""
-        return reverse('api:keyword', args=[str(self.pk)])
-
-    @cached_property
-    def get_table_url(self):
-        """Url for keyword list page."""
-        return reverse('keywords')
+        return '/keyword/edit/{}/'.format(self.keyword)
 
     @cached_property
     def get_responses_url(self):
         """Url for keyword responses list page."""
-        return reverse('keyword_responses', args=[str(self.pk)])
+        return '/keyword/responses/{}/'.format(self.keyword)
 
     @staticmethod
     def _match(sms):
@@ -723,11 +688,6 @@ class SmsOutbound(models.Model):
         """Pretty representation."""
         return self.content
 
-    @cached_property
-    def recipient_url(self):
-        """Url for message recipient."""
-        return self.recipient.get_absolute_url
-
     class Meta:
         ordering = ['-time_sent']
 
@@ -771,9 +731,23 @@ class UserProfile(models.Model):
     can_import = models.BooleanField(default=False)
     can_archive = models.BooleanField(default=True)
 
+    @staticmethod
+    def nullProfile():
+        p = UserProfile()
+
+        dummy_user = User()
+        dummy_user.email = '--'
+        dummy_user.username = '--'
+        dummy_user.is_staff = True
+        dummy_user.is_social = False
+
+        p.user = dummy_user
+        p.pk = 0
+        return p
+
     def get_absolute_url(self):
         """Url for this user profile."""
-        return reverse('user_profile_form', args=[str(self.pk)])
+        return '/users/profiles/{}/'.format(self.pk)
 
     def __str__(self):
         """Pretty representation."""
@@ -796,9 +770,10 @@ class UserProfile(models.Model):
                 # no email adress, leave as unapproved
                 pass
         else:
-            # any other save, we want to refresh navbar:
-            key = make_template_fragment_key('topbar', [self.user])
-            cache.delete(key)
+            # any other save, we want to refresh navbar and elm settings:
+            for k in ['topbar', 'elmSettings']:
+                key = make_template_fragment_key(k, [self.user])
+                cache.delete(key)
         super(UserProfile, self).save(*args, **kwargs)
 
 

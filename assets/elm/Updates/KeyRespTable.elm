@@ -1,54 +1,73 @@
-module Updates.KeyRespTable exposing (update, updateSms)
+module Updates.KeyRespTable exposing (update)
 
-import Decoders exposing (smsinboundDecoder)
 import DjangoSend exposing (archivePost, post)
 import Helpers exposing (..)
 import Http
 import Json.Encode as Encode
 import Messages exposing (..)
 import Models exposing (..)
-import Urls exposing (..)
+import Updates.DataStore exposing (updateSmsInbounds, optArchiveRecordWithPk)
+import Urls
 
 
-update : KeyRespTableMsg -> Model -> ( Model, Cmd Msg )
+update : KeyRespTableMsg -> Model -> ( Model, List (Cmd Msg) )
 update msg model =
     case msg of
         ToggleInboundSmsArchive isArchived pk ->
-            ( { model | keyRespTable = optArchiveSms model.keyRespTable pk }, toggleSmsArchive model.csrftoken isArchived pk )
+            ( { model | dataStore = optArchiveSms model.dataStore pk }
+            , [ toggleSmsArchive model.settings.csrftoken isArchived pk ]
+            )
 
         ReceiveToggleInboundSmsArchive (Ok _) ->
-            ( model, Cmd.none )
+            ( model, [] )
 
         ReceiveToggleInboundSmsArchive (Err _) ->
             handleNotSaved model
 
         ToggleInboundSmsDealtWith isDealtWith pk ->
-            ( { model | keyRespTable = optToggleDealtWith model.keyRespTable pk }, toggleSmsDealtWith model.csrftoken isDealtWith pk )
+            ( { model | dataStore = optToggleDealtWith model.dataStore pk }
+            , [ toggleSmsDealtWith model.settings.csrftoken isDealtWith pk ]
+            )
 
         ReceiveToggleInboundSmsDealtWith (Ok sms) ->
-            ( { model | keyRespTable = updateSms model.keyRespTable [ sms ] }, Cmd.none )
+            ( { model | dataStore = updateSmsInbounds model.dataStore [ sms ] }, [] )
 
         ReceiveToggleInboundSmsDealtWith (Err _) ->
             handleNotSaved model
 
+        ArchiveAllCheckBoxClick ->
+            ( { model | keyRespTable = not model.keyRespTable }, [] )
 
-updateSms : KeyRespTableModel -> SmsInbounds -> KeyRespTableModel
-updateSms model newSms =
-    { model
-        | sms =
-            mergeItems model.sms newSms
-                |> sortByTimeReceived
-    }
+        ArchiveAllButtonClick k ->
+            ( { model
+                | keyRespTable = False
+                , dataStore = optArchiveMatchingSms k model.dataStore
+              }
+            , [ archiveAll model.settings.csrftoken k ]
+            )
+
+        ReceiveArchiveAllResp _ ->
+            ( model, [] )
 
 
-optToggleDealtWith : KeyRespTableModel -> Int -> KeyRespTableModel
-optToggleDealtWith model pk =
+archiveAll : CSRFToken -> String -> Cmd Msg
+archiveAll csrftoken keyword =
+    let
+        body =
+            [ ( "tick_to_archive_all_responses", Encode.bool True ) ]
+    in
+        post csrftoken (Urls.keywordArchiveResps keyword) body decodeAlwaysTrue
+            |> Http.send (KeyRespTableMsg << ReceiveArchiveAllResp)
+
+
+optToggleDealtWith : DataStore -> Int -> DataStore
+optToggleDealtWith ds pk =
     let
         updatedSms =
-            model.sms
+            ds.inboundSms
                 |> List.map (switchDealtWith pk)
     in
-        { model | sms = updatedSms }
+        { ds | inboundSms = updatedSms }
 
 
 switchDealtWith : Int -> SmsInbound -> SmsInbound
@@ -59,25 +78,41 @@ switchDealtWith pk sms =
         sms
 
 
-optArchiveSms : KeyRespTableModel -> Int -> KeyRespTableModel
-optArchiveSms model pk =
-    { model | sms = List.filter (\r -> not (r.pk == pk)) model.sms }
+optArchiveMatchingSms : String -> DataStore -> DataStore
+optArchiveMatchingSms k ds =
+    let
+        newInboundSms =
+            List.map (archiveMatches k) ds.inboundSms
+    in
+        { ds | inboundSms = newInboundSms }
+
+
+archiveMatches : String -> SmsInbound -> SmsInbound
+archiveMatches k sms =
+    case sms.matched_keyword == k of
+        True ->
+            { sms | is_archived = True }
+
+        False ->
+            sms
+
+
+optArchiveSms : DataStore -> Int -> DataStore
+optArchiveSms ds pk =
+    { ds | inboundSms = optArchiveRecordWithPk ds.inboundSms pk }
 
 
 toggleSmsArchive : CSRFToken -> Bool -> Int -> Cmd Msg
 toggleSmsArchive csrftoken isArchived pk =
-    archivePost csrftoken (smsInboundUrl pk) isArchived smsinboundDecoder
+    archivePost csrftoken (Urls.smsInbound pk) isArchived smsinboundDecoder
         |> Http.send (KeyRespTableMsg << ReceiveToggleInboundSmsArchive)
 
 
 toggleSmsDealtWith : CSRFToken -> Bool -> Int -> Cmd Msg
 toggleSmsDealtWith csrftoken isDealtWith pk =
     let
-        url =
-            smsInboundUrl pk
-
         body =
             [ ( "dealt_with", Encode.bool isDealtWith ) ]
     in
-        post csrftoken url body smsinboundDecoder
+        post csrftoken (Urls.smsInbound pk) body smsinboundDecoder
             |> Http.send (KeyRespTableMsg << ReceiveToggleInboundSmsDealtWith)

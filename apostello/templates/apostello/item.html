@@ -1,4 +1,4 @@
-{% extends "apostello/base.html" %}
+{% extends "apostello/django.html" %}
 {% load semanticui %}
 {% load apostello_extras %}
 {% block title %}
@@ -6,15 +6,6 @@
     New {{identifier}}
   {% else %}
     {{object}}
-  {% endif %}
-{% endblock %}
-{% block fab %}
-  {% if keyword %}
-    {% fab_keyword_responses keyword %}
-    {% fab_keyword_responses_archive keyword %}
-  {% endif %}
-  {% if not object %}
-    {% include 'apostello/includes/default_fab.html' %}
   {% endif %}
 {% endblock %}
 {% block content %}
@@ -32,14 +23,11 @@
     {% if user.profile.can_see_incoming %}
       <br>
       <h4>Recent Incoming History</h4>
-      <div id="elmContainer" src="{{ object.get_recent_sms_table_url }}" pageId="apostello/incoming"></div>
+      <div id="elmContainer"></div>
     {% endif %}
   {% endif %}
   {% if 'group' == identifier and object %}
     <br>
-    <div id="elmContainer" src="{{ object.get_api_url }}" pageId="apostello/groupMembers"></div>
-  {% endif %}
-  {% if object %}
-    <div id="toggle_button" postUrl="{{ object.get_api_url }}" redirectUrl="{{ object.get_table_url }}" isArchived={{ object.is_archived|yesno:"true,false" }}></div>
+    <div id="elmContainer"></div>
   {% endif %}
 {% endblock %}

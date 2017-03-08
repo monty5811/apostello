@@ -1,6 +1,5 @@
-module Updates.ElvantoImport exposing (update, updateGroups)
+module Updates.ElvantoImport exposing (update)
 
-import Decoders exposing (elvantogroupDecoder)
 import DjangoSend exposing (post)
 import Helpers exposing (..)
 import Http
@@ -9,22 +8,21 @@ import Json.Encode as Encode
 import Messages exposing (..)
 import Models exposing (..)
 import Updates.Notification exposing (createInfoNotification, createSuccessNotification)
-import Urls exposing (..)
+import Urls
+import Updates.DataStore exposing (updateElvantoGroups)
 
 
-update : ElvantoMsg -> Model -> ( Model, Cmd Msg )
+update : ElvantoMsg -> Model -> ( Model, List (Cmd Msg) )
 update msg model =
     case msg of
         ToggleGroupSync group ->
-            ( { model | elvantoImport = optToggleGroup group model.elvantoImport }
-            , toggleElvantoGroupSync model.csrftoken group
+            ( { model | dataStore = optToggleGroup group model.dataStore }
+            , [ toggleElvantoGroupSync model.settings.csrftoken group ]
             )
 
         ReceiveToggleGroupSync (Ok group) ->
-            ( { model
-                | elvantoImport = updateGroups model.elvantoImport [ group ]
-              }
-            , Cmd.none
+            ( { model | dataStore = updateElvantoGroups model.dataStore [ group ] }
+            , []
             )
 
         ReceiveToggleGroupSync (Err _) ->
@@ -32,28 +30,19 @@ update msg model =
 
         PullGroups ->
             ( createInfoNotification model "Groups are being imported, it may take a couple of minutes"
-            , buttonReq model.csrftoken "/api/v1/elvanto/group_pull/"
+            , [ buttonReq model.settings.csrftoken Urls.elvantoPullGroups ]
             )
 
         FetchGroups ->
             ( createSuccessNotification model "Groups are being fetched, it may take a couple of minutes"
-            , buttonReq model.csrftoken "/api/v1/elvanto/group_fetch/"
+            , [ buttonReq model.settings.csrftoken Urls.elvantoFetchGroups ]
             )
 
         ReceiveButtonResp (Ok _) ->
-            ( model, Cmd.none )
+            ( model, [] )
 
         ReceiveButtonResp (Err _) ->
             handleNotSaved model
-
-
-updateGroups : ElvantoImportModel -> ElvantoGroups -> ElvantoImportModel
-updateGroups model newGroups =
-    { model
-        | groups =
-            mergeItems model.groups newGroups
-                |> List.sortBy .name
-    }
 
 
 buttonReq : CSRFToken -> String -> Cmd Msg
@@ -66,7 +55,7 @@ toggleElvantoGroupSync : CSRFToken -> ElvantoGroup -> Cmd Msg
 toggleElvantoGroupSync csrftoken group =
     let
         url =
-            elvantoGroupUrl group.pk
+            Urls.elvantoGroup group.pk
 
         body =
             [ ( "sync", Encode.bool group.sync ) ]
@@ -75,9 +64,9 @@ toggleElvantoGroupSync csrftoken group =
             |> Http.send (ElvantoMsg << ReceiveToggleGroupSync)
 
 
-optToggleGroup : ElvantoGroup -> ElvantoImportModel -> ElvantoImportModel
-optToggleGroup group model =
-    { model | groups = List.map (toggleGroupSync group.pk) model.groups }
+optToggleGroup : ElvantoGroup -> DataStore -> DataStore
+optToggleGroup group ds =
+    { ds | elvantoGroups = List.map (toggleGroupSync group.pk) ds.elvantoGroups }
 
 
 toggleGroupSync : Int -> ElvantoGroup -> ElvantoGroup

@@ -12,10 +12,11 @@ from rest_framework import generics
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 
+from api.drf_permissions import CanSeeKeywords, CanSendSms
+from api.serializers import SmsInboundSerializer, SmsInboundSimpleSerializer
+from apostello.forms import SendAdhocRecipientsForm, SendRecipientGroupForm
 from apostello.mixins import ProfilePermsMixin
 from apostello.models import Keyword, Recipient, SmsInbound
-
-from .serializers import SmsInboundSerializer, SmsInboundSimpleSerializer
 
 
 class StandardPagination(PageNumberPagination):
@@ -68,12 +69,12 @@ class ApiCollectionRecentSms(ApiCollection):
 class ApiCollectionKeywordSms(ApiCollection):
     """SMS collection for a single keyword."""
     serializer_class = SmsInboundSerializer
-    pk = None
+    keyword = None
     archive = False
 
     def get_queryset(self):
         """Handle get requests."""
-        keyword_obj = Keyword.objects.get(pk=self.kwargs['pk'])
+        keyword_obj = Keyword.objects.get(keyword=self.kwargs['keyword'])
         self.check_object_permissions(self.request, keyword_obj)
         objs = SmsInbound.objects.filter(matched_keyword=str(keyword_obj))
         if self.archive:
@@ -115,16 +116,27 @@ class ApiMember(APIView):
         obj.save()
         return obj
 
+    def get_obj(self, kwargs):
+        try:
+            obj = get_object_or_404(self.model_class, pk=kwargs['pk'])
+        except KeyError:
+            obj = get_object_or_404(
+                self.model_class, keyword=kwargs['keyword']
+            )
+
+        return obj
+
     def get(self, request, format=None, **kwargs):
         """Handle get requests."""
-        obj = get_object_or_404(self.model_class, pk=kwargs['pk'])
+        obj = self.get_obj(kwargs)
+
         serializer = self.serializer_class(obj, context={'request': request})
         return Response(serializer.data)
 
     def post(self, request, format=None, **kwargs):
         """Handle toggle buttons."""
-        pk = kwargs['pk']
-        obj = get_object_or_404(self.model_class, pk=pk)
+        obj = self.get_obj(kwargs)
+        pk = kwargs.pop('pk', None)
 
         obj = self.simple_update(request, obj, 'dealt_with')
         obj = self.simple_update(request, obj, 'display_on_wall')
@@ -191,3 +203,110 @@ class ElvantoFetchButton(ProfilePermsMixin, View):
         """Handle post requests."""
         async('apostello.tasks.fetch_elvanto_groups', force=True)
         return JsonResponse({'status': 'fetching'})
+
+
+class ArchiveAllResponses(APIView):
+    """Archive all matched responses"""
+    permission_classes = (IsAuthenticated, CanSeeKeywords)
+
+    def post(self, request, format=None, **kwargs):
+        keyword = get_object_or_404(Keyword, keyword=kwargs['keyword'])
+
+        if not keyword.can_user_access(request.user):
+            return Response({}, status=status.HTTP_403_FORBIDDEN)
+
+        if request.data.get('tick_to_archive_all_responses'):
+            for sms in keyword.fetch_matches():
+                sms.archive()
+
+        return Response({}, status=status.HTTP_200_OK)
+
+
+class ApiSendAdhoc(APIView):
+    """Send SMS to individuals."""
+    permission_classes = (IsAuthenticated, CanSendSms)
+
+    def post(self, request, format=None, **kwargs):
+        form = SendAdhocRecipientsForm(request.data, user=request.user)
+        if form.is_valid():
+            for recipient in form.cleaned_data['recipients']:
+                # send and save message
+                recipient.send_message(
+                    content=form.cleaned_data['content'],
+                    eta=form.cleaned_data['scheduled_time'],
+                    sent_by=str(self.request.user)
+                )
+
+            if form.cleaned_data['scheduled_time'] is None:
+                msg = {
+                    'type_': 'info',
+                    'text': "Sending \"{0}\"...\n"
+                    "Please check the logs for verification...".
+                    format(form.cleaned_data['content'])
+                }
+            else:
+                msg = {
+                    'type_': 'info',
+                    'text': "'{0}' has been successfully queued.".
+                    format(form.cleaned_data['content'])
+                }
+            return Response(
+                {
+                    'messages': [msg],
+                    'errors': {}
+                },
+                status=status.HTTP_201_CREATED
+            )
+
+        return Response(
+            {
+                'messages': [],
+                'errors': form.errors
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class ApiSendGroup(APIView):
+    """Send SMS to group."""
+    permission_classes = (IsAuthenticated, CanSendSms)
+
+    def post(self, request, format=None, **kwargs):
+        form = SendRecipientGroupForm(request.data, user=request.user)
+        if form.is_valid():
+            form.cleaned_data['recipient_group'].send_message(
+                content=form.cleaned_data['content'],
+                eta=form.cleaned_data['scheduled_time'],
+                sent_by=str(self.request.user)
+            )
+            if form.cleaned_data['scheduled_time'] is None:
+                msg = {
+                    'type_': 'info',
+                    'text': "Sending '{0}' to '{1}'...\n"
+                    "Please check the logs for verification...".format(
+                        form.cleaned_data['content'],
+                        form.cleaned_data['recipient_group']
+                    )
+                }
+            else:
+                msg = {
+                    'type_': 'info',
+                    'text': "'{0}' has been successfully queued.".
+                    format(form.cleaned_data['content']),
+                }
+
+            return Response(
+                {
+                    'messages': [msg],
+                    'errors': {}
+                },
+                status=status.HTTP_201_CREATED
+            )
+
+        return Response(
+            {
+                'messages': [],
+                'errors': form.errors
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )

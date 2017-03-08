@@ -1,58 +1,37 @@
-module Updates.ScheduledSmsTable exposing (update, updateSms)
+module Updates.ScheduledSmsTable exposing (update)
 
-import Date
-import Decoders exposing (decodeAlwaysTrue)
 import DjangoSend exposing (post)
 import Helpers exposing (..)
 import Http
 import Json.Encode as Encode
 import Messages exposing (..)
 import Models exposing (..)
-import Urls exposing (..)
+import Urls
 
 
-update : ScheduledSmsTableMsg -> Model -> ( Model, Cmd Msg )
+update : ScheduledSmsTableMsg -> Model -> ( Model, List (Cmd Msg) )
 update msg model =
     case msg of
         CancelSms pk ->
-            ( { model | scheduledSmsTable = optCancelSms model.scheduledSmsTable pk }, cancelSms model.csrftoken pk )
+            ( { model | dataStore = optCancelSms model.dataStore pk }, [ cancelSms model.settings.csrftoken pk ] )
 
         ReceiveCancelSms (Ok _) ->
-            ( model, Cmd.none )
+            ( model, [] )
 
         ReceiveCancelSms (Err _) ->
             handleNotSaved model
 
 
-updateSms : ScheduledSmsTableModel -> List QueuedSms -> ScheduledSmsTableModel
-updateSms model newSms =
-    { model
-        | sms =
-            mergeItems model.sms newSms
-                |> List.sortBy compareByT2S
-    }
-
-
-compareByT2S : { a | time_to_send : Maybe Date.Date } -> Float
-compareByT2S sms =
-    case sms.time_to_send of
-        Just d ->
-            Date.toTime d
-
-        Nothing ->
-            toFloat 1
-
-
-optCancelSms : ScheduledSmsTableModel -> Int -> ScheduledSmsTableModel
-optCancelSms model pk =
-    { model | sms = List.filter (\r -> not (r.pk == pk)) model.sms }
+optCancelSms : DataStore -> Int -> DataStore
+optCancelSms ds pk =
+    { ds | queuedSms = List.filter (\r -> not (r.pk == pk)) ds.queuedSms }
 
 
 cancelSms : CSRFToken -> Int -> Cmd Msg
 cancelSms csrftoken pk =
     let
         url =
-            queuedSmsUrl pk
+            Urls.queuedSms pk
 
         body =
             [ ( "cancel_sms", Encode.bool True ) ]

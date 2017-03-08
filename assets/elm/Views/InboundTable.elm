@@ -7,14 +7,15 @@ import Html.Events exposing (onClick)
 import Messages exposing (..)
 import Models exposing (..)
 import Regex
+import Views.Helpers exposing (spaLink)
 import Views.FilteringTable exposing (uiTable)
 
 
 -- Main view
 
 
-view : Regex.Regex -> InboundTableModel -> Html Msg
-view filterRegex model =
+view : Regex.Regex -> List SmsInbound -> Html Msg
+view filterRegex sms =
     let
         head =
             thead []
@@ -27,7 +28,7 @@ view filterRegex model =
                     ]
                 ]
     in
-        uiTable head filterRegex smsRow model.sms
+        uiTable head filterRegex smsRow sms
 
 
 smsRow : SmsInbound -> Html Msg
@@ -44,13 +45,8 @@ smsRow sms =
 recipientCell : SmsInbound -> Html Msg
 recipientCell sms =
     let
-        replyLink =
-            case sms.sender_pk of
-                Just pk ->
-                    "/send/adhoc/?recipient=" ++ (toString pk)
-
-                Nothing ->
-                    "#"
+        replyPage =
+            SendAdhoc Nothing <| Maybe.map List.singleton sms.sender_pk
 
         contactLink =
             case sms.sender_url of
@@ -61,7 +57,7 @@ recipientCell sms =
                     "#"
     in
         td []
-            [ a [ href replyLink ] [ i [ class "violet reply link icon" ] [] ]
+            [ spaLink a [] [ i [ class "violet reply link icon" ] [] ] replyPage
             , a [ href contactLink, style [ ( "color", "#212121" ) ] ] [ text sms.sender_name ]
             ]
 

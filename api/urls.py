@@ -26,7 +26,7 @@ urlpatterns = [
         name='user_profiles'
     ),
     url(
-        r'^v1/users/profiles/(?P<pk>[0-9]+)$',
+        r'^v1/users/profiles/(?P<pk>[0-9]+)/$',
         v.ApiMember.as_view(
             model_class=UserProfile,
             serializer_class=s.UserProfileSerializer,
@@ -35,6 +35,16 @@ urlpatterns = [
         name='user_profiles_member'
     ),
     # sms views
+    url(
+        r'^v1/sms/send/adhoc/$',
+        v.ApiSendAdhoc.as_view(),
+        name='send_adhoc',
+    ),
+    url(
+        r'^v1/sms/send/group/$',
+        v.ApiSendGroup.as_view(),
+        name='send_group',
+    ),
     url(
         r'^v1/sms/in/$',
         v.ApiCollection.as_view(
@@ -62,16 +72,7 @@ urlpatterns = [
         name='live_wall_all'
     ),
     url(
-        r'^v1/sms/in/recpient/(?P<pk>\d+)/$',
-        v.ApiCollectionRecentSms.as_view(
-            permission_classes=(
-                IsAuthenticated, CanSeeContactNames, CanSeeIncoming
-            )
-        ),
-        name='contact_recent_sms'
-    ),
-    url(
-        r'^v1/sms/in/keyword/(?P<pk>\d+)/$',
+        r'^v1/sms/in/keyword/(?P<keyword>[\d|\w]+)/$',
         v.ApiCollectionKeywordSms.as_view(
             permission_classes=(
                 IsAuthenticated, CanSeeKeywords, CanSeeKeyword, CanSeeIncoming
@@ -81,7 +82,7 @@ urlpatterns = [
         name='keyword_sms'
     ),
     url(
-        r'^v1/sms/in/keyword/(?P<pk>\d+)/archive/$',
+        r'^v1/sms/in/keyword/(?P<keyword>[\d|\w]+)/archive/$',
         v.ApiCollectionKeywordSms.as_view(
             permission_classes=(
                 IsAuthenticated, CanSeeKeywords, CanSeeKeyword, CanSeeIncoming
@@ -91,7 +92,7 @@ urlpatterns = [
         name='keyword_sms_archive'
     ),
     url(
-        r'^v1/sms/in/(?P<pk>[0-9]+)$',
+        r'^v1/sms/in/(?P<pk>[0-9]+)/$',
         v.ApiMember.as_view(
             model_class=SmsInbound,
             serializer_class=s.SmsInboundSerializer,
@@ -123,7 +124,7 @@ urlpatterns = [
         name='recipients_archive'
     ),
     url(
-        r'^v1/recipients/(?P<pk>[0-9]+)$',
+        r'^v1/recipients/(?P<pk>[0-9]+)/$',
         v.ApiMember.as_view(
             model_class=Recipient,
             serializer_class=s.RecipientSerializer,
@@ -156,7 +157,7 @@ urlpatterns = [
         name='recipient_groups_archive'
     ),
     url(
-        r'^v1/groups/(?P<pk>[0-9]+)$',
+        r'^v1/groups/(?P<pk>[0-9]+)/$',
         v.ApiMember.as_view(
             model_class=RecipientGroup,
             serializer_class=s.RecipientGroupSerializer,
@@ -175,7 +176,7 @@ urlpatterns = [
         name='elvanto_groups'
     ),
     url(
-        r'^v1/elvanto/group/(?P<pk>[0-9]+)$',
+        r'^v1/elvanto/group/(?P<pk>[0-9]+)/$',
         v.ApiMember.as_view(
             model_class=ElvantoGroup,
             serializer_class=s.ElvantoGroupSerializer,
@@ -218,13 +219,18 @@ urlpatterns = [
         name='keywords_archive'
     ),
     url(
-        r'^v1/keywords/(?P<pk>[0-9]+)$',
+        r'^v1/keywords/(?P<keyword>[\d|\w]+)/$',
         v.ApiMember.as_view(
             model_class=Keyword,
             serializer_class=s.KeywordSerializer,
             permission_classes=(IsAuthenticated, CanSeeKeyword)
         ),
         name='keyword'
+    ),
+    url(
+        r'^v1/keywords/(?P<keyword>[\d|\w]+)/archive_resps/$',
+        v.ArchiveAllResponses.as_view(),
+        name='keyword_archive_all_responses',
     ),
     # queued messages views
     url(
@@ -239,7 +245,7 @@ urlpatterns = [
         name='queued_smss'
     ),
     url(
-        r'^v1/queued/sms/(?P<pk>[0-9]+)$',
+        r'^v1/queued/sms/(?P<pk>[0-9]+)/$',
         v.ApiMember.as_view(
             model_class=QueuedSms,
             serializer_class=s.QueuedSmsSerializer,

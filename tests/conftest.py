@@ -391,20 +391,11 @@ def driver_wait_time():
 def browser(request, driver_wait_time):
     """Setup selenium browser."""
     driver = webdriver.Firefox()
-    driver.implicitly_wait(driver_wait_time)
+    driver.set_window_size(800, 600)
 
-    def fin():
-        try:
-            driver.get_screenshot_as_file(
-                '/tmp/tmp-selenium-' + request.node.name + '.png'
-            )
-        except:
-            pass
-        driver.quit()
-
-    request.addfinalizer(fin)
-
-    return driver
+    request.node._driver = driver
+    yield driver
+    driver.quit()
 
 
 @pytest.mark.usefixtures('users', 'live_server')
@@ -412,6 +403,7 @@ def browser(request, driver_wait_time):
 def browser_in(request, live_server, users, driver_wait_time):
     """Setup selenium browser and log in."""
     driver = webdriver.Firefox()
+    driver.set_window_size(800, 600)
     driver.get(live_server + '/')
     driver.add_cookie(
         {
@@ -423,15 +415,27 @@ def browser_in(request, live_server, users, driver_wait_time):
             u'secure': False
         }
     )
-    driver.implicitly_wait(driver_wait_time)
+    request.node._driver = driver
     yield driver
-    try:
-        driver.get_screenshot_as_file(
-            '/tmp/tmp-selenium-' + request.node.name + '.png'
-        )
-    except:
-        pass
     driver.quit()
+
+
+@pytest.mark.hookwrapper
+def pytest_runtest_makereport(item, call):
+    pytest_html = item.config.pluginmanager.getplugin('html')
+    outcome = yield
+    report = outcome.get_result()
+    extra = getattr(report, 'extra', [])
+    if report.when == 'call':
+        xfail = hasattr(report, 'wasxfail')
+        if (report.skipped and xfail) or (report.failed and not xfail):
+            driver = getattr(item, '_driver', None)
+            if driver is not None:
+                extra.append(
+                    pytest_html.extras.
+                    image(driver.get_screenshot_as_base64(), 'Screenshot')
+                )
+        report.extra = extra
 
 
 base_vcr = vcr.VCR(record_mode='none', ignore_localhost=True)

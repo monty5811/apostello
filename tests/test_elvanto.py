@@ -141,16 +141,16 @@ class TestPostToUrls:
         post_json(users['c_staff'], '/api/v1/elvanto/group_pull/', {})
         r = users['c_staff'].get('/api/v1/elvanto/groups/')
         assert len(r.data) == 4
-        r = users['c_staff'].get('/api/v1/elvanto/group/1')
+        r = users['c_staff'].get('/api/v1/elvanto/group/1/')
         assert r.data['name'] == 'Geneva'
         assert r.data['pk'] == 1
         r = post_json(
-            users['c_staff'], '/api/v1/elvanto/group/1', {'sync': False}
+            users['c_staff'], '/api/v1/elvanto/group/1/', {'sync': False}
         )
         assert r.data['sync']
         assert elv_models.ElvantoGroup.objects.get(pk=1).sync
         r = post_json(
-            users['c_staff'], '/api/v1/elvanto/group/1', {'sync': True}
+            users['c_staff'], '/api/v1/elvanto/group/1/', {'sync': True}
         )
         assert r.data['sync'] is False
         assert elv_models.ElvantoGroup.objects.get(pk=1).sync is False

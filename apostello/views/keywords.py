@@ -7,42 +7,14 @@ from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 
 from apostello.decorators import keyword_access_check
-from apostello.forms import ArchiveKeywordResponses
 from apostello.models import Keyword
 
 
 @keyword_access_check
 @login_required
-def keyword_responses(request, pk, archive=False):
-    """Display the responses for a single keyword."""
-    keyword = get_object_or_404(Keyword, pk=pk)
-    context = {"keyword": keyword, "archive": archive}
-
-    if archive is False:
-        context['form'] = ArchiveKeywordResponses
-        if request.method == 'POST':
-            form = ArchiveKeywordResponses(request.POST)
-            context['form'] = form
-            if form.is_valid(
-            ) and form.cleaned_data['tick_to_archive_all_responses']:
-                for sms in keyword.fetch_matches():
-                    sms.archive()
-                return redirect(
-                    reverse(
-                        "keyword_responses", kwargs={'pk': pk}
-                    )
-                )
-
-    return TemplateResponse(
-        request, "apostello/keyword_responses.html", context
-    )
-
-
-@keyword_access_check
-@login_required
-def keyword_csv(request, pk):
+def keyword_csv(request, keyword):
     """Return a CSV with the responses for a single keyword."""
-    keyword = get_object_or_404(Keyword, pk=pk)
+    keyword = get_object_or_404(Keyword, keyword=keyword)
     # Create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="{0}.csv"'.format(

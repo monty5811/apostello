@@ -3,6 +3,7 @@ module Subscriptions exposing (subscriptions)
 import Messages exposing (..)
 import Models exposing (..)
 import Time exposing (Time, second)
+import Ports exposing (updateDateValue, loadDataStore)
 
 
 subscriptions : Model -> Sub Msg
@@ -10,37 +11,66 @@ subscriptions model =
     Sub.batch
         [ reloadData model.page model.loadingStatus
         , getCurrentTime
-        , cleanOldNotifications
+        , updateDateValue (updateDateMsg model.page)
+        , loadDataStore LoadDataStore
         ]
+
+
+updateDateMsg : Page -> (String -> Msg)
+updateDateMsg page =
+    case page of
+        SendAdhoc _ _ ->
+            (SendAdhocMsg << UpdateDate)
+
+        SendGroup _ _ ->
+            (SendGroupMsg << UpdateSGDate)
+
+        _ ->
+            \_ -> Nope
 
 
 getCurrentTime : Sub Msg
 getCurrentTime =
-    Time.every second (\t -> CurrentTime t)
-
-
-cleanOldNotifications : Sub Msg
-cleanOldNotifications =
-    Time.every second (\t -> NotificationMsg (CleanOldNotifications t))
+    Time.every (5 * second) (\t -> CurrentTime t)
 
 
 reloadData : Page -> LoadingStatus -> Sub Msg
 reloadData page loadingStatus =
-    let
-        interval =
-            case page of
-                Wall ->
-                    1 * second
+    case page of
+        SendAdhoc _ _ ->
+            Sub.none
 
-                Curator ->
-                    10 * second
+        SendGroup _ _ ->
+            Sub.none
 
-                _ ->
-                    20 * second
-    in
-        case loadingStatus of
-            Finished ->
-                Time.every interval (\t -> LoadData WaitingForSubsequent)
+        _ ->
+            let
+                interval =
+                    case page of
+                        Wall ->
+                            1 * second
 
-            _ ->
-                Sub.none
+                        Curator ->
+                            10 * second
+
+                        _ ->
+                            20 * second
+            in
+                case loadingStatus of
+                    FinalPageReceived ->
+                        Time.every interval (\t -> LoadData)
+
+                    RespFailed _ ->
+                        Time.every interval (\t -> LoadData)
+
+                    NoRequestSent ->
+                        Sub.none
+
+                    WaitingForFirstResp ->
+                        Sub.none
+
+                    WaitingForPage ->
+                        Sub.none
+
+                    WaitingOnRefresh ->
+                        Sub.none

@@ -5,12 +5,6 @@ from apostello.models import Keyword, Recipient, RecipientGroup, UserProfile
 from apostello.validators import gsm_validator, less_than_sms_char_limit
 
 
-def get_content_rows():
-    from math import ceil
-    from site_config.models import SiteConfiguration
-    return ceil(SiteConfiguration.get_solo().sms_char_limit / 160)
-
-
 class SendAdhocRecipientsForm(forms.Form):
     """Send an sms to ad-hoc groups."""
     content = forms.CharField(
@@ -54,10 +48,6 @@ class SendAdhocRecipientsForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super(SendAdhocRecipientsForm, self).__init__(*args, **kwargs)
-        self.fields['content'].widget = forms.Textarea(
-            attrs={'rows': get_content_rows()}
-        )
-        self.use_required_attribute = False
 
 
 class SendRecipientGroupForm(forms.Form):
@@ -102,10 +92,6 @@ class SendRecipientGroupForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super(SendRecipientGroupForm, self).__init__(*args, **kwargs)
-        self.fields['content'].widget = forms.Textarea(
-            attrs={'rows': get_content_rows()}
-        )
-        self.use_required_attribute = False
 
 
 class ManageRecipientGroupForm(forms.ModelForm):
@@ -205,15 +191,6 @@ class KeywordForm(forms.ModelForm):
                 }
             ),
         }
-
-
-class ArchiveKeywordResponses(forms.Form):
-    """
-    Handle archiving all matching messages for a keyword.
-
-    Single tick-box field for confirmation.
-    """
-    tick_to_archive_all_responses = forms.BooleanField()
 
 
 class CsvImport(forms.Form):

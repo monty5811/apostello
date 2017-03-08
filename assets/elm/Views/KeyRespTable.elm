@@ -2,20 +2,20 @@ module Views.KeyRespTable exposing (view)
 
 import Helpers exposing (formatDate)
 import Html exposing (..)
-import Html.Attributes exposing (class, href, style)
-import Html.Events exposing (onClick)
+import Html.Attributes exposing (attribute, class, href, style, name, type_, id, checked)
+import Html.Events exposing (onClick, onSubmit)
 import Messages exposing (..)
 import Models exposing (..)
 import Regex
-import Views.Common exposing (archiveCell)
+import Views.Helpers exposing (archiveCell, spaLink)
 import Views.FilteringTable exposing (uiTable)
 
 
 -- Main view
 
 
-view : Regex.Regex -> KeyRespTableModel -> Html Msg
-view filterRegex model =
+view : Bool -> Regex.Regex -> List SmsInbound -> Bool -> String -> Html Msg
+view viewingArchive filterRegex sms ticked keyword =
     let
         head =
             thead []
@@ -28,7 +28,48 @@ view filterRegex model =
                     ]
                 ]
     in
-        uiTable head filterRegex smsRow model.sms
+        div []
+            [ uiTable head filterRegex smsRow sms
+            , br [] []
+            , archiveAllForm viewingArchive ticked keyword
+            ]
+
+
+archiveAllForm : Bool -> Bool -> String -> Html Msg
+archiveAllForm viewingArchive ticked k =
+    case viewingArchive of
+        True ->
+            text ""
+
+        False ->
+            Html.form [ onSubmit (KeyRespTableMsg <| ArchiveAllButtonClick k) ]
+                [ div [ class "field" ]
+                    [ div [ class "ui checkbox" ]
+                        [ input
+                            [ id "id_tick_to_archive_all_responses"
+                            , name "tick_to_archive_all_responses"
+                            , attribute "required" ""
+                            , type_ "checkbox"
+                            , checked ticked
+                            , onClick (KeyRespTableMsg ArchiveAllCheckBoxClick)
+                            ]
+                            []
+                        , label [] [ text "Tick to archive all responses" ]
+                        ]
+                    ]
+                , br [] []
+                , archiveAllButton ticked
+                ]
+
+
+archiveAllButton : Bool -> Html Msg
+archiveAllButton ticked =
+    case ticked of
+        True ->
+            button [ class "ui red button" ] [ text "Archive all!" ]
+
+        False ->
+            button [ class "ui disabled button" ] [ text "Archive all!" ]
 
 
 smsRow : SmsInbound -> Html Msg
@@ -54,13 +95,8 @@ smsRow sms =
 recipientCell : SmsInbound -> Html Msg
 recipientCell sms =
     let
-        replyLink =
-            case sms.sender_pk of
-                Just pk ->
-                    "/send/adhoc/?recipient=" ++ (toString sms.sender_pk)
-
-                Nothing ->
-                    "#"
+        replyPage =
+            SendAdhoc Nothing <| Maybe.map List.singleton sms.sender_pk
 
         contactLink =
             case sms.sender_url of
@@ -71,7 +107,7 @@ recipientCell sms =
                     "#"
     in
         td []
-            [ a [ href replyLink ] [ i [ class "violet reply link icon" ] [] ]
+            [ spaLink a [] [ i [ class "violet reply link icon" ] [] ] replyPage
             , a [ href contactLink, style [ ( "color", "#212121" ) ] ] [ text sms.sender_name ]
             ]
 

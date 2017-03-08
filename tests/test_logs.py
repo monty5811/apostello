@@ -32,7 +32,6 @@ class TestImportLogs:
     def test_all_incoming(self):
         logs.check_incoming_log()
 
-
     @twilio_vcr
     def test_all_outgoing(self):
         logs.check_outgoing_log()
@@ -42,21 +41,21 @@ class TestImportLogs:
 class TestSmsHandlers:
     def test_handle_incoming_sms(self):
         msg = MockMsg('447922537999')
-        cnp = logs.handle_incoming_sms(msg)
-        assert cnp is True
+        logs.handle_incoming_sms(msg)
         assert models.SmsInbound.objects.all()[0].content == msg.body
+        assert models.SmsInbound.objects.count() == 1
 
         cnp = logs.handle_incoming_sms(msg)
-        assert cnp is None
+        assert models.SmsInbound.objects.count() == 1
 
     def test_handle_outgoing_sms(self):
         msg = MockMsg('447932537999')
         cnp = logs.handle_outgoing_sms(msg)
-        assert cnp is True
         assert models.SmsOutbound.objects.all()[0].content == msg.body
+        assert models.SmsOutbound.objects.count() == 1
 
-        cnp = logs.handle_outgoing_sms(msg)
-        assert cnp is None
+        logs.handle_outgoing_sms(msg)
+        assert models.SmsOutbound.objects.count() == 1
 
 
 @pytest.mark.django_db

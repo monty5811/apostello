@@ -1,42 +1,33 @@
-module Updates.Wall exposing (update, updateSms)
+module Updates.Wall exposing (update)
 
-import Decoders exposing (smsinboundsimpleDecoder)
 import DjangoSend exposing (post)
 import Helpers exposing (..)
 import Http
 import Json.Encode as Encode
 import Messages exposing (..)
 import Models exposing (..)
-import Urls exposing (..)
+import Urls
+import Updates.DataStore exposing (updateSmsInboundSimples)
 
 
-update : WallMsg -> Model -> ( Model, Cmd Msg )
+update : WallMsg -> Model -> ( Model, List (Cmd Msg) )
 update msg model =
     case msg of
         ToggleWallDisplay isDisplayed pk ->
-            ( model, toggleWallDisplay model.csrftoken isDisplayed pk )
+            ( model, [ toggleWallDisplay model.settings.csrftoken isDisplayed pk ] )
 
         ReceiveToggleWallDisplay (Ok sms) ->
-            ( { model | wall = updateSms model.wall [ sms ] }, Cmd.none )
+            ( { model | dataStore = updateSmsInboundSimples model.dataStore [ sms ] }, [] )
 
         ReceiveToggleWallDisplay (Err _) ->
             handleNotSaved model
-
-
-updateSms : WallModel -> List SmsInboundSimple -> WallModel
-updateSms model newSms =
-    { model
-        | sms =
-            mergeItems model.sms newSms
-                |> sortByTimeReceived
-    }
 
 
 toggleWallDisplay : CSRFToken -> Bool -> Int -> Cmd Msg
 toggleWallDisplay csrftoken isDisplayed pk =
     let
         url =
-            smsInboundUrl pk
+            Urls.smsInbound pk
 
         body =
             [ ( "display_on_wall", Encode.bool isDisplayed ) ]

@@ -1,5 +1,6 @@
 module Views.UserProfileTable exposing (view)
 
+import Formatting as F exposing ((<>))
 import Html exposing (..)
 import Html.Attributes exposing (class, href, style)
 import Html.Events exposing (onClick)
@@ -12,8 +13,8 @@ import Views.FilteringTable exposing (filteringTable)
 -- Main view
 
 
-view : Regex.Regex -> UserProfileTableModel -> Html Msg
-view filterRegex model =
+view : Regex.Regex -> List UserProfile -> Html Msg
+view filterRegex profiles =
     let
         head =
             thead []
@@ -30,13 +31,18 @@ view filterRegex model =
                     ]
                 ]
     in
-        filteringTable "ui collapsing celled very basic table" head filterRegex userprofileRow model.userprofiles
+        filteringTable "ui collapsing celled very basic table" head filterRegex userprofileRow profiles
 
 
 userprofileRow : UserProfile -> Html Msg
 userprofileRow userprofile =
     tr [ class "center aligned" ]
-        [ td [] [ a [ href userprofile.url ] [ text userprofile.user.email ] ]
+        [ td []
+            [ a
+                [ href (F.print (F.s "/users/profiles/" <> F.int <> F.s "/") userprofile.pk)
+                ]
+                [ text userprofile.user.email ]
+            ]
         , toggleCell userprofile Approved
         , toggleCell userprofile Keywords
         , toggleCell userprofile SendSMS

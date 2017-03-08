@@ -24,24 +24,9 @@ class FirstRunRedirect(MiddlewareMixin):
         if num_users > 0:
             return
 
-        if not request.path_info.startswith(('/sms', '/config')):
+        if not request.path_info.startswith((
+            '/sms',
+            '/config',
+            '/offline',
+        )):
             return HttpResponseRedirect('/config/first_run/')
-
-
-class JsPathMiddleware(MiddlewareMixin):
-    """Inject template name into views so js can lookup file."""
-
-    def process_template_response(self, request, response):
-        """Inject the template name if it exists."""
-        template_name = response.template_name
-        if template_name is None:
-            return response
-
-        if type(template_name) is list and len(template_name) < 2:
-            template_name = template_name[0]
-
-        if type(template_name) is list and len(template_name) > 1:
-            template_name = template_name[-1]
-
-        response.context_data['js_path'] = template_name.replace('.html', '')
-        return response

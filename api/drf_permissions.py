@@ -60,6 +60,14 @@ class CanImport(permissions.BasePermission):
         return request.user.is_staff or request.user.profile.can_import
 
 
+class CanSendSms(permissions.BasePermission):
+    """Check if a user can send sms."""
+
+    def has_permission(self, request, view):
+        """Check permission."""
+        return request.user.profile.can_send_sms
+
+
 class IsStaff(permissions.BasePermission):
     """Check if a user has staff privileges."""
 

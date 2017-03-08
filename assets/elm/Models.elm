@@ -1,6 +1,9 @@
 module Models exposing (..)
 
 import Date
+import Json.Decode as Decode
+import Json.Decode.Extra exposing (date)
+import Json.Decode.Pipeline exposing (optional, required, decode, requiredAt)
 import Regex
 import Set exposing (Set)
 import Time
@@ -13,71 +16,95 @@ type alias Model =
     { page : Page
     , loadingStatus : LoadingStatus
     , filterRegex : Regex.Regex
-    , csrftoken : CSRFToken
-    , dataUrl : String
-    , outboundTable : OutboundTableModel
-    , inboundTable : InboundTableModel
-    , groupTable : GroupTableModel
+    , settings : Settings
+    , dataStore : DataStore
     , groupComposer : GroupComposerModel
     , groupSelect : GroupMemberSelectModel
-    , recipientTable : RecipientTableModel
-    , keywordTable : KeywordTableModel
-    , wall : WallModel
-    , elvantoImport : ElvantoImportModel
-    , userProfileTable : UserProfileTableModel
-    , scheduledSmsTable : ScheduledSmsTableModel
-    , keyRespTable : KeyRespTableModel
+    , keyRespTable : Bool
     , firstRun : FirstRunModel
+    , sendAdhoc : SendAdhocModel
+    , sendGroup : SendGroupModel
     , fabModel : FabModel
     , notifications : List Notification
     , currentTime : Time.Time
     }
 
 
-initialModel : String -> Page -> String -> Maybe FabFlags -> Model
-initialModel csrftoken page incomingUrl fabFlags =
+initialModel : Settings -> String -> Page -> Model
+initialModel settings dataStoreCache page =
     { page = page
-    , loadingStatus = initialLoadingStatus page
+    , loadingStatus = NoRequestSent
     , filterRegex = Regex.regex ""
-    , csrftoken = CSRFToken csrftoken
-    , outboundTable = initialOutboundTableModel
-    , inboundTable = initialInboundTableModel
-    , groupTable = initialGroupTableModel
+    , settings = settings
+    , dataStore = Result.withDefault emptyDataStore <| Decode.decodeString dataStoreDecoder dataStoreCache
     , groupComposer = initialGroupComposerModel
     , groupSelect = initialGroupMemberSelectModel
-    , recipientTable = initialRecipientTableModel
-    , keywordTable = initialKeywordTableModel
-    , wall = initialWallModel
-    , elvantoImport = initialElvantoImportModel
-    , userProfileTable = initialUserProfileTableModel
-    , scheduledSmsTable = initialScheduledSmsTable
-    , keyRespTable = initialKeyRespModel
+    , keyRespTable = False
     , firstRun = initialFirstRunModel
-    , fabModel = initialFabModel fabFlags
+    , sendAdhoc = initialSendAdhocModel page
+    , sendGroup = initialSendGroupModel page
+    , fabModel = initialFabModel
     , notifications = []
-    , dataUrl = incomingUrl
     , currentTime = 0
     }
 
 
-initialLoadingStatus : Page -> LoadingStatus
-initialLoadingStatus page =
-    case page of
-        FirstRun ->
-            Finished
+type alias Settings =
+    { csrftoken : CSRFToken
+    , userPerms : UserProfile
+    , twilioSendingCost : Float
+    , twilioFromNumber : String
+    , smsCharLimit : Int
+    , blockedKeywords : List String
+    }
 
-        Fab ->
-            Finished
 
-        _ ->
-            NotAsked
+type RemoteDataType
+    = IncomingSms
+    | IncomingSimpleSms
+    | OutgoingSms
+    | Contacts
+    | Groups
+    | Keywords
+    | ScheduledSms
+    | ElvantoGroups_
+    | UserProfiles
+
+
+type alias DataStore =
+    { inboundSms : List SmsInbound
+    , inboundSimpleSms : List SmsInboundSimple
+    , outboundSms : List SmsOutbound
+    , elvantoGroups : List ElvantoGroup
+    , userprofiles : List UserProfile
+    , keywords : List Keyword
+    , recipients : List Recipient
+    , groups : List RecipientGroup
+    , queuedSms : List QueuedSms
+    }
+
+
+emptyDataStore : DataStore
+emptyDataStore =
+    { inboundSms = []
+    , inboundSimpleSms = []
+    , outboundSms = []
+    , elvantoGroups = []
+    , userprofiles = []
+    , keywords = []
+    , recipients = []
+    , groups = []
+    , queuedSms = []
+    }
+
+
+
+--
 
 
 type alias Flags =
-    { pageId : String
-    , csrftoken : String
-    , dataUrl : String
-    , fabData : Maybe FabFlags
+    { settings : Settings
+    , dataStoreCache : Maybe String
     }
 
 
@@ -90,8 +117,18 @@ type alias RawResponse =
 type alias Notification =
     { type_ : NotificationType
     , text : String
-    , id : Int
-    , created : Time.Time
+    }
+
+
+type alias DjangoMessage =
+    { type_ : String
+    , text : String
+    }
+
+
+type alias SendAdhocFormResp =
+    { messages : List DjangoMessage
+    , errors : SendAdhocFormError
     }
 
 
@@ -102,81 +139,69 @@ type NotificationType
     | ErrorNotification
 
 
-type alias FabFlags =
-    { pageLinks : List PageLink
-    , archiveButton : Maybe ArchiveButton
-    }
-
-
 type Page
-    = OutboundTable
+    = Home
+    | OutboundTable
     | InboundTable
-    | GroupTable
+    | GroupTable IsArchive
     | GroupComposer
-    | GroupSelect
-    | RecipientTable
-    | KeywordTable
+    | RecipientTable IsArchive
+    | KeywordTable IsArchive
     | ElvantoImport
     | Wall
     | Curator
     | UserProfileTable
     | ScheduledSmsTable
-    | KeyRespTable
+    | KeyRespTable IsArchive String
     | FirstRun
-    | Fab
+    | AccessDenied
+    | SendAdhoc (Maybe String) (Maybe (List Int))
+    | SendGroup (Maybe String) (Maybe Int)
+    | Error404
+    | EditGroup Int
+    | EditContact Int
+    | FabOnlyPage FabOnlyPage
+
+
+type FabOnlyPage
+    = Help
+    | NewGroup
+    | CreateAllGroup
+    | NewContact
+    | NewKeyword
+    | EditKeyword String
+    | ContactImport
+    | ApiSetup
+    | EditUserProfile Int
+    | EditSiteConfig
+    | EditResponses
+
+
+type alias IsArchive =
+    Bool
 
 
 type LoadingStatus
-    = NotAsked
-    | WaitingForFirst
-    | WaitingForSubsequent
-    | Finished
+    = NoRequestSent
+    | WaitingForFirstResp
+    | WaitingForPage
+    | FinalPageReceived
+    | WaitingOnRefresh
+    | RespFailed String
 
 
-type CSRFToken
-    = CSRFToken String
+type alias CSRFToken =
+    String
 
 
-type alias FabModel =
-    { pageLinks : List PageLink
-    , archiveButton : Maybe ArchiveButton
-    , fabState : FabState
-    }
+initialFabModel : FabModel
+initialFabModel =
+    MenuHidden
 
 
-initialFabModel : Maybe FabFlags -> FabModel
-initialFabModel flags =
-    case flags of
-        Nothing ->
-            { pageLinks = []
-            , archiveButton = Nothing
-            , fabState = MenuHidden
-            }
-
-        Just f ->
-            { pageLinks = f.pageLinks
-            , archiveButton = f.archiveButton
-            , fabState = MenuHidden
-            }
-
-
-type FabState
+type FabModel
     = MenuHidden
     | MenuVisible
-
-
-type alias PageLink =
-    { url : String
-    , iconType : String
-    , linkText : String
-    }
-
-
-type alias ArchiveButton =
-    { postUrl : String
-    , isArchived : Bool
-    , redirectUrl : String
-    }
 
 
 type alias FirstRunModel =
@@ -215,32 +240,8 @@ type FormStatus
     | Failed String
 
 
-type alias ElvantoImportModel =
-    { groups : ElvantoGroups }
-
-
-initialElvantoImportModel : ElvantoImportModel
-initialElvantoImportModel =
-    { groups = [] }
-
-
-type alias InboundTableModel =
-    { sms : SmsInbounds
-    }
-
-
-initialInboundTableModel : InboundTableModel
-initialInboundTableModel =
-    { sms = []
-    }
-
-
 type alias GroupMemberSelectModel =
     { pk : Int
-    , description : String
-    , members : List RecipientSimple
-    , nonmembers : List RecipientSimple
-    , url : String
     , membersFilterRegex : Regex.Regex
     , nonmembersFilterRegex : Regex.Regex
     }
@@ -249,84 +250,19 @@ type alias GroupMemberSelectModel =
 initialGroupMemberSelectModel : GroupMemberSelectModel
 initialGroupMemberSelectModel =
     { pk = 0
-    , description = ""
-    , members = []
-    , nonmembers = []
-    , url = "#"
     , membersFilterRegex = Regex.regex ""
     , nonmembersFilterRegex = Regex.regex ""
     }
 
 
-type alias WallModel =
-    { sms : List SmsInboundSimple
-    }
-
-
-initialWallModel : WallModel
-initialWallModel =
-    { sms = []
-    }
-
-
-type alias UserProfileTableModel =
-    { userprofiles : List UserProfile }
-
-
-initialUserProfileTableModel : UserProfileTableModel
-initialUserProfileTableModel =
-    { userprofiles = [] }
-
-
-type alias KeywordTableModel =
-    { keywords : List Keyword }
-
-
-initialKeywordTableModel : KeywordTableModel
-initialKeywordTableModel =
-    { keywords = [] }
-
-
-type alias RecipientTableModel =
-    { recipients : List Recipient }
-
-
-initialRecipientTableModel : RecipientTableModel
-initialRecipientTableModel =
-    { recipients = [] }
-
-
-type alias OutboundTableModel =
-    { sms : SmsOutbounds
-    }
-
-
-initialOutboundTableModel : OutboundTableModel
-initialOutboundTableModel =
-    { sms = [] }
-
-
-type alias GroupTableModel =
-    { groups : List RecipientGroup }
-
-
-initialGroupTableModel : GroupTableModel
-initialGroupTableModel =
-    { groups = [] }
-
-
 type alias GroupComposerModel =
-    { groups : Groups
-    , people : PeopleSimple
-    , query : Maybe String
+    { query : Maybe String
     }
 
 
 initialGroupComposerModel : GroupComposerModel
 initialGroupComposerModel =
-    { groups = []
-    , people = []
-    , query = Nothing
+    { query = Nothing
     }
 
 
@@ -348,24 +284,6 @@ type alias ParenLoc =
     { open : Maybe Int
     , close : Maybe Int
     }
-
-
-type alias ScheduledSmsTableModel =
-    { sms : List QueuedSms }
-
-
-initialScheduledSmsTable : ScheduledSmsTableModel
-initialScheduledSmsTable =
-    { sms = [] }
-
-
-type alias KeyRespTableModel =
-    { sms : SmsInbounds }
-
-
-initialKeyRespModel : KeyRespTableModel
-initialKeyRespModel =
-    { sms = [] }
 
 
 
@@ -390,7 +308,7 @@ type alias Groups =
 
 nullGroup : RecipientGroup
 nullGroup =
-    RecipientGroup "" 0 "" [] [] "" "" False
+    RecipientGroup "" 0 "" [] [] 0 "" False
 
 
 type alias Keyword =
@@ -426,7 +344,7 @@ type alias RecipientGroup =
     , description : String
     , members : List RecipientSimple
     , nonmembers : List RecipientSimple
-    , cost : String
+    , cost : Float
     , url : String
     , is_archived : Bool
     }
@@ -438,7 +356,6 @@ type alias Recipient =
     , pk : Int
     , url : String
     , full_name : String
-    , number : String
     , is_archived : Bool
     , is_blocking : Bool
     , do_not_reply : Bool
@@ -486,7 +403,6 @@ type alias SmsInboundSimple =
 type alias UserProfile =
     { pk : Int
     , user : User
-    , url : String
     , approved : Bool
     , can_see_groups : Bool
     , can_see_contact_names : Bool
@@ -503,6 +419,8 @@ type alias UserProfile =
 type alias User =
     { email : String
     , username : String
+    , is_staff : Bool
+    , is_social : Bool
     }
 
 
@@ -535,3 +453,329 @@ type alias FirstRunResp =
     { status : String
     , error : String
     }
+
+
+type alias SendAdhocModel =
+    { content : String
+    , selectedContacts : List Int
+    , date : Maybe Date.Date
+    , errors : SendAdhocFormError
+    , status : FormStatus
+    , modalOpen : Bool
+    , adhocFilter : Regex.Regex
+    , cost : Maybe Float
+    }
+
+
+type alias SendAdhocFormError =
+    { recipients : List String
+    , scheduled_time : List String
+    , content : List String
+    , all : List String
+    }
+
+
+initialSendAdhocModel : Page -> SendAdhocModel
+initialSendAdhocModel page =
+    let
+        initialContent =
+            case page of
+                SendAdhoc urlContent _ ->
+                    urlContent |> Maybe.withDefault ""
+
+                _ ->
+                    ""
+
+        initialPks =
+            case page of
+                SendAdhoc _ pks ->
+                    pks
+
+                _ ->
+                    Nothing
+    in
+        { content = initialContent
+        , selectedContacts = Maybe.withDefault [] initialPks
+        , date = Nothing
+        , errors = { recipients = [], scheduled_time = [], content = [], all = [] }
+        , status = NoAction
+        , modalOpen = False
+        , adhocFilter = Regex.regex ""
+        , cost = Nothing
+        }
+
+
+type alias SendGroupModel =
+    { content : String
+    , date : Maybe Date.Date
+    , errors : SendGroupFormError
+    , status : FormStatus
+    , modalOpen : Bool
+    , selectedPk : Maybe Int
+    , cost : Maybe Float
+    , groupFilter : Regex.Regex
+    }
+
+
+type alias SendGroupFormError =
+    { group : List String
+    , scheduled_time : List String
+    , content : List String
+    , all : List String
+    }
+
+
+initialSendGroupModel : Page -> SendGroupModel
+initialSendGroupModel page =
+    let
+        initialContent =
+            case page of
+                SendGroup urlContent _ ->
+                    urlContent
+
+                _ ->
+                    Nothing
+
+        initialSelectedGroup =
+            case page of
+                SendGroup _ pk ->
+                    pk
+
+                _ ->
+                    Nothing
+    in
+        { content = Maybe.withDefault "" initialContent
+        , selectedPk = initialSelectedGroup
+        , date = Nothing
+        , errors = { group = [], scheduled_time = [], content = [], all = [] }
+        , status = NoAction
+        , modalOpen = False
+        , cost = Nothing
+        , groupFilter = Regex.regex ""
+        }
+
+
+type alias SendGroupFormResp =
+    { messages : List DjangoMessage
+    , errors : SendGroupFormError
+    }
+
+
+
+-- Decoders
+
+
+decodeAlwaysTrue : Decode.Decoder Bool
+decodeAlwaysTrue =
+    Decode.succeed True
+
+
+dataFromResp : Decode.Decoder a -> RawResponse -> List a
+dataFromResp decoder rawResp =
+    rawResp.body
+        |> Decode.decodeString (Decode.field "results" (Decode.list decoder))
+        |> Result.withDefault []
+
+
+itemFromResp : a -> Decode.Decoder a -> RawResponse -> a
+itemFromResp defaultCallback decoder rawResp =
+    rawResp.body
+        |> Decode.decodeString decoder
+        |> Result.withDefault defaultCallback
+
+
+decodeFirstRunResp : Decode.Decoder FirstRunResp
+decodeFirstRunResp =
+    decode FirstRunResp
+        |> required "status" Decode.string
+        |> optional "error" Decode.string ""
+
+
+decodeSendAdhocFormResp : Decode.Decoder SendAdhocFormResp
+decodeSendAdhocFormResp =
+    decode SendAdhocFormResp
+        |> required "messages" (Decode.list decodeDjangoMessage)
+        |> required "errors" decodeSendAdhocFormError
+
+
+decodeDjangoMessage : Decode.Decoder DjangoMessage
+decodeDjangoMessage =
+    decode DjangoMessage
+        |> required "type_" Decode.string
+        |> required "text" Decode.string
+
+
+decodeSendAdhocFormError : Decode.Decoder SendAdhocFormError
+decodeSendAdhocFormError =
+    decode SendAdhocFormError
+        |> optional "recipients" (Decode.list Decode.string) []
+        |> optional "scheduled_time" (Decode.list Decode.string) []
+        |> optional "content" (Decode.list Decode.string) []
+        |> optional "__all__" (Decode.list Decode.string) []
+
+
+decodeSendGroupFormResp : Decode.Decoder SendGroupFormResp
+decodeSendGroupFormResp =
+    decode SendGroupFormResp
+        |> required "messages" (Decode.list decodeDjangoMessage)
+        |> required "errors" decodeSendGroupFormError
+
+
+decodeSendGroupFormError : Decode.Decoder SendGroupFormError
+decodeSendGroupFormError =
+    decode SendGroupFormError
+        |> optional "group" (Decode.list Decode.string) []
+        |> optional "scheduled_time" (Decode.list Decode.string) []
+        |> optional "content" (Decode.list Decode.string) []
+        |> optional "__all__" (Decode.list Decode.string) []
+
+
+elvantogroupDecoder : Decode.Decoder ElvantoGroup
+elvantogroupDecoder =
+    decode ElvantoGroup
+        |> required "name" Decode.string
+        |> required "pk" Decode.int
+        |> required "sync" Decode.bool
+        |> required "last_synced" (Decode.maybe date)
+
+
+keywordDecoder : Decode.Decoder Keyword
+keywordDecoder =
+    decode Keyword
+        |> required "keyword" Decode.string
+        |> required "pk" Decode.int
+        |> required "description" Decode.string
+        |> required "current_response" Decode.string
+        |> required "is_live" Decode.bool
+        |> required "url" Decode.string
+        |> required "responses_url" Decode.string
+        |> required "num_replies" Decode.string
+        |> required "num_archived_replies" Decode.string
+        |> required "is_archived" Decode.bool
+
+
+queuedsmsDecoder : Decode.Decoder QueuedSms
+queuedsmsDecoder =
+    decode QueuedSms
+        |> required "pk" Decode.int
+        |> required "time_to_send" (Decode.maybe date)
+        |> required "time_to_send_formatted" Decode.string
+        |> required "sent" Decode.bool
+        |> required "failed" Decode.bool
+        |> required "content" Decode.string
+        |> required "recipient" recipientDecoder
+        |> required "recipient_group" (Decode.maybe recipientgroupDecoder)
+        |> required "sent_by" Decode.string
+
+
+recipientgroupDecoder : Decode.Decoder RecipientGroup
+recipientgroupDecoder =
+    decode RecipientGroup
+        |> required "name" Decode.string
+        |> required "pk" Decode.int
+        |> required "description" Decode.string
+        |> optional "members" (Decode.list recipientsimpleDecoder) []
+        |> optional "nonmembers" (Decode.list recipientsimpleDecoder) []
+        |> required "cost" Decode.float
+        |> required "url" Decode.string
+        |> required "is_archived" Decode.bool
+
+
+recipientDecoder : Decode.Decoder Recipient
+recipientDecoder =
+    decode Recipient
+        |> required "first_name" Decode.string
+        |> required "last_name" Decode.string
+        |> required "pk" Decode.int
+        |> required "url" Decode.string
+        |> required "full_name" Decode.string
+        |> required "is_archived" Decode.bool
+        |> required "is_blocking" Decode.bool
+        |> required "do_not_reply" Decode.bool
+        |> required "last_sms" (Decode.maybe smsinboundsimpleDecoder)
+
+
+recipientsimpleDecoder : Decode.Decoder RecipientSimple
+recipientsimpleDecoder =
+    decode RecipientSimple
+        |> required "full_name" Decode.string
+        |> required "pk" Decode.int
+
+
+smsinboundDecoder : Decode.Decoder SmsInbound
+smsinboundDecoder =
+    decode SmsInbound
+        |> required "sid" Decode.string
+        |> required "pk" Decode.int
+        |> required "sender_name" Decode.string
+        |> required "content" Decode.string
+        |> required "time_received" (Decode.maybe date)
+        |> required "dealt_with" Decode.bool
+        |> required "is_archived" Decode.bool
+        |> required "display_on_wall" Decode.bool
+        |> required "matched_keyword" Decode.string
+        |> required "matched_colour" Decode.string
+        |> required "matched_link" Decode.string
+        |> required "sender_url" (Decode.maybe Decode.string)
+        |> required "sender_pk" (Decode.maybe Decode.int)
+
+
+smsinboundsimpleDecoder : Decode.Decoder SmsInboundSimple
+smsinboundsimpleDecoder =
+    decode SmsInboundSimple
+        |> required "pk" Decode.int
+        |> required "content" Decode.string
+        |> required "time_received" (Decode.maybe date)
+        |> required "is_archived" Decode.bool
+        |> required "display_on_wall" Decode.bool
+        |> required "matched_keyword" Decode.string
+
+
+smsoutboundDecoder : Decode.Decoder SmsOutbound
+smsoutboundDecoder =
+    decode SmsOutbound
+        |> required "content" Decode.string
+        |> required "pk" Decode.int
+        |> required "time_sent" (Decode.maybe date)
+        |> required "sent_by" Decode.string
+        |> required "recipient" (Decode.maybe recipientsimpleDecoder)
+
+
+userprofileDecoder : Decode.Decoder UserProfile
+userprofileDecoder =
+    decode UserProfile
+        |> required "pk" Decode.int
+        |> required "user" userDecoder
+        |> required "approved" Decode.bool
+        |> required "can_see_groups" Decode.bool
+        |> required "can_see_contact_names" Decode.bool
+        |> required "can_see_keywords" Decode.bool
+        |> required "can_see_outgoing" Decode.bool
+        |> required "can_see_incoming" Decode.bool
+        |> required "can_send_sms" Decode.bool
+        |> required "can_see_contact_nums" Decode.bool
+        |> required "can_import" Decode.bool
+        |> required "can_archive" Decode.bool
+
+
+userDecoder : Decode.Decoder User
+userDecoder =
+    decode User
+        |> required "email" Decode.string
+        |> required "username" Decode.string
+        |> required "is_staff" Decode.bool
+        |> required "is_social" Decode.bool
+
+
+dataStoreDecoder : Decode.Decoder DataStore
+dataStoreDecoder =
+    decode DataStore
+        |> required "inboundSms" (Decode.list smsinboundDecoder)
+        |> required "inboundSimpleSms" (Decode.list smsinboundsimpleDecoder)
+        |> required "outboundSms" (Decode.list smsoutboundDecoder)
+        |> required "elvantoGroups" (Decode.list elvantogroupDecoder)
+        |> required "userprofiles" (Decode.list userprofileDecoder)
+        |> required "keywords" (Decode.list keywordDecoder)
+        |> required "recipients" (Decode.list recipientDecoder)
+        |> required "groups" (Decode.list recipientgroupDecoder)
+        |> required "queuedSms" (Decode.list queuedsmsDecoder)

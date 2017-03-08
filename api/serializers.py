@@ -94,14 +94,6 @@ class SmsInboundSimpleSerializer(BaseModelSerializer):
 class RecipientSerializer(BaseModelSerializer):
     """Serialize apostello.models.Recipient for use in table."""
     url = serializers.CharField(source='get_absolute_url')
-    number = serializers.SerializerMethodField()
-
-    def get_number(self, obj):
-        user = self.context['request'].user
-        if user.userprofile.can_see_contact_nums or user.is_staff:
-            return str(obj.number)
-
-        return ''
 
     class Meta:
         model = Recipient
@@ -111,7 +103,6 @@ class RecipientSerializer(BaseModelSerializer):
             'pk',
             'url',
             'full_name',
-            'number',
             'is_archived',
             'is_blocking',
             'do_not_reply',
@@ -146,7 +137,7 @@ class SmsOutboundSerializer(BaseModelSerializer):
 
 class RecipientGroupSerializer(BaseModelSerializer):
     """Serialize apostello.models.RecipientGroup for use in edit page."""
-    cost = serializers.CharField(source='calculate_cost')
+    cost = serializers.FloatField(source='calculate_cost')
     url = serializers.CharField(source='get_absolute_url')
     members = RecipientSimpleSerializer(
         many=True, read_only=True, source='recipient_set'
@@ -171,26 +162,30 @@ class RecipientGroupSerializer(BaseModelSerializer):
 
 class UserSerializer(BaseModelSerializer):
     """Serialize user model."""
+    is_social = serializers.SerializerMethodField()
+
+    def get_is_social(self, obj):
+        return obj.socialaccount_set.count() > 0
 
     class Meta:
         model = User
         fields = (
             'email',
             'username',
+            'is_staff',
+            'is_social',
         )
 
 
 class UserProfileSerializer(BaseModelSerializer):
     """Serialize apostello.models.UserProfile for use in table."""
     user = UserSerializer(read_only=True)
-    url = serializers.CharField(source='get_absolute_url')
 
     class Meta:
         model = UserProfile
         fields = (
             'pk',
             'user',
-            'url',
             'approved',
             'can_see_groups',
             'can_see_contact_names',

@@ -6,14 +6,15 @@ import Html.Attributes exposing (class, href, style)
 import Messages exposing (..)
 import Models exposing (..)
 import Regex
+import Route exposing (page2loc)
 import Views.FilteringTable exposing (uiTable)
 
 
 -- Main view
 
 
-view : Regex.Regex -> OutboundTableModel -> Html Messages.Msg
-view filterRegex model =
+view : Regex.Regex -> List SmsOutbound -> Html Msg
+view filterRegex sms =
     let
         head =
             thead []
@@ -24,10 +25,10 @@ view filterRegex model =
                     ]
                 ]
     in
-        uiTable head filterRegex smsRow model.sms
+        uiTable head filterRegex smsRow sms
 
 
-smsRow : SmsOutbound -> Html Messages.Msg
+smsRow : SmsOutbound -> Html Msg
 smsRow sms =
     let
         recipient =
@@ -39,7 +40,13 @@ smsRow sms =
                     { full_name = "", pk = 0 }
     in
         tr []
-            [ td [ class "collapsing" ] [ a [ href ("/recipient/edit/" ++ (toString recipient.pk)), style [ ( "color", "#212121" ) ] ] [ text recipient.full_name ] ]
+            [ td [ class "collapsing" ]
+                [ a
+                    [ href <| page2loc <| EditContact recipient.pk
+                    , style [ ( "color", "#212121" ) ]
+                    ]
+                    [ text recipient.full_name ]
+                ]
             , td [] [ text sms.content ]
             , td [ class "collapsing" ] [ text (formatDate sms.time_sent) ]
             ]

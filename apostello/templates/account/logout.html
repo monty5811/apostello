@@ -8,6 +8,13 @@
   {% if redirect_field_value %}
   <input type="hidden" name="{{redirect_field_name}}" value="{{redirect_field_value}}"/>
   {% endif %}
-  <button class="ui red button" type="submit">{% trans 'Sign Out' %}</button>
+  <button class="ui red button" type="submit" id="logout_button">{% trans 'Sign Out' %}</button>
 </form>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(function(registrations) {
+    for(let registration of registrations) {registration.unregister()}
+})
+};
+</script>
 {% endblock %}

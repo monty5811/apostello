@@ -23,7 +23,7 @@ class TestButtonPosts:
     def test_group_members_api(self, recipients, groups, users):
         # setup
         grp = groups['empty_group']
-        url = grp.get_api_url
+        url = '/api/v1/groups/{}/'.format(grp.pk)
         assert grp.all_recipients.count() == 0
         initial_not_in_group = grp.all_recipients_not_in_group.count()
         # add calvin to group

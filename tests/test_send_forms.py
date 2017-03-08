@@ -15,8 +15,9 @@ class TestSendingSmsForm:
     def test_send_adhoc_now(self, recipients, users):
         """Test sending a message now."""
         users['c_staff'].post(
-            '/send/adhoc/', {'content': 'test',
-                             'recipients': ['1']}
+            '/api/v1/sms/send/adhoc/',
+            {'content': 'test',
+             'recipients': ['1']}
         )
 
     @twilio_vcr
@@ -24,7 +25,7 @@ class TestSendingSmsForm:
         """Test sending a message later."""
         num_sms = models.SmsOutbound.objects.count()
         users['c_staff'].post(
-            '/send/adhoc/', {
+            '/api/v1/sms/send/adhoc/', {
                 'content': 'test',
                 'recipients': ['1'],
                 'scheduled_time': '2117-12-01 00:00'
@@ -38,7 +39,7 @@ class TestSendingSmsForm:
         """Test sending a message later."""
         num_sms = models.SmsOutbound.objects.count()
         users['c_staff'].post(
-            '/send/adhoc/', {
+            '/api/v1/sms/send/adhoc/', {
                 'content': 'test',
                 'recipients': ['1'],
                 'scheduled_time':
@@ -50,14 +51,25 @@ class TestSendingSmsForm:
 
     def test_send_adhoc_error(self, users):
         """Test missing field."""
-        resp = users['c_staff'].post('/send/adhoc/', {'content': ''})
+        resp = users['c_staff'].post(
+            '/api/v1/sms/send/adhoc/', {'content': ''}
+        )
         assert 'This field is required.' in str(resp.content)
+
+    def test_send_adhoc_not_allowed(self, recipients, users):
+        """Test deny sending."""
+        resp = users['c_in'].post(
+            '/api/v1/sms/send/adhoc/', {'content': 'test',
+                                        'recipients': '1'}
+        )
+        assert "do not have permission" in str(resp.content)
+        assert resp.status_code >= 400
 
     @twilio_vcr
     def test_send_group_now(self, groups, users):
         """Test sending a message now."""
         users['c_staff'].post(
-            '/send/group/',
+            '/api/v1/sms/send/group/',
             {'content': 'test',
              'recipient_group': groups['test_group'].pk}
         )
@@ -66,7 +78,7 @@ class TestSendingSmsForm:
     def test_send_group_later(self, groups, users):
         """Test sending a message later."""
         users['c_staff'].post(
-            '/send/group/', {
+            '/api/v1/sms/send/group/', {
                 'content': 'test',
                 'recipient_group': '1',
                 'scheduled_time': '2117-12-01 00:00'
@@ -76,7 +88,17 @@ class TestSendingSmsForm:
 
     def test_send_group_error(self, users):
         """Test missing field."""
-        users['c_staff'].post('/send/group/', {'content': ''})
+        users['c_staff'].post('/api/v1/sms/send/group/', {'content': ''})
+
+    def test_send_adhoc_not_allowed(self, groups, users):
+        """Test deny sending."""
+        resp = users['c_in'].post(
+            '/api/v1/sms/send/group/',
+            {'content': 'test',
+             'recipient_group': '1'}
+        )
+        assert "do not have permission" in str(resp.content)
+        assert resp.status_code >= 400
 
 
 @pytest.mark.slow

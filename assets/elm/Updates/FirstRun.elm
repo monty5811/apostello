@@ -1,6 +1,5 @@
 module Updates.FirstRun exposing (update)
 
-import Decoders exposing (..)
 import DjangoSend exposing (post)
 import Http
 import Json.Decode as Decode
@@ -9,68 +8,68 @@ import Messages exposing (..)
 import Models exposing (..)
 
 
-update : FirstRunMsg -> Model -> ( Model, Cmd Msg )
+update : FirstRunMsg -> Model -> ( Model, List (Cmd Msg) )
 update msg model =
     let
-        ( frModel, cmd ) =
-            updateFRModel msg model.csrftoken model.firstRun
+        ( frModel, cmds ) =
+            updateFRModel msg model.settings.csrftoken model.firstRun
     in
-        ( { model | firstRun = frModel }, cmd )
+        ( { model | firstRun = frModel }, cmds )
 
 
-updateFRModel : FirstRunMsg -> CSRFToken -> FirstRunModel -> ( FirstRunModel, Cmd Msg )
+updateFRModel : FirstRunMsg -> CSRFToken -> FirstRunModel -> ( FirstRunModel, List (Cmd Msg) )
 updateFRModel msg csrftoken model =
     case msg of
         UpdateAdminEmailField text ->
-            ( { model | adminEmail = text }, Cmd.none )
+            ( { model | adminEmail = text }, [] )
 
         UpdateAdminPass1Field text ->
-            ( { model | adminPass1 = text }, Cmd.none )
+            ( { model | adminPass1 = text }, [] )
 
         UpdateAdminPass2Field text ->
-            ( { model | adminPass2 = text }, Cmd.none )
+            ( { model | adminPass2 = text }, [] )
 
         CreateAdminUser ->
             if (model.adminPass1 == model.adminPass2) then
-                ( { model | adminFormStatus = InProgress }, createAdminUser csrftoken model )
+                ( { model | adminFormStatus = InProgress }, [ createAdminUser csrftoken model ] )
             else
-                ( { model | adminFormStatus = Failed "Passwords do not match" }, Cmd.none )
+                ( { model | adminFormStatus = Failed "Passwords do not match" }, [] )
 
         ReceiveCreateAdminUser (Ok r) ->
-            ( { model | adminFormStatus = Success }, Cmd.none )
+            ( { model | adminFormStatus = Success }, [] )
 
         ReceiveCreateAdminUser (Err e) ->
-            ( { model | adminFormStatus = Failed (pullOutError e) }, Cmd.none )
+            ( { model | adminFormStatus = Failed (pullOutError e) }, [] )
 
         UpdateTestEmailToField text ->
-            ( { model | testEmailTo = text }, Cmd.none )
+            ( { model | testEmailTo = text }, [] )
 
         UpdateTestEmailBodyField text ->
-            ( { model | testEmailBody = text }, Cmd.none )
+            ( { model | testEmailBody = text }, [] )
 
         SendTestEmail ->
-            ( { model | testEmailFormStatus = InProgress }, sendTestEmail csrftoken model )
+            ( { model | testEmailFormStatus = InProgress }, [ sendTestEmail csrftoken model ] )
 
         ReceiveSendTestEmail (Ok r) ->
-            ( { model | testEmailFormStatus = Success }, Cmd.none )
+            ( { model | testEmailFormStatus = Success }, [] )
 
         ReceiveSendTestEmail (Err e) ->
-            ( { model | testEmailFormStatus = Failed (pullOutError e) }, Cmd.none )
+            ( { model | testEmailFormStatus = Failed (pullOutError e) }, [] )
 
         UpdateTestSmsToField text ->
-            ( { model | testSmsTo = text }, Cmd.none )
+            ( { model | testSmsTo = text }, [] )
 
         UpdateTestSmsBodyField text ->
-            ( { model | testSmsBody = text }, Cmd.none )
+            ( { model | testSmsBody = text }, [] )
 
         SendTestSms ->
-            ( { model | testSmsFormStatus = InProgress }, sendTestSms csrftoken model )
+            ( { model | testSmsFormStatus = InProgress }, [ sendTestSms csrftoken model ] )
 
         ReceiveSendTestSms (Ok r) ->
-            ( { model | testSmsFormStatus = Success }, Cmd.none )
+            ( { model | testSmsFormStatus = Success }, [] )
 
         ReceiveSendTestSms (Err e) ->
-            ( { model | testSmsFormStatus = Failed (pullOutError e) }, Cmd.none )
+            ( { model | testSmsFormStatus = Failed (pullOutError e) }, [] )
 
 
 pullOutError : Http.Error -> String

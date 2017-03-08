@@ -1,44 +1,35 @@
-module Updates.GroupTable exposing (update, updateGroups)
+module Updates.GroupTable exposing (update)
 
-import Decoders exposing (recipientgroupDecoder)
 import DjangoSend exposing (archivePost)
 import Helpers exposing (..)
 import Http
 import Messages exposing (..)
 import Models exposing (..)
-import Urls exposing (..)
+import Urls
+import Updates.DataStore exposing (optArchiveRecordWithPk)
 
 
-update : GroupTableMsg -> Model -> ( Model, Cmd Msg )
+update : GroupTableMsg -> Model -> ( Model, List (Cmd Msg) )
 update msg model =
     case msg of
         ToggleGroupArchive isArchived pk ->
-            ( { model | groupTable = optArchiveGroup model.groupTable pk }
-            , toggleRecipientGroupArchive model.csrftoken isArchived pk
+            ( { model | dataStore = optArchiveGroup model.dataStore pk }
+            , [ toggleRecipientGroupArchive model.settings.csrftoken isArchived pk ]
             )
 
         ReceiveToggleGroupArchive (Ok _) ->
-            ( model, Cmd.none )
+            ( model, [] )
 
         ReceiveToggleGroupArchive (Err _) ->
             handleNotSaved model
 
 
-updateGroups : GroupTableModel -> List RecipientGroup -> GroupTableModel
-updateGroups model groups =
-    { model
-        | groups =
-            mergeItems model.groups groups
-                |> List.sortBy .name
-    }
-
-
-optArchiveGroup : GroupTableModel -> Int -> GroupTableModel
-optArchiveGroup model pk =
-    { model | groups = List.filter (\r -> not (r.pk == pk)) model.groups }
+optArchiveGroup : DataStore -> Int -> DataStore
+optArchiveGroup ds pk =
+    { ds | groups = optArchiveRecordWithPk ds.groups pk }
 
 
 toggleRecipientGroupArchive : CSRFToken -> Bool -> Int -> Cmd Msg
 toggleRecipientGroupArchive csrftoken isArchived pk =
-    archivePost csrftoken (groupsUrl_quick pk) isArchived recipientgroupDecoder
+    archivePost csrftoken (Urls.group pk) isArchived recipientgroupDecoder
         |> Http.send (GroupTableMsg << ReceiveToggleGroupArchive)

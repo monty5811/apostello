@@ -11,7 +11,7 @@ post csrftoken url body decoder =
     request
         { method = "POST"
         , headers =
-            [ header "X-CSRFToken" (extractToken csrftoken)
+            [ header "X-CSRFToken" csrftoken
             , header "Accept" "application/json"
             ]
         , url = url
@@ -34,8 +34,17 @@ encodeBody data =
         |> Http.jsonBody
 
 
-extractToken : CSRFToken -> String
-extractToken csrftoken =
-    case csrftoken of
-        Models.CSRFToken token ->
-            token
+rawPost : CSRFToken -> String -> List ( String, Encode.Value ) -> Request { body : String, code : Int }
+rawPost csrftoken url body =
+    request
+        { method = "POST"
+        , headers =
+            [ header "X-CSRFToken" csrftoken
+            , header "Accept" "application/json"
+            ]
+        , url = url
+        , body = encodeBody body
+        , expect = Http.expectStringResponse (\a -> Ok ({ code = a.status.code, body = a.body }))
+        , timeout = Nothing
+        , withCredentials = True
+        }

@@ -13,8 +13,8 @@ import Views.FilteringTable exposing (uiTable)
 -- Main view
 
 
-view : Regex.Regex -> WallModel -> Html Msg
-view filterRegex model =
+view : Regex.Regex -> List SmsInboundSimple -> Html Msg
+view filterRegex sms =
     let
         head =
             thead []
@@ -25,7 +25,7 @@ view filterRegex model =
                     ]
                 ]
     in
-        uiTable head filterRegex smsRow model.sms
+        uiTable head filterRegex smsRow sms
 
 
 smsRow : SmsInboundSimple -> Html Msg
