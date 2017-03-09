@@ -38,11 +38,6 @@ smsInbound pk =
     print (s "/api/v1/sms/in/" <> int <> s "/") pk
 
 
-smsInboundsWall : String
-smsInboundsWall =
-    "/api/v1/sms/live_wall/all/"
-
-
 smsInboundsKeyword : String -> String
 smsInboundsKeyword keyword =
     print (s "/api/v1/sms/in/keyword/" <> string <> s "/") keyword

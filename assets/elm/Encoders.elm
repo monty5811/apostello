@@ -10,7 +10,6 @@ encodeDataStore : DataStore -> Encode.Value
 encodeDataStore ds =
     Encode.object
         [ ( "inboundSms", (Encode.list <| List.map smsinboundEncoder ds.inboundSms) )
-        , ( "inboundSimpleSms", (Encode.list <| List.map smsinboundsimpleEncoder ds.inboundSimpleSms) )
         , ( "outboundSms", (Encode.list <| List.map smsoutboundEncoder ds.outboundSms) )
         , ( "elvantoGroups", (Encode.list <| List.map elvantogroupEncoder ds.elvantoGroups) )
         , ( "userprofiles", (Encode.list <| List.map encodeUserProfile ds.userprofiles) )
@@ -116,7 +115,7 @@ recipientEncoder contact =
         , ( "is_archived", Encode.bool contact.is_archived )
         , ( "is_blocking", Encode.bool contact.is_blocking )
         , ( "do_not_reply", Encode.bool contact.do_not_reply )
-        , ( "last_sms", encodeMaybe smsinboundsimpleEncoder contact.last_sms )
+        , ( "last_sms", encodeMaybe smsinboundEncoder contact.last_sms )
         ]
 
 
@@ -125,18 +124,6 @@ recipientsimpleEncoder contact =
     Encode.object
         [ ( "full_name", Encode.string contact.full_name )
         , ( "pk", Encode.int contact.pk )
-        ]
-
-
-smsinboundsimpleEncoder : SmsInboundSimple -> Encode.Value
-smsinboundsimpleEncoder sms =
-    Encode.object
-        [ ( "pk", Encode.int sms.pk )
-        , ( "content", Encode.string sms.content )
-        , ( "time_received", encodeMaybeDate sms.time_received )
-        , ( "is_archived", Encode.bool sms.is_archived )
-        , ( "display_on_wall", Encode.bool sms.display_on_wall )
-        , ( "matched_keyword", Encode.string sms.matched_keyword )
         ]
 
 

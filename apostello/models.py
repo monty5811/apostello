@@ -585,8 +585,6 @@ class SmsInbound(models.Model):
     def save(self, *args, **kwargs):
         """Override save method to invalidate cache."""
         super(SmsInbound, self).save(*args, **kwargs)
-        # invalidate live wall cache
-        cache.set('live_wall_all', None, 0)
         # invalidate per person last sms cache
         cache.set('last_msg__{0}'.format(self.sender_num), None, 0)
 

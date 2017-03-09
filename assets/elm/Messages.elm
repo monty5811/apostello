@@ -105,7 +105,7 @@ type GroupMemberSelectMsg
 
 type WallMsg
     = ToggleWallDisplay Bool Int
-    | ReceiveToggleWallDisplay (Result Http.Error SmsInboundSimple)
+    | ReceiveToggleWallDisplay (Result Http.Error SmsInbound)
 
 
 type UserProfileTableMsg

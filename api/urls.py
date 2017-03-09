@@ -65,13 +65,6 @@ urlpatterns = [
         name='out_log'
     ),
     url(
-        r'^v1/sms/live_wall/all/$',
-        v.ApiCollectionAllWall.as_view(
-            permission_classes=(IsAuthenticated, CanSeeIncoming)
-        ),
-        name='live_wall_all'
-    ),
-    url(
         r'^v1/sms/in/keyword/(?P<keyword>[\d|\w]+)/$',
         v.ApiCollectionKeywordSms.as_view(
             permission_classes=(

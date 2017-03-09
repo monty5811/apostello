@@ -61,7 +61,6 @@ type alias Settings =
 
 type RemoteDataType
     = IncomingSms
-    | IncomingSimpleSms
     | OutgoingSms
     | Contacts
     | Groups
@@ -73,7 +72,6 @@ type RemoteDataType
 
 type alias DataStore =
     { inboundSms : List SmsInbound
-    , inboundSimpleSms : List SmsInboundSimple
     , outboundSms : List SmsOutbound
     , elvantoGroups : List ElvantoGroup
     , userprofiles : List UserProfile
@@ -87,7 +85,6 @@ type alias DataStore =
 emptyDataStore : DataStore
 emptyDataStore =
     { inboundSms = []
-    , inboundSimpleSms = []
     , outboundSms = []
     , elvantoGroups = []
     , userprofiles = []
@@ -359,7 +356,7 @@ type alias Recipient =
     , is_archived : Bool
     , is_blocking : Bool
     , do_not_reply : Bool
-    , last_sms : Maybe SmsInboundSimple
+    , last_sms : Maybe SmsInbound
     }
 
 
@@ -388,16 +385,6 @@ type alias SmsInbound =
 
 type alias SmsInbounds =
     List SmsInbound
-
-
-type alias SmsInboundSimple =
-    { pk : Int
-    , content : String
-    , time_received : Maybe Date.Date
-    , is_archived : Bool
-    , display_on_wall : Bool
-    , matched_keyword : String
-    }
 
 
 type alias UserProfile =
@@ -692,7 +679,7 @@ recipientDecoder =
         |> required "is_archived" Decode.bool
         |> required "is_blocking" Decode.bool
         |> required "do_not_reply" Decode.bool
-        |> required "last_sms" (Decode.maybe smsinboundsimpleDecoder)
+        |> required "last_sms" (Decode.maybe smsinboundDecoder)
 
 
 recipientsimpleDecoder : Decode.Decoder RecipientSimple
@@ -718,17 +705,6 @@ smsinboundDecoder =
         |> required "matched_link" Decode.string
         |> required "sender_url" (Decode.maybe Decode.string)
         |> required "sender_pk" (Decode.maybe Decode.int)
-
-
-smsinboundsimpleDecoder : Decode.Decoder SmsInboundSimple
-smsinboundsimpleDecoder =
-    decode SmsInboundSimple
-        |> required "pk" Decode.int
-        |> required "content" Decode.string
-        |> required "time_received" (Decode.maybe date)
-        |> required "is_archived" Decode.bool
-        |> required "display_on_wall" Decode.bool
-        |> required "matched_keyword" Decode.string
 
 
 smsoutboundDecoder : Decode.Decoder SmsOutbound
@@ -771,7 +747,6 @@ dataStoreDecoder : Decode.Decoder DataStore
 dataStoreDecoder =
     decode DataStore
         |> required "inboundSms" (Decode.list smsinboundDecoder)
-        |> required "inboundSimpleSms" (Decode.list smsinboundsimpleDecoder)
         |> required "outboundSms" (Decode.list smsoutboundDecoder)
         |> required "elvantoGroups" (Decode.list elvantogroupDecoder)
         |> required "userprofiles" (Decode.list userprofileDecoder)

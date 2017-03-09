@@ -9,7 +9,7 @@ import Models exposing (..)
 -- Main view
 
 
-view : List SmsInboundSimple -> Html Msg
+view : List SmsInbound -> Html Msg
 view sms =
     div
         [ class "ui grid"
@@ -29,7 +29,7 @@ view sms =
         ]
 
 
-smsCard : SmsInboundSimple -> Html Msg
+smsCard : SmsInbound -> Html Msg
 smsCard sms =
     let
         firstWord =

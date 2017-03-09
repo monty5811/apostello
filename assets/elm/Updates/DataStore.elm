@@ -26,9 +26,6 @@ updateNewData dt rawResp model =
         ElvantoGroups_ ->
             { model | dataStore = updateElvantoGroups model.dataStore (dataFromResp elvantogroupDecoder rawResp) }
 
-        IncomingSimpleSms ->
-            { model | dataStore = updateSmsInboundSimples model.dataStore (dataFromResp smsinboundsimpleDecoder rawResp) }
-
         UserProfiles ->
             { model | dataStore = updateUserProfiles model.dataStore (dataFromResp userprofileDecoder rawResp) }
 
@@ -55,15 +52,6 @@ updateSmsInbounds ds newSms =
     { ds
         | inboundSms =
             mergeItems ds.inboundSms newSms
-                |> sortByTimeReceived
-    }
-
-
-updateSmsInboundSimples : DataStore -> List SmsInboundSimple -> DataStore
-updateSmsInboundSimples ds newSms =
-    { ds
-        | inboundSimpleSms =
-            mergeItems ds.inboundSimpleSms newSms
                 |> sortByTimeReceived
     }
 

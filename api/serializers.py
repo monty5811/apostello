@@ -75,22 +75,6 @@ class SmsInboundSerializer(BaseModelSerializer):
         )
 
 
-class SmsInboundSimpleSerializer(BaseModelSerializer):
-    """Serialize apostello.models.SmsInbound for use in log and wall."""
-    time_received = serializers.DateTimeField()
-
-    class Meta:
-        model = SmsInbound
-        fields = (
-            'pk',
-            'content',
-            'time_received',
-            'is_archived',
-            'display_on_wall',
-            'matched_keyword',
-        )
-
-
 class RecipientSerializer(BaseModelSerializer):
     """Serialize apostello.models.Recipient for use in table."""
     url = serializers.CharField(source='get_absolute_url')

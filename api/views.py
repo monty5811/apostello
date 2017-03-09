@@ -13,7 +13,7 @@ from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 
 from api.drf_permissions import CanSeeKeywords, CanSendSms
-from api.serializers import SmsInboundSerializer, SmsInboundSimpleSerializer
+from api.serializers import SmsInboundSerializer
 from apostello.forms import SendAdhocRecipientsForm, SendRecipientGroupForm
 from apostello.mixins import ProfilePermsMixin
 from apostello.models import Keyword, Recipient, SmsInbound
@@ -81,20 +81,6 @@ class ApiCollectionKeywordSms(ApiCollection):
             objs = objs.filter(is_archived=True)
         else:
             objs = objs.filter(is_archived=False)
-        return objs
-
-
-class ApiCollectionAllWall(ApiCollection):
-    """SMS collection for the curating wall."""
-    serializer_class = SmsInboundSimpleSerializer
-
-    def get_queryset(self):
-        """Handle get requests."""
-        cache_key = 'live_wall_all'
-        objs = cache.get(cache_key)
-        if objs is None:
-            objs = SmsInbound.objects.filter(is_archived=False)
-            cache.set(cache_key, objs, 120)
         return objs
 
 

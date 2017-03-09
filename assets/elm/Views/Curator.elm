@@ -13,7 +13,7 @@ import Views.FilteringTable exposing (uiTable)
 -- Main view
 
 
-view : Regex.Regex -> List SmsInboundSimple -> Html Msg
+view : Regex.Regex -> List SmsInbound -> Html Msg
 view filterRegex sms =
     let
         head =
@@ -28,7 +28,7 @@ view filterRegex sms =
         uiTable head filterRegex smsRow sms
 
 
-smsRow : SmsInboundSimple -> Html Msg
+smsRow : SmsInbound -> Html Msg
 smsRow sms =
     tr []
         [ td [] [ text sms.content ]
@@ -37,7 +37,7 @@ smsRow sms =
         ]
 
 
-curateToggleCell : SmsInboundSimple -> Html Msg
+curateToggleCell : SmsInbound -> Html Msg
 curateToggleCell sms =
     let
         text_ =

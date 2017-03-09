@@ -56,10 +56,10 @@ dt_url_from_page p =
             [ ( ElvantoGroups_, Urls.elvantoGroups ) ]
 
         Wall ->
-            [ ( IncomingSimpleSms, Urls.smsInboundsWall ) ]
+            [ ( IncomingSms, Urls.smsInbounds ) ]
 
         Curator ->
-            [ ( IncomingSimpleSms, Urls.smsInboundsWall ) ]
+            [ ( IncomingSms, Urls.smsInbounds ) ]
 
         UserProfileTable ->
             [ ( UserProfiles, Urls.userProfiles ) ]

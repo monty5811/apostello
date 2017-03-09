@@ -40,21 +40,29 @@ recipientRow recipient =
                 False ->
                     ""
 
-        lastSms =
+        timeReceived =
             case recipient.last_sms of
                 Just sms ->
-                    sms
+                    sms.time_received
 
                 Nothing ->
-                    SmsInboundSimple 0 "" Nothing False False ""
+                    Nothing
+
+        content =
+            case recipient.last_sms of
+                Just sms ->
+                    sms.content
+
+                Nothing ->
+                    ""
     in
         tr [ class className ]
             [ td []
                 [ a [ href recipient.url ] [ text recipient.full_name ]
                 , doNotReplyIndicator recipient.do_not_reply
                 ]
-            , td [] [ text lastSms.content ]
-            , td [] [ text (formatDate lastSms.time_received) ]
+            , td [] [ text content ]
+            , td [] [ text <| formatDate timeReceived ]
             , archiveCell recipient.is_archived (RecipientTableMsg (ToggleRecipientArchive recipient.is_archived recipient.pk))
             ]
 

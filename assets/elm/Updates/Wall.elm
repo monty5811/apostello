@@ -7,7 +7,7 @@ import Json.Encode as Encode
 import Messages exposing (..)
 import Models exposing (..)
 import Urls
-import Updates.DataStore exposing (updateSmsInboundSimples)
+import Updates.DataStore exposing (updateSmsInbounds)
 
 
 update : WallMsg -> Model -> ( Model, List (Cmd Msg) )
@@ -17,7 +17,7 @@ update msg model =
             ( model, [ toggleWallDisplay model.settings.csrftoken isDisplayed pk ] )
 
         ReceiveToggleWallDisplay (Ok sms) ->
-            ( { model | dataStore = updateSmsInboundSimples model.dataStore [ sms ] }, [] )
+            ( { model | dataStore = updateSmsInbounds model.dataStore [ sms ] }, [] )
 
         ReceiveToggleWallDisplay (Err _) ->
             handleNotSaved model
@@ -32,5 +32,5 @@ toggleWallDisplay csrftoken isDisplayed pk =
         body =
             [ ( "display_on_wall", Encode.bool isDisplayed ) ]
     in
-        post csrftoken url body smsinboundsimpleDecoder
+        post csrftoken url body smsinboundDecoder
             |> Http.send (WallMsg << ReceiveToggleWallDisplay)

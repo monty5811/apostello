@@ -67,10 +67,10 @@ content model =
             EI.view model.filterRegex model.dataStore.elvantoGroups
 
         Wall ->
-            W.view (model.dataStore.inboundSimpleSms |> filterArchived False |> List.filter (\s -> s.display_on_wall))
+            W.view (model.dataStore.inboundSms |> filterArchived False |> List.filter (\s -> s.display_on_wall))
 
         Curator ->
-            C.view model.filterRegex (model.dataStore.inboundSimpleSms |> filterArchived False)
+            C.view model.filterRegex (model.dataStore.inboundSms |> filterArchived False)
 
         UserProfileTable ->
             UPT.view model.filterRegex model.dataStore.userprofiles
