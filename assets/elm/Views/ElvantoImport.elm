@@ -15,24 +15,25 @@ import Views.FilteringTable exposing (filteringTable)
 
 view : Regex.Regex -> List ElvantoGroup -> Html Msg
 view filterRegex groups =
-    let
-        head =
-            thead []
-                [ tr []
-                    [ th [] []
-                    , th [] [ text "Last Synced" ]
-                    , th [] [ text "Sync?" ]
-                    ]
-                ]
-    in
-        div []
-            [ div [ class "ui fluid buttons" ]
-                [ fetchButton
-                , pullButton
-                ]
-            , br [] []
-            , filteringTable "ui striped compact definition table" head filterRegex groupRow groups
+    div []
+        [ div [ class "ui fluid buttons" ]
+            [ fetchButton
+            , pullButton
             ]
+        , br [] []
+        , filteringTable "ui striped compact definition table" tableHead filterRegex groupRow groups
+        ]
+
+
+tableHead : Html Msg
+tableHead =
+    thead []
+        [ tr []
+            [ th [] []
+            , th [] [ text "Last Synced" ]
+            , th [] [ text "Sync?" ]
+            ]
+        ]
 
 
 fetchButton : Html Msg

@@ -16,24 +16,23 @@ import Views.FilteringTable exposing (uiTable)
 
 view : Regex.Regex -> Time.Time -> List QueuedSms -> Html Msg
 view filterRegex currentTime sms =
-    let
-        head =
-            thead []
-                [ tr []
-                    [ th [] [ text "Queued By" ]
-                    , th [] [ text "Recipient" ]
-                    , th [] [ text "Group" ]
-                    , th [] [ text "Message" ]
-                    , th [] [ text "Scheduled Time" ]
-                    , th [] []
-                    ]
-                ]
+    sms
+        |> List.filter (onlyFuture currentTime)
+        |> uiTable tableHead filterRegex smsRow
 
-        smsFiltered =
-            sms
-                |> List.filter (onlyFuture currentTime)
-    in
-        uiTable head filterRegex smsRow smsFiltered
+
+tableHead : Html Msg
+tableHead =
+    thead []
+        [ tr []
+            [ th [] [ text "Queued By" ]
+            , th [] [ text "Recipient" ]
+            , th [] [ text "Group" ]
+            , th [] [ text "Message" ]
+            , th [] [ text "Scheduled Time" ]
+            , th [] []
+            ]
+        ]
 
 
 onlyFuture : Time.Time -> QueuedSms -> Bool

@@ -14,21 +14,22 @@ import Views.FilteringTable exposing (filteringTable)
 
 view : Regex.Regex -> List Keyword -> Html Msg
 view filterRegex keywords =
-    let
-        head =
-            thead []
-                [ tr []
-                    [ th [] []
-                    , th [] [ text "Matches" ]
-                    , th [] [ text "Description" ]
-                    , th [] [ text "Auto Reply" ]
-                    , th [] [ text "Status" ]
-                    , th [] []
-                    , th [] []
-                    ]
-                ]
-    in
-        filteringTable "ui striped definition table" head filterRegex keywordRow keywords
+    filteringTable "ui striped definition table" tableHead filterRegex keywordRow keywords
+
+
+tableHead : Html Msg
+tableHead =
+    thead []
+        [ tr []
+            [ th [] []
+            , th [] [ text "Matches" ]
+            , th [] [ text "Description" ]
+            , th [] [ text "Auto Reply" ]
+            , th [] [ text "Status" ]
+            , th [] []
+            , th [] []
+            ]
+        ]
 
 
 keywordRow : Keyword -> Html Msg

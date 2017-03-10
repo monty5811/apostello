@@ -15,23 +15,24 @@ import Views.FilteringTable exposing (filteringTable)
 
 view : Regex.Regex -> List UserProfile -> Html Msg
 view filterRegex profiles =
-    let
-        head =
-            thead []
-                [ tr [ class "left aligned" ]
-                    [ th [] [ text "User" ]
-                    , th [] [ text "Approved" ]
-                    , th [] [ text "Keywords" ]
-                    , th [] [ text "Send SMS" ]
-                    , th [] [ text "Contacts" ]
-                    , th [] [ text "Groups" ]
-                    , th [] [ text "Incoming" ]
-                    , th [] [ text "Outgoing" ]
-                    , th [] [ text "Archiving" ]
-                    ]
-                ]
-    in
-        filteringTable "ui collapsing celled very basic table" head filterRegex userprofileRow profiles
+    filteringTable "ui collapsing celled very basic table" tableHead filterRegex userprofileRow profiles
+
+
+tableHead : Html Msg
+tableHead =
+    thead []
+        [ tr [ class "left aligned" ]
+            [ th [] [ text "User" ]
+            , th [] [ text "Approved" ]
+            , th [] [ text "Keywords" ]
+            , th [] [ text "Send SMS" ]
+            , th [] [ text "Contacts" ]
+            , th [] [ text "Groups" ]
+            , th [] [ text "Incoming" ]
+            , th [] [ text "Outgoing" ]
+            , th [] [ text "Archiving" ]
+            ]
+        ]
 
 
 userprofileRow : UserProfile -> Html Msg

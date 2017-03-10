@@ -59,31 +59,31 @@ timeField errors date =
 -- Send Button
 
 
+sendButtonClass : Maybe Float -> String
+sendButtonClass cost =
+    case cost of
+        Nothing ->
+            "disabled"
+
+        Just _ ->
+            "primary"
+
+
+sendButtonText : Maybe Float -> String
+sendButtonText cost =
+    case cost of
+        Nothing ->
+            "0.00"
+
+        Just c ->
+            Round.round 2 c
+
+
 sendButton : Msg -> Maybe Float -> Html Msg
 sendButton msg cost =
-    let
-        buttonClass =
-            case cost of
-                Nothing ->
-                    "disabled"
-
-                Just _ ->
-                    "primary"
-
-        buttonText =
-            case cost of
-                Nothing ->
-                    "0.00"
-
-                Just c ->
-                    Round.round 2 c
-    in
-        button
-            [ class ("ui " ++ buttonClass ++ " button")
-            , id "send_button"
-            , onClick msg
-            ]
-            [ text ("Send ($" ++ buttonText ++ ")") ]
+    button
+        [ class ("ui " ++ sendButtonClass cost ++ " button"), id "send_button", onClick msg ]
+        [ text ("Send ($" ++ sendButtonText cost ++ ")") ]
 
 
 

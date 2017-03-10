@@ -25,7 +25,7 @@ view model groups =
         div [ class "ui grid" ]
             [ div [ class "row" ] [ helpView ]
             , div [ class "row" ] [ queryEntry model.query ]
-            , (dataView groups activePeople activeGroupPks)
+            , dataView groups activePeople activeGroupPks
             ]
 
 
@@ -35,16 +35,13 @@ view model groups =
 
 collectPeople : Groups -> PeopleSimple
 collectPeople groups =
-    let
-        people =
-            groups
-                |> List.concatMap (\x -> x.members)
-                |> List.map (\x -> ( x.pk, x ))
-    in
-        Dict.fromList people
-            |> Dict.toList
-            |> List.map (\x -> Tuple.second x)
-            |> List.sortBy .full_name
+    groups
+        |> List.concatMap (\x -> x.members)
+        |> List.map (\x -> ( x.pk, x ))
+        |> Dict.fromList
+        |> Dict.toList
+        |> List.map (\x -> Tuple.second x)
+        |> List.sortBy .full_name
 
 
 
@@ -79,18 +76,12 @@ queryEntry query =
             [ input
                 [ placeholder "Query goes here: e.g. 1 + 2 - 3"
                 , type_ "text"
-                , onInput handleInput
+                , onInput <| GroupComposerMsg << UpdateQueryString
                 , value (Maybe.withDefault "" query)
                 ]
                 []
             ]
         ]
-
-
-handleInput : String -> Msg
-handleInput s =
-    UpdateQueryString s
-        |> GroupComposerMsg
 
 
 
@@ -119,7 +110,7 @@ groupsList groups activeGroupPks =
                     ]
                 ]
             , br [] []
-            , div [ class "ui divided list" ] (groups |> List.map (groupRow activeGroupPks))
+            , div [ class "ui divided list" ] <| List.map (groupRow activeGroupPks) groups
             ]
         ]
 
@@ -134,10 +125,12 @@ groupRow activeGroupPks group =
 
 activeGroupStyle : List Int -> RecipientGroup -> List ( String, String )
 activeGroupStyle activeGroupPks group =
-    if List.member group.pk activeGroupPks then
-        [ ( "color", "#38AF3C" ) ]
-    else
-        []
+    case List.member group.pk activeGroupPks of
+        True ->
+            [ ( "color", "#38AF3C" ) ]
+
+        False ->
+            []
 
 
 
@@ -152,7 +145,7 @@ groupPreview people =
                 [ text "Live preview"
                 , groupLink people
                 ]
-            , div [ class "ui list" ] (people |> List.map personRow)
+            , div [ class "ui list" ] (List.map personRow people)
             ]
         ]
 
@@ -169,7 +162,7 @@ groupLink people =
     else
         a
             [ class "circular ui violet icon right floated button"
-            , href (buildGroupLink people)
+            , href <| buildGroupLink people
             ]
             [ i [ class "icon mail" ] []
             ]
@@ -264,11 +257,8 @@ applyOperator opL opR existingPeople =
 handleBrackets : Query -> Query
 handleBrackets query =
     let
-        maxLength =
-            (List.length query)
-
         pairs =
-            parenPairs maxLength query 0 0 []
+            parenPairs (List.length query) query 0 0 []
     in
         if evenPairs pairs then
             case pairs of
@@ -415,30 +405,23 @@ parseOp groups string =
 
 decodeGroup : Groups -> String -> QueryOp
 decodeGroup groups s =
-    let
-        res =
-            String.toInt s
-    in
-        case res of
-            Ok num ->
-                G (getMembers groups num)
+    case String.toInt s of
+        Ok num ->
+            G (getMembers groups num)
 
-            Err _ ->
-                NoOp
+        Err _ ->
+            NoOp
 
 
 getMembers : Groups -> GroupPk -> Set Int
 getMembers groups gPk =
-    let
-        group =
-            groups
-                |> List.filter (\x -> x.pk == gPk)
-                |> List.head
-                |> Maybe.withDefault nullGroup
-    in
-        group.members
-            |> List.map .pk
-            |> Set.fromList
+    groups
+        |> List.filter (\x -> x.pk == gPk)
+        |> List.head
+        |> Maybe.withDefault nullGroup
+        |> .members
+        |> List.map .pk
+        |> Set.fromList
 
 
 isNothing : Maybe a -> Bool

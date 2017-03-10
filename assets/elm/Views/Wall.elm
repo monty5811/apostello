@@ -31,26 +31,29 @@ view sms =
 
 smsCard : SmsInbound -> Html Msg
 smsCard sms =
-    let
-        firstWord =
-            sms.content
-                |> String.split " "
-                |> List.head
-                |> Maybe.withDefault ""
-
-        restOfMessage =
-            sms.content
-                |> String.split " "
-                |> List.tail
-                |> Maybe.withDefault []
-                |> String.join " "
-                |> (++) " "
-    in
-        div [ class "card", style [ ( "backgroundColor", "#ffffff" ), ( "fontSize", "200%" ) ] ]
-            [ div [ class "content" ]
-                [ p []
-                    [ span [ style [ ( "color", "#d3d3d3" ) ] ] [ text firstWord ]
-                    , text restOfMessage
-                    ]
+    div [ class "card", style [ ( "backgroundColor", "#ffffff" ), ( "fontSize", "200%" ) ] ]
+        [ div [ class "content" ]
+            [ p []
+                [ span [ style [ ( "color", "#d3d3d3" ) ] ] [ text <| firstWord sms ]
+                , text <| restOfMessage sms
                 ]
             ]
+        ]
+
+
+firstWord : SmsInbound -> String
+firstWord sms =
+    sms.content
+        |> String.split " "
+        |> List.head
+        |> Maybe.withDefault ""
+
+
+restOfMessage : SmsInbound -> String
+restOfMessage sms =
+    sms.content
+        |> String.split " "
+        |> List.tail
+        |> Maybe.withDefault []
+        |> String.join " "
+        |> (++) " "

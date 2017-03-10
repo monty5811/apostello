@@ -15,18 +15,19 @@ import Round
 
 view : Regex.Regex -> List RecipientGroup -> Html Msg
 view filterRegex groups =
-    let
-        head =
-            thead []
-                [ tr []
-                    [ th [] [ text "Name" ]
-                    , th [] [ text "Description" ]
-                    , th [] [ text "Cost" ]
-                    , th [] []
-                    ]
-                ]
-    in
-        uiTable head filterRegex groupRow groups
+    uiTable tableHead filterRegex groupRow groups
+
+
+tableHead : Html Msg
+tableHead =
+    thead []
+        [ tr []
+            [ th [] [ text "Name" ]
+            , th [] [ text "Description" ]
+            , th [] [ text "Cost" ]
+            , th [] []
+            ]
+        ]
 
 
 groupRow : RecipientGroup -> Html Msg
