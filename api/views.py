@@ -54,18 +54,6 @@ class ApiCollection(generics.ListAPIView):
         return context
 
 
-class ApiCollectionRecentSms(ApiCollection):
-    """SMS collection for a single recipient."""
-    serializer_class = SmsInboundSerializer
-
-    def get_queryset(self):
-        """Handle get requests."""
-        objs = SmsInbound.objects.filter(
-            sender_num=Recipient.objects.get(pk=self.kwargs['pk']).number
-        )
-        return objs
-
-
 class ApiCollectionKeywordSms(ApiCollection):
     """SMS collection for a single keyword."""
     serializer_class = SmsInboundSerializer
