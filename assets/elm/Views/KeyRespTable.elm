@@ -1,11 +1,12 @@
 module Views.KeyRespTable exposing (view)
 
 import Helpers exposing (formatDate)
-import Html exposing (..)
+import Html exposing (Html, div, text, i, button, a, td, th, thead, tr, br, label, input)
 import Html.Attributes exposing (attribute, class, href, style, name, type_, id, checked)
 import Html.Events exposing (onClick, onSubmit)
-import Messages exposing (..)
-import Models exposing (..)
+import Messages exposing (Msg(KeyRespTableMsg), KeyRespTableMsg(..))
+import Models exposing (Model, SmsInbound)
+import Pages exposing (Page(SendAdhoc))
 import Regex
 import Views.Helpers exposing (archiveCell, spaLink)
 import Views.FilteringTable exposing (uiTable)
@@ -16,23 +17,24 @@ import Views.FilteringTable exposing (uiTable)
 
 view : Bool -> Regex.Regex -> List SmsInbound -> Bool -> String -> Html Msg
 view viewingArchive filterRegex sms ticked keyword =
-    let
-        head =
-            thead []
-                [ tr []
-                    [ th [] [ text "From" ]
-                    , th [] [ text "Time Received" ]
-                    , th [] [ text "Message" ]
-                    , th [] [ text "Requires Action?" ]
-                    , th [] []
-                    ]
-                ]
-    in
-        div []
-            [ uiTable head filterRegex smsRow sms
-            , br [] []
-            , archiveAllForm viewingArchive ticked keyword
+    div []
+        [ uiTable tableHead filterRegex smsRow sms
+        , br [] []
+        , archiveAllForm viewingArchive ticked keyword
+        ]
+
+
+tableHead : Html Msg
+tableHead =
+    thead []
+        [ tr []
+            [ th [] [ text "From" ]
+            , th [] [ text "Time Received" ]
+            , th [] [ text "Message" ]
+            , th [] [ text "Requires Action?" ]
+            , th [] []
             ]
+        ]
 
 
 archiveAllForm : Bool -> Bool -> String -> Html Msg

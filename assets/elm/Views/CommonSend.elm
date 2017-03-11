@@ -49,7 +49,9 @@ timeField errors date =
                             date
                 ]
                 []
-            , div [ class "ui label" ] [ text "Leave this blank to send your message immediately, otherwise select a date and time to schedule your message" ]
+            , div [ class "ui label" ]
+                [ text "Leave this blank to send your message immediately, otherwise select a date and time to schedule your message"
+                ]
             ]
             (List.map fieldMessage errors)
         )

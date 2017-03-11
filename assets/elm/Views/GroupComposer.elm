@@ -5,10 +5,11 @@ import Dict
 import Html exposing (..)
 import Html.Attributes exposing (class, href, placeholder, style, type_, value)
 import Html.Events exposing (onInput, onClick)
-import List.Extra exposing (uncons, findIndices)
-import Messages exposing (..)
-import Models exposing (..)
-import Regex exposing (..)
+import List.Extra exposing (findIndices)
+import Messages exposing (Msg(LoadData, GroupComposerMsg), GroupComposerMsg(UpdateQueryString))
+import Models exposing (GroupComposerModel, RecipientGroup, GroupPk, Groups, nullGroup, QueryOp(..), Query, ParenLoc, PeopleSimple, RecipientSimple)
+import Pages exposing (Page(SendAdhoc))
+import Regex exposing (regex)
 import Route exposing (page2loc)
 import Set exposing (Set)
 
@@ -60,7 +61,7 @@ runQuery groups people queryString =
 
         result =
             people
-                |> List.filter (\p -> Set.member p.pk peoplePks)
+                |> List.filter (\person -> Set.member person.pk peoplePks)
     in
         ( result, selectedGroups )
 
@@ -220,7 +221,7 @@ applyQuery pks q =
     case handleBrackets q of
         first :: second :: rest ->
             applyOperator first second pks
-                |> ((flip applyQuery) rest)
+                |> flip applyQuery rest
 
         _ :: [] ->
             pks
@@ -262,7 +263,7 @@ handleBrackets query =
     in
         if evenPairs pairs then
             case pairs of
-                p1 :: pRest ->
+                p1 :: _ ->
                     replaceExpr query p1
                         |> handleBrackets
 
@@ -274,7 +275,7 @@ handleBrackets query =
 
 evenPairs : List ParenLoc -> Bool
 evenPairs locs =
-    List.all (\x -> (not (isNothing x.close))) locs
+    List.all (\x -> not (isNothing x.close)) locs
 
 
 replaceExpr : Query -> ParenLoc -> Query
@@ -312,24 +313,24 @@ replaceOp left right op query =
             Array.slice (right + 1) (Array.length ar) ar
                 |> Array.toList
     in
-        lhs ++ [ op ] ++ rhs
+        List.concat [ lhs, [ op ], rhs ]
 
 
 parenPairs : Int -> Query -> Int -> Int -> List ParenLoc -> List ParenLoc
-parenPairs maxL query i depth res =
+parenPairs maxL query idx depth res =
     let
         nextI =
-            i + 1
+            idx + 1
     in
-        if i > maxL then
+        if idx > maxL then
             res
         else
             case query of
                 OpenBracket :: rest ->
-                    parenPairs maxL rest nextI (depth + 1) (List.append res [ ParenLoc (Just i) Nothing ])
+                    parenPairs maxL rest nextI (depth + 1) (List.append res [ ParenLoc (Just idx) Nothing ])
 
                 CloseBracket :: rest ->
-                    parenPairs maxL rest nextI (depth - 1) (replaceLastNothing res i)
+                    parenPairs maxL rest nextI (depth - 1) (replaceLastNothing res idx)
 
                 _ :: rest ->
                     parenPairs maxL rest nextI depth res
@@ -353,8 +354,8 @@ replaceLastNothing res bracketIndex =
 updateMatchedLoc : Int -> Maybe Int -> Int -> ParenLoc -> ParenLoc
 updateMatchedLoc bracketIndex nothingIndex mapIndex t =
     case nothingIndex of
-        Just i ->
-            if (i == mapIndex) then
+        Just idx ->
+            if idx == mapIndex then
                 { t | close = Just bracketIndex }
             else
                 t
@@ -367,7 +368,7 @@ parseQueryString : Groups -> String -> Query
 parseQueryString groups queryString =
     "|"
         ++ queryString
-        |> find All (regex "\\d+|\\(|\\)|-|\\+|\\|")
+        |> Regex.find Regex.All (regex "\\d+|\\(|\\)|-|\\+|\\|")
         |> List.map .match
         |> List.map (parseOp groups)
 
@@ -375,7 +376,7 @@ parseQueryString groups queryString =
 selectGroups : String -> List Int
 selectGroups queryString =
     queryString
-        |> find All (regex "\\d+")
+        |> Regex.find Regex.All (regex "\\d+")
         |> List.map .match
         |> List.map String.toInt
         |> List.map (Result.withDefault 0)

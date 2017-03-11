@@ -1,11 +1,12 @@
-module Views.Menu exposing (..)
+module Views.Menu exposing (menu)
 
-import Html exposing (..)
-import Html.Attributes exposing (class, href, style)
-import Messages exposing (..)
-import Models exposing (..)
+import Html exposing (Html, div, text, i, a)
+import Html.Attributes exposing (class, href)
+import Messages exposing (Msg)
+import Models exposing (Settings, UserProfile)
+import Pages exposing (Page(..), FabOnlyPage(..))
 import Route exposing (page2loc)
-import Views.Helpers exposing (..)
+import Views.Helpers exposing (spaLink)
 
 
 menu : Settings -> Html Msg
@@ -33,13 +34,13 @@ menu settings =
                     , maybeDivider (isStaff || userPerms.can_see_keywords)
                     , itemSpa (SendAdhoc Nothing Nothing) "Send to Individuals" userPerms.can_send_sms
                     , itemSpa (SendGroup Nothing Nothing) "Send to a Group" userPerms.can_send_sms
-                    , itemSpa (ScheduledSmsTable) "Scheduled Messages" isStaff
+                    , itemSpa ScheduledSmsTable "Scheduled Messages" isStaff
                     , maybeDivider (isStaff || userPerms.can_send_sms)
                     , itemSpa (RecipientTable False) "Contacts" userPerms.can_see_contact_names
                     , itemSpa (GroupTable False) "Groups" userPerms.can_see_groups
                     , divider
-                    , itemSpa (InboundTable) "Incoming SMS" userPerms.can_see_incoming
-                    , itemSpa (OutboundTable) "Outgoing SMS" userPerms.can_see_outgoing
+                    , itemSpa InboundTable "Incoming SMS" userPerms.can_see_incoming
+                    , itemSpa OutboundTable "Outgoing SMS" userPerms.can_see_outgoing
                     , divider
                     , lockedItem False "/accounts/password/change" "Change Password" userPerms.user.is_social
                     , item "/accounts/logout/" "Logout" True
@@ -60,7 +61,7 @@ maybeToolsMenu isStaff userPerms =
         itemSpa =
             lockedSpaItem isStaff
     in
-        case (isStaff || userPerms.can_import) of
+        case isStaff || userPerms.can_import of
             True ->
                 div [ class "ui simple dropdown item" ]
                     [ text "Tools "
@@ -89,7 +90,7 @@ maybeToolsMenu isStaff userPerms =
 
 lockedSpaItem : Bool -> Page -> String -> Bool -> Html Msg
 lockedSpaItem isStaff page desc perm =
-    case (isStaff || perm) of
+    case isStaff || perm of
         True ->
             spaLink a [ class "item" ] [ text desc ] page
 
@@ -99,7 +100,7 @@ lockedSpaItem isStaff page desc perm =
 
 lockedItem : Bool -> String -> String -> Bool -> Html Msg
 lockedItem isStaff uri desc perm =
-    case (isStaff || perm) of
+    case isStaff || perm of
         True ->
             a [ class "item", href uri ] [ text desc ]
 

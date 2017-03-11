@@ -1,9 +1,10 @@
-module Remote exposing (..)
+module Remote exposing (maybeFetchData, fetchData, increasePageSize)
 
 import Http
 import Json.Decode as Decode
 import Messages exposing (..)
-import Models exposing (..)
+import Models exposing (RemoteDataType(..), RawResponse)
+import Pages exposing (Page(..), FabOnlyPage(..))
 import Regex
 import Urls
 
@@ -91,12 +92,12 @@ dt_url_from_page p =
         SendGroup _ _ ->
             [ ( Groups, Urls.groups ) ]
 
-        EditGroup pk ->
+        EditGroup _ ->
             [ ( Groups, Urls.groups )
             , ( Groups, Urls.groupsArchive )
             ]
 
-        EditContact pk ->
+        EditContact _ ->
             [ ( IncomingSms, Urls.smsInbounds )
             , ( Contacts, Urls.recipients )
             , ( Contacts, Urls.recipientsArchive )

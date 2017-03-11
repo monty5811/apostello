@@ -17,7 +17,7 @@ update msg model =
 removeNotification : List Notification -> Notification -> List Notification
 removeNotification notifs notif =
     notifs
-        |> List.filter (\n -> (not (n.text == notif.text)))
+        |> List.filter (\n -> not (n.text == notif.text))
 
 
 createNotification : Model -> String -> NotificationType -> Model
@@ -28,7 +28,7 @@ createNotification model text type_ =
     in
         case List.member text existing of
             False ->
-                { model | notifications = (Notification type_ text) :: model.notifications }
+                { model | notifications = Notification type_ text :: model.notifications }
 
             True ->
                 model

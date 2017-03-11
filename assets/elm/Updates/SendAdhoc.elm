@@ -10,6 +10,7 @@ import Json.Encode as Encode
 import List.Extra as LE
 import Messages exposing (..)
 import Models exposing (..)
+import Pages exposing (Page)
 import Regex
 import Updates.Notification exposing (createNotificationFromDjangoMessage)
 import Views.FilteringTable as FT
@@ -67,7 +68,7 @@ updateSAModel msg csrftoken model =
                     Ok data ->
                         ( { model | status = Success, errors = data.errors } |> wipeForm, [], data.messages )
 
-                    Err data ->
+                    Err _ ->
                         ( { model | status = Failed "" }, [], [] )
 
         ReceiveFormResp (Err e) ->
@@ -81,7 +82,7 @@ updateSAModel msg csrftoken model =
                             Ok data ->
                                 ( { model | status = Success, errors = data.errors }, [], data.messages )
 
-                            Err data ->
+                            Err _ ->
                                 ( { model | status = Failed "" }, [], [] )
 
                 _ ->
@@ -119,7 +120,7 @@ updateCost smsCost model =
                     { model | cost = Nothing }
 
                 n ->
-                    { model | cost = Just (calculateSmsCost (smsCost * (toFloat n)) c) }
+                    { model | cost = Just (calculateSmsCost (smsCost * toFloat n) c) }
 
 
 postForm : CSRFToken -> SendAdhocModel -> Cmd Msg

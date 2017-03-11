@@ -1,4 +1,4 @@
-port module Ports exposing (..)
+port module Ports exposing (updateDateValue, saveDataStore, loadDataStore)
 
 import Json.Encode as Encode
 

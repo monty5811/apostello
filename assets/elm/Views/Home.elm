@@ -1,9 +1,9 @@
 module Views.Home exposing (view)
 
 import Html exposing (..)
-import Html.Attributes exposing (class, href, src, type_)
-import Messages exposing (..)
-import Models exposing (..)
+import Html.Attributes exposing (href, src, type_)
+import Messages exposing (Msg)
+import Pages exposing (Page(FabOnlyPage), FabOnlyPage(Help))
 import Route exposing (page2loc)
 
 

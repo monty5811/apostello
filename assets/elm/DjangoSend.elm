@@ -1,6 +1,6 @@
-module DjangoSend exposing (..)
+module DjangoSend exposing (post, archivePost, rawPost)
 
-import Http exposing (..)
+import Http exposing (Request, request, header, expectJson)
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Models exposing (CSRFToken)
@@ -44,7 +44,7 @@ rawPost csrftoken url body =
             ]
         , url = url
         , body = encodeBody body
-        , expect = Http.expectStringResponse (\a -> Ok ({ code = a.status.code, body = a.body }))
+        , expect = Http.expectStringResponse (\a -> Ok { code = a.status.code, body = a.body })
         , timeout = Nothing
         , withCredentials = True
         }

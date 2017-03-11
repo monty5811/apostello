@@ -1,7 +1,7 @@
 module Views.Wall exposing (view)
 
 import Html exposing (..)
-import Html.Attributes exposing (class, href, style)
+import Html.Attributes exposing (class, style)
 import Messages exposing (..)
 import Models exposing (..)
 

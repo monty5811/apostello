@@ -2,7 +2,7 @@ module Views.ScheduledSmsTable exposing (view)
 
 import Date
 import Html exposing (..)
-import Html.Attributes exposing (class, href, style)
+import Html.Attributes exposing (class, href)
 import Html.Events exposing (onClick)
 import Messages exposing (..)
 import Models exposing (..)
@@ -39,7 +39,7 @@ onlyFuture : Time.Time -> QueuedSms -> Bool
 onlyFuture t sms =
     case sms.time_to_send of
         Just time_to_send ->
-            t < (Date.toTime time_to_send)
+            t < Date.toTime time_to_send
 
         Nothing ->
             False

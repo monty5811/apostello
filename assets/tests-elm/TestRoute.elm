@@ -2,10 +2,11 @@ module TestRoute exposing (suite)
 
 import Expect
 import List.Extra exposing (uncons)
-import Models exposing (..)
+import Models exposing (Model)
+import Pages exposing (Page(..), FabOnlyPage(..))
 import Navigation
-import Route exposing (..)
-import Test exposing (..)
+import Route exposing (route, page2loc)
+import Test exposing (describe, test, fuzz, Test)
 import UrlParser as Url
 import Fuzz as F
 
@@ -34,7 +35,7 @@ suite =
 
 fuzzEditPage : (Int -> Page) -> Test
 fuzzEditPage page =
-    fuzz (F.int) "Edit Pages" (\pk -> Expect.equal (page pk) (page pk |> page2str2page))
+    fuzz F.int "Edit Pages" (\pk -> Expect.equal (page pk) (page pk |> page2str2page))
 
 
 easyPages : List Page
@@ -104,7 +105,6 @@ loc url =
                     ""
 
                 Just s ->
-                    "?"
-                        ++ (String.join "?" (Tuple.second s))
+                    "?" ++ (s |> Tuple.second |> String.join "?")
     in
         Navigation.Location url "" "" "" "" "" path search "" "" ""

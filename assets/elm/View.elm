@@ -1,13 +1,13 @@
 module View exposing (view)
 
-import Html exposing (..)
+import Html exposing (Html, text)
 import Messages exposing (..)
 import Models exposing (..)
+import Pages exposing (Page(..), FabOnlyPage(..))
 import Views.AccessDenied as AD
 import Views.Curator as C
 import Views.ElvantoImport as EI
 import Views.Error404 as E404
-import Views.Fab as F
 import Views.Fab as F
 import Views.FirstRun as FR
 import Views.GroupComposer as GC
@@ -79,7 +79,11 @@ content model =
             SST.view model.filterRegex model.currentTime model.dataStore.queuedSms
 
         KeyRespTable viewingArchive currentKeyword ->
-            KRT.view viewingArchive model.filterRegex (model.dataStore.inboundSms |> filterArchived viewingArchive |> filterByMatchedKeyword currentKeyword) model.keyRespTable currentKeyword
+            KRT.view viewingArchive
+                model.filterRegex
+                (model.dataStore.inboundSms |> filterArchived viewingArchive |> filterByMatchedKeyword currentKeyword)
+                model.keyRespTable
+                currentKeyword
 
         FirstRun ->
             FR.view model.firstRun
@@ -91,7 +95,9 @@ content model =
             SA.view model.loadingStatus model.settings model.sendAdhoc <| filterArchived False model.dataStore.recipients
 
         SendGroup _ _ ->
-            SG.view model.loadingStatus model.settings model.sendGroup <| List.filter (\x -> x.cost > 0) <| filterArchived False model.dataStore.groups
+            SG.view model.loadingStatus model.settings model.sendGroup <|
+                List.filter (\x -> x.cost > 0) <|
+                    filterArchived False model.dataStore.groups
 
         Error404 ->
             E404.view
@@ -128,4 +134,4 @@ filterByMatchedKeyword currentKeyword data =
 filterBySenderPk : Int -> List { a | sender_pk : Maybe Int } -> List { a | sender_pk : Maybe Int }
 filterBySenderPk pk data =
     data
-        |> List.filter (\x -> (Maybe.withDefault 0 x.sender_pk) == pk)
+        |> List.filter (\x -> Maybe.withDefault 0 x.sender_pk == pk)

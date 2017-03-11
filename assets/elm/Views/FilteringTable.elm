@@ -1,4 +1,4 @@
-module Views.FilteringTable exposing (..)
+module Views.FilteringTable exposing (filteringTable, filterRecord, uiTable, textToRegex)
 
 import Html exposing (..)
 import Html.Attributes exposing (class, placeholder, type_)

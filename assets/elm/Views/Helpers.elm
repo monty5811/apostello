@@ -6,6 +6,7 @@ import Html.Events exposing (onWithOptions)
 import Json.Decode as Decode
 import Messages exposing (..)
 import Models exposing (..)
+import Pages exposing (Page)
 import Route exposing (page2loc)
 
 

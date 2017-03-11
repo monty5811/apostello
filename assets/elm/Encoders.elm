@@ -9,14 +9,14 @@ import Models exposing (..)
 encodeDataStore : DataStore -> Encode.Value
 encodeDataStore ds =
     Encode.object
-        [ ( "inboundSms", (Encode.list <| List.map smsinboundEncoder ds.inboundSms) )
-        , ( "outboundSms", (Encode.list <| List.map smsoutboundEncoder ds.outboundSms) )
-        , ( "elvantoGroups", (Encode.list <| List.map elvantogroupEncoder ds.elvantoGroups) )
-        , ( "userprofiles", (Encode.list <| List.map encodeUserProfile ds.userprofiles) )
-        , ( "keywords", (Encode.list <| List.map keywordEncoder ds.keywords) )
-        , ( "recipients", (Encode.list <| List.map recipientEncoder ds.recipients) )
-        , ( "groups", (Encode.list <| List.map recipientgroupEncoder ds.groups) )
-        , ( "queuedSms", (Encode.list <| List.map queuedsmsEncoder ds.queuedSms) )
+        [ ( "inboundSms", Encode.list <| List.map smsinboundEncoder ds.inboundSms )
+        , ( "outboundSms", Encode.list <| List.map smsoutboundEncoder ds.outboundSms )
+        , ( "elvantoGroups", Encode.list <| List.map elvantogroupEncoder ds.elvantoGroups )
+        , ( "userprofiles", Encode.list <| List.map encodeUserProfile ds.userprofiles )
+        , ( "keywords", Encode.list <| List.map keywordEncoder ds.keywords )
+        , ( "recipients", Encode.list <| List.map recipientEncoder ds.recipients )
+        , ( "groups", Encode.list <| List.map recipientgroupEncoder ds.groups )
+        , ( "queuedSms", Encode.list <| List.map queuedsmsEncoder ds.queuedSms )
         ]
 
 

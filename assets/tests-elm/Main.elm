@@ -1,4 +1,4 @@
-port module Main exposing (..)
+port module Main exposing (main, emit)
 
 import Json.Encode exposing (Value)
 import Test exposing (..)

@@ -5,6 +5,7 @@ import Html.Attributes exposing (class, id, href)
 import Html.Events exposing (onClick)
 import Messages exposing (..)
 import Models exposing (..)
+import Pages exposing (Page(..), FabOnlyPage(..))
 import Route exposing (page2loc)
 import Urls
 import Views.Helpers exposing (spaLink)
@@ -116,7 +117,7 @@ fabLinks ds page =
         ScheduledSmsTable ->
             defaultLinksHref
 
-        KeyRespTable viewingArchive k ->
+        KeyRespTable _ k ->
             let
                 keyword =
                     List.filter (\x -> x.keyword == k) ds.keywords
@@ -364,16 +365,6 @@ keywordArchiveResponses k =
 newContact : Html Msg
 newContact =
     fabLink (page2loc <| FabOnlyPage <| NewContact) Plus "New Contact"
-
-
-contacts : Html Msg
-contacts =
-    fabLink (page2loc <| RecipientTable False) Table " Contacts"
-
-
-contactArchive : Html Msg
-contactArchive =
-    fabLink (page2loc <| RecipientTable True) Table "Archived Contacts"
 
 
 contactsSpa : Html Msg

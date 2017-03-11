@@ -1,15 +1,16 @@
 module Views.SendGroup exposing (view)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (onInput, onBlur, onSubmit, onFocus)
+import Html exposing (Html, div, br, text, i, p, input, h3, button, label, a)
+import Html.Attributes exposing (class, style, type_, placeholder, value, readonly, name, id, for, href)
+import Html.Events exposing (onInput, onSubmit, onFocus)
 import Html.Keyed
-import Messages exposing (..)
-import Models exposing (..)
+import Messages exposing (Msg(SendGroupMsg), SendGroupMsg(..))
+import Models exposing (Model, SendGroupModel, RecipientGroup, nullGroup, LoadingStatus(..), Settings)
+import Pages exposing (Page(FabOnlyPage), FabOnlyPage(NewGroup))
 import Route exposing (page2loc)
-import Views.CommonSend exposing (..)
+import Views.CommonSend exposing (errorFieldClass, fieldMessage, sendButton, timeField, contentField)
 import Views.FilteringTable exposing (filterRecord)
-import Views.Helpers exposing (..)
+import Views.Helpers exposing (onClick, formClass)
 
 
 -- Form
@@ -21,13 +22,13 @@ view ls settings model groups =
         [ br [] []
         , case ls of
             FinalPageReceived ->
-                if (List.length groups == 0) then
+                if List.length groups == 0 then
                     noGroups
                 else
                     modalOrForm ls settings model groups
 
             RespFailed _ ->
-                if (List.length groups == 0) then
+                if List.length groups == 0 then
                     noGroups
                 else
                     modalOrForm ls settings model groups
@@ -59,8 +60,8 @@ sendForm : Settings -> SendGroupModel -> List RecipientGroup -> Html Msg
 sendForm settings model groups =
     div []
         [ p [] [ text "Send a message to a single person or to an ad-hoc group of people:" ]
-        , Html.form [ class (formClass model.status), onSubmit <| SendGroupMsg <| PostSGForm ]
-            ((List.map fieldMessage model.errors.all)
+        , Html.form [ class <| formClass model.status, onSubmit <| SendGroupMsg <| PostSGForm ]
+            (List.map fieldMessage model.errors.all
                 ++ [ contentField settings.smsCharLimit model.errors.content (SendGroupMsg << UpdateSGContent) model.content
                    , groupField model.errors.group model.selectedPk groups
                    , timeField model.errors.scheduled_time model.date
@@ -167,7 +168,7 @@ groupItem selectedPk group =
 groupItemHelper : Maybe Int -> RecipientGroup -> Html Msg
 groupItemHelper selectedPk group =
     div [ style [ ( "color", "#000" ) ] ]
-        [ div [ class "right floated content" ] [ text <| "($" ++ (toString group.cost) ++ ")" ]
+        [ div [ class "right floated content" ] [ text <| "($" ++ toString group.cost ++ ")" ]
         , div [ class "content" ]
             [ selectedIcon selectedPk group
             , text <| group.name ++ " - " ++ group.description

@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (class)
 import Messages exposing (..)
 import Models exposing (..)
+import Pages exposing (Page(..), FabOnlyPage(..))
 import Views.Menu
 import Views.Notification as Notif
 
@@ -23,7 +24,7 @@ view model mainContent fab =
         InboundTable ->
             commonShell model mainContent fab
 
-        GroupTable viewingArchive ->
+        GroupTable _ ->
             commonShell model mainContent fab
 
         GroupComposer ->
@@ -82,7 +83,7 @@ commonShell model mainContent fab =
         , div [ class "ui hidden divider" ] []
         , div [ class "ui stackable grid container" ]
             [ div [ class "fourteen wide centered column" ]
-                ((Notif.view model) ++ [ mainContent ])
+                (Notif.view model ++ [ mainContent ])
             ]
         , div [ class "ui hidden divider" ] []
         , fab

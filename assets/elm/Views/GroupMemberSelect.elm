@@ -2,7 +2,7 @@ module Views.GroupMemberSelect exposing (view)
 
 import Views.FilteringTable exposing (filterRecord)
 import Html exposing (..)
-import Html.Attributes exposing (class, href, placeholder, style, type_)
+import Html.Attributes exposing (class, placeholder, type_)
 import Html.Events exposing (onClick, onInput)
 import Messages exposing (..)
 import Models exposing (..)

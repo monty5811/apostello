@@ -6,6 +6,7 @@ import Html.Attributes exposing (class, href, style)
 import Html.Events exposing (onClick)
 import Messages exposing (..)
 import Models exposing (..)
+import Pages exposing (Page(SendAdhoc))
 import Regex
 import Views.Helpers exposing (spaLink)
 import Views.FilteringTable exposing (uiTable)

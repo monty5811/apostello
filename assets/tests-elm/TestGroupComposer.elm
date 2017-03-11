@@ -51,13 +51,14 @@ callParenPairs s =
         parenPairs (List.length ops) ops 0 0 []
 
 
+testParenPairs : List Test
 testParenPairs =
     [ test "simple" <|
         \() ->
-            Expect.equal (callParenPairs "()") [ (ParenLoc (Just 1) (Just 2)) ]
+            Expect.equal (callParenPairs "()") [ ParenLoc (Just 1) (Just 2) ]
     , test "two brackets" <|
         \() ->
-            Expect.equal (callParenPairs "()()") [ (ParenLoc (Just 1) (Just 2)), (ParenLoc (Just 3) (Just 4)) ]
+            Expect.equal (callParenPairs "()()") [ ParenLoc (Just 1) (Just 2), ParenLoc (Just 3) (Just 4) ]
     ]
 
 

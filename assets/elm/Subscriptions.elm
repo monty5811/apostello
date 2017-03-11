@@ -1,9 +1,10 @@
 module Subscriptions exposing (subscriptions)
 
-import Messages exposing (..)
-import Models exposing (..)
-import Time exposing (Time, second)
+import Messages exposing (Msg(..), SendGroupMsg(UpdateSGDate), SendAdhocMsg(UpdateDate))
+import Models exposing (Model, LoadingStatus(..), RawResponse)
+import Pages exposing (Page(Curator, Wall, SendAdhoc, SendGroup))
 import Ports exposing (updateDateValue, loadDataStore)
+import Time exposing (Time, second)
 
 
 subscriptions : Model -> Sub Msg
@@ -58,10 +59,10 @@ reloadData page loadingStatus =
             in
                 case loadingStatus of
                     FinalPageReceived ->
-                        Time.every interval (\t -> LoadData)
+                        Time.every interval (\_ -> LoadData)
 
                     RespFailed _ ->
-                        Time.every interval (\t -> LoadData)
+                        Time.every interval (\_ -> LoadData)
 
                     NoRequestSent ->
                         Sub.none

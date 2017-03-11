@@ -1,12 +1,12 @@
-module Main exposing (..)
+module Main exposing (main)
 
-import Messages exposing (..)
-import Models exposing (..)
+import Messages exposing (Msg(..))
+import Models exposing (Model, Flags, initialModel)
 import Navigation
+import Route exposing (loc2Page)
 import Subscriptions exposing (subscriptions)
 import Update exposing (update)
 import View exposing (view)
-import Route exposing (loc2Page)
 
 
 main : Program Flags Model Msg

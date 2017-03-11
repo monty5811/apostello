@@ -72,8 +72,8 @@ optToggleDealtWith ds pk =
 
 switchDealtWith : Int -> SmsInbound -> SmsInbound
 switchDealtWith pk sms =
-    if (pk == sms.pk) then
-        { sms | dealt_with = (not sms.dealt_with) }
+    if pk == sms.pk then
+        { sms | dealt_with = not sms.dealt_with }
     else
         sms
 

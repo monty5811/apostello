@@ -1,7 +1,7 @@
 module Updates.ElvantoImport exposing (update)
 
 import DjangoSend exposing (post)
-import Helpers exposing (..)
+import Helpers exposing (handleNotSaved)
 import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -72,6 +72,6 @@ optToggleGroup group ds =
 toggleGroupSync : Int -> ElvantoGroup -> ElvantoGroup
 toggleGroupSync pk group =
     if pk == group.pk then
-        { group | sync = (not group.sync) }
+        { group | sync = not group.sync }
     else
         group

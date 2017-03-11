@@ -4,8 +4,8 @@ import DjangoSend exposing (post)
 import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
-import Messages exposing (..)
-import Models exposing (..)
+import Messages exposing (Msg(FirstRunMsg), FirstRunMsg(..))
+import Models exposing (Model, FirstRunModel, FormStatus(..), CSRFToken, decodeFirstRunResp)
 
 
 update : FirstRunMsg -> Model -> ( Model, List (Cmd Msg) )
@@ -30,12 +30,14 @@ updateFRModel msg csrftoken model =
             ( { model | adminPass2 = text }, [] )
 
         CreateAdminUser ->
-            if (model.adminPass1 == model.adminPass2) then
-                ( { model | adminFormStatus = InProgress }, [ createAdminUser csrftoken model ] )
-            else
-                ( { model | adminFormStatus = Failed "Passwords do not match" }, [] )
+            case model.adminPass1 == model.adminPass2 of
+                True ->
+                    ( { model | adminFormStatus = InProgress }, [ createAdminUser csrftoken model ] )
 
-        ReceiveCreateAdminUser (Ok r) ->
+                False ->
+                    ( { model | adminFormStatus = Failed "Passwords do not match" }, [] )
+
+        ReceiveCreateAdminUser (Ok _) ->
             ( { model | adminFormStatus = Success }, [] )
 
         ReceiveCreateAdminUser (Err e) ->
@@ -50,7 +52,7 @@ updateFRModel msg csrftoken model =
         SendTestEmail ->
             ( { model | testEmailFormStatus = InProgress }, [ sendTestEmail csrftoken model ] )
 
-        ReceiveSendTestEmail (Ok r) ->
+        ReceiveSendTestEmail (Ok _) ->
             ( { model | testEmailFormStatus = Success }, [] )
 
         ReceiveSendTestEmail (Err e) ->
@@ -65,7 +67,7 @@ updateFRModel msg csrftoken model =
         SendTestSms ->
             ( { model | testSmsFormStatus = InProgress }, [ sendTestSms csrftoken model ] )
 
-        ReceiveSendTestSms (Ok r) ->
+        ReceiveSendTestSms (Ok _) ->
             ( { model | testSmsFormStatus = Success }, [] )
 
         ReceiveSendTestSms (Err e) ->

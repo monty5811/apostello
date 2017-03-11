@@ -100,7 +100,7 @@ updateHelper msg model =
             in
                 ( newModel, cmds )
 
-        ReceiveRawResp dt (Err e) ->
+        ReceiveRawResp _ (Err e) ->
             handleLoadingFailed e model
 
         LoadDataStore str ->
@@ -161,7 +161,7 @@ updateHelper msg model =
 
         -- Filtering Table
         UpdateTableFilter filterText ->
-            ( { model | filterRegex = (FT.textToRegex filterText) }, [] )
+            ( { model | filterRegex = FT.textToRegex filterText }, [] )
 
         CurrentTime t ->
             ( { model | currentTime = t }, [] )

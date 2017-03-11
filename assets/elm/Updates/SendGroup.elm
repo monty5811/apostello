@@ -9,6 +9,7 @@ import Json.Decode as Decode
 import Json.Encode as Encode
 import Messages exposing (..)
 import Models exposing (..)
+import Pages exposing (Page)
 import Regex
 import Updates.Notification exposing (createNotificationFromDjangoMessage)
 import Views.FilteringTable as FT
@@ -21,7 +22,7 @@ update msg model =
         ( sgModel, cmds, messages ) =
             updateSGModel msg model.settings.csrftoken model.sendGroup
     in
-        ( List.foldl createNotificationFromDjangoMessage { model | sendGroup = sgModel |> updateCost (model.dataStore.groups) } messages
+        ( List.foldl createNotificationFromDjangoMessage { model | sendGroup = sgModel |> updateCost model.dataStore.groups } messages
         , cmds
         )
 
@@ -63,7 +64,7 @@ updateSGModel msg csrftoken model =
                     Ok data ->
                         ( { model | status = Success, errors = data.errors } |> wipeForm, [], data.messages )
 
-                    Err data ->
+                    Err _ ->
                         ( { model | status = Failed "" }, [], [] )
 
         ReceiveSGFormResp (Err e) ->
@@ -77,11 +78,17 @@ updateSGModel msg csrftoken model =
                             Ok data ->
                                 ( { model | status = Success, errors = data.errors }, [], data.messages )
 
-                            Err data ->
+                            Err _ ->
                                 ( { model | status = Failed "" }, [], [] )
 
                 _ ->
-                    ( { model | status = Failed "" }, [], [ { type_ = "error", text = "Something went wrong there, you may want to check the logs before trying again." } ] )
+                    ( { model | status = Failed "" }
+                    , []
+                    , [ { type_ = "error"
+                        , text = "Something went wrong there, you may want to check the logs before trying again."
+                        }
+                      ]
+                    )
 
 
 wipeForm : SendGroupModel -> SendGroupModel

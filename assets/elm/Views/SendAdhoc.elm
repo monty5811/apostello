@@ -2,14 +2,14 @@ module Views.SendAdhoc exposing (view)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onInput, onBlur, onSubmit)
+import Html.Events exposing (onInput, onSubmit)
 import Html.Keyed
-import Messages exposing (..)
-import Models exposing (..)
+import Messages exposing (Msg(SendAdhocMsg), SendAdhocMsg(..))
+import Models exposing (Settings, SendAdhocModel, LoadingStatus(..), Recipient)
+import Pages exposing (Page(FabOnlyPage), FabOnlyPage(NewContact))
 import Route exposing (page2loc)
-import Views.FilteringTable as FT
-import Views.Helpers exposing (..)
-import Views.CommonSend exposing (..)
+import Views.Helpers exposing (formClass, onClick)
+import Views.CommonSend exposing (sendButton, fieldMessage, errorFieldClass, timeField, contentField)
 import Views.FilteringTable exposing (filterRecord)
 
 
@@ -22,13 +22,13 @@ view ls settings model contacts =
         [ br [] []
         , case ls of
             FinalPageReceived ->
-                if (List.length contacts == 0) then
+                if List.length contacts == 0 then
                     noContacts
                 else
                     modalOrForm ls settings model contacts
 
             RespFailed _ ->
-                if (List.length contacts == 0) then
+                if List.length contacts == 0 then
                     noContacts
                 else
                     modalOrForm ls settings model contacts
@@ -61,8 +61,8 @@ sendForm settings model contacts =
     div []
         [ p [] [ text "Send a message to a single person or to an ad-hoc group of people:" ]
         , Html.form
-            [ class (formClass model.status), onSubmit (SendAdhocMsg PostForm) ]
-            ((List.map fieldMessage model.errors.all)
+            [ class <| formClass model.status, onSubmit <| SendAdhocMsg PostForm ]
+            (List.map fieldMessage model.errors.all
                 ++ [ contentField settings.smsCharLimit model.errors.content (SendAdhocMsg << UpdateContent) model.content
                    , contactsField model contacts
                    , timeField model.errors.scheduled_time model.date
@@ -138,17 +138,16 @@ contactsField model contacts =
             , name "recipients"
             , onClick <| SendAdhocMsg <| ToggleSelectAdhocModal True
             ]
-            ([ input
+            (input
                 [ style [ ( "width", "100% !important" ) ]
                 , id "recipients_input"
                 , readonly True
                 ]
                 [ text "" ]
-             ]
-                ++ (selectedItems contacts model.selectedContacts)
+                :: selectedItems contacts model.selectedContacts
             )
          ]
-            ++ (List.map fieldMessage model.errors.recipients)
+            ++ List.map fieldMessage model.errors.recipients
         )
 
 

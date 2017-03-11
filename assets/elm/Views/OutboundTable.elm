@@ -3,8 +3,9 @@ module Views.OutboundTable exposing (view)
 import Helpers exposing (formatDate)
 import Html exposing (..)
 import Html.Attributes exposing (class, href, style)
-import Messages exposing (..)
+import Messages exposing (Msg)
 import Models exposing (..)
+import Pages exposing (Page(EditContact))
 import Regex
 import Route exposing (page2loc)
 import Views.FilteringTable exposing (uiTable)
@@ -15,17 +16,18 @@ import Views.FilteringTable exposing (uiTable)
 
 view : Regex.Regex -> List SmsOutbound -> Html Msg
 view filterRegex sms =
-    let
-        head =
-            thead []
-                [ tr []
-                    [ th [] [ text "To" ]
-                    , th [] [ text "Message" ]
-                    , th [] [ text "Sent" ]
-                    ]
-                ]
-    in
-        uiTable head filterRegex smsRow sms
+    uiTable tableHead filterRegex smsRow sms
+
+
+tableHead : Html Msg
+tableHead =
+    thead []
+        [ tr []
+            [ th [] [ text "To" ]
+            , th [] [ text "Message" ]
+            , th [] [ text "Sent" ]
+            ]
+        ]
 
 
 smsRow : SmsOutbound -> Html Msg

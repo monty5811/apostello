@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (class, href, style)
 import Messages exposing (..)
 import Models exposing (..)
+import Pages exposing (Page(KeyRespTable))
 import Regex
 import Views.Helpers exposing (archiveCell, spaLink)
 import Views.FilteringTable exposing (filteringTable)

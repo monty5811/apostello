@@ -1,8 +1,9 @@
-module Route exposing (..)
+module Route exposing (loc2Page, page2loc, route)
 
 import Formatting as F exposing ((<>))
-import Models exposing (..)
+import Models exposing (Settings, UserProfile)
 import Navigation
+import Pages exposing (FabOnlyPage(..), Page(..))
 import UrlParser as Url exposing ((</>), (<?>), s, int, customParam, stringParam, intParam, top, string)
 
 
@@ -60,13 +61,13 @@ intListParam name =
 
 
 parseListInts : Maybe String -> Maybe (List Int)
-parseListInts s =
-    case s of
+parseListInts str =
+    case str of
         Nothing ->
             Nothing
 
         Just value ->
-            if (String.startsWith "[" value) && (String.endsWith "]" value) then
+            if String.startsWith "[" value && String.endsWith "]" value then
                 value
                     |> String.dropLeft 1
                     |> String.dropRight 1
@@ -216,7 +217,7 @@ addGroupParams maybeContent maybePk url =
 notNothing : Maybe a -> Bool
 notNothing m =
     case m of
-        Just a ->
+        Just _ ->
             True
 
         Nothing ->
