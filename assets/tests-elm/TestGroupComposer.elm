@@ -1,10 +1,11 @@
 module TestGroupComposer exposing (suite)
 
 import Expect
-import Models exposing (..)
+import Models.Apostello exposing (RecipientGroup, RecipientSimple)
+import Models.GroupComposer exposing (ParenLoc)
 import Set exposing (Set)
 import Test exposing (..)
-import Views.GroupComposer exposing (..)
+import View.GroupComposer exposing (..)
 
 
 john : RecipientSimple
@@ -22,7 +23,7 @@ bill =
     RecipientSimple "Bill" 3
 
 
-testGroups : Groups
+testGroups : List RecipientGroup
 testGroups =
     [ RecipientGroup "all" 123 "" [ john, bob, bill ] [] 0 "" False
     , RecipientGroup "john" 1 "" [ john ] [] 0 "" False

@@ -1,10 +1,17 @@
-module Helpers exposing (handleNotSaved, formatDate, calculateSmsCost)
+module Helpers exposing (handleNotSaved, formatDate, calculateSmsCost, decodeAlwaysTrue)
 
 import Date
 import Date.Format
+import Json.Decode as Decode
 import Messages exposing (Msg)
 import Models exposing (Model)
-import Updates.Notification exposing (createNotSavedNotification)
+import Update.Notification exposing (createNotSavedNotification)
+
+
+decodeAlwaysTrue : Decode.Decoder Bool
+decodeAlwaysTrue =
+    Decode.succeed True
+
 
 
 -- update model after http errors:

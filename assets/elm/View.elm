@@ -4,27 +4,27 @@ import Html exposing (Html, text)
 import Messages exposing (..)
 import Models exposing (..)
 import Pages exposing (Page(..), FabOnlyPage(..))
-import Views.AccessDenied as AD
-import Views.Curator as C
-import Views.ElvantoImport as EI
-import Views.Error404 as E404
-import Views.Fab as F
-import Views.FirstRun as FR
-import Views.GroupComposer as GC
-import Views.GroupMemberSelect as GMS
-import Views.GroupTable as GT
-import Views.Home as H
-import Views.InboundTable as IT
-import Views.KeyRespTable as KRT
-import Views.KeywordTable as KT
-import Views.OutboundTable as OT
-import Views.RecipientTable as RT
-import Views.ScheduledSmsTable as SST
-import Views.SendAdhoc as SA
-import Views.SendGroup as SG
-import Views.Shell as Shell
-import Views.UserProfileTable as UPT
-import Views.Wall as W
+import View.AccessDenied as AD
+import View.Curator as C
+import View.ElvantoImport as EI
+import View.Error404 as E404
+import View.Fab as F
+import View.FirstRun as FR
+import View.GroupComposer as GC
+import View.GroupMemberSelect as GMS
+import View.GroupTable as GT
+import View.Home as H
+import View.InboundTable as IT
+import View.KeyRespTable as KRT
+import View.KeywordTable as KT
+import View.OutboundTable as OT
+import View.RecipientTable as RT
+import View.ScheduledSmsTable as SST
+import View.SendAdhoc as SA
+import View.SendGroup as SG
+import View.Shell as Shell
+import View.UserProfileTable as UPT
+import View.Wall as W
 
 
 view : Model -> Html Msg

@@ -1,7 +1,8 @@
 module Route exposing (loc2Page, page2loc, route)
 
 import Formatting as F exposing ((<>))
-import Models exposing (Settings, UserProfile)
+import Models exposing (Settings)
+import Models.Apostello exposing (UserProfile)
 import Navigation
 import Pages exposing (FabOnlyPage(..), Page(..))
 import UrlParser as Url exposing ((</>), (<?>), s, int, customParam, stringParam, intParam, top, string)

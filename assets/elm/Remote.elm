@@ -3,7 +3,7 @@ module Remote exposing (maybeFetchData, fetchData, increasePageSize)
 import Http
 import Json.Decode as Decode
 import Messages exposing (..)
-import Models exposing (RemoteDataType(..), RawResponse)
+import Models.Remote exposing (RemoteDataType(..), RawResponse)
 import Pages exposing (Page(..), FabOnlyPage(..))
 import Regex
 import Urls
@@ -54,7 +54,7 @@ dt_url_from_page p =
             [ ( Keywords, Urls.keywordsArchive ) ]
 
         ElvantoImport ->
-            [ ( ElvantoGroups_, Urls.elvantoGroups ) ]
+            [ ( ElvantoGroups, Urls.elvantoGroups ) ]
 
         Wall ->
             [ ( IncomingSms, Urls.smsInbounds ) ]

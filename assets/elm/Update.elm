@@ -1,6 +1,5 @@
 module Update exposing (update)
 
-import Encoders exposing (encodeDataStore)
 import Http
 import Json.Decode as Decode
 import Messages exposing (..)
@@ -10,24 +9,24 @@ import Ports exposing (saveDataStore)
 import Regex
 import Remote exposing (increasePageSize, fetchData, maybeFetchData)
 import Route exposing (loc2Page)
-import Updates.DataStore exposing (updateNewData)
-import Updates.ElvantoImport
-import Updates.Fab
-import Updates.FirstRun
-import Updates.GroupComposer
-import Updates.GroupMemberSelect
-import Updates.GroupTable
-import Updates.InboundTable
-import Updates.KeyRespTable
-import Updates.KeywordTable
-import Updates.Notification
-import Updates.RecipientTable
-import Updates.ScheduledSmsTable
-import Updates.SendAdhoc
-import Updates.SendGroup
-import Updates.UserProfileTable
-import Updates.Wall
-import Views.FilteringTable as FT
+import Update.DataStore exposing (updateNewData)
+import Update.ElvantoImport
+import Update.Fab
+import Update.FirstRun
+import Update.GroupComposer
+import Update.GroupMemberSelect
+import Update.GroupTable
+import Update.InboundTable
+import Update.KeyRespTable
+import Update.KeywordTable
+import Update.Notification
+import Update.RecipientTable
+import Update.ScheduledSmsTable
+import Update.SendAdhoc
+import Update.SendGroup
+import Update.UserProfileTable
+import Update.Wall
+import View.FilteringTable as FT
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -73,8 +72,8 @@ updateHelper msg model =
                     | page = page
                     , loadingStatus = NoRequestSent
                     , filterRegex = Regex.regex ""
-                    , sendAdhoc = Updates.SendAdhoc.resetForm page
-                    , sendGroup = Updates.SendGroup.resetForm page
+                    , sendAdhoc = Update.SendAdhoc.resetForm page
+                    , sendGroup = Update.SendGroup.resetForm page
                   }
                 , [ maybeFetchData page ]
                 )
@@ -106,58 +105,58 @@ updateHelper msg model =
         LoadDataStore str ->
             let
                 ds =
-                    Decode.decodeString (Decode.at [ "data" ] dataStoreDecoder) str
+                    Decode.decodeString (Decode.at [ "data" ] decodeDataStore) str
                         |> Result.withDefault model.dataStore
             in
                 ( { model | dataStore = ds }, [] )
 
         FabMsg subMsg ->
-            Updates.Fab.update subMsg model
+            Update.Fab.update subMsg model
 
         NotificationMsg subMsg ->
-            ( Updates.Notification.update subMsg model, [] )
+            ( Update.Notification.update subMsg model, [] )
 
         FirstRunMsg subMsg ->
-            Updates.FirstRun.update subMsg model
+            Update.FirstRun.update subMsg model
 
         ElvantoMsg subMsg ->
-            Updates.ElvantoImport.update subMsg model
+            Update.ElvantoImport.update subMsg model
 
         InboundTableMsg subMsg ->
-            Updates.InboundTable.update subMsg model
+            Update.InboundTable.update subMsg model
 
         RecipientTableMsg subMsg ->
-            Updates.RecipientTable.update subMsg model
+            Update.RecipientTable.update subMsg model
 
         KeywordTableMsg subMsg ->
-            Updates.KeywordTable.update subMsg model
+            Update.KeywordTable.update subMsg model
 
         GroupTableMsg subMsg ->
-            Updates.GroupTable.update subMsg model
+            Update.GroupTable.update subMsg model
 
         GroupComposerMsg subMsg ->
-            ( Updates.GroupComposer.update subMsg model, [] )
+            ( Update.GroupComposer.update subMsg model, [] )
 
         GroupMemberSelectMsg subMsg ->
-            Updates.GroupMemberSelect.update subMsg model
+            Update.GroupMemberSelect.update subMsg model
 
         WallMsg subMsg ->
-            Updates.Wall.update subMsg model
+            Update.Wall.update subMsg model
 
         UserProfileTableMsg subMsg ->
-            Updates.UserProfileTable.update subMsg model
+            Update.UserProfileTable.update subMsg model
 
         ScheduledSmsTableMsg subMsg ->
-            Updates.ScheduledSmsTable.update subMsg model
+            Update.ScheduledSmsTable.update subMsg model
 
         KeyRespTableMsg subMsg ->
-            Updates.KeyRespTable.update subMsg model
+            Update.KeyRespTable.update subMsg model
 
         SendAdhocMsg subMsg ->
-            Updates.SendAdhoc.update subMsg model
+            Update.SendAdhoc.update subMsg model
 
         SendGroupMsg subMsg ->
-            Updates.SendGroup.update subMsg model
+            Update.SendGroup.update subMsg model
 
         -- Filtering Table
         UpdateTableFilter filterText ->
@@ -211,4 +210,4 @@ handleLoadingFailed err model =
                 Http.Timeout ->
                     "It took too long to reach the server..."
     in
-        ( { model | loadingStatus = RespFailed errStr } |> Updates.Notification.createLoadingFailedNotification, [] )
+        ( { model | loadingStatus = RespFailed errStr } |> Update.Notification.createLoadingFailedNotification, [] )
