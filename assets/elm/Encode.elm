@@ -17,10 +17,6 @@ encodeMaybe encoder ms =
 
 encodeMaybeDate : Maybe Date.Date -> Encode.Value
 encodeMaybeDate date =
-    case date of
-        Just d ->
-            Date.Format.format "%Y-%m-%d %H:%M:%S" d
-                |> Encode.string
-
-        Nothing ->
-            Encode.null
+    date
+        |> Maybe.map (Date.Format.format "%Y-%m-%d %H:%M:%S")
+        |> encodeMaybe Encode.string
