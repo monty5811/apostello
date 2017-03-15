@@ -5,7 +5,7 @@ pytest-django==3.1.2
 pytest-env==0.6.0
 pytest-html==1.13.0
 pytest==3.0.6
-scandir==1.4
+scandir==1.5
 selenium==2.53.6
-tox==2.5.0
+tox==2.6.0
 vcrpy==1.10.5
