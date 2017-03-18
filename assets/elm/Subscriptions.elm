@@ -32,7 +32,7 @@ updateDateMsg page =
 
 getCurrentTime : Sub Msg
 getCurrentTime =
-    Time.every (5 * second) (\t -> CurrentTime t)
+    Time.every (60 * second) (\t -> CurrentTime t)
 
 
 reloadData : Page -> LoadingStatus -> Sub Msg
@@ -49,13 +49,13 @@ reloadData page loadingStatus =
                 interval =
                     case page of
                         Wall ->
-                            1 * second
+                            5 * second
 
                         Curator ->
-                            10 * second
+                            20 * second
 
                         _ ->
-                            20 * second
+                            60 * second
             in
                 case loadingStatus of
                     FinalPageReceived ->
