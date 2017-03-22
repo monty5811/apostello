@@ -3,6 +3,20 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [v1.17.0]
+
+### Added
+
+ - Offline page
+
+### Changed
+
+ - Make most of site a "Single Page Application" - faster page switches, smarter data caching, inter-tab communication
+
+### Fixed
+
+ - Error when fetching logs from Twilio
+
 ## [v1.16.3]
 
 ### Fixed
