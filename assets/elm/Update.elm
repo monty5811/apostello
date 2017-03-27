@@ -75,12 +75,12 @@ updateHelper msg model =
                     , sendAdhoc = Update.SendAdhoc.resetForm page
                     , sendGroup = Update.SendGroup.resetForm page
                   }
-                , [ maybeFetchData page ]
+                , [ maybeFetchData page model.settings.userPerms.user.is_staff ]
                 )
 
         -- Load data
         LoadData ->
-            ( { model | loadingStatus = waitingHelper model.loadingStatus }, [ maybeFetchData model.page ] )
+            ( { model | loadingStatus = waitingHelper model.loadingStatus }, [ maybeFetchData model.page model.settings.userPerms.user.is_staff ] )
 
         ReceiveRawResp dt (Ok resp) ->
             let

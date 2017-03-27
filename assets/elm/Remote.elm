@@ -9,10 +9,10 @@ import Regex
 import Urls
 
 
-maybeFetchData : Page -> Cmd Msg
-maybeFetchData dataToFetch =
+maybeFetchData : Page -> Bool -> Cmd Msg
+maybeFetchData dataToFetch isStaff =
     dataToFetch
-        |> dt_url_from_page
+        |> dt_url_from_page isStaff
         |> List.map fetchData
         |> Cmd.batch
 
@@ -23,8 +23,8 @@ fetchData ( dt, dataUrl ) =
         |> Http.send (ReceiveRawResp dt)
 
 
-dt_url_from_page : Page -> List ( RemoteDataType, String )
-dt_url_from_page p =
+dt_url_from_page : Bool -> Page -> List ( RemoteDataType, String )
+dt_url_from_page isStaff p =
     case p of
         OutboundTable ->
             [ ( OutgoingSms, Urls.smsOutbounds ) ]
@@ -69,16 +69,34 @@ dt_url_from_page p =
             [ ( ScheduledSms, Urls.queuedSmss ) ]
 
         KeyRespTable False k ->
-            [ ( IncomingSms, Urls.smsInboundsKeyword k )
-            , ( Keywords, Urls.keywords )
-            , ( Keywords, Urls.keywordsArchive )
-            ]
+            let
+                archive =
+                    case isStaff of
+                        True ->
+                            [ ( Keywords, Urls.keywordsArchive ) ]
+
+                        False ->
+                            []
+            in
+                [ ( IncomingSms, Urls.smsInboundsKeyword k )
+                , ( Keywords, Urls.keywords )
+                ]
+                    ++ archive
 
         KeyRespTable True k ->
-            [ ( IncomingSms, Urls.smsInboundsKeywordArchive k )
-            , ( Keywords, Urls.keywords )
-            , ( Keywords, Urls.keywordsArchive )
-            ]
+            let
+                archive =
+                    case isStaff of
+                        True ->
+                            [ ( Keywords, Urls.keywordsArchive ) ]
+
+                        False ->
+                            []
+            in
+                [ ( IncomingSms, Urls.smsInboundsKeywordArchive k )
+                , ( Keywords, Urls.keywords )
+                ]
+                    ++ archive
 
         FirstRun ->
             []

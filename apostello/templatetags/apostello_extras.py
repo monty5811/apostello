@@ -29,7 +29,7 @@ def elm_settings(user):
         'noAccessMessage': config.not_approved_msg,
         'blockedKeywords': [
             x.keyword for x in Keyword.objects.all()
-            if not x.can_user_access(user)
+            if x.can_user_access(user)
         ],
     }
     return mark_safe(json.dumps(elm))
