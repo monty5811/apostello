@@ -3,6 +3,7 @@ from time import sleep
 from django.contrib.auth.models import User
 from django.core import mail
 from tests.conftest import twilio_vcr
+from tests.functional_tests.utils import click_and_wait
 
 import pytest
 from apostello.models import SmsOutbound
@@ -36,9 +37,8 @@ class TestFirstRun:
             body_input_box.send_keys(k)
 
         submit_button = browser.find_elements_by_id('email_send_button')[0]
-        submit_button.click()
+        click_and_wait(submit_button, driver_wait_time)
 
-        sleep(driver_wait_time)
         assert len(mail.outbox) == 1
         assert 'test message' in mail.outbox[0].body
 
@@ -58,9 +58,8 @@ class TestFirstRun:
         body_input_box.send_keys('test')
 
         submit_button = browser.find_elements_by_id('sms_send_button')[0]
-        submit_button.click()
+        click_and_wait(submit_button, driver_wait_time)
 
-        sleep(driver_wait_time)
         assert 'AC00000000000000000000000000000000' in browser.page_source
         assert 'Error:' in browser.page_source
         assert 'Twilio returned the following information:'
@@ -82,9 +81,8 @@ class TestFirstRun:
         pass2_input_box.send_keys('password')
 
         submit_button = browser.find_elements_by_id('create_admin_button')[0]
-        submit_button.click()
+        click_and_wait(submit_button, driver_wait_time)
 
-        sleep(driver_wait_time)
         assert User.objects.count() == 1
         browser.get(live_server + URI)
         assert URI not in browser.current_url

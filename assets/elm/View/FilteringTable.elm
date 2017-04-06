@@ -1,6 +1,6 @@
 module View.FilteringTable exposing (filteringTable, filterRecord, uiTable, textToRegex)
 
-import Html exposing (..)
+import Html exposing (Html, div, i, input, table, tbody)
 import Html.Attributes exposing (class, placeholder, type_)
 import Html.Events exposing (onInput)
 import Messages exposing (Msg(UpdateTableFilter))

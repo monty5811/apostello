@@ -1,13 +1,22 @@
-module View.CommonSend exposing (..)
+module View.CommonSend
+    exposing
+        ( contentField
+        , timeField
+        , sendButtonClass
+        , sendButtonText
+        , sendButton
+        , fieldMessage
+        , errorFieldClass
+        )
 
 import Date
 import Date.Format
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, label, textarea, div, text, button, input)
+import Html.Attributes as A
 import Html.Events exposing (onInput)
-import Messages exposing (..)
+import Messages exposing (Msg)
 import Round
-import View.Helpers exposing (..)
+import View.Helpers exposing (onClick)
 
 
 -- Fields
@@ -15,16 +24,16 @@ import View.Helpers exposing (..)
 
 contentField : Int -> List String -> (String -> Msg) -> String -> Html Msg
 contentField smsCharLimit errors msg content =
-    div [ class (errorFieldClass "required field" errors) ]
+    div [ A.class (errorFieldClass "required field" errors) ]
         (List.append
-            [ label [ for "id_content" ] [ text "Content" ]
+            [ label [ A.for "id_content" ] [ text "Content" ]
             , textarea
-                [ id "id_content"
-                , name "content"
-                , rows (smsCharLimit |> toFloat |> (/) 160 |> ceiling)
-                , cols 40
+                [ A.id "id_content"
+                , A.name "content"
+                , A.rows (smsCharLimit |> toFloat |> (/) 160 |> ceiling)
+                , A.cols 40
                 , onInput msg
-                , value content
+                , A.value content
                 ]
                 []
             ]
@@ -34,22 +43,22 @@ contentField smsCharLimit errors msg content =
 
 timeField : List String -> Maybe Date.Date -> Html Msg
 timeField errors date =
-    div [ class (errorFieldClass "field" errors) ]
+    div [ A.class (errorFieldClass "field" errors) ]
         (List.append
-            [ label [ for "id_scheduled_time" ] [ text "Scheduled time" ]
+            [ label [ A.for "id_scheduled_time" ] [ text "Scheduled time" ]
             , input
-                [ attribute "data-field" "datetime"
-                , id "id_scheduled_time"
-                , name "scheduled_time"
-                , readonly True
-                , type_ "text"
-                , value <|
+                [ A.attribute "data-field" "datetime"
+                , A.id "id_scheduled_time"
+                , A.name "scheduled_time"
+                , A.readonly True
+                , A.type_ "text"
+                , A.value <|
                     Maybe.withDefault "" <|
                         Maybe.map (Date.Format.format "%Y-%m-%d %H:%M") <|
                             date
                 ]
                 []
-            , div [ class "ui label" ]
+            , div [ A.class "ui label" ]
                 [ text "Leave this blank to send your message immediately, otherwise select a date and time to schedule your message"
                 ]
             ]
@@ -84,7 +93,7 @@ sendButtonText cost =
 sendButton : Msg -> Maybe Float -> Html Msg
 sendButton msg cost =
     button
-        [ class ("ui " ++ sendButtonClass cost ++ " button"), id "send_button", onClick msg ]
+        [ A.class ("ui " ++ sendButtonClass cost ++ " button"), A.id "send_button", onClick msg ]
         [ text ("Send ($" ++ sendButtonText cost ++ ")") ]
 
 
@@ -94,7 +103,7 @@ sendButton msg cost =
 
 fieldMessage : String -> Html Msg
 fieldMessage message =
-    div [ class "ui error message" ] [ text message ]
+    div [ A.class "ui error message" ] [ text message ]
 
 
 errorFieldClass : String -> List String -> String

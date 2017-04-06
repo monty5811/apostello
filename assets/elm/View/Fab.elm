@@ -12,12 +12,12 @@ import Urls
 import View.Helpers exposing (spaLink)
 
 
-view : DataStore -> Page -> FabModel -> Html Msg
-view ds page model =
+view : DataStore -> Page -> FabModel -> Bool -> Html Msg
+view ds page model canArchive =
     div []
         [ fabDimView model
         , div [ class "fabContainer" ]
-            [ fabDropdownView ds page model
+            [ fabDropdownView ds page model canArchive
             , br [] []
             , br [] []
             , fabButtonView
@@ -25,8 +25,8 @@ view ds page model =
         ]
 
 
-fabDropdownView : DataStore -> Page -> FabModel -> Html Msg
-fabDropdownView ds page model =
+fabDropdownView : DataStore -> Page -> FabModel -> Bool -> Html Msg
+fabDropdownView ds page model canArchive =
     case model of
         MenuHidden ->
             div [] []
@@ -34,7 +34,7 @@ fabDropdownView ds page model =
         MenuVisible ->
             div [ class "fabDropdown" ]
                 [ div [ class "ui fab large very relaxed inverted list" ]
-                    (fabLinks ds page)
+                    (fabLinks ds page canArchive)
                 ]
 
 
@@ -55,8 +55,8 @@ fabButtonView =
         ]
 
 
-fabLinks : DataStore -> Page -> List (Html Msg)
-fabLinks ds page =
+fabLinks : DataStore -> Page -> Bool -> List (Html Msg)
+fabLinks ds page canArchive =
     case page of
         OutboundTable ->
             defaultLinksHref
@@ -156,7 +156,7 @@ fabLinks ds page =
                         |> List.head
                         |> Maybe.map .is_archived
             in
-                [ archiveButton (GroupTable False) (Urls.group pk) isArchived ]
+                [ archiveButton (GroupTable False) (Urls.group pk) isArchived canArchive ]
 
         EditContact pk ->
             let
@@ -165,7 +165,7 @@ fabLinks ds page =
                         |> List.head
                         |> Maybe.map .is_archived
             in
-                [ archiveButton (RecipientTable False) (Urls.recipient pk) isArchived ]
+                [ archiveButton (RecipientTable False) (Urls.recipient pk) isArchived canArchive ]
 
         FabOnlyPage fabPage ->
             case fabPage of
@@ -199,7 +199,7 @@ fabLinks ds page =
                     in
                         [ keywordResponses keyword
                         , keywordArchiveResponses keyword
-                        , archiveButton (KeywordTable False) (Urls.keyword k) isArchived
+                        , archiveButton (KeywordTable False) (Urls.keyword k) isArchived canArchive
                         ]
 
                 ContactImport ->
@@ -244,19 +244,25 @@ fabSpaLink page icon linkText =
 -- Archive/Restore Button
 
 
-archiveButton : Page -> String -> Maybe Bool -> Html Msg
-archiveButton page url maybeIsArchived =
-    case maybeIsArchived of
-        Nothing ->
-            div [ class "ui fluid grey button" ] [ text "Loading..." ]
+archiveButton : Page -> String -> Maybe Bool -> Bool -> Html Msg
+archiveButton page url maybeIsArchived canArchive =
+    case canArchive of
+        -- only show button if user has permission
+        False ->
+            div [] []
 
-        Just isArchived ->
-            case isArchived of
-                True ->
-                    div [ class "ui fluid positive button", onClick <| FabMsg <| ArchiveItem (page2loc <| page) url isArchived ] [ text "Restore" ]
+        True ->
+            case maybeIsArchived of
+                Nothing ->
+                    div [ class "ui fluid grey button" ] [ text "Loading..." ]
 
-                False ->
-                    div [ class "ui fluid negative button", onClick <| FabMsg <| ArchiveItem (page2loc <| page) url isArchived ] [ text "Remove" ]
+                Just isArchived ->
+                    case isArchived of
+                        True ->
+                            div [ class "ui fluid positive button", onClick <| FabMsg <| ArchiveItem (page2loc <| page) url isArchived ] [ text "Restore" ]
+
+                        False ->
+                            div [ class "ui fluid negative button", onClick <| FabMsg <| ArchiveItem (page2loc <| page) url isArchived ] [ text "Remove" ]
 
 
 

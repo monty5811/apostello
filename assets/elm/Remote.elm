@@ -2,17 +2,17 @@ module Remote exposing (maybeFetchData, fetchData, increasePageSize)
 
 import Http
 import Json.Decode as Decode
-import Messages exposing (..)
+import Messages exposing (Msg(..))
 import Models.Remote exposing (RemoteDataType(..), RawResponse)
 import Pages exposing (Page(..), FabOnlyPage(..))
-import Regex
+import String.Extra
 import Urls
 
 
-maybeFetchData : Page -> Bool -> Cmd Msg
-maybeFetchData dataToFetch isStaff =
+maybeFetchData : Page -> Cmd Msg
+maybeFetchData dataToFetch =
     dataToFetch
-        |> dt_url_from_page isStaff
+        |> dt_url_from_page
         |> List.map fetchData
         |> Cmd.batch
 
@@ -23,8 +23,8 @@ fetchData ( dt, dataUrl ) =
         |> Http.send (ReceiveRawResp dt)
 
 
-dt_url_from_page : Bool -> Page -> List ( RemoteDataType, String )
-dt_url_from_page isStaff p =
+dt_url_from_page : Page -> List ( RemoteDataType, String )
+dt_url_from_page p =
     case p of
         OutboundTable ->
             [ ( OutgoingSms, Urls.smsOutbounds ) ]
@@ -32,26 +32,17 @@ dt_url_from_page isStaff p =
         InboundTable ->
             [ ( IncomingSms, Urls.smsInbounds ) ]
 
-        GroupTable False ->
+        GroupTable _ ->
             [ ( Groups, Urls.groups ) ]
-
-        GroupTable True ->
-            [ ( Groups, Urls.groupsArchive ) ]
 
         GroupComposer ->
             [ ( Groups, Urls.groups ) ]
 
-        RecipientTable False ->
+        RecipientTable _ ->
             [ ( Contacts, Urls.recipients ) ]
 
-        RecipientTable True ->
-            [ ( Contacts, Urls.recipientsArchive ) ]
-
-        KeywordTable False ->
+        KeywordTable _ ->
             [ ( Keywords, Urls.keywords ) ]
-
-        KeywordTable True ->
-            [ ( Keywords, Urls.keywordsArchive ) ]
 
         ElvantoImport ->
             [ ( ElvantoGroups, Urls.elvantoGroups ) ]
@@ -69,34 +60,14 @@ dt_url_from_page isStaff p =
             [ ( ScheduledSms, Urls.queuedSmss ) ]
 
         KeyRespTable False k ->
-            let
-                archive =
-                    case isStaff of
-                        True ->
-                            [ ( Keywords, Urls.keywordsArchive ) ]
-
-                        False ->
-                            []
-            in
-                [ ( IncomingSms, Urls.smsInboundsKeyword k )
-                , ( Keywords, Urls.keywords )
-                ]
-                    ++ archive
+            [ ( IncomingSms, Urls.smsInbounds )
+            , ( Keywords, Urls.keywords )
+            ]
 
         KeyRespTable True k ->
-            let
-                archive =
-                    case isStaff of
-                        True ->
-                            [ ( Keywords, Urls.keywordsArchive ) ]
-
-                        False ->
-                            []
-            in
-                [ ( IncomingSms, Urls.smsInboundsKeywordArchive k )
-                , ( Keywords, Urls.keywords )
-                ]
-                    ++ archive
+            [ ( IncomingSms, Urls.smsInbounds )
+            , ( Keywords, Urls.keywords )
+            ]
 
         FirstRun ->
             []
@@ -112,13 +83,11 @@ dt_url_from_page isStaff p =
 
         EditGroup _ ->
             [ ( Groups, Urls.groups )
-            , ( Groups, Urls.groupsArchive )
             ]
 
         EditContact _ ->
             [ ( IncomingSms, Urls.smsInbounds )
             , ( Contacts, Urls.recipients )
-            , ( Contacts, Urls.recipientsArchive )
             ]
 
         Error404 ->
@@ -145,7 +114,7 @@ dt_url_from_page isStaff p =
                     []
 
                 EditKeyword _ ->
-                    [ ( Keywords, Urls.keywords ), ( Keywords, Urls.keywordsArchive ) ]
+                    [ ( Keywords, Urls.keywords ) ]
 
                 ContactImport ->
                     []
@@ -198,9 +167,9 @@ nextFromBody body =
 
 increasePageSize : String -> String
 increasePageSize url =
-    case Regex.contains (Regex.regex "page_size") url of
+    case String.contains "page_size" url of
         True ->
-            Regex.replace (Regex.AtMost 1) (Regex.regex "page=2&page_size=100$") (\_ -> "page_size=1000") url
+            String.Extra.replace "page=2&page_size=100$" "page_size=1000" url
 
         False ->
-            Regex.replace (Regex.AtMost 1) (Regex.regex "page=2$") (\_ -> "page_size=100") url
+            String.Extra.replace "page=2$" "page_size=100" url

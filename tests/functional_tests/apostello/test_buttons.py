@@ -7,7 +7,7 @@ from django_q.models import Schedule
 
 import pytest
 from apostello import models
-from tests.functional_tests.utils import check_and_close_msg
+from tests.functional_tests.utils import check_and_close_msg, click_and_wait
 
 
 @pytest.mark.django_db
@@ -32,6 +32,7 @@ class TestButton:
         browser_in.get(live_server + uri)
         assert uri in browser_in.current_url
         # check table is there
+        sleep(driver_wait_time)
         tables = browser_in.find_elements_by_xpath('//table')
         assert len(tables) == 1
         table = tables[0]
@@ -40,8 +41,7 @@ class TestButton:
         toggle_buttons = browser_in.find_elements_by_class_name('grey')
         num_buttons = len(toggle_buttons)
         while num_buttons > 0:
-            toggle_buttons[0].click()
-            sleep(driver_wait_time)
+            click_and_wait(toggle_buttons[0], driver_wait_time)
             toggle_buttons = browser_in.find_elements_by_class_name('grey')
             assert num_buttons - 1 == len(toggle_buttons)
             num_buttons = len(toggle_buttons)
@@ -72,11 +72,9 @@ class TestButton:
         browser_in.get(live_server + uri)
         sleep(driver_wait_time)
         wrench = browser_in.find_elements_by_class_name('wrench')[0]
-        wrench.click()
-        sleep(driver_wait_time)
+        click_and_wait(wrench, driver_wait_time)
         button = browser_in.find_elements_by_class_name('positive')[0]
-        button.click()
-        sleep(driver_wait_time)
+        click_and_wait(button, driver_wait_time)
         assert 'all' in browser_in.current_url
         k.refresh_from_db()
         assert k.is_archived is False
@@ -89,6 +87,7 @@ class TestButton:
         sms.display_on_wall = False
         uri = '/incoming/curate_wall/'
         browser_in.get(live_server + uri)
+        sleep(driver_wait_time)
         tables = browser_in.find_elements_by_class_name('table')
         assert len(tables) == 1
         table = tables[0]
@@ -96,8 +95,7 @@ class TestButton:
         hidden_buttons = browser_in.find_elements_by_class_name('red')
         num_buttons = len(hidden_buttons)
         while num_buttons > 0:
-            hidden_buttons[0].click()
-            sleep(driver_wait_time)
+            click_and_wait(hidden_buttons[0], driver_wait_time)
             hidden_buttons = browser_in.find_elements_by_class_name('red')
             assert num_buttons - 1 == len(hidden_buttons)
             num_buttons = len(hidden_buttons)
@@ -108,8 +106,7 @@ class TestButton:
         displaying_buttons = browser_in.find_elements_by_class_name('green')
         num_buttons = len(displaying_buttons)
         while len(displaying_buttons) > 0:
-            displaying_buttons[0].click()
-            sleep(driver_wait_time)
+            click_and_wait(displaying_buttons[0], driver_wait_time)
             displaying_buttons = browser_in.find_elements_by_class_name(
                 'green'
             )
@@ -171,8 +168,7 @@ class TestButton:
         sleep(driver_wait_time)
         # archive (should fail and show a popup):
         toggle_buttons = browser_in.find_elements_by_class_name('grey')
-        toggle_buttons[0].click()
-        sleep(driver_wait_time)
+        click_and_wait(toggle_buttons[0], driver_wait_time)
         check_and_close_msg(browser_in, driver_wait_time)
 
     def test_cancel_sms(
@@ -212,8 +208,7 @@ class TestButton:
         cancel_buttons = browser_in.find_elements_by_class_name('grey')
         num_buttons = len(cancel_buttons)
         while num_buttons > 0:
-            cancel_buttons[0].click()
-            sleep(driver_wait_time)
+            click_and_wait(cancel_buttons[0], driver_wait_time)
             cancel_buttons = browser_in.find_elements_by_class_name('grey')
             assert num_buttons - 1 == len(cancel_buttons)
             num_buttons = len(cancel_buttons)

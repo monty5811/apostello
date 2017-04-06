@@ -1,4 +1,35 @@
-module Models.Apostello exposing (..)
+module Models.Apostello
+    exposing
+        ( GroupPk
+        , Keyword
+        , QueuedSms
+        , RecipientGroup
+        , RecipientSimple
+        , Recipient
+        , UserProfile
+        , ElvantoGroup
+        , SmsInbound
+        , SmsOutbound
+        , decodeElvantoGroup
+        , decodeKeyword
+        , decodeQueuedSms
+        , decodeRecipient
+        , decodeRecipientGroup
+        , decodeRecipientSimple
+        , decodeSmsInbound
+        , decodeSmsOutbound
+        , decodeUserProfile
+        , encodeElvantoGroup
+        , encodeKeyword
+        , encodeQueuedSms
+        , encodeRecipient
+        , encodeRecipientGroup
+        , encodeRecipientSimple
+        , encodeSmsInbound
+        , encodeSmsOutbound
+        , encodeUserProfile
+        , nullGroup
+        )
 
 import Date
 import Encode exposing (encodeMaybeDate, encodeMaybe)
@@ -198,10 +229,6 @@ encodeRecipient contact =
         , ( "do_not_reply", Encode.bool contact.do_not_reply )
         , ( "last_sms", encodeMaybe encodeSmsInbound contact.last_sms )
         ]
-
-
-type alias PersonPk =
-    Int
 
 
 type alias RecipientSimple =

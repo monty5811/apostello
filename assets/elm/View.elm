@@ -1,8 +1,8 @@
 module View exposing (view)
 
 import Html exposing (Html, text)
-import Messages exposing (..)
-import Models exposing (..)
+import Messages exposing (Msg)
+import Models exposing (Model)
 import Pages exposing (Page(..), FabOnlyPage(..))
 import View.AccessDenied as AD
 import View.Curator as C
@@ -31,7 +31,10 @@ view : Model -> Html Msg
 view model =
     let
         fab =
-            F.view model.dataStore model.page model.fabModel
+            F.view model.dataStore
+                model.page
+                model.fabModel
+                (model.settings.userPerms.can_archive || model.settings.userPerms.user.is_staff)
 
         shell =
             Shell.view model

@@ -220,6 +220,7 @@ class Recipient(models.Model):
         if add_to_group_flag:
             from apostello.tasks import add_new_contact_to_groups
             async('apostello.tasks.add_new_contact_to_groups', self.pk)
+
     def __str__(self):
         """Pretty representation."""
         return self.full_name
@@ -653,6 +654,9 @@ class QueuedSms(models.Model):
             time=self.time_to_send,
         )
         return val
+
+    class Meta:
+        ordering = ['time_to_send']
 
 
 class SmsOutbound(models.Model):

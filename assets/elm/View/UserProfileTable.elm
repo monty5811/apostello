@@ -1,10 +1,10 @@
 module View.UserProfileTable exposing (view)
 
 import Formatting as F exposing ((<>))
-import Html exposing (..)
+import Html exposing (Html, thead, tr, th, text, a, i, button, td)
 import Html.Attributes exposing (class, href)
 import Html.Events exposing (onClick)
-import Messages exposing (..)
+import Messages exposing (Msg(UserProfileTableMsg), UserProfileTableMsg(ToggleField))
 import Models.Apostello exposing (UserProfile)
 import Regex
 import View.FilteringTable exposing (filteringTable)

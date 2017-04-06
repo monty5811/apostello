@@ -4,7 +4,16 @@ import Helpers exposing (formatDate)
 import Html exposing (Html, div, text, i, button, a, td, th, thead, tr, br, label, input)
 import Html.Attributes exposing (attribute, class, href, style, name, type_, id, checked)
 import Html.Events exposing (onClick, onSubmit)
-import Messages exposing (Msg(KeyRespTableMsg), KeyRespTableMsg(..))
+import Messages
+    exposing
+        ( Msg(KeyRespTableMsg)
+        , KeyRespTableMsg
+            ( ArchiveAllButtonClick
+            , ArchiveAllCheckBoxClick
+            , ToggleInboundSmsDealtWith
+            , ToggleInboundSmsArchive
+            )
+        )
 import Models.Apostello exposing (SmsInbound)
 import Pages exposing (Page(SendAdhoc))
 import Regex
@@ -118,7 +127,15 @@ dealtWithButton : SmsInbound -> Html Msg
 dealtWithButton sms =
     case sms.dealt_with of
         True ->
-            button [ class "ui tiny positive icon button", onClick (KeyRespTableMsg (ToggleInboundSmsDealtWith sms.dealt_with sms.pk)) ] [ i [ class "checkmark icon" ] [], text "Dealt With" ]
+            button
+                [ class "ui tiny positive icon button"
+                , onClick (KeyRespTableMsg (ToggleInboundSmsDealtWith sms.dealt_with sms.pk))
+                ]
+                [ i [ class "checkmark icon" ] [], text "Dealt With" ]
 
         False ->
-            button [ class "ui tiny orange icon button", onClick (KeyRespTableMsg (ToggleInboundSmsDealtWith sms.dealt_with sms.pk)) ] [ i [ class "attention icon" ] [], text "Requires Action" ]
+            button
+                [ class "ui tiny orange icon button"
+                , onClick (KeyRespTableMsg (ToggleInboundSmsDealtWith sms.dealt_with sms.pk))
+                ]
+                [ i [ class "attention icon" ] [], text "Requires Action" ]

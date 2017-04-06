@@ -269,17 +269,26 @@ checkPerm blockedKeywords userPerms page =
                 InboundTable ->
                     userPerms.can_see_incoming
 
-                GroupTable _ ->
+                GroupTable False ->
                     userPerms.can_see_groups
+
+                GroupTable True ->
+                    userPerms.user.is_staff
 
                 GroupComposer ->
                     userPerms.can_see_contact_names && userPerms.can_see_groups
 
-                RecipientTable _ ->
+                RecipientTable False ->
                     userPerms.can_see_contact_names
 
-                KeywordTable _ ->
+                RecipientTable True ->
+                    userPerms.user.is_staff
+
+                KeywordTable False ->
                     userPerms.can_see_keywords
+
+                KeywordTable True ->
+                    userPerms.user.is_staff
 
                 ElvantoImport ->
                     userPerms.can_import

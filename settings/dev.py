@@ -2,7 +2,9 @@
 from .common import *
 
 DEBUG = True
-INSTALLED_APPS += ['debug_toolbar', ]
+INSTALLED_APPS += [
+    'debug_toolbar',
+]
 MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
 INTERNAL_IPS = ('*', )
 
@@ -12,7 +14,9 @@ def show_toolbar(request):
     return True
 
 
-DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": show_toolbar, }
+DEBUG_TOOLBAR_CONFIG = {
+    "SHOW_TOOLBAR_CALLBACK": show_toolbar,
+}
 
 TEMPLATES[0]['OPTIONS']['debug'] = True
 
@@ -26,7 +30,9 @@ DATABASES = {
 }
 
 # overwrite static files (use white noise instead of runserver)
-MIDDLEWARE = ['whitenoise.middleware.WhiteNoiseMiddleware', ] + MIDDLEWARE
+MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+] + MIDDLEWARE
 STATIC_ROOT = BASE_DIR + '/static/'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 

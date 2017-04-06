@@ -10,15 +10,10 @@ class TestButtonPosts:
     def test_api_posts(
         self, recipients, groups, smsin, smsout, keywords, users
     ):
-        for endpoint in ['sms']:
-            for param in [
-                'reingest', 'dealt_with', 'archived', 'display_on_wall'
-            ]:
-                for value in [True, False]:
-                    post_json(
-                        users['c_staff'], '/api/v1/' + endpoint + '/in/1',
-                        {param: value}
-                    )
+        url = '/api/v1/smsin/{}/'.format(smsin['sms1'].pk)
+        for param in ['reingest', 'dealt_with', 'archived', 'display_on_wall']:
+            for value in [True, False]:
+                post_json(users['c_staff'], url, {param: value})
 
     def test_group_members_api(self, recipients, groups, users):
         # setup

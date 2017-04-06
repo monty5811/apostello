@@ -1,9 +1,9 @@
 module View.FirstRun exposing (view)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, text, p, div, pre, button, input, label, h3, br)
+import Html.Attributes as A
 import Html.Events exposing (onInput)
-import Messages exposing (..)
+import Messages exposing (Msg(FirstRunMsg), FirstRunMsg(..))
 import Models.FirstRun exposing (FirstRunModel)
 import Models.FormStatus exposing (FormStatus(..))
 import View.Helpers exposing (..)
@@ -23,36 +23,36 @@ view model =
 
 testEmailView : FirstRunModel -> Html Msg
 testEmailView model =
-    div [ id "sent_test_email" ]
-        [ div [ class "ui raised segment" ]
+    div [ A.id "sent_test_email" ]
+        [ div [ A.class "ui raised segment" ]
             [ h3 [] [ text "Send Test Email" ]
-            , Html.form [ class (formClass model.testEmailFormStatus) ]
+            , Html.form [ A.class (formClass model.testEmailFormStatus) ]
                 [ formMsg model.testEmailFormStatus emailSuccessMsg
-                , div [ class "fields" ]
-                    [ div [ class "four wide field" ]
+                , div [ A.class "fields" ]
+                    [ div [ A.class "four wide field" ]
                         [ label [] [ text "Email Address" ]
                         , input
-                            [ type_ "email"
-                            , name "email-to"
-                            , placeholder "test@example.com"
-                            , id "email_to"
+                            [ A.type_ "email"
+                            , A.name "email-to"
+                            , A.placeholder "test@example.com"
+                            , A.id "email_to"
                             , onInput (FirstRunMsg << UpdateTestEmailToField)
                             ]
                             []
                         ]
-                    , div [ class "twelve wide field" ]
+                    , div [ A.class "twelve wide field" ]
                         [ label [] [ text "Email Body" ]
                         , input
-                            [ type_ "text"
-                            , name "email-body"
-                            , placeholder "This is a test"
-                            , id "email_body"
+                            [ A.type_ "text"
+                            , A.name "email-body"
+                            , A.placeholder "This is a test"
+                            , A.id "email_body"
                             , onInput (FirstRunMsg << UpdateTestEmailBodyField)
                             ]
                             []
                         ]
                     ]
-                , button [ class "ui violet button", onClick (FirstRunMsg SendTestEmail), id "email_send_button" ] [ text "Send" ]
+                , button [ A.class "ui violet button", onClick (FirstRunMsg SendTestEmail), A.id "email_send_button" ] [ text "Send" ]
                 ]
             ]
         ]
@@ -60,36 +60,36 @@ testEmailView model =
 
 testSmsView : FirstRunModel -> Html Msg
 testSmsView model =
-    div [ id "sent_test_sms" ]
-        [ div [ class "ui raised segment" ]
+    div [ A.id "sent_test_sms" ]
+        [ div [ A.class "ui raised segment" ]
             [ h3 [] [ text "Send Test SMS" ]
-            , Html.form [ class (formClass model.testSmsFormStatus) ]
+            , Html.form [ A.class (formClass model.testSmsFormStatus) ]
                 [ formMsg model.testSmsFormStatus smsSuccessMsg
-                , div [ class "fields" ]
-                    [ div [ class "four wide field" ]
+                , div [ A.class "fields" ]
+                    [ div [ A.class "four wide field" ]
                         [ label [] [ text "Phone Number" ]
                         , input
-                            [ type_ "text"
-                            , name "sms-to"
-                            , placeholder "+447095320967"
-                            , id "sms_to"
+                            [ A.type_ "text"
+                            , A.name "sms-to"
+                            , A.placeholder "+447095320967"
+                            , A.id "sms_to"
                             , onInput (FirstRunMsg << UpdateTestSmsToField)
                             ]
                             []
                         ]
-                    , div [ class "twelve wide field" ]
+                    , div [ A.class "twelve wide field" ]
                         [ label [] [ text "Email Body" ]
                         , input
-                            [ type_ "text"
-                            , name "sms-body"
-                            , placeholder "This is a test"
-                            , id "sms_body"
+                            [ A.type_ "text"
+                            , A.name "sms-body"
+                            , A.placeholder "This is a test"
+                            , A.id "sms_body"
                             , onInput (FirstRunMsg << UpdateTestSmsBodyField)
                             ]
                             []
                         ]
                     ]
-                , button [ class "ui violet button", onClick (FirstRunMsg SendTestSms), id "sms_send_button" ] [ text "Send" ]
+                , button [ A.class "ui violet button", onClick (FirstRunMsg SendTestSms), A.id "sms_send_button" ] [ text "Send" ]
                 ]
             ]
         ]
@@ -97,45 +97,50 @@ testSmsView model =
 
 createAdminView : FirstRunModel -> Html Msg
 createAdminView model =
-    div [ id "create_admin_user" ]
-        [ div [ class "ui raised segment" ]
+    div [ A.id "create_admin_user" ]
+        [ div [ A.class "ui raised segment" ]
             [ h3 [] [ text "Create Admin User" ]
-            , Html.form [ class (formClass model.adminFormStatus) ]
+            , Html.form [ A.class (formClass model.adminFormStatus) ]
                 [ formMsg model.adminFormStatus adminSuccessMsg
-                , div [ class "fields" ]
-                    [ div [ class "eight wide field" ]
+                , div [ A.class "fields" ]
+                    [ div [ A.class "eight wide field" ]
                         [ label [] [ text "Admin Email" ]
                         , input
-                            [ type_ "email"
-                            , name "email"
-                            , placeholder "you@example.com"
-                            , id "admin_email"
+                            [ A.type_ "email"
+                            , A.name "email"
+                            , A.placeholder "you@example.com"
+                            , A.id "admin_email"
                             , onInput (FirstRunMsg << UpdateAdminEmailField)
                             ]
                             []
                         ]
-                    , div [ class "four wide field" ]
+                    , div [ A.class "four wide field" ]
                         [ label [] [ text "Password" ]
                         , input
-                            [ type_ "password"
-                            , name "password"
-                            , id "admin_pass1"
+                            [ A.type_ "password"
+                            , A.name "password"
+                            , A.id "admin_pass1"
                             , onInput (FirstRunMsg << UpdateAdminPass1Field)
                             ]
                             []
                         ]
-                    , div [ class "four wide field" ]
+                    , div [ A.class "four wide field" ]
                         [ label [] [ text "Password" ]
                         , input
-                            [ type_ "password"
-                            , name "password"
-                            , id "admin_pass2"
+                            [ A.type_ "password"
+                            , A.name "password"
+                            , A.id "admin_pass2"
                             , onInput (FirstRunMsg << UpdateAdminPass2Field)
                             ]
                             []
                         ]
                     ]
-                , button [ class "ui violet button", onClick (FirstRunMsg CreateAdminUser), id "create_admin_button" ] [ text "Create" ]
+                , button
+                    [ A.class "ui violet button"
+                    , onClick (FirstRunMsg CreateAdminUser)
+                    , A.id "create_admin_button"
+                    ]
+                    [ text "Create" ]
                 ]
             ]
         ]
@@ -154,8 +159,8 @@ formMsg status successDiv =
             successDiv
 
         Failed e ->
-            div [ class "ui error message" ]
-                [ div [ class "header" ] [ text "Uh oh, something went wrong!" ]
+            div [ A.class "ui error message" ]
+                [ div [ A.class "header" ] [ text "Uh oh, something went wrong!" ]
                 , p [] [ text "Check your settings and try again." ]
                 , p [] [ text "Error:" ]
                 , pre [] [ text e ]
@@ -164,23 +169,23 @@ formMsg status successDiv =
 
 adminSuccessMsg : Html Msg
 adminSuccessMsg =
-    div [ class "ui success message" ]
-        [ div [ class "header" ] [ text "Admin User Created" ]
+    div [ A.class "ui success message" ]
+        [ div [ A.class "header" ] [ text "Admin User Created" ]
         , p [] [ text "Refresh this page and you will be able to login" ]
         ]
 
 
 emailSuccessMsg : Html Msg
 emailSuccessMsg =
-    div [ class "ui success message" ]
-        [ div [ class "header" ] [ text "Email sent!" ]
+    div [ A.class "ui success message" ]
+        [ div [ A.class "header" ] [ text "Email sent!" ]
         , p [] [ text "Check your inbox to confirm!" ]
         ]
 
 
 smsSuccessMsg : Html Msg
 smsSuccessMsg =
-    div [ class "ui success message" ]
-        [ div [ class "header" ] [ text "SMS Sending!" ]
+    div [ A.class "ui success message" ]
+        [ div [ A.class "header" ] [ text "SMS Sending!" ]
         , p [] [ text "Check your phone to confirm!" ]
         ]

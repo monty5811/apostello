@@ -1,19 +1,22 @@
 module View.Notification exposing (view)
 
-import Html exposing (..)
+import Dict
+import Html exposing (Html, i, div, text)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
-import Messages exposing (..)
+import Messages exposing (Msg(NotificationMsg), NotificationMsg(RemoveNotification))
 import Models exposing (..)
 
 
 view : Model -> List (Html Msg)
 view model =
-    List.map tView model.notifications
+    model.notifications
+        |> Dict.toList
+        |> List.map tView
 
 
-tView : Notification -> Html Msg
-tView notification =
+tView : ( Int, Notification ) -> Html Msg
+tView ( id, notification ) =
     let
         messageType =
             case notification.type_ of
@@ -33,6 +36,10 @@ tView notification =
             "ui floating " ++ messageType ++ " message"
     in
         div [ class className ]
-            [ i [ class "close icon", onClick (NotificationMsg (RemoveNotification notification)) ] []
+            [ i
+                [ class "close icon"
+                , onClick <| NotificationMsg <| RemoveNotification id
+                ]
+                []
             , text notification.text
             ]

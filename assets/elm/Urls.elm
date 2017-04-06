@@ -1,6 +1,6 @@
 module Urls exposing (..)
 
-import Formatting exposing (..)
+import Formatting exposing ((<>), int, s, print, string)
 
 
 recipient : Int -> String
@@ -11,11 +11,6 @@ recipient pk =
 recipients : String
 recipients =
     "/api/v1/recipients/"
-
-
-recipientsArchive : String
-recipientsArchive =
-    "/api/v1/recipients_archive/"
 
 
 keyword : String -> String
@@ -36,16 +31,6 @@ smsInbounds =
 smsInbound : Int -> String
 smsInbound pk =
     print (s "/api/v1/sms/in/" <> int <> s "/") pk
-
-
-smsInboundsKeyword : String -> String
-smsInboundsKeyword keyword =
-    print (s "/api/v1/sms/in/keyword/" <> string <> s "/") keyword
-
-
-smsInboundsKeywordArchive : String -> String
-smsInboundsKeywordArchive keyword =
-    print (s "/api/v1/sms/in/keyword/" <> string <> s "/archive/") keyword
 
 
 elvantoGroup : Int -> String
@@ -83,19 +68,9 @@ groups =
     "/api/v1/groups/"
 
 
-groupsArchive : String
-groupsArchive =
-    "/api/v1/groups_archive/"
-
-
 keywords : String
 keywords =
     "/api/v1/keywords/"
-
-
-keywordsArchive : String
-keywordsArchive =
-    "/api/v1/keywords_archive/"
 
 
 elvantoGroups : String

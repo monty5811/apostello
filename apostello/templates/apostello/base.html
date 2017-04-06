@@ -11,11 +11,12 @@
     {% block main %}
     {% endblock %}
     <div id="elmContainer"></div>
-    {% cache 1800 elmSettings request.user %}
     <script>
+    {% cache 60 elmSettings request.user %}
       var elmSettings = {% elm_settings request.user %};
-    </script>
     {% endcache %}
+      var elmMessages = {% elm_messages request %};
+    </script>
     {% include 'apostello/includes/js.html' %}
     {% block morejs %}{% endblock %}
     <div id="dtBox"></div>

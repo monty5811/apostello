@@ -186,7 +186,7 @@ SMS_CHAR_LIMIT = 160 - MAX_NAME_LENGTH + len('{name}')
 # https://www.twilio.com/help/faq/voice/what-are-global-permissions-and-why-do-they-exist
 COUNTRY_CODE = os.environ.get('COUNTRY_CODE', '44')
 
-NO_ACCESS_WARNING = 'You do not have access to this page. ' \
+NO_ACCESS_WARNING = 'You do not have access to that page. ' \
     'If you believe you are seeing it in error please contact the office'
 
 # opbeat django:

@@ -29,8 +29,7 @@ Prerequisites
 * `Python 3 <https://www.python.org/>`_
 * `Git <https://www.atlassian.com/git/tutorials/install-git/>`_
 * Optional: `Node <https://nodejs.org/>`_ for frontend development
-* Optional: Java for minifying JS
-* Optional: Firefox (<46) to run integration tests
+* Optional: Geckodriver and Firefox (>47) to run browser based tests
 
 Get Started
 ~~~~~~~~~~~
@@ -78,7 +77,7 @@ Running Tests
 .. code-block:: bash
 
     pip install tox
-    tox # you need firefox < 46 installed
+    tox # you need firefox installed
     tox -e py35 # runs tests only for py35
     tox -e py35 -- -m \"not slow" # runs only quick tests on py35
 
@@ -93,7 +92,7 @@ Setup:
 .. code-block:: bash
 
     cd assets/
-    yarn install # this may take a while
+    yarn install # this may take a while the first time
 
 Changes must then be compiled:
 

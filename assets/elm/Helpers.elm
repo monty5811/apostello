@@ -5,7 +5,7 @@ import Date.Format
 import Json.Decode as Decode
 import Messages exposing (Msg)
 import Models exposing (Model)
-import Update.Notification exposing (createNotSavedNotification)
+import Update.Notification as Notif
 
 
 decodeAlwaysTrue : Decode.Decoder Bool
@@ -19,7 +19,11 @@ decodeAlwaysTrue =
 
 handleNotSaved : Model -> ( Model, List (Cmd Msg) )
 handleNotSaved model =
-    ( createNotSavedNotification model, [] )
+    let
+        ( newModel, cmd ) =
+            Notif.createNotSaved model
+    in
+        ( newModel, [ cmd ] )
 
 
 

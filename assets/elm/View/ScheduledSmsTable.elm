@@ -1,7 +1,7 @@
 module View.ScheduledSmsTable exposing (view)
 
 import Date
-import Html exposing (..)
+import Html exposing (Html, thead, th, td, tr, text, a, div)
 import Html.Attributes exposing (class, href)
 import Html.Events exposing (onClick)
 import Messages exposing (..)

@@ -239,7 +239,7 @@ def keywords():
     test_early.save()
 
     test_no_end = Keyword.objects.create(
-        keyword="test_no_end",
+        keyword="no_end",
         description="This has no end",
         custom_response="Will always reply",
         activate_time=timezone.make_aware(
@@ -250,7 +250,7 @@ def keywords():
     test_no_end.save()
     # test deactivated response
     test_deac_resp_fail = Keyword.objects.create(
-        keyword="test_cust_endf",
+        keyword="cust_endf",
         description="This has a diff reply",
         custom_response="Hi!",
         deactivated_response="Too slow, Joe!",
@@ -261,7 +261,7 @@ def keywords():
     )
 
     test_deac_resp = Keyword.objects.create(
-        keyword="test_cust_end",
+        keyword="just_in_time",
         description="This has a diff reply",
         custom_response="Just in time!",
         deactivated_response="Too slow, Joe!",
@@ -277,7 +277,7 @@ def keywords():
     test_no_end.save()
 
     test_early_with_response = Keyword.objects.create(
-        keyword="early_test2",
+        keyword="22early",
         description="This is a not yet active test keyword"
         "with a custom response",
         too_early_response="This is far too early",
@@ -391,7 +391,8 @@ def driver_wait_time():
 def browser(request, driver_wait_time):
     """Setup selenium browser."""
     driver = webdriver.Firefox()
-    driver.set_window_size(800, 600)
+    driver.implicitly_wait(driver_wait_time)
+    driver.set_window_size(800, 1200)
 
     request.node._driver = driver
     yield driver
@@ -403,13 +404,37 @@ def browser(request, driver_wait_time):
 def browser_in(request, live_server, users, driver_wait_time):
     """Setup selenium browser and log in."""
     driver = webdriver.Firefox()
-    driver.set_window_size(800, 600)
+    driver.implicitly_wait(driver_wait_time)
+    driver.set_window_size(800, 1200)
     driver.get(live_server + '/')
     driver.add_cookie(
         {
             u'domain': u'localhost',
             u'name': u'sessionid',
             u'value': users['c_staff'].session.session_key,
+            u'path': u'/',
+            u'httponly': True,
+            u'secure': False
+        }
+    )
+    request.node._driver = driver
+    yield driver
+    driver.quit()
+
+
+@pytest.mark.usefixtures('users', 'live_server')
+@pytest.yield_fixture()
+def browser_in_not_staff(request, live_server, users, driver_wait_time):
+    """Setup selenium browser and log in."""
+    driver = webdriver.Firefox()
+    driver.implicitly_wait(driver_wait_time)
+    driver.set_window_size(800, 1200)
+    driver.get(live_server + '/')
+    driver.add_cookie(
+        {
+            u'domain': u'localhost',
+            u'name': u'sessionid',
+            u'value': users['c_in'].session.session_key,
             u'path': u'/',
             u'httponly': True,
             u'secure': False

@@ -1,11 +1,14 @@
-module View.Helpers exposing (..)
+module View.Helpers exposing (archiveCell, onClick, formClass, spaLink)
 
 import Html exposing (Attribute, Html, a, td, text)
 import Html.Attributes exposing (class, href)
 import Html.Events exposing (onWithOptions)
 import Json.Decode as Decode
-import Messages exposing (..)
-import Models.FormStatus exposing (..)
+import Messages exposing (Msg(NewUrl))
+import Models.FormStatus
+    exposing
+        ( FormStatus(NoAction, Failed, Success, InProgress)
+        )
 import Pages exposing (Page)
 import Route exposing (page2loc)
 

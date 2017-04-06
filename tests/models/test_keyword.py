@@ -15,9 +15,8 @@ class TestKeywords():
         assert str(keywords['test']) == "test"
 
     def test_disabled_reply(self, keywords, recipients):
-        assert keywords['test_do_not_reply'].construct_reply(
-            recipients['calvin']
-        ) == ''
+        assert keywords['test_do_not_reply'
+                        ].construct_reply(recipients['calvin']) == ''
 
     def test_expired(self, recipients, keywords):
         assert keywords['test_expired'].construct_reply(
@@ -57,9 +56,8 @@ class TestKeywords():
         ) == "Too slow, Joe!"
 
     def test_deactivated_custom_reply_no_deac_time(self, recipients, keywords):
-        assert keywords['test_deac_resp_fail'].construct_reply(
-            recipients['calvin']
-        ) == "Hi!"
+        assert keywords['test_deac_resp_fail'
+                        ].construct_reply(recipients['calvin']) == "Hi!"
 
     def test_too_early_custom_reply(self, recipients, keywords):
         assert keywords['test_early_with_response'].construct_reply(

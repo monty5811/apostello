@@ -19,7 +19,7 @@ import Update.GroupTable
 import Update.InboundTable
 import Update.KeyRespTable
 import Update.KeywordTable
-import Update.Notification
+import Update.Notification as Notif
 import Update.RecipientTable
 import Update.ScheduledSmsTable
 import Update.SendAdhoc
@@ -75,12 +75,12 @@ updateHelper msg model =
                     , sendAdhoc = Update.SendAdhoc.resetForm page
                     , sendGroup = Update.SendGroup.resetForm page
                   }
-                , [ maybeFetchData page model.settings.userPerms.user.is_staff ]
+                , [ maybeFetchData page ]
                 )
 
         -- Load data
         LoadData ->
-            ( { model | loadingStatus = waitingHelper model.loadingStatus }, [ maybeFetchData model.page model.settings.userPerms.user.is_staff ] )
+            ( { model | loadingStatus = waitingHelper model.loadingStatus }, [ maybeFetchData model.page ] )
 
         ReceiveRawResp dt (Ok resp) ->
             let
@@ -114,7 +114,7 @@ updateHelper msg model =
             Update.Fab.update subMsg model
 
         NotificationMsg subMsg ->
-            ( Update.Notification.update subMsg model, [] )
+            Notif.update subMsg model
 
         FirstRunMsg subMsg ->
             Update.FirstRun.update subMsg model
@@ -190,24 +190,33 @@ waitingHelper ls =
             WaitingForPage
 
 
+userFacingErrorMessage : Http.Error -> String
+userFacingErrorMessage err =
+    case err of
+        Http.BadUrl _ ->
+            "That's a bad URL. Sorry."
+
+        Http.NetworkError ->
+            "Looks like there may be something wrong with your internet connection :("
+
+        Http.BadStatus _ ->
+            "Something went wrong there. Sorry."
+
+        Http.BadPayload _ _ ->
+            "Something went wrong there. Sorry."
+
+        Http.Timeout ->
+            "It took too long to reach the server..."
+
+
 handleLoadingFailed : Http.Error -> Model -> ( Model, List (Cmd Msg) )
 handleLoadingFailed err model =
     let
-        errStr =
-            case err of
-                Http.BadUrl _ ->
-                    "That's a bad URL. Sorry."
+        niceMsg =
+            userFacingErrorMessage err
 
-                Http.NetworkError ->
-                    "Looks like there may be something wrong with your internet connection :("
-
-                Http.BadStatus _ ->
-                    "Something went wrong there. Sorry."
-
-                Http.BadPayload _ _ ->
-                    "Something went wrong there. Sorry."
-
-                Http.Timeout ->
-                    "It took too long to reach the server..."
+        ( newModel, cmd ) =
+            { model | loadingStatus = RespFailed <| niceMsg }
+                |> Notif.createLoadingFailed niceMsg
     in
-        ( { model | loadingStatus = RespFailed errStr } |> Update.Notification.createLoadingFailedNotification, [] )
+        ( newModel, [ cmd ] )

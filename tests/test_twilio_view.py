@@ -8,6 +8,7 @@ from twilio.util import RequestValidator
 
 from apostello.models import *
 from apostello.views import *
+from apostello import tasks
 from tests.conftest import twilio_vcr
 
 if sys.version_info[0] == 3:
@@ -33,9 +34,8 @@ class TwilioRequestFactory(RequestFactory):
         if 'HTTP_X_TWILIO_SIGNATURE' not in extra:
             extra.update(
                 {
-                    'HTTP_X_TWILIO_SIGNATURE': self._compute_signature(
-                        path, params=data
-                    )
+                    'HTTP_X_TWILIO_SIGNATURE':
+                    self._compute_signature(path, params=data)
                 }
             )
         return super(TwilioRequestFactory, self).get(path, data, **extra)
@@ -46,9 +46,8 @@ class TwilioRequestFactory(RequestFactory):
         if 'HTTP_X_TWILIO_SIGNATURE' not in extra:
             extra.update(
                 {
-                    'HTTP_X_TWILIO_SIGNATURE': self._compute_signature(
-                        path, params=data
-                    )
+                    'HTTP_X_TWILIO_SIGNATURE':
+                    self._compute_signature(path, params=data)
                 }
             )
         if content_type is None:
@@ -149,6 +148,7 @@ class TestTwilioViewAskForName:
         from site_config.models import SiteConfiguration
         config = SiteConfiguration.get_solo()
         config.disable_all_replies = False
+        config.office_email = 'test@example.com'
         config.save()
         factory = TwilioRequestFactory(token=settings.TWILIO_AUTH_TOKEN)
         data = test_request_data()

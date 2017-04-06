@@ -1,6 +1,6 @@
 module View.KeywordTable exposing (view)
 
-import Html exposing (..)
+import Html exposing (Html, thead, th, tr, td, text, a, div)
 import Html.Attributes exposing (class, href)
 import Messages exposing (..)
 import Models.Apostello exposing (Keyword)

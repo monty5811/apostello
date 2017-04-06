@@ -1,42 +1,56 @@
 module Update.Notification exposing (..)
 
-import Messages exposing (..)
+import Dict
+import Messages
+    exposing
+        ( Msg(NotificationMsg)
+        , NotificationMsg(RemoveNotification)
+        )
 import Models exposing (Model, NotificationType(..), Notification)
 import Models.DjangoMessage exposing (DjangoMessage)
+import Process
+import Time
+import Task
 
 
-update : NotificationMsg -> Model -> Model
+delayAction : Time.Time -> msg -> Cmd msg
+delayAction t msg =
+    Process.sleep t
+        |> Task.andThen (always <| Task.succeed msg)
+        |> Task.perform identity
+
+
+update : NotificationMsg -> Model -> ( Model, List (Cmd Msg) )
 update msg model =
     case msg of
-        NewNotification type_ text ->
-            createNotification model text type_
-
-        RemoveNotification notif ->
-            { model | notifications = removeNotification model.notifications notif }
+        RemoveNotification id ->
+            ( { model | notifications = remove id model.notifications }, [] )
 
 
-removeNotification : List Notification -> Notification -> List Notification
-removeNotification notifs notif =
-    notifs
-        |> List.filter (\n -> not (n.text == notif.text))
+remove : Int -> Dict.Dict Int Notification -> Dict.Dict Int Notification
+remove id notifications =
+    Dict.remove id notifications
 
 
-createNotification : Model -> String -> NotificationType -> Model
-createNotification model text type_ =
+create : Model -> String -> NotificationType -> ( Model, Cmd Msg )
+create model text type_ =
     let
-        existing =
-            model.notifications |> List.map .text
+        maxId =
+            model.notifications
+                |> Dict.keys
+                |> List.maximum
+                |> Maybe.withDefault 0
+
+        newNotifications =
+            Dict.insert (maxId + 1) (Notification type_ text) model.notifications
     in
-        case List.member text existing of
-            False ->
-                { model | notifications = Notification type_ text :: model.notifications }
-
-            True ->
-                model
+        ( { model | notifications = newNotifications }
+        , delayAction (20 * Time.second) <| NotificationMsg <| RemoveNotification (maxId + 1)
+        )
 
 
-createNotificationFromDjangoMessage : DjangoMessage -> Model -> Model
-createNotificationFromDjangoMessage dm model =
+createFromDjangoMessage : DjangoMessage -> Model -> ( Model, Cmd Msg )
+createFromDjangoMessage dm model =
     let
         type_ =
             case dm.type_ of
@@ -55,34 +69,35 @@ createNotificationFromDjangoMessage dm model =
                 _ ->
                     WarningNotification
     in
-        createNotification model dm.text type_
+        create model dm.text type_
 
 
-createWarningNotification : Model -> String -> Model
-createWarningNotification model text =
-    createNotification model text WarningNotification
+createFromDjangoMessageNoDestroy : DjangoMessage -> Model -> Model
+createFromDjangoMessageNoDestroy message model =
+    createFromDjangoMessage message model
+        |> Tuple.first
 
 
-createInfoNotification : Model -> String -> Model
-createInfoNotification model text =
-    createNotification model text InfoNotification
+createWarning : Model -> String -> ( Model, Cmd Msg )
+createWarning model text =
+    create model text WarningNotification
 
 
-createSuccessNotification : Model -> String -> Model
-createSuccessNotification model text =
-    createNotification model text SuccessNotification
+createInfo : Model -> String -> ( Model, Cmd Msg )
+createInfo model text =
+    create model text InfoNotification
 
 
-createErrorNotification : Model -> String -> Model
-createErrorNotification model text =
-    createNotification model text ErrorNotification
+createSuccess : Model -> String -> ( Model, Cmd Msg )
+createSuccess model text =
+    create model text SuccessNotification
 
 
-createNotSavedNotification : Model -> Model
-createNotSavedNotification model =
-    createWarningNotification model "Something went wrong, there :-( Your changes may not have been saved"
+createNotSaved : Model -> ( Model, Cmd Msg )
+createNotSaved model =
+    createWarning model "Something went wrong, there :-( Your changes may not have been saved"
 
 
-createLoadingFailedNotification : Model -> Model
-createLoadingFailedNotification model =
-    createWarningNotification model "Something went wrong there when we tried to talk to the server, we'll try again in a bit..."
+createLoadingFailed : String -> Model -> ( Model, Cmd Msg )
+createLoadingFailed msg model =
+    createWarning model msg

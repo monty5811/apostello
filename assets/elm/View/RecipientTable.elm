@@ -1,9 +1,9 @@
 module View.RecipientTable exposing (view)
 
 import Helpers exposing (formatDate)
-import Html exposing (..)
+import Html exposing (Html, thead, th, td, tr, text, a, div)
 import Html.Attributes exposing (class, href)
-import Messages exposing (..)
+import Messages exposing (Msg(RecipientTableMsg), RecipientTableMsg(ToggleRecipientArchive))
 import Models.Apostello exposing (Recipient)
 import Regex
 import View.Helpers exposing (archiveCell)

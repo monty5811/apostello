@@ -1,5 +1,5 @@
 {% with profile=request.user.profile %}
-<div class="ui simple dropdown item" data-intro="Use this menu to switch between different pages." data-step="1" data-position="right" id="primary-menu">
+<div class="ui simple dropdown item" id="primary-menu">
   Menu <i class="dropdown icon"></i>
   <div class="ui vertical menu">
     {% if profile.can_see_keywords or request.user.is_staff %}

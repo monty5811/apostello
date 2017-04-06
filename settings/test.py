@@ -1,13 +1,29 @@
 import uuid
+import warnings
+
+import fakeredis
 
 from .common import *
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, str(uuid.uuid4()) + '.sqlite3'),
+if os.environ.get('DATABASE_POSTGRESQL_USERNAME'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'apostello_test_db',
+            'USER': os.environ.get('DATABASE_POSTGRESQL_USERNAME', ''),
+            'PASSWORD': os.environ.get('DATABASE_POSTGRESQL_PASSWORD', ''),
+            'HOST': 'localhost',
+            'PORT': 5432,
+            'CONN_MAX_AGE': 0,
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, str(uuid.uuid4()) + '.sqlite3'),
+        }
+    }
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'default')
 DEBUG = False
@@ -24,7 +40,6 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
 ALLOWED_HOSTS = ['testserver']
 
 #
-import fakeredis
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -51,7 +66,6 @@ DJANGO_TWILIO_FORGERY_PROTECTION = False
 EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'
 
-import warnings
 warnings.filterwarnings(
     'error',
     r"DateTimeField .* received a naive datetime",

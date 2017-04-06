@@ -47,7 +47,7 @@ urlpatterns = [
     ),
     url(
         r'^v1/sms/in/$',
-        v.ApiCollection.as_view(
+        v.ApiSmsCollection.as_view(
             model_class=SmsInbound,
             serializer_class=s.SmsInboundSerializer,
             permission_classes=(IsAuthenticated, CanSeeIncoming)
@@ -65,26 +65,6 @@ urlpatterns = [
         name='out_log'
     ),
     url(
-        r'^v1/sms/in/keyword/(?P<keyword>[\d|\w]+)/$',
-        v.ApiCollectionKeywordSms.as_view(
-            permission_classes=(
-                IsAuthenticated, CanSeeKeywords, CanSeeKeyword, CanSeeIncoming
-            ),
-            archive=False
-        ),
-        name='keyword_sms'
-    ),
-    url(
-        r'^v1/sms/in/keyword/(?P<keyword>[\d|\w]+)/archive/$',
-        v.ApiCollectionKeywordSms.as_view(
-            permission_classes=(
-                IsAuthenticated, CanSeeKeywords, CanSeeKeyword, CanSeeIncoming
-            ),
-            archive=True
-        ),
-        name='keyword_sms_archive'
-    ),
-    url(
         r'^v1/sms/in/(?P<pk>[0-9]+)/$',
         v.ApiMember.as_view(
             model_class=SmsInbound,
@@ -99,22 +79,9 @@ urlpatterns = [
         v.ApiCollection.as_view(
             model_class=Recipient,
             serializer_class=s.RecipientSerializer,
-            filter_list=True,
-            filters={'is_archived': False},
             permission_classes=(IsAuthenticated, CanSeeContactNames)
         ),
         name='recipients'
-    ),
-    url(
-        r'^v1/recipients_archive/$',
-        v.ApiCollection.as_view(
-            model_class=Recipient,
-            serializer_class=s.RecipientSerializer,
-            filter_list=True,
-            filters={'is_archived': True},
-            permission_classes=(IsAuthenticated, IsStaff)
-        ),
-        name='recipients_archive'
     ),
     url(
         r'^v1/recipients/(?P<pk>[0-9]+)/$',
@@ -131,23 +98,10 @@ urlpatterns = [
         v.ApiCollection.as_view(
             model_class=RecipientGroup,
             serializer_class=s.RecipientGroupSerializer,
-            filter_list=True,
-            filters={'is_archived': False},
             permission_classes=(IsAuthenticated, CanSeeGroups),
             prefetch_fields=['recipient_set'],
         ),
         name='recipient_groups'
-    ),
-    url(
-        r'^v1/groups_archive/$',
-        v.ApiCollection.as_view(
-            model_class=RecipientGroup,
-            serializer_class=s.RecipientGroupSerializer,
-            filter_list=True,
-            filters={'is_archived': True},
-            permission_classes=(IsAuthenticated, IsStaff),
-        ),
-        name='recipient_groups_archive'
     ),
     url(
         r'^v1/groups/(?P<pk>[0-9]+)/$',
@@ -194,22 +148,9 @@ urlpatterns = [
         v.ApiCollection.as_view(
             model_class=Keyword,
             serializer_class=s.KeywordSerializer,
-            filter_list=True,
-            filters={'is_archived': False},
             permission_classes=(IsAuthenticated, CanSeeKeywords)
         ),
         name='keywords'
-    ),
-    url(
-        r'^v1/keywords_archive/$',
-        v.ApiCollection.as_view(
-            model_class=Keyword,
-            serializer_class=s.KeywordSerializer,
-            filter_list=True,
-            filters={'is_archived': True},
-            permission_classes=(IsAuthenticated, IsStaff)
-        ),
-        name='keywords_archive'
     ),
     url(
         r'^v1/keywords/(?P<keyword>[\d|\w]+)/$',
@@ -228,11 +169,9 @@ urlpatterns = [
     # queued messages views
     url(
         r'^v1/queued/sms/$',
-        v.ApiCollection.as_view(
+        v.QueuedSmsCollection.as_view(
             model_class=QueuedSms,
             serializer_class=s.QueuedSmsSerializer,
-            filter_list=True,
-            filters={'sent': False},
             permission_classes=(IsAuthenticated, IsStaff)
         ),
         name='queued_smss'

@@ -1,7 +1,7 @@
 module View.SendAdhoc exposing (view)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, br, text, i, p, input, h3, button, label, a, div)
+import Html.Attributes exposing (class, style, type_, placeholder, readonly, name, id, for, href)
 import Html.Events exposing (onInput, onSubmit)
 import Html.Keyed
 import Messages exposing (Msg(SendAdhocMsg), SendAdhocMsg(..))

@@ -11,33 +11,29 @@ StatusCode = namedtuple('StatusCode', 'anon, user, staff')
 
 @pytest.mark.slow
 @pytest.mark.parametrize(
-    "url,status_code", [
+    "url,status_code",
+    [
         ('/', StatusCode(302, 200, 200)),
         ('/not_approved/', StatusCode(200, 200, 200)),
         ('/group/new/', StatusCode(302, 200, 200)),
-        ('/group/edit/1/', StatusCode(302, 200, 200)),
+        # ('/group/edit/1/', StatusCode(302, 200, 200)),
         ('/group/create_all/', StatusCode(302, 302, 200)),
         ('/recipient/new/', StatusCode(302, 200, 200)),
-        ('/recipient/edit/1/', StatusCode(302, 302, 200)),
+        # ('/recipient/edit/1/', StatusCode(302, 302, 200)),
         ('/recipient/import/', StatusCode(302, 302, 200)),
         ('/keyword/edit/test/', StatusCode(302, 302, 200)),
         ('/keyword/responses/csv/test/', StatusCode(302, 302, 200)),
-        ('/users/profiles/1/', StatusCode(302, 302, 200)),
+        # ('/users/profiles/1/', StatusCode(302, 302, 200)),
         ('/api/v1/users/profiles/', StatusCode(403, 403, 200)),
-        ('/api/v1/users/profiles/1/', StatusCode(403, 403, 200)),
+        # ('/api/v1/users/profiles/1/', StatusCode(403, 403, 200)),
         ('/api/v1/sms/in/', StatusCode(403, 200, 200)),
         ('/api/v1/sms/out/', StatusCode(403, 200, 200)),
-        ('/api/v1/sms/in/keyword/test/', StatusCode(403, 403, 200)),
-        ('/api/v1/sms/in/keyword/test/archive/', StatusCode(403, 403, 200)),
-        ('/api/v1/sms/in/1/', StatusCode(403, 200, 200)),
+        # ('/api/v1/sms/in/1/', StatusCode(403, 200, 200)),
         ('/api/v1/recipients/', StatusCode(403, 200, 200)),
-        ('/api/v1/recipients_archive/', StatusCode(403, 403, 200)),
-        ('/api/v1/recipients/1/', StatusCode(403, 200, 200)),
+        # ('/api/v1/recipients/1/', StatusCode(403, 200, 200)),
         ('/api/v1/groups/', StatusCode(403, 200, 200)),
-        ('/api/v1/groups_archive/', StatusCode(403, 403, 200)),
-        ('/api/v1/groups/1/', StatusCode(403, 200, 200)),
+        # ('/api/v1/groups/1/', StatusCode(403, 200, 200)),
         ('/api/v1/keywords/', StatusCode(403, 200, 200)),
-        ('/api/v1/keywords_archive/', StatusCode(403, 403, 200)),
         ('/api/v1/keywords/test/', StatusCode(403, 200, 200)),
         ('/api/v1/queued/sms/', StatusCode(403, 403, 200)),
         ('/graphs/recent/', StatusCode(302, 200, 200)),
@@ -86,8 +82,19 @@ class TestAPITokens:
     def test_no_access(self, users):
         assert users['c_out'].get('/api/v1/recipients/').status_code == 403
 
-    def test_good_token(self, users, recipients):
+    def test_good_token_staff(self, users, recipients):
         t = Token.objects.create(user=users['staff'])
+        r = users['c_out'].get(
+            '/api/v1/recipients/',
+            **{'HTTP_AUTHORIZATION': 'Token {}'.format(t.key)}
+        )
+        assert r.status_code == 200
+        data = r.json()
+        assert data['count'] == len(data['results'])
+        assert data['count'] == models.Recipient.objects.count()
+
+    def test_good_token_not_staff(self, users, recipients):
+        t = Token.objects.create(user=users['notstaff'])
         r = users['c_out'].get(
             '/api/v1/recipients/',
             **{'HTTP_AUTHORIZATION': 'Token {}'.format(t.key)}

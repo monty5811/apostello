@@ -1,10 +1,14 @@
 module View.ElvantoImport exposing (view)
 
 import Helpers exposing (formatDate)
-import Html exposing (..)
+import Html exposing (Html, div, br, tr, th, td, thead, text, a)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
-import Messages exposing (..)
+import Messages
+    exposing
+        ( Msg(ElvantoMsg)
+        , ElvantoMsg(ToggleGroupSync, PullGroups, FetchGroups)
+        )
 import Models.Apostello exposing (ElvantoGroup)
 import Regex
 import View.FilteringTable exposing (filteringTable)

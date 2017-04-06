@@ -1,6 +1,6 @@
 module View.Home exposing (view)
 
-import Html exposing (..)
+import Html exposing (Html, div, a, p, figure, embed, br, text)
 import Html.Attributes exposing (href, src, type_)
 import Messages exposing (Msg)
 import Pages exposing (Page(FabOnlyPage), FabOnlyPage(Help))

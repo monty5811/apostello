@@ -1,4 +1,4 @@
-module Models.DjangoMessage exposing (..)
+module Models.DjangoMessage exposing (DjangoMessage, decodeDjangoMessage)
 
 import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (required, decode)

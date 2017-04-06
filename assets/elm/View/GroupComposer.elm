@@ -1,6 +1,6 @@
 module View.GroupComposer exposing (view, runQuery, parenPairs, parseQueryString)
 
-import Array
+import Array.Hamt as Array
 import Dict
 import Html exposing (..)
 import Html.Attributes exposing (class, href, placeholder, style, type_, value)

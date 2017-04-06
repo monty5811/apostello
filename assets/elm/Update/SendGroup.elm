@@ -15,7 +15,7 @@ import Models.FormStatus exposing (FormStatus(..))
 import Models.SendGroupForm exposing (SendGroupModel, initialSendGroupModel, decodeSendGroupFormResp)
 import Pages exposing (Page)
 import Regex
-import Update.Notification exposing (createNotificationFromDjangoMessage)
+import Update.Notification as Notif
 import View.FilteringTable as FT
 import Urls
 
@@ -26,7 +26,10 @@ update msg model =
         ( sgModel, cmds, messages ) =
             updateSGModel msg model.settings.csrftoken model.sendGroup
     in
-        ( List.foldl createNotificationFromDjangoMessage { model | sendGroup = sgModel |> updateCost model.dataStore.groups } messages
+        ( List.foldl
+            Notif.createFromDjangoMessageNoDestroy
+            { model | sendGroup = sgModel |> updateCost model.dataStore.groups }
+            messages
         , cmds
         )
 

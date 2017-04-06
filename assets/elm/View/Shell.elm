@@ -1,9 +1,9 @@
 module View.Shell exposing (view)
 
-import Html exposing (..)
+import Html exposing (Html, div)
 import Html.Attributes exposing (class)
-import Messages exposing (..)
-import Models exposing (..)
+import Messages exposing (Msg)
+import Models exposing (Model)
 import Pages exposing (Page(..), FabOnlyPage(..))
 import View.Menu
 import View.Notification as Notif

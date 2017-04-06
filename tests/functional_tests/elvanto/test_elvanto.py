@@ -3,7 +3,7 @@ from time import sleep
 import pytest
 import vcr
 from elvanto.models import ElvantoGroup
-from tests.functional_tests.utils import check_and_close_msg
+from tests.functional_tests.utils import check_and_close_msg, click_and_wait
 
 my_vcr = vcr.VCR(record_mode='none', ignore_localhost=True)
 
@@ -11,7 +11,9 @@ my_vcr = vcr.VCR(record_mode='none', ignore_localhost=True)
 @pytest.mark.django_db
 @pytest.mark.slow
 @pytest.mark.selenium
-@pytest.mark.parametrize("uri", ['/elvanto/import/', ])
+@pytest.mark.parametrize("uri", [
+    '/elvanto/import/',
+])
 class TestElvantoImport:
     @my_vcr.use_cassette(
         'tests/fixtures/vcr_cass/elv.yaml', filter_headers=['authorization']
@@ -47,8 +49,7 @@ class TestElvantoImport:
         group_button = browser_in.find_elements_by_xpath(
             '//*[@id="elmContainer"]/div/div[3]/div/div/div[2]/table/tbody/tr[1]/td[3]/a'
         )[0]
-        group_button.click()
-        sleep(driver_wait_time)
+        click_and_wait(group_button, driver_wait_time)
         table = browser_in.find_elements_by_class_name('table')[0]
         assert 'Syncing' in table.text
         # pull groups
@@ -69,6 +70,5 @@ class TestElvantoImport:
         # fetch groups
         browser_in.get(live_server + uri)
         fetch_button = browser_in.find_elements_by_id('fetch_button')[0]
-        fetch_button.click()
-        # sleep(driver_wait_time)
+        click_and_wait(fetch_button, driver_wait_time)
         check_and_close_msg(browser_in, driver_wait_time)

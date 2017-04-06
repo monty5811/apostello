@@ -2,6 +2,7 @@ import json
 
 from django import template
 from django.conf import settings
+from django.contrib.messages import get_messages
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
@@ -14,7 +15,6 @@ register = template.Library()
 
 @register.simple_tag
 def elm_settings(user):
-    # TODO cache (at least keyword lookup)
     try:
         profile = user.profile
     except AttributeError:
@@ -29,7 +29,14 @@ def elm_settings(user):
         'noAccessMessage': config.not_approved_msg,
         'blockedKeywords': [
             x.keyword for x in Keyword.objects.all()
-            if x.can_user_access(user)
+            if x.is_locked and not x.can_user_access(user)
         ],
     }
     return mark_safe(json.dumps(elm))
+
+
+@register.simple_tag
+def elm_messages(request):
+    storage = get_messages(request)
+    data = [{'type_': message.tags, 'text': str(message)} for message in storage]
+    return mark_safe(json.dumps(data))

@@ -55,13 +55,17 @@ class TestSendGroupsInvalid():
 
     def test_missing_group(self, groups):
         """Test missing group"""
-        form_data = {'content': 'This is a message', }
+        form_data = {
+            'content': 'This is a message',
+        }
         form = SendRecipientGroupForm(data=form_data)
         assert form.is_valid() is False
 
     def test_missing_content(self, groups):
         """Test missing content"""
-        form_data = {'recipient_group': '1', }
+        form_data = {
+            'recipient_group': '1',
+        }
         form = SendRecipientGroupForm(data=form_data, user=UserMock())
         assert form.is_valid() is False
 

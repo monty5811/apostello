@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from tests.conftest import twilio_vcr
 
 import pytest
@@ -40,10 +40,14 @@ class TestSendingSmsForm:
         num_sms = models.SmsOutbound.objects.count()
         users['c_staff'].post(
             '/api/v1/sms/send/adhoc/', {
-                'content': 'test',
-                'recipients': ['1'],
+                'content':
+                'test',
+                'recipients': [str(recipients['calvin'].pk)],
                 'scheduled_time':
-                datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M')
+                datetime.strftime(
+                    datetime.now() - timedelta(minutes=5),
+                    '%Y-%m-%d %H:%M',
+                )
             }
         )
         tasks.send_queued_sms()
@@ -90,7 +94,7 @@ class TestSendingSmsForm:
         """Test missing field."""
         users['c_staff'].post('/api/v1/sms/send/group/', {'content': ''})
 
-    def test_send_adhoc_not_allowed(self, groups, users):
+    def test_send_group_not_allowed(self, groups, users):
         """Test deny sending."""
         resp = users['c_in'].post(
             '/api/v1/sms/send/group/',
@@ -151,7 +155,9 @@ class TestGroupForm:
     def test_create_all_group_form(self, users, recipients):
         """Test the form to create a group composed of all recipients."""
         resp = users['c_staff'].post(
-            '/group/create_all/', {'group_name': 'test', }
+            '/group/create_all/', {
+                'group_name': 'test',
+            }
         )
         assert resp.status_code == 302
         assert resp.url == '/group/all/'
@@ -164,7 +170,9 @@ class TestGroupForm:
         Test populating an already existing group.
         """
         resp = users['c_staff'].post(
-            '/group/create_all/', {'group_name': 'Empty Group', }
+            '/group/create_all/', {
+                'group_name': 'Empty Group',
+            }
         )
         assert resp.status_code == 302
         assert resp.url == '/group/all/'

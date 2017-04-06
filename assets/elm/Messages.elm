@@ -1,8 +1,17 @@
 module Messages exposing (..)
 
 import Http
-import Models exposing (..)
-import Models.Apostello exposing (..)
+import Models.Apostello
+    exposing
+        ( ElvantoGroup
+        , Keyword
+        , Recipient
+        , RecipientSimple
+        , RecipientGroup
+        , SmsInbound
+        , SmsOutbound
+        , UserProfile
+        )
 import Models.FirstRun exposing (FirstRunResp)
 import Models.Remote exposing (RemoteDataType, RawResponse)
 import Navigation
@@ -40,8 +49,7 @@ type Msg
 
 
 type NotificationMsg
-    = NewNotification NotificationType String
-    | RemoveNotification Notification
+    = RemoveNotification Int
 
 
 type FabMsg

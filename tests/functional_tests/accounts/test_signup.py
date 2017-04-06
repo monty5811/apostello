@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.core import mail
 
 from site_config.models import SiteConfiguration
+from tests.functional_tests.utils import assert_with_timeout, click_and_wait
 
 
 @pytest.mark.django_db
@@ -32,12 +33,12 @@ class TestSignup:
         login_button = browser.find_elements_by_xpath(
             'html/body/div/div/form/button'
         )[0]
-        login_button.click()
-        # check we have been redirected
-        sleep(driver_wait_time)
-        assert '/accounts/confirm-email/' in browser.current_url
-        assert len(mail.outbox) == 2
-        assert '[apostello] New User' in mail.outbox[0].subject
+        click_and_wait(login_button, driver_wait_time)
+        def _test():
+            assert '/accounts/confirm-email/' in browser.current_url
+            assert len(mail.outbox) == 2
+            assert '[apostello] New User' in mail.outbox[0].subject
+        assert_with_timeout(_test, 10 * driver_wait_time)
         # when we have no office email set
         assert 'Please Confirm Your E-mail Address' in mail.outbox[1].subject
         for x in mail.outbox[1].body.split():

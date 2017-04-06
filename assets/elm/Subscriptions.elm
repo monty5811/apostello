@@ -1,7 +1,23 @@
 module Subscriptions exposing (subscriptions)
 
-import Messages exposing (Msg(..), SendGroupMsg(UpdateSGDate), SendAdhocMsg(UpdateDate))
-import Models exposing (Model, LoadingStatus(..))
+import Messages
+    exposing
+        ( Msg(LoadData, CurrentTime, Nope, SendAdhocMsg, SendGroupMsg, LoadDataStore)
+        , SendGroupMsg(UpdateSGDate)
+        , SendAdhocMsg(UpdateDate)
+        )
+import Models
+    exposing
+        ( Model
+        , LoadingStatus
+            ( NoRequestSent
+            , FinalPageReceived
+            , RespFailed
+            , WaitingOnRefresh
+            , WaitingForPage
+            , WaitingForFirstResp
+            )
+        )
 import Pages exposing (Page(Curator, Wall, SendAdhoc, SendGroup))
 import Ports exposing (updateDateValue, loadDataStore)
 import Time exposing (Time, second)

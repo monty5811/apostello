@@ -1,9 +1,25 @@
-module Models exposing (..)
+module Models
+    exposing
+        ( Model
+        , DataStore
+        , Settings
+        , Notification
+        , NotificationType(..)
+        , CSRFToken
+        , LoadingStatus(..)
+        , FabModel(..)
+        , Flags
+        , initialModel
+        , decodeDataStore
+        , encodeDataStore
+        )
 
+import Dict exposing (Dict)
 import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (required, decode)
 import Json.Encode as Encode
 import Models.Apostello exposing (..)
+import Models.DjangoMessage exposing (DjangoMessage)
 import Models.FirstRun exposing (..)
 import Models.GroupComposer exposing (..)
 import Models.GroupMemberSelect exposing (..)
@@ -30,7 +46,7 @@ type alias Model =
     , sendAdhoc : SendAdhocModel
     , sendGroup : SendGroupModel
     , fabModel : FabModel
-    , notifications : List Notification
+    , notifications : Dict Int Notification
     , currentTime : Time.Time
     }
 
@@ -49,7 +65,7 @@ initialModel settings dataStoreCache page =
     , sendAdhoc = initialSendAdhocModel page
     , sendGroup = initialSendGroupModel page
     , fabModel = initialFabModel
-    , notifications = []
+    , notifications = Dict.empty
     , currentTime = 0
     }
 
@@ -81,6 +97,18 @@ type alias DataStore =
     , recipients : List Recipient
     , groups : List RecipientGroup
     , queuedSms : List QueuedSms
+    }
+
+
+type alias DataStoreStatus =
+    { inboundSms : LoadingStatus
+    , outboundSms : LoadingStatus
+    , elvantoGroups : LoadingStatus
+    , userprofiles : LoadingStatus
+    , keywords : LoadingStatus
+    , recipients : LoadingStatus
+    , groups : LoadingStatus
+    , queuedSms : LoadingStatus
     }
 
 
@@ -130,6 +158,7 @@ encodeDataStore ds =
 
 type alias Flags =
     { settings : Settings
+    , messages : List DjangoMessage
     , dataStoreCache : Maybe String
     }
 

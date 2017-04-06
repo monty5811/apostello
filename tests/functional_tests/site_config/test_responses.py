@@ -1,10 +1,14 @@
 import pytest
 
+from tests.functional_tests.utils import assert_with_timeout
+
 
 @pytest.mark.django_db
 @pytest.mark.slow
 @pytest.mark.selenium
-@pytest.mark.parametrize("uri", ['/config/responses/', ])
+@pytest.mark.parametrize("uri", [
+    '/config/responses/',
+])
 class TestDefaultResponses:
     def test_display_form(self, uri, live_server, browser_in):
         browser_in.get(live_server + uri)
@@ -30,5 +34,6 @@ class TestDefaultResponses:
         input_box.submit()
 
         from site_config.models import DefaultResponses
-        resps = DefaultResponses.get_solo()
-        assert 'Thank you for signing up' in resps.start_reply
+        def _test():
+            resps = DefaultResponses.get_solo()
+            assert 'Thank you for signing up' in resps.start_reply

@@ -1,8 +1,8 @@
 module View.GroupTable exposing (view)
 
-import Html exposing (..)
+import Html exposing (Html, thead, tr, th, td, text, a)
 import Html.Attributes exposing (class, href)
-import Messages exposing (..)
+import Messages exposing (Msg(GroupTableMsg), GroupTableMsg(ToggleGroupArchive))
 import Models.Apostello exposing (RecipientGroup)
 import Regex
 import View.Helpers exposing (archiveCell)

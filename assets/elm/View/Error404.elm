@@ -1,7 +1,7 @@
 module View.Error404 exposing (view)
 
-import Html exposing (..)
-import Messages exposing (..)
+import Html exposing (Html, div, text)
+import Messages exposing (Msg)
 
 
 view : Html Msg

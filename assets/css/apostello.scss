@@ -1,21 +1,6 @@
 @import "./../semantic/dist/semantic";
 @import "./../node_modules/datetimepicker/dist/DateTimePicker";
 
-// tour:
-@import "./../node_modules/intro.js/introjs";
-.introjs-overlay {
-  background: none !important;
-  filter: none !important;
-  opacity: none !important;
-  z-index: -1 !important;
-}
-.introjs-helperLayer {
-  position: absolute;
-  z-index: 9999998;
-  background-color: rgba(255,255,255,0);
-  border: none !important;
-  box-shadow: none !important;
-}
 // fab:
 .fabContainer{
   position: fixed;

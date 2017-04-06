@@ -5,10 +5,20 @@ import Helpers exposing (handleNotSaved)
 import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
-import Messages exposing (..)
+import Messages
+    exposing
+        ( Msg(ElvantoMsg)
+        , ElvantoMsg
+            ( ReceiveButtonResp
+            , ReceiveToggleGroupSync
+            , FetchGroups
+            , PullGroups
+            , ToggleGroupSync
+            )
+        )
 import Models exposing (Model, DataStore, CSRFToken)
 import Models.Apostello exposing (ElvantoGroup, decodeElvantoGroup)
-import Update.Notification exposing (createInfoNotification, createSuccessNotification)
+import Update.Notification as Notif
 import Urls
 import Update.DataStore exposing (updateElvantoGroups)
 
@@ -30,14 +40,24 @@ update msg model =
             handleNotSaved model
 
         PullGroups ->
-            ( createInfoNotification model "Groups are being imported, it may take a couple of minutes"
-            , [ buttonReq model.settings.csrftoken Urls.elvantoPullGroups ]
-            )
+            let
+                ( newModel, destroyNotifCmd ) =
+                    Notif.createInfo model "Groups are being imported, it may take a couple of minutes"
+            in
+                ( newModel
+                , [ buttonReq model.settings.csrftoken Urls.elvantoPullGroups
+                  , destroyNotifCmd
+                  ]
+                )
 
         FetchGroups ->
-            ( createSuccessNotification model "Groups are being fetched, it may take a couple of minutes"
-            , [ buttonReq model.settings.csrftoken Urls.elvantoFetchGroups ]
-            )
+            let
+                ( newModel, destroyNotifCmd ) =
+                    Notif.createSuccess model "Groups are being fetched, it may take a couple of minutes"
+            in
+                ( newModel
+                , [ buttonReq model.settings.csrftoken Urls.elvantoFetchGroups, destroyNotifCmd ]
+                )
 
         ReceiveButtonResp (Ok _) ->
             ( model, [] )

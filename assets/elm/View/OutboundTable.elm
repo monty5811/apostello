@@ -1,7 +1,7 @@
 module View.OutboundTable exposing (view)
 
 import Helpers exposing (formatDate)
-import Html exposing (..)
+import Html exposing (Html, thead, th, tr, td, a, text)
 import Html.Attributes exposing (class, href, style)
 import Messages exposing (Msg)
 import Models.Apostello exposing (SmsOutbound)

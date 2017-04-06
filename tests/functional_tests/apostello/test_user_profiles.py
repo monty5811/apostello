@@ -1,6 +1,7 @@
 from time import sleep
 
 import pytest
+from tests.functional_tests.utils import assert_with_timeout
 
 
 @pytest.mark.django_db
@@ -16,17 +17,20 @@ class TestUserProfiles:
         browser_in.get(live_server + uri)
         assert uri in browser_in.current_url
         # check table is there
-        sleep(driver_wait_time)
-        tables = browser_in.find_elements_by_class_name('table')
-        assert len(tables) == 1
-        table = tables[0]
-        assert 'Approved' in table.text
-        assert 'Incoming' in table.text
-        assert 'test@example.com' in table.text
+        def _test1():
+            tables = browser_in.find_elements_by_class_name('table')
+            assert len(tables) == 1
+            table = tables[0]
+            assert 'Approved' in table.text
+            assert 'Incoming' in table.text
+            assert 'test@example.com' in table.text
+        assert_with_timeout(_test1, 10 * driver_wait_time)
         # toggle a permission
         toggle_button = browser_in.find_elements_by_class_name('minus')[0]
         toggle_button.click()
-        assert users['staff'].profile.approved
+        def _test2():
+            assert users['staff'].profile.approved
+        assert_with_timeout(_test2, 10 * driver_wait_time)
 
     def test_user_profile_form(
         self, live_server, browser_in, users, driver_wait_time
@@ -43,4 +47,6 @@ class TestUserProfiles:
         # submit
         save_button = browser_in.find_elements_by_class_name('primary')[0]
         save_button.click()
-        assert uri not in browser_in.current_url
+        def _test():
+            assert uri not in browser_in.current_url
+        assert_with_timeout(_test, 10 * driver_wait_time)

@@ -1,4 +1,10 @@
-module Models.Remote exposing (..)
+module Models.Remote
+    exposing
+        ( RawResponse
+        , RemoteDataType(..)
+        , dataFromResp
+        , itemFromResp
+        )
 
 import Json.Decode as Decode
 

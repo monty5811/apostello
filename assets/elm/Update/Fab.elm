@@ -3,7 +3,15 @@ module Update.Fab exposing (update)
 import DjangoSend exposing (archivePost)
 import Helpers exposing (decodeAlwaysTrue)
 import Http
-import Messages exposing (..)
+import Messages
+    exposing
+        ( Msg(FabMsg)
+        , FabMsg
+            ( ReceiveArchiveResp
+            , ArchiveItem
+            , ToggleFabView
+            )
+        )
 import Models exposing (Model, FabModel(..), CSRFToken)
 import Navigation
 

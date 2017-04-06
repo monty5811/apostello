@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 
-/* global elmSettings */
+/* global elmSettings, elmMessages */
 
 const lsKey = 'elm-apostello-datastore-v1';
 
@@ -34,6 +34,7 @@ function renderElm() {
     const app = Elm.Main.embed(node,
       {
         settings: elmSettings,
+        messages: elmMessages,
         dataStoreCache: getDataStoreCache(elmSettings.userPerms.user.email),
       },
     );

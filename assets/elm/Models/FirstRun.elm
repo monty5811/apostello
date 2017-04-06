@@ -1,8 +1,14 @@
-module Models.FirstRun exposing (..)
+module Models.FirstRun
+    exposing
+        ( FirstRunModel
+        , FirstRunResp
+        , decodeFirstRunResp
+        , initialFirstRunModel
+        )
 
 import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (optional, required, decode)
-import Models.FormStatus exposing (..)
+import Models.FormStatus exposing (FormStatus(NoAction))
 
 
 type alias FirstRunResp =

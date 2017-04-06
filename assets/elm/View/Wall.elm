@@ -1,8 +1,8 @@
 module View.Wall exposing (view)
 
-import Html exposing (..)
+import Html exposing (Html, div, p, span, text)
 import Html.Attributes exposing (class, style)
-import Messages exposing (..)
+import Messages exposing (Msg)
 import Models.Apostello exposing (SmsInbound)
 
 

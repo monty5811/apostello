@@ -11,7 +11,7 @@ from tests.conftest import twilio_vcr
 
 class MockMsg:
     def __init__(self, from_):
-        self.sid = 'a' * 36
+        self.sid = 'a' * 34
         self.body = 'test message'
         self.from_ = from_
         self.to = settings.to = '447922537999'

@@ -1,9 +1,11 @@
 from time import sleep
 
 import pytest
+from selenium.common.exceptions import ElementNotVisibleException
 
-from tests.conftest import twilio_vcr
 from apostello.models import SmsOutbound
+from tests.conftest import twilio_vcr
+from tests.functional_tests.utils import click_and_wait
 
 ADHOC_URI = '/send/adhoc/'
 GROUP_URI = '/send/group/'
@@ -19,60 +21,61 @@ def load_page(b, wt, url):
 
 def click_send(b, wt):
     send_button = b.find_element_by_id('send_button')
-    send_button.click()
-    sleep(wt)
+    click_and_wait(send_button, wt)
     return b
 
 
 def add_recipient(b, wt):
     recip_box = b.find_elements_by_class_name('search')[0]
-    recip_box.click()
-    sleep(wt)
+    click_and_wait(recip_box, wt)
     for x in b.find_elements_by_class_name('item'):
         if x.text == 'John Calvin':
             recipient = x
             break
-    recipient.click()
-    sleep(wt)
+    click_and_wait(recipient, wt)
     # close overlay
-    b.find_elements_by_class_name('green')[0].click()
-    sleep(wt)
+    click_and_wait(b.find_elements_by_class_name('green')[0], wt)
     return b
 
 
 def add_group(b, wt):
     group_box = b.find_element_by_id('id_recipient_group')
-    group_box.click()
-    sleep(wt)
+    click_and_wait(group_box, wt)
     group = b.find_elements_by_xpath(
         '//*[@id="elmContainer"]/div/div[3]/div/div/div/div[1]/div[2]/div'
     )[-1]
-    group.click()
-    sleep(wt)
+    click_and_wait(group, wt)
     return b
 
 
 def add_content(b, wt):
-    content_box = b.find_elements_by_name('content')[0]
-    content_box.send_keys('test')
-    sleep(wt)
+    t = 0
+    max_t = 10 * wt
+    while t <= max_t:
+        try:
+            content_box = b.find_elements_by_name('content')[0]
+            content_box.send_keys('test')
+            break
+        except ElementNotVisibleException as e:
+            if t < max_t:
+                sleep(wt)
+                t = t + wt
+            else:
+                raise(e)
     return b
 
 
 def add_scheduled_time(b, wt):
     time_box = b.find_elements_by_name('scheduled_time')[0]
-    time_box.click()
-    sleep(wt)
+    click_and_wait(time_box, wt)
     plus_button = b.find_elements_by_class_name('increment')[-1]
     plus_button.click()
     plus_button.click()
     set_button = b.find_elements_by_class_name('dtpicker-buttonSet')[0]
-    set_button.click()
-    sleep(wt)
+    click_and_wait(set_button, wt)
     return b
 
 
-#@pytest.mark.django_db
 @pytest.mark.slow
 @pytest.mark.selenium
 class TestSendAdhoc:
@@ -99,9 +102,6 @@ class TestSendAdhoc:
         assert ADHOC_URI in b.current_url
 
     @twilio_vcr
-    @pytest.mark.skip(
-        reason="This works in the browser, but not selenium. TODO: revisit"
-    )
     def test_scheduled_message(
         self, live_server, browser_in, users, driver_wait_time, recipients
     ):
@@ -162,8 +162,7 @@ class TestSendAdhoc:
         reply_buttons = b.find_elements_by_class_name('reply')
         assert len(reply_buttons) == len(smsin)
         # test button works
-        reply_buttons[0].click()
-        sleep(driver_wait_time)
+        click_and_wait(reply_buttons[0], driver_wait_time)
         assert '/send/adhoc/?recipients=[' in browser_in.current_url
         # check message sent to correct recipient
         b = add_content(b, driver_wait_time)
@@ -184,7 +183,6 @@ class TestSendAdhoc:
         assert 'DO NOT REPLY' == content_box.get_attribute('value')
 
 
-@pytest.mark.django_db
 @pytest.mark.slow
 @pytest.mark.selenium
 class TestSendGroup:
@@ -211,9 +209,6 @@ class TestSendGroup:
         assert GROUP_URI in b.current_url
 
     @twilio_vcr
-    @pytest.mark.skip(
-        reason="This works in the browser, but not selenium. TODO: revisit"
-    )
     def test_scheduled_message(
         self, live_server, browser_in, users, driver_wait_time, groups
     ):

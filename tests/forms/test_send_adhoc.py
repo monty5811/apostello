@@ -67,13 +67,17 @@ class TestAdhocFormInvalid():
 
     def test_missing_person(self):
         """Test no person supplied"""
-        form_data = {'content': 'This is a message', }
+        form_data = {
+            'content': 'This is a message',
+        }
         form = SendAdhocRecipientsForm(data=form_data, user=UserMock())
         assert form.is_valid() is False
 
     def test_missing_content(self, recipients):
         """Test no content supplied"""
-        form_data = {'recipient': '1', }
+        form_data = {
+            'recipient': '1',
+        }
         form = SendAdhocRecipientsForm(data=form_data)
         assert form.is_valid() is False
 

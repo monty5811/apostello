@@ -1,5 +1,3 @@
-import json
-
 from django.core.cache import cache
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -16,7 +14,7 @@ from api.drf_permissions import CanSeeKeywords, CanSendSms
 from api.serializers import SmsInboundSerializer
 from apostello.forms import SendAdhocRecipientsForm, SendRecipientGroupForm
 from apostello.mixins import ProfilePermsMixin
-from apostello.models import Keyword, Recipient, SmsInbound
+from apostello.models import Keyword, Recipient, SmsInbound, SmsOutbound
 
 
 class StandardPagination(PageNumberPagination):
@@ -33,43 +31,43 @@ class ApiCollection(generics.ListAPIView):
     serializer_class = None
     related_field = None
     prefetch_fields = None
-    filter_list = False
-    filters = {}
     pagination_class = StandardPagination
 
     def get_queryset(self):
+        return self._get_queryset()
+
+    def _get_queryset(self):
         """Handle get requests."""
         objs = self.model_class.objects.all()
         if self.related_field is not None:
             objs = objs.select_related(self.related_field)
         if self.prefetch_fields is not None:
             objs = objs.prefetch_related(*self.prefetch_fields)
-        if self.filter_list:
-            objs = objs.filter(**self.filters)
-        return objs
-
-    def get_serializer_context(self):
-        context = super(ApiCollection, self).get_serializer_context()
-        context['request'] = self.request
-        return context
-
-
-class ApiCollectionKeywordSms(ApiCollection):
-    """SMS collection for a single keyword."""
-    serializer_class = SmsInboundSerializer
-    keyword = None
-    archive = False
-
-    def get_queryset(self):
-        """Handle get requests."""
-        keyword_obj = Keyword.objects.get(keyword=self.kwargs['keyword'])
-        self.check_object_permissions(self.request, keyword_obj)
-        objs = SmsInbound.objects.filter(matched_keyword=str(keyword_obj))
-        if self.archive:
-            objs = objs.filter(is_archived=True)
-        else:
+        if not self.request.user.is_staff  \
+                and self.model_class is not SmsInbound \
+                and self.model_class is not SmsOutbound:
+            # filter out archived items
             objs = objs.filter(is_archived=False)
         return objs
+
+
+class ApiSmsCollection(ApiCollection):
+    def get_queryset(self):
+        qs = self._get_queryset()
+        if self.request.user.is_staff:
+            return qs
+
+        blocked_keywords = [
+            x.keyword for x in Keyword.objects.all()
+            if not x.can_user_access(self.request.user)
+        ]
+        return qs.exclude(matched_keyword__in=blocked_keywords)
+
+
+class QueuedSmsCollection(ApiCollection):
+    def get_queryset(self):
+        """Return only messages that have not been sent"""
+        return self.model_class.objects.all().filter(sent=False)
 
 
 class ApiMember(APIView):
@@ -110,7 +108,6 @@ class ApiMember(APIView):
     def post(self, request, format=None, **kwargs):
         """Handle toggle buttons."""
         obj = self.get_obj(kwargs)
-        pk = kwargs.pop('pk', None)
 
         obj = self.simple_update(request, obj, 'dealt_with')
         obj = self.simple_update(request, obj, 'display_on_wall')
@@ -213,15 +210,19 @@ class ApiSendAdhoc(APIView):
 
             if form.cleaned_data['scheduled_time'] is None:
                 msg = {
-                    'type_': 'info',
-                    'text': "Sending \"{0}\"...\n"
+                    'type_':
+                    'info',
+                    'text':
+                    "Sending \"{0}\"...\n"
                     "Please check the logs for verification...".
                     format(form.cleaned_data['content'])
                 }
             else:
                 msg = {
-                    'type_': 'info',
-                    'text': "'{0}' has been successfully queued.".
+                    'type_':
+                    'info',
+                    'text':
+                    "'{0}' has been successfully queued.".
                     format(form.cleaned_data['content'])
                 }
             return Response(
@@ -255,8 +256,10 @@ class ApiSendGroup(APIView):
             )
             if form.cleaned_data['scheduled_time'] is None:
                 msg = {
-                    'type_': 'info',
-                    'text': "Sending '{0}' to '{1}'...\n"
+                    'type_':
+                    'info',
+                    'text':
+                    "Sending '{0}' to '{1}'...\n"
                     "Please check the logs for verification...".format(
                         form.cleaned_data['content'],
                         form.cleaned_data['recipient_group']
@@ -264,8 +267,10 @@ class ApiSendGroup(APIView):
                 }
             else:
                 msg = {
-                    'type_': 'info',
-                    'text': "'{0}' has been successfully queued.".
+                    'type_':
+                    'info',
+                    'text':
+                    "'{0}' has been successfully queued.".
                     format(form.cleaned_data['content']),
                 }
 

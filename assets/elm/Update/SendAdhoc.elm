@@ -15,7 +15,7 @@ import Models.FormStatus exposing (FormStatus(..))
 import Models.SendAdhocForm exposing (SendAdhocModel, initialSendAdhocModel, decodeSendAdhocFormResp)
 import Pages exposing (Page)
 import Regex
-import Update.Notification exposing (createNotificationFromDjangoMessage)
+import Update.Notification as Notif
 import View.FilteringTable as FT
 import Urls
 
@@ -29,7 +29,7 @@ update msg model =
         newModel =
             { model | sendAdhoc = updateCost model.settings.twilioSendingCost saModel }
     in
-        ( List.foldl createNotificationFromDjangoMessage newModel messages
+        ( List.foldl Notif.createFromDjangoMessageNoDestroy newModel messages
         , cmds
         )
 

@@ -6,11 +6,10 @@
   "dependencies": {
     "datetimepicker": "0.1.38",
     "elm": "0.18.0",
-    "intro.js": "2.4.0",
     "jquery": "3.1.1",
-    "js-cookie": "2.1.3",
+    "js-cookie": "^2.1.4",
     "opbeat-js": "3.1.4",
-    "semantic-ui": "^2.2.9"
+    "semantic-ui": "^2.2.10"
   },
   "devDependencies": {
     "babel-core": "6.23.1",
@@ -19,7 +18,7 @@
     "babel-preset-es2015-native-modules": "6.9.4",
     "babel-preset-react": "6.23.0",
     "elm-test": "0.18.2",
-    "elm-webpack-loader": "4.2.0",
+    "elm-webpack-loader": "^4.3.0",
     "eslint": "3.16.0",
     "eslint-config-airbnb": "14.1.0",
     "eslint-loader": "1.6.1",
@@ -31,8 +30,8 @@
     "gulp-plumber": "1.1.0",
     "gulp-rename": "1.2.2",
     "gulp-sass": "3.1.0",
-    "node-sass": "4.5.0",
-    "webpack": "2.2.1",
+    "node-sass": "^4.5.2",
+    "webpack": "^2.3.3",
     "wrench": "1.5.9"
   },
   "scripts": {

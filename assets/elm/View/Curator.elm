@@ -1,7 +1,7 @@
 module View.Curator exposing (view)
 
 import Helpers exposing (formatDate)
-import Html exposing (..)
+import Html exposing (Html, thead, tr, th, td, text, a)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Messages exposing (..)
