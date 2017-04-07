@@ -37,7 +37,7 @@ keywordRow : Keyword -> Html Msg
 keywordRow keyword =
     tr []
         [ td [] [ spaLink a [] [ text keyword.keyword ] <| KeyRespTable keyword.is_archived keyword.keyword ]
-        , td [ class "center aligned" ] [ a [ href keyword.responses_url ] [ text keyword.num_replies ] ]
+        , td [ class "center aligned" ] [ spaLink a [] [ text keyword.num_replies ] <| KeyRespTable keyword.is_archived keyword.keyword ]
         , td [] [ text keyword.description ]
         , td [] [ text keyword.current_response ]
         , keywordStatusCell keyword.is_live
