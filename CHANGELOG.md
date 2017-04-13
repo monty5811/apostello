@@ -3,6 +3,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [v1.18.0]
+
+### Changed
+
+ - Hide messages if a user cannot access the matched keyword
+ - Disable archive button if user cannot use it
+ - Simplify API
+
+### Fixed
+
+ - Keyword permissions
+ - Misc fixes on front end
+
 ## [v1.17.0]
 
 ### Added
