@@ -1,0 +1,17 @@
+---
+- name: "[py36] check already exists"
+  stat: path=/usr/bin/python3.6
+  register: py36bin
+
+- name: "[py36] add deadsnakes ppa"
+  apt_repository:
+    repo: "ppa:fkrull/deadsnakes"
+  when: py36bin.stat.exists == false
+
+- name: "[py36] install"
+  apt: name={{ item }} update_cache={{ update_apt_cache }} force=yes state=installed
+  with_items:
+    - python3.6
+    - python3.6-dev
+    - python3.6-venv
+  when: py36bin.stat.exists == false

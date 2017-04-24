@@ -25,6 +25,7 @@
     - python3-pip
     - python3.4-venv
     - python3-pycurl
+    - software-properties-common
     - supervisor
   tags: packages
 
@@ -34,6 +35,8 @@
 - name: Install virtualenv
   pip: name=virtualenv executable=pip3
   tags: packages
+
+- include: setup_py36.yml
 
 - include: setup_ufw.yml
   when: setup_ufw

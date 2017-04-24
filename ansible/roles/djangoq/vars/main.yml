@@ -1,11 +1,5 @@
 ---
 
-server_root_dir: /webapps
-
-virtualenv_path: "/webapps/{{ application_name }}"
-project_path: "{{ virtualenv_path }}/{{ project_name }}"
-application_path: "{{ project_path }}"
-
 django_q_user: "{{ application_name }}"
 django_q_group: webapps
 django_q_application_name: django_q

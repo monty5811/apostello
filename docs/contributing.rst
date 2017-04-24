@@ -43,11 +43,11 @@ Fork apostello on Github (`how-to <https://help.github.com/articles/fork-a-repo/
     # create a branch for your feature/fix:
     git checkout -b <branch-name>
 
-Create a python virtualenv and install dependencies:
+Create a python 3.6 virtualenv and install dependencies:
 
 .. code-block:: bash
 
-    python3 -m venv venv
+    python3.6 -m venv venv
     pip install -r requirements/dev.txt
 
 Create a development database (this uses sqlite, if you need to reset the database, just delete db.sqlite3 and run this command again):
@@ -78,8 +78,7 @@ Running Tests
 
     pip install tox
     tox # you need firefox installed
-    tox -e py35 # runs tests only for py35
-    tox -e py35 -- -m \"not slow" # runs only quick tests on py35
+    tox -- -m \"not slow" # runs only quick tests
 
 
 Frontend
