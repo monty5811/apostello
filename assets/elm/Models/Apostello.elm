@@ -6,6 +6,7 @@ module Models.Apostello
         , RecipientGroup
         , RecipientSimple
         , Recipient
+        , User
         , UserProfile
         , ElvantoGroup
         , SmsInbound
@@ -18,6 +19,7 @@ module Models.Apostello
         , decodeRecipientSimple
         , decodeSmsInbound
         , decodeSmsOutbound
+        , decodeUser
         , decodeUserProfile
         , encodeElvantoGroup
         , encodeKeyword
@@ -27,6 +29,7 @@ module Models.Apostello
         , encodeRecipientSimple
         , encodeSmsInbound
         , encodeSmsOutbound
+        , encodeUser
         , encodeUserProfile
         , nullGroup
         )

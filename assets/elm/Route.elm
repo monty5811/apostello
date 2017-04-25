@@ -37,11 +37,13 @@ route =
         , Url.map UserProfileTable (s "users" </> s "profiles")
         , Url.map ElvantoImport (s "elvanto" </> s "import")
         , Url.map FirstRun (s "config" </> s "first_run")
-          -- No Shell views:
+
+        -- No Shell views:
         , Url.map Wall (s "incoming" </> s "wall")
         , Url.map EditGroup (s "group" </> s "edit" </> int)
         , Url.map EditContact (s "recipient" </> s "edit" </> int)
-          -- Fab only views:
+
+        -- Fab only views:
         , Url.map (FabOnlyPage Help) (s "help")
         , Url.map (FabOnlyPage NewGroup) (s "group" </> s "new")
         , Url.map (FabOnlyPage CreateAllGroup) (s "group" </> s "create_all")
