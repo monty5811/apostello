@@ -190,6 +190,7 @@ def blacklist_notify(recipient_pk, sms_body, keyword):
 
 def send_keyword_digest():
     """Send daily digest email."""
+    from apostello import digest
     from apostello.models import Keyword
     for keyword in Keyword.objects.filter(is_archived=False):
         checked_time = timezone.now()
@@ -200,12 +201,11 @@ def send_keyword_digest():
             )
         # if any, loop over subscribers and send email
         if new_responses.count() > 0:
+            subject = 'Daily update for "{0}" responses'.format(str(keyword)),
+            body = digest.create_email_body(keyword, new_responses)
             for subscriber in keyword.subscribed_to_digest.all():
                 async(
-                    'apostello.tasks.send_async_mail',
-                    'Daily update for "{0}" responses'.format(str(keyword)),
-                    "The following text messages have been received today:\n\n{0}".
-                    format("\n".join([str(x) for x in new_responses])),
+                    'apostello.tasks.send_async_mail', subject, body,
                     [subscriber.email]
                 )
 
@@ -235,9 +235,12 @@ def sms_to_slack(sms_body, person_name, keyword_name):
     )
     attachments = [
         {
-            'fallback': fallback,
-            'color': '#5b599c',
-            'text': sms_body,
+            'fallback':
+            fallback,
+            'color':
+            '#5b599c',
+            'text':
+            sms_body,
             'fields': [
                 {
                     'title': 'From',

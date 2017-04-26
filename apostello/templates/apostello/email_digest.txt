@@ -1,0 +1,17 @@
+The following text messages have been received today:
+
+Keyword: {{ keyword.keyword }}
+
+{{ table }}
+
+
+View these responses in apostello:
+
+https://{{ domain }}{{ keyword.get_responses_url }}
+
+
+You are receiving this email because you are signed up for nightly
+updates on the "{{ keyword.keyword }}" keyword. You can disable
+these updates here:
+
+https://{{ domain }}{{ keyword.get_absolute_url }}
