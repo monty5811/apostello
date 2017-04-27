@@ -31,21 +31,17 @@ function renderElm() {
     elmSettings.csrftoken = Cookies.get('csrftoken');
 
     const Elm = require('../elm/Main.elm');
-    const app = Elm.Main.embed(node,
-      {
-        settings: elmSettings,
-        messages: elmMessages,
-        dataStoreCache: getDataStoreCache(elmSettings.userPerms.user.email),
-      },
-    );
+    const app = Elm.Main.embed(node, {
+      settings: elmSettings,
+      messages: elmMessages,
+      dataStoreCache: getDataStoreCache(elmSettings.userPerms.user.email),
+    });
 
-    app.ports.saveDataStore.subscribe(
-      (data) => {
-        setDataStoreCache(data, elmSettings.userPerms.user.email);
-      },
-    );
+    app.ports.saveDataStore.subscribe(data => {
+      setDataStoreCache(data, elmSettings.userPerms.user.email);
+    });
 
-    window.addEventListener('storage', (event) => {
+    window.addEventListener('storage', event => {
       if (event.key === lsKey) {
         app.ports.loadDataStore.send(event.newValue);
       }

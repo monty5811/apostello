@@ -14,7 +14,6 @@ Guidelines for code contributions:
 * Any new features must include tests - if a feature requires interaction through the browser, please add selenium backed tests
 * Please do not hit the network in tests - see how vcrpy is used in the test suite for help with this
 * Please run ``./scripts/run_yapf.py`` before committing to maintain code style
-* Please ensure any changes to javascript code compile without warnings
 * Please add only a single feature per pull request
 
 Please do not hesitate to ask for help in our `chat <http://chat.church.io/>`_.
@@ -97,6 +96,7 @@ Changes must then be compiled:
 
 .. code-block:: bash
 
+    npm run format # format elm and js code to maintain style
     npm run build # regenerate all the assets
     npm run watchjs # watch js and elm code for changes
     npm run prodjs # build the js and elm for production

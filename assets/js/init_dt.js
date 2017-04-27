@@ -7,7 +7,7 @@ function initDateTimePickers(elmApp) {
       minuteInterval: 5,
       setValueInTextboxOnEveryClick: true,
       buttonsToDisplay: ['SetButton', 'ClearButton'],
-      settingValueOfElement: (sValue) => {
+      settingValueOfElement: sValue => {
         if (elmApp !== null) {
           elmApp.ports.updateDateValue.send(sValue);
         }

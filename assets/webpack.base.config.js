@@ -1,45 +1,45 @@
 var path = require("path");
-var webpack = require('webpack');
+var webpack = require("webpack");
 
 if (process.env.WATCH) {
-  elmLoader = 'elm-webpack-loader?debug=true?warn=true';
+  elmLoader = "elm-webpack-loader?debug=true?warn=true";
 } else {
-  elmLoader = 'elm-webpack-loader';
+  elmLoader = "elm-webpack-loader";
 }
 
 module.exports = {
   context: __dirname,
 
   entry: {
-    app: './js/app',
+    app: "./js/app",
     vendor: [
-      'datetimepicker',
-      './semantic/dist/components/transition.js',
-      './semantic/dist/components/dropdown.js',
+      "datetimepicker",
+      "./semantic/dist/components/transition.js",
+      "./semantic/dist/components/dropdown.js"
     ]
   },
 
-	externals: {
-		jquery: 'jQuery'
-	},
+  externals: {
+    jquery: "jQuery"
+  },
 
   output: {
-    path: path.resolve('./../apostello/static/js/'),
-    filename: "[name].js",
+    path: path.resolve("./../apostello/static/js/"),
+    filename: "[name].js"
   },
 
   resolve: {
-    extensions: ['.js', '.elm'],
+    extensions: [".js", ".elm"],
     alias: {
-			jquery: 'jquery/src/jquery',
-    },
+      jquery: "jquery/src/jquery"
+    }
   },
 
   plugins: [
-		new webpack.LoaderOptionsPlugin({
-			minimize: true,
-			debug: false
-		}),
+    new webpack.LoaderOptionsPlugin({
+      minimize: true,
+      debug: false
+    }),
     //
     new webpack.ProvidePlugin({
       $: "jquery",
@@ -47,39 +47,34 @@ module.exports = {
     }),
     //
     new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      filename: 'vendor.js'
-    }),
+      name: "vendor",
+      filename: "vendor.js"
+    })
   ],
 
   module: {
     rules: [
       {
-        enforce: 'pre',
-        test: /\.jsx?$/,
-        loader: "eslint-loader"
-      },
-      {
         test: /\.jsx?$/,
         exclude: /node_modules/,
-        loader: 'babel-loader',
+        loader: "babel-loader"
       },
       {
         test: /\.elm?$/,
         exclude: [/elm-stuff/, /node_modules/],
-        loader: elmLoader,
+        loader: elmLoader
       }
     ],
 
-    noParse: /\.elm$/,
+    noParse: /\.elm$/
   },
 
   performance: {
-    hints: false,
+    hints: false
   },
 
-  devtool: 'cheap-module-source-map',
+  devtool: "cheap-module-source-map",
   watchOptions: {
     poll: 500
   }
-}
+};
