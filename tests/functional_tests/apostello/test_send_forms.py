@@ -26,23 +26,17 @@ def click_send(b, wt):
 
 
 def add_recipient(b, wt):
-    recip_box = b.find_elements_by_class_name('search')[0]
-    click_and_wait(recip_box, wt)
     for x in b.find_elements_by_class_name('item'):
         if x.text == 'John Calvin':
             recipient = x
             break
     click_and_wait(recipient, wt)
-    # close overlay
-    click_and_wait(b.find_elements_by_class_name('green')[0], wt)
     return b
 
 
 def add_group(b, wt):
-    group_box = b.find_element_by_id('id_recipient_group')
-    click_and_wait(group_box, wt)
     group = b.find_elements_by_xpath(
-        '//*[@id="elmContainer"]/div/div[3]/div/div/div/div[1]/div[2]/div'
+        '//*[@id="elmContainer"]/div[1]/div[3]/div/div/div/form/div[2]/div/div[2]/div[1]/div/div[2]'
     )[-1]
     click_and_wait(group, wt)
     return b

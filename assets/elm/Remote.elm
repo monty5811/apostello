@@ -59,12 +59,12 @@ dt_url_from_page p =
         ScheduledSmsTable ->
             [ ( ScheduledSms, Urls.queuedSmss ) ]
 
-        KeyRespTable False k ->
+        KeyRespTable False _ ->
             [ ( IncomingSms, Urls.smsInbounds )
             , ( Keywords, Urls.keywords )
             ]
 
-        KeyRespTable True k ->
+        KeyRespTable True _ ->
             [ ( IncomingSms, Urls.smsInbounds )
             , ( Keywords, Urls.keywords )
             ]

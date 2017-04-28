@@ -1,11 +1,32 @@
 module View.SendAdhoc exposing (view)
 
-import Html exposing (Html, br, text, i, p, input, h3, button, label, a, div)
-import Html.Attributes exposing (class, style, type_, placeholder, readonly, name, id, for, href)
+import Html exposing (Html, br, text, i, p, input, label, a, div)
+import Html.Attributes exposing (class, style, type_, placeholder, for, href)
 import Html.Events exposing (onInput, onSubmit)
 import Html.Keyed
-import Messages exposing (Msg(SendAdhocMsg), SendAdhocMsg(..))
-import Models exposing (Model, Settings, LoadingStatus(..))
+import Messages
+    exposing
+        ( Msg(SendAdhocMsg)
+        , SendAdhocMsg
+            ( ToggleSelectedContact
+            , PostForm
+            , UpdateAdhocFilter
+            , UpdateContent
+            )
+        )
+import Models
+    exposing
+        ( Model
+        , Settings
+        , LoadingStatus
+            ( NoRequestSent
+            , WaitingForPage
+            , WaitingForFirstResp
+            , WaitingOnRefresh
+            , FinalPageReceived
+            , RespFailed
+            )
+        )
 import Models.Apostello exposing (Recipient)
 import Models.SendAdhocForm exposing (SendAdhocModel)
 import Pages exposing (Page(FabOnlyPage), FabOnlyPage(NewContact))
@@ -27,27 +48,11 @@ view ls settings model contacts =
                 if List.length contacts == 0 then
                     noContacts
                 else
-                    modalOrForm ls settings model contacts
-
-            RespFailed _ ->
-                if List.length contacts == 0 then
-                    noContacts
-                else
-                    modalOrForm ls settings model contacts
+                    sendForm ls settings model contacts
 
             _ ->
-                modalOrForm ls settings model contacts
+                sendForm ls settings model contacts
         ]
-
-
-modalOrForm : LoadingStatus -> Settings -> SendAdhocModel -> List Recipient -> Html Msg
-modalOrForm ls settings model contacts =
-    case model.modalOpen of
-        True ->
-            adhocSelectModal ls model contacts
-
-        False ->
-            sendForm settings model contacts
 
 
 noContacts : Html Msg
@@ -58,15 +63,15 @@ noContacts =
         ]
 
 
-sendForm : Settings -> SendAdhocModel -> List Recipient -> Html Msg
-sendForm settings model contacts =
+sendForm : LoadingStatus -> Settings -> SendAdhocModel -> List Recipient -> Html Msg
+sendForm ls settings model contacts =
     div []
         [ p [] [ text "Send a message to a single person or to an ad-hoc group of people:" ]
         , Html.form
             [ class <| formClass model.status, onSubmit <| SendAdhocMsg PostForm ]
             (List.map fieldMessage model.errors.all
                 ++ [ contentField settings.smsCharLimit model.errors.content (SendAdhocMsg << UpdateContent) model.content
-                   , contactsField model contacts
+                   , contactsField ls model contacts
                    , timeField model.errors.scheduled_time model.date
                    , sendButton (SendAdhocMsg PostForm) model.cost
                    ]
@@ -76,34 +81,6 @@ sendForm settings model contacts =
 
 
 -- Contacts Dropdown
-
-
-adhocSelectModal : LoadingStatus -> SendAdhocModel -> List Recipient -> Html Msg
-adhocSelectModal ls model contacts =
-    div []
-        [ button [ class "ui attached green button", onClick <| SendAdhocMsg <| ToggleSelectAdhocModal False ] [ text "Done" ]
-        , div
-            [ class "ui raised segment"
-            , style [ ( "min-height", "50vh" ) ]
-            ]
-            [ loadingMessage ls
-            , h3 [ class "ui header" ] [ text "Select Recipients" ]
-            , div [ class "ui left icon large transparent fluid input" ]
-                [ input
-                    [ placeholder "Filter..."
-                    , type_ "text"
-                    , onInput (SendAdhocMsg << UpdateAdhocFilter)
-                    ]
-                    []
-                , i [ class "violet filter icon" ] []
-                ]
-            , div [ class "ui divided selection list" ]
-                (contacts
-                    |> List.filter (filterRecord model.adhocFilter)
-                    |> List.map (contactItem model.selectedContacts)
-                )
-            ]
-        ]
 
 
 loadingMessage : LoadingStatus -> Html Msg
@@ -128,26 +105,36 @@ loadingMessage ls =
             text ""
 
 
-contactsField : SendAdhocModel -> List Recipient -> Html Msg
-contactsField model contacts =
+contactsField : LoadingStatus -> SendAdhocModel -> List Recipient -> Html Msg
+contactsField ls model contacts =
     div
         [ class (errorFieldClass "required field" model.errors.recipients)
         ]
         ([ label [ for "id_recipients" ] [ text "Recipients" ]
-         , div
-            [ class "ui compact search dropdown selection multiple"
-            , id "id_recipients"
-            , name "recipients"
-            , onClick <| SendAdhocMsg <| ToggleSelectAdhocModal True
-            ]
-            (input
-                [ style [ ( "width", "100% !important" ) ]
-                , id "recipients_input"
-                , readonly True
+         , div [ class "ui raised segment" ]
+            [ loadingMessage ls
+            , div [ class "ui left icon large transparent fluid input" ]
+                [ input
+                    [ placeholder "Filter..."
+                    , type_ "text"
+                    , onInput (SendAdhocMsg << UpdateAdhocFilter)
+                    ]
+                    []
+                , i [ class "violet filter icon" ] []
                 ]
-                [ text "" ]
-                :: selectedItems contacts model.selectedContacts
-            )
+            , div
+                [ class "ui divided selection list"
+                , style
+                    [ ( "min-height", "25vh" )
+                    , ( "max-height", "50vh" )
+                    , ( "overflow-y", "auto" )
+                    ]
+                ]
+                (contacts
+                    |> List.filter (filterRecord model.adhocFilter)
+                    |> List.map (contactItem model.selectedContacts)
+                )
+            ]
          ]
             ++ List.map fieldMessage model.errors.recipients
         )
@@ -176,19 +163,3 @@ selectedIcon selectedPks contact =
 
         True ->
             i [ class "check icon", style [ ( "color", "#603cba" ) ] ] []
-
-
-selectedItems : List Recipient -> List Int -> List (Html Msg)
-selectedItems contacts pks =
-    contacts
-        |> List.filter (\x -> List.member x.pk pks)
-        |> List.map selectedItem
-
-
-selectedItem : Recipient -> Html Msg
-selectedItem contact =
-    a
-        [ class "ui label visible"
-        , style [ ( "display", "inline-block !important" ) ]
-        ]
-        [ text contact.full_name ]

@@ -1,7 +1,16 @@
 module Models.Remote
     exposing
         ( RawResponse
-        , RemoteDataType(..)
+        , RemoteDataType
+            ( IncomingSms
+            , OutgoingSms
+            , Contacts
+            , Groups
+            , Keywords
+            , ScheduledSms
+            , ElvantoGroups
+            , UserProfiles
+            )
         , dataFromResp
         , itemFromResp
         )

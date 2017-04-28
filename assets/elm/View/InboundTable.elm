@@ -1,7 +1,7 @@
 module View.InboundTable exposing (view)
 
 import Helpers exposing (formatDate)
-import Html exposing (Html, thead, tr, th, text, div, a, td, b, i)
+import Html exposing (Html, thead, tr, th, text, a, td, b, i)
 import Html.Attributes exposing (class, href, style)
 import Html.Events exposing (onClick)
 import Messages exposing (..)

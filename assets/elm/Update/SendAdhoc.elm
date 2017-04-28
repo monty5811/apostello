@@ -44,9 +44,6 @@ updateSAModel msg csrftoken model =
         UpdateDate date ->
             ( { model | date = date |> Date.fromString |> Result.toMaybe }, [], [] )
 
-        ToggleSelectAdhocModal newState ->
-            ( { model | modalOpen = newState, adhocFilter = Regex.regex "" }, [], [] )
-
         ToggleSelectedContact pk ->
             ( { model | selectedContacts = toggleSelectedContact pk model.selectedContacts }, [], [] )
 
@@ -83,7 +80,7 @@ updateSAModel msg csrftoken model =
                     in
                         case r of
                             Ok data ->
-                                ( { model | status = Success, errors = data.errors }, [], data.messages )
+                                ( { model | status = Failed "", errors = data.errors }, [], data.messages )
 
                             Err _ ->
                                 ( { model | status = Failed "" }, [], [] )
@@ -101,7 +98,6 @@ wipeForm model =
         | content = ""
         , selectedContacts = []
         , adhocFilter = Regex.regex ""
-        , modalOpen = False
         , date = Nothing
     }
 

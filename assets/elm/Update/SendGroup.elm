@@ -44,11 +44,8 @@ updateSGModel msg csrftoken model =
         UpdateSGDate date ->
             ( { model | date = date |> Date.fromString |> Result.toMaybe }, [], [] )
 
-        ToggleSelectGroupModal newState ->
-            ( { model | modalOpen = newState, groupFilter = Regex.regex "" }, [], [] )
-
         SelectGroup pk ->
-            ( { model | selectedPk = Just pk, modalOpen = False }, [], [] )
+            ( { model | selectedPk = Just pk }, [], [] )
 
         UpdateGroupFilter str ->
             ( { model | groupFilter = FT.textToRegex str }, [], [] )
@@ -83,7 +80,7 @@ updateSGModel msg csrftoken model =
                     in
                         case r of
                             Ok data ->
-                                ( { model | status = Success, errors = data.errors }, [], data.messages )
+                                ( { model | status = Failed "", errors = data.errors }, [], data.messages )
 
                             Err _ ->
                                 ( { model | status = Failed "" }, [], [] )
@@ -103,7 +100,6 @@ wipeForm model =
     { model
         | content = ""
         , selectedPk = Nothing
-        , modalOpen = False
         , date = Nothing
         , groupFilter = Regex.regex ""
     }

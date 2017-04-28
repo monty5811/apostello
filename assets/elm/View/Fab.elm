@@ -257,12 +257,24 @@ archiveButton page url maybeIsArchived canArchive =
                     div [ class "ui fluid grey button" ] [ text "Loading..." ]
 
                 Just isArchived ->
-                    case isArchived of
-                        True ->
-                            div [ class "ui fluid positive button", onClick <| FabMsg <| ArchiveItem (page2loc <| page) url isArchived ] [ text "Restore" ]
+                    let
+                        clickAction =
+                            FabMsg <| ArchiveItem (page2loc page) url isArchived
+                    in
+                        case isArchived of
+                            True ->
+                                div
+                                    [ class "ui fluid positive button"
+                                    , onClick clickAction
+                                    ]
+                                    [ text "Restore" ]
 
-                        False ->
-                            div [ class "ui fluid negative button", onClick <| FabMsg <| ArchiveItem (page2loc <| page) url isArchived ] [ text "Remove" ]
+                            False ->
+                                div
+                                    [ class "ui fluid negative button"
+                                    , onClick clickAction
+                                    ]
+                                    [ text "Remove" ]
 
 
 

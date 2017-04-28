@@ -100,18 +100,6 @@ type alias DataStore =
     }
 
 
-type alias DataStoreStatus =
-    { inboundSms : LoadingStatus
-    , outboundSms : LoadingStatus
-    , elvantoGroups : LoadingStatus
-    , userprofiles : LoadingStatus
-    , keywords : LoadingStatus
-    , recipients : LoadingStatus
-    , groups : LoadingStatus
-    , queuedSms : LoadingStatus
-    }
-
-
 emptyDataStore : DataStore
 emptyDataStore =
     { inboundSms = []

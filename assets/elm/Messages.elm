@@ -63,7 +63,6 @@ type SendAdhocMsg
     | UpdateDate String
     | PostForm
     | ReceiveFormResp (Result Http.Error { body : String, code : Int })
-    | ToggleSelectAdhocModal Bool
     | ToggleSelectedContact Int
     | UpdateAdhocFilter String
 
@@ -73,7 +72,6 @@ type SendGroupMsg
     | UpdateSGDate String
     | PostSGForm
     | ReceiveSGFormResp (Result Http.Error { body : String, code : Int })
-    | ToggleSelectGroupModal Bool
     | SelectGroup Int
     | UpdateGroupFilter String
 

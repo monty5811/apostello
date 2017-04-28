@@ -14,7 +14,6 @@ type alias SendGroupModel =
     , date : Maybe Date.Date
     , errors : SendGroupFormError
     , status : FormStatus
-    , modalOpen : Bool
     , selectedPk : Maybe Int
     , cost : Maybe Float
     , groupFilter : Regex.Regex
@@ -59,7 +58,6 @@ initialSendGroupModel page =
         , date = Nothing
         , errors = { group = [], scheduled_time = [], content = [], all = [] }
         , status = NoAction
-        , modalOpen = False
         , cost = Nothing
         , groupFilter = Regex.regex ""
         }

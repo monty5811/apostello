@@ -5,7 +5,17 @@ import Html exposing (Html, i, div, text)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Messages exposing (Msg(NotificationMsg), NotificationMsg(RemoveNotification))
-import Models exposing (..)
+import Models
+    exposing
+        ( Model
+        , Notification
+        , NotificationType
+            ( SuccessNotification
+            , InfoNotification
+            , WarningNotification
+            , ErrorNotification
+            )
+        )
 
 
 view : Model -> List (Html Msg)

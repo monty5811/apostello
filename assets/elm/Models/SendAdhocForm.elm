@@ -4,7 +4,7 @@ import Date
 import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (optional, required, decode)
 import Models.DjangoMessage exposing (DjangoMessage, decodeDjangoMessage)
-import Models.FormStatus exposing (..)
+import Models.FormStatus exposing (FormStatus(NoAction))
 import Pages exposing (Page(SendAdhoc))
 import Regex
 
@@ -15,7 +15,6 @@ type alias SendAdhocModel =
     , date : Maybe Date.Date
     , errors : SendAdhocFormError
     , status : FormStatus
-    , modalOpen : Bool
     , adhocFilter : Regex.Regex
     , cost : Maybe Float
     }
@@ -75,7 +74,6 @@ initialSendAdhocModel page =
         , date = Nothing
         , errors = { recipients = [], scheduled_time = [], content = [], all = [] }
         , status = NoAction
-        , modalOpen = False
         , adhocFilter = Regex.regex ""
         , cost = Nothing
         }

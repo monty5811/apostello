@@ -1,12 +1,21 @@
 module View.SendGroup exposing (view)
 
-import Html exposing (Html, div, br, text, i, p, input, h3, button, label, a)
-import Html.Attributes exposing (class, style, type_, placeholder, value, readonly, name, id, for, href)
-import Html.Events exposing (onInput, onSubmit, onFocus)
+import Html exposing (Html, div, br, text, i, p, input, label, a)
+import Html.Attributes exposing (class, style, type_, placeholder, for, href)
+import Html.Events exposing (onInput, onSubmit)
 import Html.Keyed
-import Messages exposing (Msg(SendGroupMsg), SendGroupMsg(..))
-import Models exposing (Model, Settings, LoadingStatus(..))
-import Models.Apostello exposing (RecipientGroup, nullGroup)
+import Messages
+    exposing
+        ( Msg(SendGroupMsg)
+        , SendGroupMsg(SelectGroup, UpdateGroupFilter, PostSGForm, UpdateSGContent)
+        )
+import Models
+    exposing
+        ( Model
+        , Settings
+        , LoadingStatus(NoRequestSent, WaitingForFirstResp, WaitingOnRefresh, WaitingForPage, RespFailed, FinalPageReceived)
+        )
+import Models.Apostello exposing (RecipientGroup)
 import Models.SendGroupForm exposing (SendGroupModel)
 import Pages exposing (Page(FabOnlyPage), FabOnlyPage(NewGroup))
 import Route exposing (page2loc)
@@ -27,27 +36,11 @@ view ls settings model groups =
                 if List.length groups == 0 then
                     noGroups
                 else
-                    modalOrForm ls settings model groups
-
-            RespFailed _ ->
-                if List.length groups == 0 then
-                    noGroups
-                else
-                    modalOrForm ls settings model groups
+                    sendForm ls settings model groups
 
             _ ->
-                modalOrForm ls settings model groups
+                sendForm ls settings model groups
         ]
-
-
-modalOrForm : LoadingStatus -> Settings -> SendGroupModel -> List RecipientGroup -> Html Msg
-modalOrForm ls settings model groups =
-    case model.modalOpen of
-        False ->
-            sendForm settings model groups
-
-        True ->
-            groupSelectModal ls model groups
 
 
 noGroups : Html Msg
@@ -58,14 +51,14 @@ noGroups =
         ]
 
 
-sendForm : Settings -> SendGroupModel -> List RecipientGroup -> Html Msg
-sendForm settings model groups =
+sendForm : LoadingStatus -> Settings -> SendGroupModel -> List RecipientGroup -> Html Msg
+sendForm ls settings model groups =
     div []
         [ p [] [ text "Send a message to a single person or to an ad-hoc group of people:" ]
         , Html.form [ class <| formClass model.status, onSubmit <| SendGroupMsg <| PostSGForm ]
             (List.map fieldMessage model.errors.all
                 ++ [ contentField settings.smsCharLimit model.errors.content (SendGroupMsg << UpdateSGContent) model.content
-                   , groupField model.errors.group model.selectedPk groups
+                   , groupField ls model groups
                    , timeField model.errors.scheduled_time model.date
                    , sendButton (SendGroupMsg PostSGForm) model.cost
                    ]
@@ -73,56 +66,41 @@ sendForm settings model groups =
         ]
 
 
-groupField : List String -> Maybe Int -> List RecipientGroup -> Html Msg
-groupField errors selectedPk groups =
+groupField : LoadingStatus -> SendGroupModel -> List RecipientGroup -> Html Msg
+groupField ls model groups =
     div
-        [ class (errorFieldClass "required field" errors)
+        [ class (errorFieldClass "required field" model.errors.group)
         ]
         (List.append
             [ label [ for "id_recipient_group" ] [ text "Recipient group" ]
-            , input
-                [ class "ui field"
-                , id "id_recipient_group"
-                , name "recipient_group"
-                , readonly True
-                , onClick <| SendGroupMsg <| ToggleSelectGroupModal True
-                , onFocus <| SendGroupMsg <| ToggleSelectGroupModal True
-                , value <| selectedGroup selectedPk groups
-                ]
-                []
-            ]
-            (List.map fieldMessage errors)
-        )
-
-
-groupSelectModal : LoadingStatus -> SendGroupModel -> List RecipientGroup -> Html Msg
-groupSelectModal ls model groups =
-    div
-        []
-        [ button [ class "ui attached green button", onClick <| SendGroupMsg <| ToggleSelectGroupModal False ] [ text "Done" ]
-        , div
-            [ class "ui raised segment"
-            , style [ ( "min-height", "50vh" ) ]
-            ]
-            [ loadingMessage ls
-            , h3 [ class "ui header" ] [ text "Select a Group" ]
-            , div [ class "ui left icon large transparent fluid input" ]
-                [ input
-                    [ placeholder "Filter..."
-                    , type_ "text"
-                    , onInput (SendGroupMsg << UpdateGroupFilter)
+            , div [ class "ui raised segment" ]
+                [ loadingMessage ls
+                , div [ class "ui left icon large transparent fluid input" ]
+                    [ input
+                        [ placeholder "Filter..."
+                        , type_ "text"
+                        , onInput (SendGroupMsg << UpdateGroupFilter)
+                        ]
+                        []
+                    , i [ class "violet filter icon" ] []
                     ]
-                    []
-                , i [ class "violet filter icon" ] []
+                , div
+                    [ class "ui divided selection list"
+                    , style
+                        [ ( "min-height", "25vh" )
+                        , ( "max-height", "50vh" )
+                        , ( "overflow-y", "auto" )
+                        ]
+                    ]
+                    (groups
+                        |> List.filter (filterRecord model.groupFilter)
+                        |> List.map (groupItem model.selectedPk)
+                    )
+                , div [ class "ui secondary bottom attached segment" ] [ p [] [ text "Note that empty groups are not shown here." ] ]
                 ]
-            , div [ class "ui divided selection list" ]
-                (groups
-                    |> List.filter (filterRecord model.groupFilter)
-                    |> List.map (groupItem model.selectedPk)
-                )
             ]
-        , div [ class "ui secondary bottom attached segment" ] [ p [] [ text "Note that empty groups are not shown here." ] ]
-        ]
+            (List.map fieldMessage model.errors.group)
+        )
 
 
 loadingMessage : LoadingStatus -> Html Msg
@@ -145,19 +123,6 @@ loadingMessage ls =
 
         WaitingOnRefresh ->
             text ""
-
-
-selectedGroup : Maybe Int -> List RecipientGroup -> String
-selectedGroup selectedPk groups =
-    case selectedPk of
-        Nothing ->
-            ""
-
-        Just pk ->
-            List.filter (\x -> x.pk == pk) groups
-                |> List.head
-                |> Maybe.withDefault nullGroup
-                |> .name
 
 
 groupItem : Maybe Int -> RecipientGroup -> Html Msg
