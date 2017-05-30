@@ -332,8 +332,7 @@ def browser(request, driver_wait_time):
     """Setup selenium browser."""
     driver = webdriver.Firefox()
     driver.implicitly_wait(driver_wait_time)
-    # FIXME removed as causes selenium to crash on semaphore
-    # driver.set_window_size(800, 1200)
+    driver.set_window_size(800, 1200)
 
     request.node._driver = driver
     yield driver
@@ -346,8 +345,7 @@ def browser_in(request, live_server, users, driver_wait_time):
     """Setup selenium browser and log in."""
     driver = webdriver.Firefox()
     driver.implicitly_wait(driver_wait_time)
-    # FIXME removed as causes selenium to crash on semaphore
-    # driver.set_window_size(800, 1200)
+    driver.set_window_size(800, 1200)
     driver.get(live_server + '/')
     driver.add_cookie(
         {
@@ -370,8 +368,7 @@ def browser_in_not_staff(request, live_server, users, driver_wait_time):
     """Setup selenium browser and log in."""
     driver = webdriver.Firefox()
     driver.implicitly_wait(driver_wait_time)
-    # FIXME removed as causes selenium to crash on semaphore
-    # driver.set_window_size(800, 1200)
+    driver.set_window_size(800, 1200)
     driver.get(live_server + '/')
     driver.add_cookie(
         {
