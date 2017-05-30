@@ -1,20 +1,34 @@
 module Messages exposing (..)
 
+import Data.Keyword exposing (Keyword)
+import Data.Recipient exposing (Recipient)
+import Data.RecipientGroup exposing (RecipientGroup)
+import Data.Request exposing (StoreMsg)
 import Http
-import Models.Apostello
-    exposing
-        ( ElvantoGroup
-        , Keyword
-        , Recipient
-        , RecipientSimple
-        , RecipientGroup
-        , SmsInbound
-        , SmsOutbound
-        , UserProfile
-        )
-import Models.FirstRun exposing (FirstRunResp)
-import Models.Remote exposing (RemoteDataType, RawResponse)
 import Navigation
+import Pages.ContactForm.Messages exposing (ContactFormMsg)
+import Pages.ContactForm.Model exposing (ContactFormModel)
+import Pages.ElvantoImport.Messages exposing (ElvantoMsg)
+import Pages.FirstRun.Messages exposing (FirstRunMsg)
+import Pages.GroupComposer.Messages exposing (GroupComposerMsg)
+import Pages.GroupForm.Messages exposing (GroupFormMsg)
+import Pages.GroupForm.Model exposing (GroupFormModel)
+import Pages.GroupTable.Messages exposing (GroupTableMsg)
+import Pages.InboundTable.Messages exposing (InboundTableMsg)
+import Pages.KeyRespTable.Messages exposing (KeyRespTableMsg)
+import Pages.KeywordForm.Messages exposing (KeywordFormMsg)
+import Pages.KeywordForm.Model exposing (KeywordFormModel)
+import Pages.KeywordTable.Messages exposing (KeywordTableMsg)
+import Pages.RecipientTable.Messages exposing (RecipientTableMsg)
+import Pages.ScheduledSmsTable.Messages exposing (ScheduledSmsTableMsg)
+import Pages.SendAdhocForm.Messages exposing (SendAdhocMsg)
+import Pages.SendAdhocForm.Model exposing (SendAdhocModel)
+import Pages.SendGroupForm.Messages exposing (SendGroupMsg)
+import Pages.SendGroupForm.Model exposing (SendGroupModel)
+import Pages.SiteConfigForm.Messages exposing (SiteConfigFormMsg)
+import Pages.SiteConfigForm.Model exposing (SiteConfigFormModel)
+import Pages.UserProfileTable.Messages exposing (UserProfileTableMsg)
+import Pages.Wall.Messages exposing (WallMsg)
 import Time
 
 
@@ -22,10 +36,10 @@ import Time
 
 
 type Msg
-    = LoadData
-    | ReceiveRawResp RemoteDataType (Result Http.Error RawResponse)
+    = StoreMsg StoreMsg
     | UrlChange Navigation.Location
     | NewUrl String
+    | FormMsg FormMsg
     | UpdateTableFilter String
     | ElvantoMsg ElvantoMsg
     | InboundTableMsg InboundTableMsg
@@ -33,7 +47,9 @@ type Msg
     | KeywordTableMsg KeywordTableMsg
     | GroupTableMsg GroupTableMsg
     | GroupComposerMsg GroupComposerMsg
-    | GroupMemberSelectMsg GroupMemberSelectMsg
+    | GroupFormMsg GroupFormMsg
+    | ContactFormMsg ContactFormMsg
+    | KeywordFormMsg KeywordFormMsg
     | WallMsg WallMsg
     | UserProfileTableMsg UserProfileTableMsg
     | ScheduledSmsTableMsg ScheduledSmsTableMsg
@@ -41,10 +57,11 @@ type Msg
     | FirstRunMsg FirstRunMsg
     | SendAdhocMsg SendAdhocMsg
     | SendGroupMsg SendGroupMsg
+    | SiteConfigFormMsg SiteConfigFormMsg
     | FabMsg FabMsg
     | NotificationMsg NotificationMsg
     | CurrentTime Time.Time
-    | LoadDataStore String
+    | ReceiveSiteConfigFormModel (Result Http.Error SiteConfigFormModel)
     | Nope
 
 
@@ -58,99 +75,11 @@ type FabMsg
     | ToggleFabView
 
 
-type SendAdhocMsg
-    = UpdateContent String
-    | UpdateDate String
-    | PostForm
-    | ReceiveFormResp (Result Http.Error { body : String, code : Int })
-    | ToggleSelectedContact Int
-    | UpdateAdhocFilter String
-
-
-type SendGroupMsg
-    = UpdateSGContent String
-    | UpdateSGDate String
-    | PostSGForm
-    | ReceiveSGFormResp (Result Http.Error { body : String, code : Int })
-    | SelectGroup Int
-    | UpdateGroupFilter String
-
-
-type FirstRunMsg
-    = UpdateAdminEmailField String
-    | UpdateAdminPass1Field String
-    | UpdateAdminPass2Field String
-    | UpdateTestEmailToField String
-    | UpdateTestEmailBodyField String
-    | UpdateTestSmsToField String
-    | UpdateTestSmsBodyField String
-    | SendTestEmail
-    | SendTestSms
-    | CreateAdminUser
-    | ReceiveCreateAdminUser (Result Http.Error FirstRunResp)
-    | ReceiveSendTestSms (Result Http.Error FirstRunResp)
-    | ReceiveSendTestEmail (Result Http.Error FirstRunResp)
-
-
-type ElvantoMsg
-    = ToggleGroupSync ElvantoGroup
-    | ReceiveToggleGroupSync (Result Http.Error ElvantoGroup)
-    | PullGroups
-    | FetchGroups
-    | ReceiveButtonResp (Result Http.Error Bool)
-
-
-type InboundTableMsg
-    = ReprocessSms Int
-    | ReceiveReprocessSms (Result Http.Error SmsInbound)
-
-
-type GroupMemberSelectMsg
-    = UpdateMemberFilter String
-    | UpdateNonMemberFilter String
-    | ToggleMembership RecipientGroup RecipientSimple
-    | ReceiveToggleMembership (Result Http.Error RecipientGroup)
-
-
-type WallMsg
-    = ToggleWallDisplay Bool Int
-    | ReceiveToggleWallDisplay (Result Http.Error SmsInbound)
-
-
-type UserProfileTableMsg
-    = ToggleField UserProfile
-    | ReceiveToggleProfile (Result Http.Error UserProfile)
-
-
-type RecipientTableMsg
-    = ToggleRecipientArchive Bool Int
-    | ReceiveRecipientToggleArchive (Result Http.Error Recipient)
-
-
-type KeywordTableMsg
-    = ToggleKeywordArchive Bool String
-    | ReceiveToggleKeywordArchive (Result Http.Error Keyword)
-
-
-type GroupTableMsg
-    = ToggleGroupArchive Bool Int
-    | ReceiveToggleGroupArchive (Result Http.Error RecipientGroup)
-
-
-type GroupComposerMsg
-    = UpdateQueryString String
-
-
-type ScheduledSmsTableMsg
-    = CancelSms Int
-    | ReceiveCancelSms (Result Http.Error Bool)
-
-
-type KeyRespTableMsg
-    = ToggleInboundSmsArchive Bool Int
-    | ToggleInboundSmsDealtWith Bool Int
-    | ReceiveToggleInboundSmsArchive (Result Http.Error SmsInbound)
-    | ReceiveToggleInboundSmsDealtWith (Result Http.Error SmsInbound)
-    | ArchiveAllButtonClick String
-    | ArchiveAllCheckBoxClick
-    | ReceiveArchiveAllResp (Result Http.Error Bool)
+type FormMsg
+    = PostKeywordForm KeywordFormModel (Maybe Keyword)
+    | PostContactForm ContactFormModel (Maybe Recipient)
+    | PostGroupForm GroupFormModel (Maybe RecipientGroup)
+    | PostAdhocForm SendAdhocModel
+    | PostSGForm SendGroupModel
+    | PostSiteConfigForm SiteConfigFormModel
+    | ReceiveFormResp (List (Cmd Msg)) (Result Http.Error { body : String, code : Int })

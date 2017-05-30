@@ -1,4 +1,4 @@
-module Encode exposing (encodeMaybeDate, encodeMaybe)
+module Encode exposing (encodeDate, encodeMaybe, encodeMaybeDate)
 
 import Date
 import Date.Format
@@ -20,3 +20,10 @@ encodeMaybeDate date =
     date
         |> Maybe.map (Date.Format.format "%Y-%m-%d %H:%M:%S")
         |> encodeMaybe Encode.string
+
+
+encodeDate : Date.Date -> Encode.Value
+encodeDate date =
+    date
+        |> Date.Format.format "%Y-%m-%d %H:%M:%S"
+        |> Encode.string

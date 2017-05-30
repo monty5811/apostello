@@ -10,32 +10,15 @@ from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.views.generic import TemplateView, View
 from django.views.generic.edit import UpdateView
-from django_twilio.client import twilio_client
 from rest_framework.parsers import JSONParser
-from twilio.rest.exceptions import TwilioRestException
+from twilio.base.exceptions import TwilioException
 
 from apostello.mixins import ProfilePermsMixin
-from site_config.forms import DefaultResponsesForm, SiteConfigurationForm
-from site_config.models import DefaultResponses, SiteConfiguration
+from apostello.twilio import twilio_client
+from site_config.forms import DefaultResponsesForm
+from site_config.models import DefaultResponses
 
 EnvVarSetting = namedtuple('EnvVarSetting', ['env_var_name', 'info', 'val'])
-
-
-class SiteConfigView(ProfilePermsMixin, UpdateView):
-    """View to handle site config form."""
-    template_name = 'site_config/edit_config.html'
-    form_class = SiteConfigurationForm
-    required_perms = []
-    success_url = '/'
-
-    def get_object(self):
-        """Retreive the config instance."""
-        return SiteConfiguration.get_solo()
-
-    def form_valid(self, form):
-        """Handle successful form submission."""
-        messages.success(self.request, 'Configuration updated')
-        return super(SiteConfigView, self).form_valid(form)
 
 
 class ResponsesView(ProfilePermsMixin, UpdateView):
@@ -71,19 +54,18 @@ class FirstRunView(TemplateView):
         context = super(FirstRunView, self).get_context_data(**kwargs)
 
         try:
-            numbers = twilio_client.phone_numbers.list(
-                phone_number=settings.TWILIO_FROM_NUM
-            )
+            numbers = twilio_client.incoming_phone_numbers.list()
+            number = [n for n in numbers if n.phone_number == settings.TWILIO_FROM_NUM]
             if numbers:
                 number = numbers[0]
                 sms_url = number.sms_url
                 sms_method = number.sms_method
             else:
                 sms_url = 'Number not found'
-                sms_method = sms_url
-        except TwilioRestException:
-            sms_url = 'Uh oh, something went wrong, please refresh the page.'
-            sms_method = sms_url
+                sms_method = 'Url not found'
+        except TwilioException:
+            sms_url = 'Uh oh, something went wrong, please refresh the page, or correct your twilio settings.'
+            sms_method = 'Uh oh, something went wrong, please refresh the page, or correct your twilio settings.'
 
         context['number'] = {
             'sms_url': sms_url,
@@ -91,44 +73,20 @@ class FirstRunView(TemplateView):
         }
 
         context['variables'] = [
+            EnvVarSetting('TWILIO_ACCOUNT_SID', 'Your Twilio account SID', settings.TWILIO_ACCOUNT_SID),
+            EnvVarSetting('TWILIO_AUTH_TOKEN', 'Your Twilio auth ID (hidden)', '****'),
+            EnvVarSetting('TWILIO_FROM_NUM', 'Your Twilio number', settings.TWILIO_FROM_NUM),
             EnvVarSetting(
-                'TWILIO_ACCOUNT_SID', 'Your Twilio account SID',
-                settings.TWILIO_ACCOUNT_SID
-            ),
-            EnvVarSetting(
-                'TWILIO_AUTH_TOKEN', 'Your Twilio auth ID (hidden)', '****'
-            ),
-            EnvVarSetting(
-                'TWILIO_FROM_NUM', 'Your Twilio number',
-                settings.TWILIO_FROM_NUM
-            ),
-            EnvVarSetting(
-                'TWILIO_SENDING_COST',
-                'Cost of sending a SMS using Twilio in your country',
+                'TWILIO_SENDING_COST', 'Cost of sending a SMS using Twilio in your country',
                 settings.TWILIO_SENDING_COST
             ),
+            EnvVarSetting('DJANGO_EMAIL_HOST', 'Email host', settings.EMAIL_HOST),
+            EnvVarSetting('DJANGO_EMAIL_HOST_USER', 'Email host user name', settings.EMAIL_HOST_USER),
+            EnvVarSetting('DJANGO_EMAIL_HOST_PASSWORD', 'Email host password (hidden)', '****'),
+            EnvVarSetting('DJANGO_FROM_EMAIL', 'Email from which to send', settings.EMAIL_FROM),
+            EnvVarSetting('DJANGO_EMAIL_HOST_PORT', 'Email host port', settings.EMAIL_PORT),
             EnvVarSetting(
-                'DJANGO_EMAIL_HOST', 'Email host', settings.EMAIL_HOST
-            ),
-            EnvVarSetting(
-                'DJANGO_EMAIL_HOST_USER', 'Email host user name',
-                settings.EMAIL_HOST_USER
-            ),
-            EnvVarSetting(
-                'DJANGO_EMAIL_HOST_PASSWORD', 'Email host password (hidden)',
-                '****'
-            ),
-            EnvVarSetting(
-                'DJANGO_FROM_EMAIL', 'Email from which to send',
-                settings.EMAIL_FROM
-            ),
-            EnvVarSetting(
-                'DJANGO_EMAIL_HOST_PORT', 'Email host port',
-                settings.EMAIL_PORT
-            ),
-            EnvVarSetting(
-                'ACCOUNT_DEFAULT_HTTP_PROTOCOL',
-                'Set to "http" if you do not have SSL setup',
+                'ACCOUNT_DEFAULT_HTTP_PROTOCOL', 'Set to "http" if you do not have SSL setup',
                 settings.ACCOUNT_DEFAULT_HTTP_PROTOCOL
             ),
             EnvVarSetting(
@@ -136,22 +94,10 @@ class FirstRunView(TemplateView):
                 'Any users that sign up with an email address matching this domain will be granted "approved" status automatically',
                 '\n'.join(settings.WHITELISTED_LOGIN_DOMAINS)
             ),
-            EnvVarSetting(
-                'DJANGO_TIME_ZONE', 'Your timezone (e.g. "Europe/London"',
-                settings.TIME_ZONE
-            ),
-            EnvVarSetting(
-                'DJANGO_SECRET_KEY',
-                'This should be a long random string (hidden for security)',
-                '****'
-            ),
-            EnvVarSetting(
-                'ELVANTO_KEY', 'Your Elvanto API key', settings.ELVANTO_KEY
-            ),
-            EnvVarSetting(
-                'COUNTRY_CODE', 'Used to normalise numbers from Elvanto',
-                settings.COUNTRY_CODE
-            ),
+            EnvVarSetting('DJANGO_TIME_ZONE', 'Your timezone (e.g. "Europe/London"', settings.TIME_ZONE),
+            EnvVarSetting('DJANGO_SECRET_KEY', 'This should be a long random string (hidden for security)', '****'),
+            EnvVarSetting('ELVANTO_KEY', 'Your Elvanto API key', settings.ELVANTO_KEY),
+            EnvVarSetting('COUNTRY_CODE', 'Used to normalise numbers from Elvanto', settings.COUNTRY_CODE),
             EnvVarSetting(
                 'LE_EMAIL',
                 'This is the email address associated with youe Let\'s Encrypt certificate. This is only required with Ansible deploys.',
@@ -205,9 +151,7 @@ class TestSmsView(TestSetupView):
 
     def run_test(self, data, *args, **kwargs):
         """Send message to posted number."""
-        twilio_client.messages.create(
-            body=data['body_'], to=data['to_'], from_=settings.TWILIO_FROM_NUM
-        )
+        twilio_client.messages.create(body=data['body_'], to=data['to_'], from_=settings.TWILIO_FROM_NUM)
 
 
 class CreateSuperUser(TestSetupView):

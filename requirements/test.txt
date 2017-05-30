@@ -1,11 +1,11 @@
 -r dev.txt
-ipdb==0.10.2
-pytest-cov==2.4.0
+ipdb==0.10.3
+pytest-cov==2.5.1
 pytest-django==3.1.2
 pytest-env==0.6.0
 pytest-html==1.14.2
-pytest==3.0.7
+pytest==3.1.0
 scandir==1.5
-selenium==3.3.3
-tox==2.6.0
+selenium==3.4.2
+tox==2.7.0
 vcrpy==1.10.5

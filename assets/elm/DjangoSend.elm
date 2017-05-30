@@ -1,6 +1,6 @@
-module DjangoSend exposing (post, archivePost, rawPost)
+module DjangoSend exposing (archivePost, post, rawPost)
 
-import Http exposing (Request, request, header, expectJson)
+import Http exposing (Request, expectJson, header, request)
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Models exposing (CSRFToken)

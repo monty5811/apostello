@@ -2,9 +2,7 @@ import pygal
 from django.utils import timezone
 from pygal.style import CleanStyle
 
-from apostello.models import (
-    Keyword, Recipient, RecipientGroup, SmsInbound, SmsOutbound
-)
+from apostello.models import (Keyword, Recipient, RecipientGroup, SmsInbound, SmsOutbound)
 from graphs.sms_freq import sms_graph_data
 
 clean_style_large_text = CleanStyle(
@@ -16,13 +14,7 @@ clean_style_large_text = CleanStyle(
 def recent():
     """Render the recent SMS activity graph on home page."""
     bar_chart = pygal.Bar(
-        height=200,
-        style=CleanStyle,
-        margin=15,
-        spacing=5,
-        show_y_labels=True,
-        x_label_rotation=90,
-        legend_box_size=10
+        height=200, style=CleanStyle, margin=15, spacing=5, show_y_labels=True, x_label_rotation=90, legend_box_size=10
     )
     bar_chart.add('In', sms_graph_data(direction='in'))
     bar_chart.add('Out', sms_graph_data(direction='out'))
@@ -69,7 +61,9 @@ def groups():
     for grp in RecipientGroup.objects.filter(is_archived=False):
         treemap.add(str(grp), [grp.recipient_set.all().count()])
 
-    return treemap.render(show_legend=False, )
+    return treemap.render(
+        show_legend=False,
+    )
 
 
 def keywords():
@@ -102,7 +96,9 @@ def incoming_by_contact():
             SmsInbound.objects.filter(sender_num=str(con.number)).count(),
         )
 
-    return treemap.render(show_legend=False, )
+    return treemap.render(
+        show_legend=False,
+    )
 
 
 def outgoing_by_contact():
@@ -112,11 +108,11 @@ def outgoing_by_contact():
         margin=0,
     )
     for con in Recipient.objects.filter(is_archived=False):
-        treemap.add(
-            str(con), SmsOutbound.objects.filter(recipient=con).count()
-        )
+        treemap.add(str(con), SmsOutbound.objects.filter(recipient=con).count())
 
-    return treemap.render(show_legend=False, )
+    return treemap.render(
+        show_legend=False,
+    )
 
 
 def sms_totals():

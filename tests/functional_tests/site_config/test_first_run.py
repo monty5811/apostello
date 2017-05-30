@@ -43,9 +43,7 @@ class TestFirstRun:
         assert 'test message' in mail.outbox[0].body
 
     # @twilio_vcr
-    def test_sms_form(
-        self, live_server, browser, driver_wait_time, recipients
-    ):
+    def test_sms_form(self, live_server, browser, driver_wait_time, recipients):
         browser.get(live_server + URI)
         assert URI in browser.current_url
         sleep(driver_wait_time)

@@ -1,9 +1,6 @@
-port module Ports exposing (updateDateValue, saveDataStore, loadDataStore)
+port module Ports exposing (loadDataStore, saveDataStore)
 
 import Json.Encode as Encode
-
-
-port updateDateValue : (String -> msg) -> Sub msg
 
 
 port saveDataStore : Encode.Value -> Cmd msg

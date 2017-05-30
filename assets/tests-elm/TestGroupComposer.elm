@@ -1,11 +1,12 @@
 module TestGroupComposer exposing (suite)
 
+import Data.Recipient exposing (RecipientSimple)
+import Data.RecipientGroup exposing (RecipientGroup)
 import Expect
-import Models.Apostello exposing (RecipientGroup, RecipientSimple)
-import Models.GroupComposer exposing (ParenLoc)
+import Pages.GroupComposer.Model exposing (ParenLoc)
+import Pages.GroupComposer.View exposing (..)
 import Set exposing (Set)
 import Test exposing (..)
-import View.GroupComposer exposing (..)
 
 
 john : RecipientSimple
@@ -39,8 +40,8 @@ testPeoplePks queryString =
         ( result, _ ) =
             runQuery testGroups [ john, bob, bill ] queryString
     in
-        List.map (\p -> p.pk) result
-            |> Set.fromList
+    List.map (\p -> p.pk) result
+        |> Set.fromList
 
 
 callParenPairs : String -> List ParenLoc
@@ -49,7 +50,7 @@ callParenPairs s =
         ops =
             parseQueryString [] s
     in
-        parenPairs (List.length ops) ops 0 0 []
+    parenPairs (List.length ops) ops 0 0 []
 
 
 testParenPairs : List Test

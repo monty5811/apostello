@@ -6,13 +6,9 @@ var gulp = require('gulp'),
   gutil = require("gulp-util"),
   webpack = require("webpack"),
   // require tasks as dependencies
-  uiBuildCss = require('./semantic/tasks/build/css'),
-  uiBuildJs = require('./semantic/tasks/build/javascript');
+  uiBuildCss = require('./semantic/tasks/build/css');
 
 gulp.task('uiBuildCss', uiBuildCss);
-gulp.task('uiBuildJs', uiBuildJs);
-
-gulp.task('build-ui', ['uiBuildCss', 'uiBuildJs']);
 
 gulp.task('copyThemeFonts', function() {
   gulp.src([
@@ -54,12 +50,12 @@ gulp.task('css', ['uiBuildCss', 'copyThemeFonts', 'copyThemeImages'], function()
     .pipe(gulp.dest('./../apostello/static/css'));
 });
 
-gulp.task("webpack", ['uiBuildJs'], function(callback) {
+gulp.task('webpack', [], function(callback) {
   var config = require('./webpack.production.config.js');
   // run webpack
   webpack(config, function(err, stats) {
-    if (err) throw new gutil.PluginError("webpack", err);
-    gutil.log("[webpack]", stats.toString({
+    if (err) throw new gutil.PluginError('webpack', err);
+    gutil.log('[webpack]', stats.toString({
       // output options
     }));
     callback();

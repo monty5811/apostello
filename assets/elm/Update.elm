@@ -1,32 +1,43 @@
 module Update exposing (update)
 
-import Http
-import Json.Decode as Decode
+import Data.Request exposing (StoreMsg(LoadDataStore))
+import Data.Store as Store
+import Data.Store.Update as SU
+import Date
+import DateTimePicker
+import FilteringTable as FT
+import Forms.Update as F
 import Messages exposing (..)
-import Models exposing (..)
+import Models exposing (FabModel(..), Model, Settings)
 import Navigation
+import Pages as P
+import Pages.ContactForm.Update as CF
+import Pages.ElvantoImport.Update as ElvImp
+import Pages.FirstRun.Update as FR
+import Pages.Fragments.Fab.Update as Fab
+import Pages.Fragments.Notification.Update as Notif
+import Pages.GroupComposer.Update as GC
+import Pages.GroupForm.Update as GF
+import Pages.GroupTable.Update as GT
+import Pages.InboundTable.Update as IT
+import Pages.KeyRespTable.Update as KRT
+import Pages.KeywordForm.Messages as KFM
+import Pages.KeywordForm.Update as KF
+import Pages.KeywordTable.Update as KT
+import Pages.RecipientTable.Update as RT
+import Pages.ScheduledSmsTable.Update as SST
+import Pages.SendAdhocForm.Messages as SAM
+import Pages.SendAdhocForm.Update as SA
+import Pages.SendGroupForm.Messages as SGM
+import Pages.SendGroupForm.Update as SG
+import Pages.SiteConfigForm.Model exposing (SiteConfigFormModel)
+import Pages.SiteConfigForm.Remote as SCFR
+import Pages.SiteConfigForm.Update as SCF
+import Pages.UserProfileTable.Update as UPT
+import Pages.Wall.Update as Wall
 import Ports exposing (saveDataStore)
 import Regex
-import Remote exposing (increasePageSize, fetchData, maybeFetchData)
 import Route exposing (loc2Page)
-import Update.DataStore exposing (updateNewData)
-import Update.ElvantoImport
-import Update.Fab
-import Update.FirstRun
-import Update.GroupComposer
-import Update.GroupMemberSelect
-import Update.GroupTable
-import Update.InboundTable
-import Update.KeyRespTable
-import Update.KeywordTable
-import Update.Notification as Notif
-import Update.RecipientTable
-import Update.ScheduledSmsTable
-import Update.SendAdhoc
-import Update.SendGroup
-import Update.UserProfileTable
-import Update.Wall
-import View.FilteringTable as FT
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -36,20 +47,9 @@ update msg model =
             updateHelper msg model
 
         newCmds =
-            case msg of
-                LoadDataStore _ ->
-                    cmds
-
-                _ ->
-                    case newModel.dataStore == model.dataStore of
-                        True ->
-                            cmds
-
-                        False ->
-                            (saveDataStore <| encodeDataStore newModel.dataStore)
-                                :: cmds
+            maybeSaveDataStore msg model newModel cmds
     in
-        ( newModel, Cmd.batch newCmds )
+    ( newModel, Cmd.batch newCmds )
 
 
 updateHelper : Msg -> Model -> ( Model, List (Cmd Msg) )
@@ -68,95 +68,153 @@ updateHelper msg model =
                 page =
                     loc2Page location model.settings
             in
-                ( { model
-                    | page = page
-                    , loadingStatus = NoRequestSent
-                    , filterRegex = Regex.regex ""
-                    , sendAdhoc = Update.SendAdhoc.resetForm page
-                    , sendGroup = Update.SendGroup.resetForm page
-                  }
-                , [ maybeFetchData page ]
-                )
+            ( { model
+                | page = page
+                , dataStore = Store.resetStatus model.dataStore
+                , filterRegex = Regex.regex ""
+              }
+            , []
+            )
+                |> initDateTimePickers
+                |> SU.maybeFetchData
+                |> SCFR.maybeFetchConfig
 
-        -- Load data
-        LoadData ->
-            ( { model | loadingStatus = waitingHelper model.loadingStatus }, [ maybeFetchData model.page ] )
-
-        ReceiveRawResp dt (Ok resp) ->
+        ReceiveSiteConfigFormModel (Ok scModel) ->
             let
                 newModel =
-                    model
-                        |> updateNewData dt resp
-                        |> updateLoadingStatus resp.next
+                    case model.page of
+                        P.SiteConfigForm _ ->
+                            { model | page = P.SiteConfigForm <| Just scModel }
 
-                cmds =
-                    case resp.next of
-                        Nothing ->
-                            []
-
-                        Just url ->
-                            [ fetchData ( dt, increasePageSize url ) ]
+                        _ ->
+                            model
             in
-                ( newModel, cmds )
+            ( { newModel | settings = updateSettings scModel newModel.settings }, [] )
 
-        ReceiveRawResp _ (Err e) ->
-            handleLoadingFailed e model
+        ReceiveSiteConfigFormModel (Err _) ->
+            ( model, [] )
 
-        LoadDataStore str ->
-            let
-                ds =
-                    Decode.decodeString (Decode.at [ "data" ] decodeDataStore) str
-                        |> Result.withDefault model.dataStore
-            in
-                ( { model | dataStore = ds }, [] )
+        -- Load data
+        StoreMsg subMsg ->
+            SU.update subMsg model
+
+        FormMsg subMsg ->
+            F.update subMsg model
 
         FabMsg subMsg ->
-            Update.Fab.update subMsg model
+            Fab.update subMsg model
 
         NotificationMsg subMsg ->
             Notif.update subMsg model
 
         FirstRunMsg subMsg ->
-            Update.FirstRun.update subMsg model
+            FR.update subMsg model
 
         ElvantoMsg subMsg ->
-            Update.ElvantoImport.update subMsg model
+            ElvImp.update subMsg model
 
         InboundTableMsg subMsg ->
-            Update.InboundTable.update subMsg model
+            IT.update subMsg model
 
         RecipientTableMsg subMsg ->
-            Update.RecipientTable.update subMsg model
+            RT.update subMsg model
 
         KeywordTableMsg subMsg ->
-            Update.KeywordTable.update subMsg model
+            KT.update subMsg model
 
         GroupTableMsg subMsg ->
-            Update.GroupTable.update subMsg model
+            GT.update subMsg model
 
         GroupComposerMsg subMsg ->
-            ( Update.GroupComposer.update subMsg model, [] )
+            ( GC.update subMsg model, [] )
 
-        GroupMemberSelectMsg subMsg ->
-            Update.GroupMemberSelect.update subMsg model
+        GroupFormMsg subMsg ->
+            case model.page of
+                P.GroupForm gfModel maybePk ->
+                    ( { model | page = P.GroupForm (GF.update subMsg gfModel) maybePk }
+                    , []
+                    )
+
+                _ ->
+                    ( model, [] )
+
+        ContactFormMsg subMsg ->
+            case model.page of
+                P.ContactForm cfModel maybePk ->
+                    ( { model
+                        | page =
+                            P.ContactForm (CF.update subMsg cfModel)
+                                maybePk
+                      }
+                    , []
+                    )
+
+                _ ->
+                    ( model, [] )
+
+        KeywordFormMsg subMsg ->
+            case model.page of
+                P.KeywordForm kfModel maybeK ->
+                    ( { model
+                        | page =
+                            P.KeywordForm (KF.update subMsg kfModel)
+                                maybeK
+                      }
+                    , []
+                    )
+
+                _ ->
+                    ( model, [] )
+
+        SiteConfigFormMsg subMsg ->
+            case model.page of
+                P.SiteConfigForm _ ->
+                    ( { model
+                        | page =
+                            P.SiteConfigForm <| Just <| SCF.update subMsg
+                      }
+                    , []
+                    )
+
+                _ ->
+                    ( model, [] )
 
         WallMsg subMsg ->
-            Update.Wall.update subMsg model
+            Wall.update subMsg model
 
         UserProfileTableMsg subMsg ->
-            Update.UserProfileTable.update subMsg model
+            UPT.update subMsg model
 
         ScheduledSmsTableMsg subMsg ->
-            Update.ScheduledSmsTable.update subMsg model
+            SST.update subMsg model
 
         KeyRespTableMsg subMsg ->
-            Update.KeyRespTable.update subMsg model
+            KRT.update subMsg model
 
         SendAdhocMsg subMsg ->
-            Update.SendAdhoc.update subMsg model
+            case model.page of
+                P.SendAdhoc saModel ->
+                    ( { model | page = P.SendAdhoc <| SA.update model.settings.twilioSendingCost subMsg saModel }, [] )
+
+                _ ->
+                    ( model, [] )
 
         SendGroupMsg subMsg ->
-            Update.SendGroup.update subMsg model
+            case model.page of
+                P.SendGroup sgModel ->
+                    ( { model
+                        | page =
+                            P.SendGroup <|
+                                SG.update
+                                    (Store.toList model.dataStore.groups)
+                                    subMsg
+                                    sgModel
+                      }
+                    , []
+                    )
+
+                _ ->
+                    ( model, [] )
 
         -- Filtering Table
         UpdateTableFilter filterText ->
@@ -166,57 +224,78 @@ updateHelper msg model =
             ( { model | currentTime = t }, [] )
 
 
-updateLoadingStatus : Maybe String -> Model -> Model
-updateLoadingStatus next model =
-    let
-        loadingStatus =
-            case next of
-                Nothing ->
-                    FinalPageReceived
+maybeSaveDataStore : Msg -> Model -> Model -> List (Cmd Msg) -> List (Cmd Msg)
+maybeSaveDataStore msg oldModel newModel cmds =
+    case msg of
+        StoreMsg subMsg ->
+            case subMsg of
+                LoadDataStore _ ->
+                    cmds
 
                 _ ->
-                    waitingHelper model.loadingStatus
-    in
-        { model | loadingStatus = loadingStatus }
-
-
-waitingHelper : LoadingStatus -> LoadingStatus
-waitingHelper ls =
-    case ls of
-        WaitingOnRefresh ->
-            WaitingOnRefresh
+                    addSaveDataStoreCmd oldModel newModel cmds
 
         _ ->
-            WaitingForPage
+            addSaveDataStoreCmd oldModel newModel cmds
 
 
-userFacingErrorMessage : Http.Error -> String
-userFacingErrorMessage err =
-    case err of
-        Http.BadUrl _ ->
-            "That's a bad URL. Sorry."
+addSaveDataStoreCmd : Model -> Model -> List (Cmd Msg) -> List (Cmd Msg)
+addSaveDataStoreCmd oldModel newModel cmds =
+    case newModel.dataStore == oldModel.dataStore of
+        True ->
+            cmds
 
-        Http.NetworkError ->
-            "Looks like there may be something wrong with your internet connection :("
-
-        Http.BadStatus _ ->
-            "Something went wrong there. Sorry."
-
-        Http.BadPayload _ _ ->
-            "Something went wrong there. Sorry."
-
-        Http.Timeout ->
-            "It took too long to reach the server..."
+        False ->
+            (saveDataStore <| Store.encodeDataStore newModel.dataStore)
+                :: cmds
 
 
-handleLoadingFailed : Http.Error -> Model -> ( Model, List (Cmd Msg) )
-handleLoadingFailed err model =
-    let
-        niceMsg =
-            userFacingErrorMessage err
+initDateTimePickers : ( Model, List (Cmd Msg) ) -> ( Model, List (Cmd Msg) )
+initDateTimePickers ( model, msgs ) =
+    ( model, msgs ++ initDateTimePickersHelp model.page )
 
-        ( newModel, cmd ) =
-            { model | loadingStatus = RespFailed <| niceMsg }
-                |> Notif.createLoadingFailed niceMsg
-    in
-        ( newModel, [ cmd ] )
+
+initDateTimePickersHelp : P.Page -> List (Cmd Msg)
+initDateTimePickersHelp page =
+    case page of
+        P.KeywordForm model _ ->
+            [ DateTimePicker.initialCmd initActTime model.datePickerActState
+            , DateTimePicker.initialCmd initDeactTime model.datePickerDeactState
+            ]
+
+        P.SendAdhoc model ->
+            [ DateTimePicker.initialCmd initSendAdhocDate model.datePickerState ]
+
+        P.SendGroup model ->
+            [ DateTimePicker.initialCmd initSendGroupDate model.datePickerState ]
+
+        _ ->
+            []
+
+
+initActTime : DateTimePicker.State -> Maybe Date.Date -> Msg
+initActTime state maybeDate =
+    KeywordFormMsg <| KFM.UpdateActivateTime state maybeDate
+
+
+initDeactTime : DateTimePicker.State -> Maybe Date.Date -> Msg
+initDeactTime state maybeDate =
+    KeywordFormMsg <| KFM.UpdateDeactivateTime state maybeDate
+
+
+initSendAdhocDate : DateTimePicker.State -> Maybe Date.Date -> Msg
+initSendAdhocDate state maybeDate =
+    SendAdhocMsg <| SAM.UpdateDate state maybeDate
+
+
+initSendGroupDate : DateTimePicker.State -> Maybe Date.Date -> Msg
+initSendGroupDate state maybeDate =
+    SendGroupMsg <| SGM.UpdateSGDate state maybeDate
+
+
+updateSettings : SiteConfigFormModel -> Settings -> Settings
+updateSettings newSCModel settings =
+    { settings
+        | smsCharLimit = newSCModel.sms_char_limit
+        , defaultNumberPrefix = newSCModel.default_number_prefix
+    }

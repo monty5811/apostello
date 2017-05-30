@@ -18,9 +18,7 @@ class ImportRecipients(ProfilePermsMixin, FormView):
     template_name = 'apostello/importer.html'
 
     def form_valid(self, form):
-        csv_string = u"first_name,last_name,number\n" + form.cleaned_data[
-            'csv_data'
-        ]
+        csv_string = u"first_name,last_name,number\n" + form.cleaned_data['csv_data']
         data = [x for x in csv.DictReader(io.StringIO(csv_string))]
         bad_rows = list()
         for row in data:
@@ -37,9 +35,7 @@ class ImportRecipients(ProfilePermsMixin, FormView):
                 bad_rows.append(row)
 
         if bad_rows:
-            messages.warning(
-                self.request, "Uh oh, something went wrong with these imports!"
-            )
+            messages.warning(self.request, "Uh oh, something went wrong with these imports!")
             context = {}
             context['form'] = CsvImport()
             context['bad_rows'] = bad_rows

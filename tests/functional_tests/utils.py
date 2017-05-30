@@ -27,4 +27,4 @@ def assert_with_timeout(fn, max_t):
                 sleep(1)
                 t = t + 1
             else:
-                raise(e)
+                raise (e)

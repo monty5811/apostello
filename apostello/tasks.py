@@ -5,11 +5,11 @@ import requests
 from django.conf import settings
 from django.core.mail import get_connection, send_mail
 from django.utils import timezone
-from django_twilio.client import twilio_client
-from twilio.rest.exceptions import TwilioRestException
-
-from apostello.utils import fetch_default_reply
 from django_q.tasks import async
+from twilio.base.exceptions import TwilioRestException
+
+from apostello.twilio import twilio_client
+from apostello.utils import fetch_default_reply
 
 logger = logging.getLogger('apostello')
 
@@ -22,9 +22,7 @@ def group_send_message_task(body, group_name, sent_by, eta):
     group = RecipientGroup.objects.filter(name=group_name, is_archived=False)
 
     for recipient in Recipient.objects.filter(groups__in=group):
-        recipient.send_message(
-            content=body, group=group_name, sent_by=sent_by, eta=eta
-        )
+        recipient.send_message(content=body, group=group_name, sent_by=sent_by, eta=eta)
 
 
 def recipient_send_message_task(recipient_pk, body, group, sent_by):
@@ -40,19 +38,9 @@ def recipient_send_message_task(recipient_pk, body, group, sent_by):
     body = recipient.personalise(body)
     # send twilio message
     try:
-        message = twilio_client.messages.create(
-            body=body,
-            to=str(recipient.number),
-            from_=settings.TWILIO_FROM_NUM
-        )
+        message = twilio_client.messages.create(body=body, to=str(recipient.number), from_=settings.TWILIO_FROM_NUM)
         # add to sms out table
-        sms = SmsOutbound(
-            sid=message.sid,
-            content=body,
-            time_sent=timezone.now(),
-            recipient=recipient,
-            sent_by=sent_by
-        )
+        sms = SmsOutbound(sid=message.sid, content=body, time_sent=timezone.now(), recipient=recipient, sent_by=sent_by)
         if group is not None:
             sms.recipient_group = RecipientGroup.objects.filter(name=group)[0]
         sms.save()
@@ -68,9 +56,7 @@ def recipient_send_message_task(recipient_pk, body, group, sent_by):
 def send_queued_sms():
     """Check for and send any queued messages."""
     from apostello.models import QueuedSms
-    for sms in QueuedSms.objects.filter(
-        sent=False, time_to_send__lte=timezone.now()
-    ):
+    for sms in QueuedSms.objects.filter(sent=False, time_to_send__lte=timezone.now()):
         sms.send()
 
 
@@ -83,10 +69,7 @@ def ask_for_name(person_from_pk, sms_body, ask_for_name):
     if not config.disable_all_replies:
         from apostello.models import Recipient
         contact = Recipient.objects.get(pk=person_from_pk)
-        contact.send_message(
-            content=fetch_default_reply('auto_name_request'),
-            sent_by="auto name request"
-        )
+        contact.send_message(content=fetch_default_reply('auto_name_request'), sent_by="auto name request")
         async(
             'apostello.tasks.notify_office_mail',
             '[Apostello] Unknown Contact!',
@@ -196,18 +179,13 @@ def send_keyword_digest():
         checked_time = timezone.now()
         new_responses = keyword.fetch_matches()
         if keyword.last_email_sent_time is not None:
-            new_responses = new_responses.filter(
-                time_received__gt=keyword.last_email_sent_time
-            )
+            new_responses = new_responses.filter(time_received__gt=keyword.last_email_sent_time)
         # if any, loop over subscribers and send email
         if new_responses.count() > 0:
             subject = 'Daily update for "{0}" responses'.format(str(keyword)),
             body = digest.create_email_body(keyword, new_responses)
             for subscriber in keyword.subscribed_to_digest.all():
-                async(
-                    'apostello.tasks.send_async_mail', subject, body,
-                    [subscriber.email]
-                )
+                async('apostello.tasks.send_async_mail', subject, body, [subscriber.email])
 
         keyword.last_email_sent_time = checked_time
         keyword.save()
@@ -219,20 +197,14 @@ def post_to_slack(attachments):
     config = SiteConfiguration.get_solo()
     url = config.slack_url
     if url:
-        data = {
-            'username': 'apostello',
-            'icon_emoji': ':speech_balloon:',
-            'attachments': attachments
-        }
+        data = {'username': 'apostello', 'icon_emoji': ':speech_balloon:', 'attachments': attachments}
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         requests.post(url, data=json.dumps(data), headers=headers)
 
 
 def sms_to_slack(sms_body, person_name, keyword_name):
     """Post message to slack webhook."""
-    fallback = "{0}\nFrom: {1}\n(matched: {2})".format(
-        sms_body, person_name, keyword_name
-    )
+    fallback = "{0}\nFrom: {1}\n(matched: {2})".format(sms_body, person_name, keyword_name)
     attachments = [
         {
             'fallback':

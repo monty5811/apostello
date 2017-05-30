@@ -17,9 +17,7 @@ from site_config.models import SiteConfiguration
 
 @never_cache
 def sw_js(request, js):
-    return TemplateResponse(
-        request, 'apostello/sw.js', content_type='application/x-javascript'
-    )
+    return TemplateResponse(request, 'apostello/sw.js', content_type='application/x-javascript')
 
 
 class NotApprovedView(TemplateView):

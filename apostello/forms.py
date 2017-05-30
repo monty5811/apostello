@@ -16,23 +16,12 @@ class SendAdhocRecipientsForm(forms.Form):
         queryset=Recipient.objects.filter(is_archived=False),
         required=True,
         help_text='',
-        widget=forms.SelectMultiple(
-            attrs={
-                "class": "ui compact search dropdown",
-                "multiple": "",
-            }
-        ),
     )
     scheduled_time = forms.DateTimeField(
         required=False,
         help_text='Leave this blank to send your message immediately, '
         'otherwise select a date and time to schedule your message',
-        widget=forms.TextInput(
-            attrs={
-                'data-field': 'datetime',
-                'readonly': True,
-            },
-        ),
+        label='Scheduled Time',
     )
 
     def clean(self):
@@ -41,8 +30,7 @@ class SendAdhocRecipientsForm(forms.Form):
         if 'recipients' in cleaned_data and 'content' in cleaned_data:
             # if we have no recipients, we don't need to check cost limit
             Recipient.check_user_cost_limit(
-                cleaned_data['recipients'],
-                self.user.profile.message_cost_limit, cleaned_data['content']
+                cleaned_data['recipients'], self.user.profile.message_cost_limit, cleaned_data['content']
             )
 
     def __init__(self, *args, **kwargs):
@@ -61,23 +49,12 @@ class SendRecipientGroupForm(forms.Form):
         queryset=RecipientGroup.objects.filter(is_archived=False),
         required=True,
         empty_label='Choose a group...',
-        widget=forms.Select(
-            attrs={
-                "class": "ui fluid dropdown",
-                "id": "id_recipient_group",
-            }
-        ),
     )
     scheduled_time = forms.DateTimeField(
         required=False,
         help_text='Leave this blank to send your message immediately, '
         'otherwise select a date and time to schedule your message',
-        widget=forms.TextInput(
-            attrs={
-                'data-field': 'datetime',
-                'readonly': True,
-            },
-        ),
+        label='Scheduled Time',
     )
 
     def clean(self):
@@ -112,24 +89,6 @@ class RecipientForm(forms.ModelForm):
     class Meta:
         model = Recipient
         exclude = ['is_archived', 'is_blocking']
-        widgets = {
-            'number': forms.TextInput(attrs={'placeholder': '+447259006790'}),
-            'groups': forms.SelectMultiple(
-                attrs={
-                    "class": "ui fluid search dropdown",
-                    "multiple": "",
-                    "id": "groups_dropdown",
-                }
-            ),
-        }
-
-
-class UserChoiceField(ModelMultipleChoiceField):
-    """Display emails and user names when selecting users."""
-
-    def label_from_instance(self, obj):
-        """Display the user's label."""
-        return '{0} ({1})'.format(obj.email, obj.username)
 
 
 class KeywordForm(forms.ModelForm):
@@ -138,66 +97,11 @@ class KeywordForm(forms.ModelForm):
     class Meta:
         model = Keyword
         exclude = ['is_archived', 'last_email_sent_time']
-        field_classes = {
-            'subscribed_to_digest': UserChoiceField,
-            'owners': UserChoiceField,
-        }
-        widgets = {
-            'keyword':
-            forms.TextInput(attrs={'placeholder': '(No spaces allowed)'}),
-            'description': forms.TextInput(
-                attrs={
-                    'placeholder':
-                    'Please provide a description of your keyword.'
-                }
-            ),
-            'custom_response': forms.TextInput(
-                attrs={
-                    'placeholder':
-                    'eg: Thanks %name%, you have sucessfully signed up.'
-                }
-            ),
-            'activate_time': forms.TextInput(
-                attrs={
-                    'data-field': 'datetime',
-                    'readonly': True,
-                },
-            ),
-            'deactivate_time': forms.TextInput(
-                attrs={
-                    'data-field': 'datetime',
-                    'readonly': True,
-                },
-            ),
-            'owners': forms.SelectMultiple(
-                attrs={
-                    "class": "ui fluid search dropdown",
-                    "multiple": "",
-                    "id": "owners_dropdown",
-                }
-            ),
-            'linked_groups': forms.SelectMultiple(
-                attrs={
-                    "class": "ui fluid search dropdown",
-                    "multiple": "",
-                    "id": "linked_group_dropdown",
-                }
-            ),
-            'subscribed_to_digest': forms.SelectMultiple(
-                attrs={
-                    "class": "ui fluid search dropdown",
-                    "multiple": "",
-                    "id": "digest_dropdown",
-                }
-            ),
-        }
 
 
 class CsvImport(forms.Form):
     """Handle CSV imports."""
-    csv_data = forms.CharField(
-        help_text='John, Calvin, +447095237960', widget=forms.Textarea
-    )
+    csv_data = forms.CharField(help_text='John, Calvin, +447095237960', widget=forms.Textarea)
 
 
 class UserProfileForm(forms.ModelForm):
@@ -205,7 +109,9 @@ class UserProfileForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
-        exclude = ['user', ]
+        exclude = [
+            'user',
+        ]
 
 
 class GroupAllCreateForm(forms.Form):

@@ -23,19 +23,13 @@ def sms_graph_data(direction='in'):
         # grab all the message timestamps from last 31 days as a list
         if cache_id == 'ogd':
             sms_list = list(
-                model_class.objects.filter(
-                    time_sent__gt=td - timezone.timedelta(days=31)
-                ).values_list(
-                    'time_sent', flat=True
-                )
+                model_class.objects.filter(time_sent__gt=td - timezone.timedelta(days=31))
+                .values_list('time_sent', flat=True)
             )
         elif cache_id == 'igd':
             sms_list = list(
-                model_class.objects.filter(
-                    time_received__gt=td - timezone.timedelta(days=31)
-                ).values_list(
-                    'time_received', flat=True
-                )
+                model_class.objects.filter(time_received__gt=td - timezone.timedelta(days=31))
+                .values_list('time_received', flat=True)
             )
         # count sms per day
         smsdata = []
@@ -43,11 +37,7 @@ def sms_graph_data(direction='in'):
             delta = timezone.timedelta(days=x)
             today = td + delta
             num_of_sms = len(
-                [
-                    x for x in sms_list
-                    if x.year == today.year and x.month == today.month and
-                    x.day == today.day
-                ]
+                [x for x in sms_list if x.year == today.year and x.month == today.month and x.day == today.day]
             )
             smsdata.append(num_of_sms)
 

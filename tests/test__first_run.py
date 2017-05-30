@@ -10,6 +10,7 @@ import pytest
 class TestFirstRun:
     """Test first run experience"""
 
+    @twilio_vcr
     def test_first_run_page(self):
         c = Client()
         resp = c.get('/')
@@ -26,11 +27,7 @@ class TestFirstRun:
         assert data['status'] == 'failed'
         assert 'error' in data
 
-        resp = post_json(
-            c, '/config/send_test_email/',
-            {'to_': 'test@example.com',
-             'body_': 'test message'}
-        )
+        resp = post_json(c, '/config/send_test_email/', {'to_': 'test@example.com', 'body_': 'test message'})
         assert resp.status_code == 200
         assert len(mail.outbox) == 1
 
@@ -46,11 +43,7 @@ class TestFirstRun:
         assert data['status'] == 'failed'
         assert 'error' in data
 
-        resp = post_json(
-            c, '/config/send_test_sms/',
-            {'to_': str(recipients['calvin'].number),
-             'body_': 'test'}
-        )
+        resp = post_json(c, '/config/send_test_sms/', {'to_': str(recipients['calvin'].number), 'body_': 'test'})
         assert resp.status_code == 200
 
     def test_send_test_sms_with_user(self, users):
@@ -64,11 +57,7 @@ class TestFirstRun:
         assert data['status'] == 'failed'
         assert 'error' in data
 
-        resp = post_json(
-            c, '/config/create_admin_user/',
-            {'email_': 'test@example.com',
-             'pass_': 'testpass'}
-        )
+        resp = post_json(c, '/config/create_admin_user/', {'email_': 'test@example.com', 'pass_': 'testpass'})
         assert resp.status_code == 200
 
         resp = c.get('/config/first_run/')

@@ -16,26 +16,17 @@ def validate_lower(value):
 def not_twilio_num(value):
     """Ensure value does not match the sending number."""
     if str(value) == str(settings.TWILIO_FROM_NUM):
-        raise ValidationError(
-            "You cannot add the number from which we send messages. Inception!"
-        )
+        raise ValidationError("You cannot add the number from which we send messages. Inception!")
 
 
 def twilio_reserved(value):
     """Ensure value does not overlap a twilio reserverd keyword."""
-    if value.lower(
-    ) in TWILIO_INFO_WORDS + TWILIO_START_WORDS + TWILIO_STOP_WORDS + (
-        'name',
-    ):
-        raise ValidationError(
-            '{0} is a reserved keyword, please choose another.'.
-            format(value.lower())
-        )
+    if value.lower() in TWILIO_INFO_WORDS + TWILIO_START_WORDS + TWILIO_STOP_WORDS + ('name', ):
+        raise ValidationError('{0} is a reserved keyword, please choose another.'.format(value.lower()))
 
 
 gsm_validator = RegexValidator(
-    '^[\s\w@?£!1$"¥#è?¤é%ù&ì\\ò(Ç)*:Ø+;ÄäøÆ,<LÖlöæ\-=ÑñÅß.>ÜüåÉ/§à¡¿\']+$',
-    message="You can only use GSM characters."
+    '^[\s\w@?£!1$"¥#è?¤é%ù&ì\\ò(Ç)*:Ø+;ÄäøÆ,<LÖlöæ\-=ÑñÅß.>ÜüåÉ/§à¡¿\']+$', message="You can only use GSM characters."
 )
 
 
@@ -46,15 +37,10 @@ def no_overlap_keyword(value):
     if value in keywords:
         # if exact match, then we are updating, should validate
         return
-    keywords += TWILIO_INFO_WORDS + TWILIO_START_WORDS + TWILIO_STOP_WORDS + (
-        'name',
-    )
+    keywords += TWILIO_INFO_WORDS + TWILIO_START_WORDS + TWILIO_STOP_WORDS + ('name', )
     for keyword in keywords:
         if keyword.startswith(value) or value.startswith(keyword):
-            raise ValidationError(
-                '{0} clashes with {1}, please choose another.'.
-                format(value.lower(), keyword)
-            )
+            raise ValidationError('{0} clashes with {1}, please choose another.'.format(value.lower(), keyword))
 
 
 def less_than_sms_char_limit(value):
@@ -68,10 +54,7 @@ def less_than_sms_char_limit(value):
         sms_char_lim = sms_char_lim - settings.MAX_NAME_LENGTH + len('%name%')
 
     if len(value) > sms_char_lim:
-        raise ValidationError(
-            'You have exceeded the maximum char limit of {0}.'.
-            format(sms_char_lim)
-        )
+        raise ValidationError('You have exceeded the maximum char limit of {0}.'.format(sms_char_lim))
 
 
 def validate_starts_with_plus(value):

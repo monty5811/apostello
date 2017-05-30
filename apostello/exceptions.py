@@ -6,8 +6,3 @@ class ApostelloException(Exception):
 class NoKeywordMatchException(ApostelloException):
     """SMS matches no keywords."""
     pass
-
-
-class ArchivedItemException(ApostelloException):
-    """Item already exists in the archive."""
-    pass

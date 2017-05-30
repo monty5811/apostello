@@ -30,14 +30,14 @@ class TestSignup:
         password_box1.send_keys('top_secret')
         password_box2 = browser.find_elements_by_name('password2')[0]
         password_box2.send_keys('top_secret')
-        login_button = browser.find_elements_by_xpath(
-            'html/body/div/div/form/button'
-        )[0]
+        login_button = browser.find_elements_by_xpath('html/body/div/div/form/button')[0]
         click_and_wait(login_button, driver_wait_time)
+
         def _test():
             assert '/accounts/confirm-email/' in browser.current_url
             assert len(mail.outbox) == 2
             assert '[apostello] New User' in mail.outbox[0].subject
+
         assert_with_timeout(_test, 10 * driver_wait_time)
         # when we have no office email set
         assert 'Please Confirm Your E-mail Address' in mail.outbox[1].subject

@@ -1,63 +1,42 @@
 module Subscriptions exposing (subscriptions)
 
-import Messages
-    exposing
-        ( Msg(LoadData, CurrentTime, Nope, SendAdhocMsg, SendGroupMsg, LoadDataStore)
-        , SendGroupMsg(UpdateSGDate)
-        , SendAdhocMsg(UpdateDate)
-        )
-import Models
-    exposing
-        ( Model
-        , LoadingStatus
-            ( NoRequestSent
-            , FinalPageReceived
-            , RespFailed
-            , WaitingOnRefresh
-            , WaitingForPage
-            , WaitingForFirstResp
-            )
-        )
-import Pages exposing (Page(Curator, Wall, SendAdhoc, SendGroup))
-import Ports exposing (updateDateValue, loadDataStore)
+import Data.Request exposing (StoreMsg(LoadData, LoadDataStore))
+import Data.Store as Store
+import Messages as M
+import Models exposing (Model)
+import Pages exposing (Page(Curator, SendAdhoc, SendGroup, Wall))
+import Ports exposing (loadDataStore)
 import Time exposing (Time, second)
 
 
-subscriptions : Model -> Sub Msg
+subscriptions : Model -> Sub M.Msg
 subscriptions model =
     Sub.batch
-        [ reloadData model.page model.loadingStatus
+        [ reloadData model.page model.dataStore
         , getCurrentTime
-        , updateDateValue (updateDateMsg model.page)
-        , loadDataStore LoadDataStore
+        , loadDataStore (M.StoreMsg << LoadDataStore)
         ]
 
 
-updateDateMsg : Page -> (String -> Msg)
-updateDateMsg page =
-    case page of
-        SendAdhoc _ _ ->
-            (SendAdhocMsg << UpdateDate)
-
-        SendGroup _ _ ->
-            (SendGroupMsg << UpdateSGDate)
-
-        _ ->
-            \_ -> Nope
-
-
-getCurrentTime : Sub Msg
+getCurrentTime : Sub M.Msg
 getCurrentTime =
-    Time.every (60 * second) (\t -> CurrentTime t)
+    Time.every (60 * second) (\t -> M.CurrentTime t)
 
 
-reloadData : Page -> LoadingStatus -> Sub Msg
-reloadData page loadingStatus =
+reloadData : Page -> Store.DataStore -> Sub M.Msg
+reloadData page dataStore =
+    let
+        allFinished =
+            Store.allFinished page dataStore
+
+        anyFailed =
+            Store.anyFailed page dataStore
+    in
     case page of
-        SendAdhoc _ _ ->
+        SendAdhoc _ ->
             Sub.none
 
-        SendGroup _ _ ->
+        SendGroup _ ->
             Sub.none
 
         _ ->
@@ -73,21 +52,9 @@ reloadData page loadingStatus =
                         _ ->
                             60 * second
             in
-                case loadingStatus of
-                    FinalPageReceived ->
-                        Time.every interval (\_ -> LoadData)
-
-                    RespFailed _ ->
-                        Time.every interval (\_ -> LoadData)
-
-                    NoRequestSent ->
-                        Sub.none
-
-                    WaitingForFirstResp ->
-                        Sub.none
-
-                    WaitingForPage ->
-                        Sub.none
-
-                    WaitingOnRefresh ->
-                        Sub.none
+            if allFinished then
+                Time.every interval (\_ -> M.StoreMsg LoadData)
+            else if anyFailed then
+                Time.every interval (\_ -> M.StoreMsg LoadData)
+            else
+                Sub.none

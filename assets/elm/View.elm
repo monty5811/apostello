@@ -1,30 +1,34 @@
 module View exposing (view)
 
+import Data.Store as Store
 import Html exposing (Html, text)
 import Messages exposing (Msg)
 import Models exposing (Model)
-import Pages exposing (Page(..), FabOnlyPage(..))
-import View.AccessDenied as AD
-import View.Curator as C
-import View.ElvantoImport as EI
-import View.Error404 as E404
-import View.Fab as F
-import View.FirstRun as FR
-import View.GroupComposer as GC
-import View.GroupMemberSelect as GMS
-import View.GroupTable as GT
-import View.Home as H
-import View.InboundTable as IT
-import View.KeyRespTable as KRT
-import View.KeywordTable as KT
-import View.OutboundTable as OT
-import View.RecipientTable as RT
-import View.ScheduledSmsTable as SST
-import View.SendAdhoc as SA
-import View.SendGroup as SG
-import View.Shell as Shell
-import View.UserProfileTable as UPT
-import View.Wall as W
+import Pages exposing (FabOnlyPage(..), Page(..))
+import Pages.AccessDenied as AD
+import Pages.ContactForm.View as CF
+import Pages.Curator as C
+import Pages.ElvantoImport.View as EI
+import Pages.Error404 as E404
+import Pages.FirstRun.View as FR
+import Pages.Fragments.Fab.View as F
+import Pages.Fragments.Shell as Shell
+import Pages.GroupComposer.View as GC
+import Pages.GroupForm.View as GF
+import Pages.GroupTable.View as GT
+import Pages.Home as H
+import Pages.InboundTable.View as IT
+import Pages.KeyRespTable.View as KRT
+import Pages.KeywordForm.View as KF
+import Pages.KeywordTable.View as KT
+import Pages.OutboundTable as OT
+import Pages.RecipientTable.View as RT
+import Pages.ScheduledSmsTable.View as SST
+import Pages.SendAdhocForm.View as SA
+import Pages.SendGroupForm.View as SG
+import Pages.SiteConfigForm.View as SCF
+import Pages.UserProfileTable.View as UPT
+import Pages.Wall.View as W
 
 
 view : Model -> Html Msg
@@ -42,7 +46,7 @@ view model =
         mainContent =
             content model
     in
-        shell mainContent fab
+    shell mainContent fab
 
 
 content : Model -> Html Msg
@@ -55,25 +59,25 @@ content model =
             IT.view model.filterRegex model.dataStore.inboundSms
 
         GroupTable viewingArchive ->
-            GT.view model.filterRegex (filterArchived viewingArchive model.dataStore.groups)
+            GT.view model.filterRegex (Store.filterArchived viewingArchive model.dataStore.groups)
 
-        GroupComposer ->
-            GC.view model.groupComposer (filterArchived False model.dataStore.groups)
+        GroupComposer composerModel ->
+            GC.view composerModel (Store.filterArchived False model.dataStore.groups)
 
         RecipientTable viewingArchive ->
-            RT.view model.filterRegex <| filterArchived viewingArchive model.dataStore.recipients
+            RT.view model.filterRegex <| Store.filterArchived viewingArchive model.dataStore.recipients
 
         KeywordTable viewingArchive ->
-            KT.view model.filterRegex <| filterArchived viewingArchive model.dataStore.keywords
+            KT.view model.filterRegex <| Store.filterArchived viewingArchive model.dataStore.keywords
 
         ElvantoImport ->
             EI.view model.filterRegex model.dataStore.elvantoGroups
 
         Wall ->
-            W.view (model.dataStore.inboundSms |> filterArchived False |> List.filter (\s -> s.display_on_wall))
+            W.view (model.dataStore.inboundSms |> Store.filterArchived False |> Store.filter (\s -> s.display_on_wall))
 
         Curator ->
-            C.view model.filterRegex (model.dataStore.inboundSms |> filterArchived False)
+            C.view model.filterRegex (model.dataStore.inboundSms |> Store.filterArchived False)
 
         UserProfileTable ->
             UPT.view model.filterRegex model.dataStore.userprofiles
@@ -81,26 +85,32 @@ content model =
         ScheduledSmsTable ->
             SST.view model.filterRegex model.currentTime model.dataStore.queuedSms
 
-        KeyRespTable viewingArchive currentKeyword ->
+        KeyRespTable keyRespModel viewingArchive currentKeyword ->
             KRT.view viewingArchive
                 model.filterRegex
-                (model.dataStore.inboundSms |> filterArchived viewingArchive |> filterByMatchedKeyword currentKeyword)
-                model.keyRespTable
+                (model.dataStore.inboundSms |> Store.filterArchived viewingArchive |> Store.filter (filterByMatchedKeyword currentKeyword))
+                keyRespModel
                 currentKeyword
 
-        FirstRun ->
-            FR.view model.firstRun
+        FirstRun m ->
+            FR.view m
 
         AccessDenied ->
             AD.view
 
-        SendAdhoc _ _ ->
-            SA.view model.loadingStatus model.settings model.sendAdhoc <| filterArchived False model.dataStore.recipients
+        SendAdhoc saModel ->
+            SA.view
+                model.settings
+                saModel
+                (Store.filterArchived False model.dataStore.recipients)
+                model.formStatus
 
-        SendGroup _ _ ->
-            SG.view model.loadingStatus model.settings model.sendGroup <|
-                List.filter (\x -> x.cost > 0) <|
-                    filterArchived False model.dataStore.groups
+        SendGroup sgModel ->
+            SG.view
+                model.settings
+                sgModel
+                (Store.filterArchived False model.dataStore.groups |> Store.filter (\x -> x.cost > 0))
+                model.formStatus
 
         Error404 ->
             E404.view
@@ -108,11 +118,39 @@ content model =
         Home ->
             H.view
 
-        EditGroup pk ->
-            GMS.view (model.dataStore.groups |> List.filter (\x -> x.pk == pk) |> List.head) model.groupSelect
+        GroupForm gfModel maybePk ->
+            GF.view maybePk model.dataStore.groups gfModel model.formStatus
 
-        EditContact pk ->
-            IT.view model.filterRegex (model.dataStore.inboundSms |> filterBySenderPk pk)
+        ContactForm cfModel maybePk ->
+            let
+                incomingTable =
+                    case maybePk of
+                        Nothing ->
+                            Nothing
+
+                        Just pk ->
+                            Just <| IT.view model.filterRegex (model.dataStore.inboundSms |> Store.filter (filterBySenderPk pk))
+            in
+            CF.view
+                model.settings
+                incomingTable
+                maybePk
+                model.dataStore.recipients
+                cfModel
+                model.formStatus
+
+        KeywordForm kfModel maybeK ->
+            KF.view
+                model.dataStore
+                maybeK
+                kfModel
+                model.formStatus
+
+        SiteConfigForm scModel ->
+            SCF.view
+                model.dataStore
+                scModel
+                model.formStatus
 
         FabOnlyPage _ ->
             text ""
@@ -122,19 +160,11 @@ content model =
 -- filter data for display
 
 
-filterArchived : Bool -> List { a | is_archived : Bool } -> List { a | is_archived : Bool }
-filterArchived viewingArchive data =
-    data
-        |> List.filter (\x -> x.is_archived == viewingArchive)
+filterByMatchedKeyword : String -> { a | matched_keyword : String } -> Bool
+filterByMatchedKeyword currentKeyword k =
+    k.matched_keyword == currentKeyword
 
 
-filterByMatchedKeyword : String -> List { a | matched_keyword : String } -> List { a | matched_keyword : String }
-filterByMatchedKeyword currentKeyword data =
-    data
-        |> List.filter (\x -> x.matched_keyword == currentKeyword)
-
-
-filterBySenderPk : Int -> List { a | sender_pk : Maybe Int } -> List { a | sender_pk : Maybe Int }
-filterBySenderPk pk data =
-    data
-        |> List.filter (\x -> Maybe.withDefault 0 x.sender_pk == pk)
+filterBySenderPk : Int -> { a | sender_pk : Maybe Int } -> Bool
+filterBySenderPk pk recip =
+    pk == Maybe.withDefault 0 recip.sender_pk

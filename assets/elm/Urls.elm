@@ -1,133 +1,306 @@
-module Urls
-    exposing
-        ( elvantoFetchGroups
-        , elvantoGroup
-        , elvantoGroups
-        , elvantoPullGroups
-        , group
-        , groups
-        , keyword
-        , keywordArchiveResps
-        , keywords
-        , queuedSms
-        , queuedSmss
-        , recipient
-        , recipients
-        , sendAdhoc
-        , sendGroup
-        , smsInbound
-        , smsInbounds
-        , smsOutbounds
-        , userProfiles
-        , userprofile
-        )
-
-import Formatting exposing ((<>), int, s, print, string)
+module Urls exposing (..)
 
 
-recipient : Int -> String
-recipient pk =
-    print (s "/api/v1/recipients/" <> int <> s "/") pk
+drfdocs : String
+drfdocs =
+    "/api-docs/"
 
 
-recipients : String
-recipients =
-    "/api/v1/recipients/"
+site_config_first_run : String
+site_config_first_run =
+    "/config/first_run/"
 
 
-keyword : String -> String
-keyword k =
-    print (s "/api/v1/keywords/" <> string <> s "/") k
+api_act_send_group : String
+api_act_send_group =
+    "/api/v2/actions/sms/send/group/"
 
 
-keywordArchiveResps : String -> String
-keywordArchiveResps k =
-    print (s "/api/v1/keywords/" <> string <> s "/archive_resps/") k
+account_signup : String
+account_signup =
+    "/accounts/signup/"
 
 
-smsInbounds : String
-smsInbounds =
-    "/api/v1/sms/in/"
+api_elvanto_groups : String
+api_elvanto_groups =
+    "/api/v2/elvanto/groups/"
 
 
-smsInbound : Int -> String
-smsInbound pk =
-    print (s "/api/v1/sms/in/" <> int <> s "/") pk
+api_toggle_deal_with_sms : Int -> String
+api_toggle_deal_with_sms pk =
+    "/api/v2/toggle/sms/in/deal_with/" ++ toString pk ++ "/"
 
 
-elvantoGroup : Int -> String
-elvantoGroup pk =
-    print (s "/api/v1/elvanto/group/" <> int <> s "/") pk
+api_act_keyword_archive_all_responses : String -> String
+api_act_keyword_archive_all_responses keyword =
+    "/api/v2/actions/keywords/" ++ keyword ++ "/archive_resps/"
 
 
-userprofile : Int -> String
-userprofile pk =
-    print (s "/api/v1/users/profiles/" <> int <> s "/") pk
+api_out_log : String
+api_out_log =
+    "/api/v2/sms/out/"
 
 
-queuedSms : Int -> String
-queuedSms pk =
-    print (s "/api/v1/queued/sms/" <> int <> s "/") pk
+socialaccount_login_cancelled : String
+socialaccount_login_cancelled =
+    "/accounts/social/login/cancelled/"
 
 
-queuedSmss : String
-queuedSmss =
-    "/api/v1/queued/sms/"
+usage_summary : String
+usage_summary =
+    "/usage/"
 
 
-group : Int -> String
-group pk =
-    print (s "/api/v1/groups/" <> int <> s "/") pk
+api_act_archive_group : Int -> String
+api_act_archive_group pk =
+    "/api/v2/actions/group/archive/" ++ toString pk ++ "/"
 
 
-smsOutbounds : String
-smsOutbounds =
-    "/api/v1/sms/out/"
+api_act_fetch_elvanto_groups : String
+api_act_fetch_elvanto_groups =
+    "/api/v2/actions/elvanto/group_fetch/"
 
 
-groups : String
-groups =
-    "/api/v1/groups/"
+site_config_site : String
+site_config_site =
+    "/config/site/"
 
 
-keywords : String
-keywords =
-    "/api/v1/keywords/"
+user_profile_form : Int -> String
+user_profile_form pk =
+    "/users/profiles/" ++ toString pk ++ "/"
 
 
-elvantoGroups : String
-elvantoGroups =
-    "/api/v1/elvanto/groups/"
+account_reset_password_done : String
+account_reset_password_done =
+    "/accounts/password/reset/done/"
 
 
-userProfiles : String
-userProfiles =
-    "/api/v1/users/profiles/"
+api_act_archive_sms : Int -> String
+api_act_archive_sms pk =
+    "/api/v2/actions/sms/in/archive/" ++ toString pk ++ "/"
 
 
-
--- sending
-
-
-sendGroup : String
-sendGroup =
-    "/api/v1/sms/send/group/"
+keyword_csv : String -> String
+keyword_csv keyword =
+    "/keyword/responses/csv/" ++ keyword ++ "/"
 
 
-sendAdhoc : String
-sendAdhoc =
-    "/api/v1/sms/send/adhoc/"
+not_approved : String
+not_approved =
+    "/not_approved/"
 
 
-
--- elvanto actions
-
-
-elvantoPullGroups : String
-elvantoPullGroups =
-    "/api/v1/elvanto/group_pull/"
+api_in_log : String
+api_in_log =
+    "/api/v2/sms/in/"
 
 
-elvantoFetchGroups : String
-elvantoFetchGroups =
-    "/api/v1/elvanto/group_fetch/"
+api_queued_smss : String
+api_queued_smss =
+    "/api/v2/queued/sms/"
+
+
+account_confirm_email : String
+account_confirm_email =
+    "/accounts/confirm-email/<key>/"
+
+
+site_config_responses : String
+site_config_responses =
+    "/config/responses/"
+
+
+api_users : String
+api_users =
+    "/api/v2/users/"
+
+
+site_config_create_super_user : String
+site_config_create_super_user =
+    "/config/create_admin_user/"
+
+
+api_toggle_display_on_wall : Int -> String
+api_toggle_display_on_wall pk =
+    "/api/v2/toggle/sms/in/display_on_wall/" ++ toString pk ++ "/"
+
+
+api_act_update_group_members : Int -> String
+api_act_update_group_members pk =
+    "/api/v2/actions/group/update_members/" ++ toString pk ++ "/"
+
+
+group_create_all : String
+group_create_all =
+    "/group/create_all/"
+
+
+api_site_config : String
+api_site_config =
+    "/api/v2/config/"
+
+
+api_toggle_elvanto_group_sync : Int -> String
+api_toggle_elvanto_group_sync pk =
+    "/api/v2/toggle/elvanto/group/sync/" ++ toString pk ++ "/"
+
+
+account_reset_password_from_key : String
+account_reset_password_from_key =
+    "/accounts/password/reset/key/<uidb36>-<key>/"
+
+
+api_recipient_groups : String
+api_recipient_groups =
+    "/api/v2/groups/"
+
+
+google_login : String
+google_login =
+    "/accounts/google/login/"
+
+
+account_logout : String
+account_logout =
+    "/accounts/logout/"
+
+
+socialaccount_signup : String
+socialaccount_signup =
+    "/accounts/social/signup/"
+
+
+api_act_cancel_queued_sms : Int -> String
+api_act_cancel_queued_sms pk =
+    "/api/v2/actions/queued/sms/" ++ toString pk ++ "/"
+
+
+account_email_verification_sent : String
+account_email_verification_sent =
+    "/accounts/confirm-email/"
+
+
+socialaccount_login_error : String
+socialaccount_login_error =
+    "/accounts/social/login/error/"
+
+
+account_email : String
+account_email =
+    "/accounts/email/"
+
+
+api_act_reingest_sms : Int -> String
+api_act_reingest_sms pk =
+    "/api/v2/actions/sms/in/reingest/" ++ toString pk ++ "/"
+
+
+api_keywords : String
+api_keywords =
+    "/api/v2/keywords/"
+
+
+api_user_profile_update : Int -> String
+api_user_profile_update pk =
+    "/api/v2/actions/users/profiles/update/" ++ toString pk ++ "/"
+
+
+site_config_test_sms : String
+site_config_test_sms =
+    "/config/send_test_sms/"
+
+
+account_change_password : String
+account_change_password =
+    "/accounts/password/change/"
+
+
+account_login : String
+account_login =
+    "/accounts/login/"
+
+
+account_inactive : String
+account_inactive =
+    "/accounts/inactive/"
+
+
+api_recipients : String
+api_recipients =
+    "/api/v2/recipients/"
+
+
+api_act_archive_keyword : String -> String
+api_act_archive_keyword keyword =
+    "/api/v2/actions/keyword/archive/" ++ keyword ++ "/"
+
+
+account_set_password : String
+account_set_password =
+    "/accounts/password/set/"
+
+
+api_setup : String
+api_setup =
+    "/api-setup/"
+
+
+account_reset_password : String
+account_reset_password =
+    "/accounts/password/reset/"
+
+
+offline : String
+offline =
+    "/offline/"
+
+
+socialaccount_connections : String
+socialaccount_connections =
+    "/accounts/social/connections/"
+
+
+api_act_archive_recipient : Int -> String
+api_act_archive_recipient pk =
+    "/api/v2/actions/recipient/archive/" ++ toString pk ++ "/"
+
+
+google_callback : String
+google_callback =
+    "/accounts/google/login/callback/"
+
+
+help : String
+help =
+    "/help/"
+
+
+import_recipients : String
+import_recipients =
+    "/recipient/import/"
+
+
+account_reset_password_from_key_done : String
+account_reset_password_from_key_done =
+    "/accounts/password/reset/key/done/"
+
+
+api_act_pull_elvanto_groups : String
+api_act_pull_elvanto_groups =
+    "/api/v2/actions/elvanto/group_pull/"
+
+
+site_config_test_email : String
+site_config_test_email =
+    "/config/send_test_email/"
+
+
+api_act_send_adhoc : String
+api_act_send_adhoc =
+    "/api/v2/actions/sms/send/adhoc/"
+
+
+api_user_profiles : String
+api_user_profiles =
+    "/api/v2/users/profiles/"

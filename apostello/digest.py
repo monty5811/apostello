@@ -12,10 +12,7 @@ class Table():
         self.col_widths = self.calculate_widths()
 
     def calculate_widths(self):
-        return [
-            self._column_width(i, n)
-            for i, n in zip(self.col_ids, self.col_names)
-        ]
+        return [self._column_width(i, n) for i, n in zip(self.col_ids, self.col_names)]
 
     def _column_width(self, id, name):
         sizes = [len(str(getattr(x, id))) for x in self.responses]

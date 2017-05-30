@@ -18,9 +18,8 @@ from phonenumber_field.modelfields import PhoneNumberField
 from apostello.exceptions import NoKeywordMatchException
 from apostello.utils import fetch_default_reply
 from apostello.validators import (
-    TWILIO_INFO_WORDS, TWILIO_START_WORDS, TWILIO_STOP_WORDS, gsm_validator,
-    less_than_sms_char_limit, no_overlap_keyword, not_twilio_num,
-    twilio_reserved, validate_lower
+    TWILIO_INFO_WORDS, TWILIO_START_WORDS, TWILIO_STOP_WORDS, gsm_validator, less_than_sms_char_limit,
+    no_overlap_keyword, not_twilio_num, twilio_reserved, validate_lower
 )
 
 logger = logging.getLogger('apostello')
@@ -42,10 +41,7 @@ class RecipientGroup(models.Model):
 
     def send_message(self, content, sent_by, eta=None):
         """Send message to group."""
-        async(
-            'apostello.tasks.group_send_message_task', content, self.name,
-            sent_by, eta
-        )
+        async('apostello.tasks.group_send_message_task', content, self.name, sent_by, eta)
     def archive(self):
         """Archive the group."""
         self.is_archived = True
@@ -58,10 +54,7 @@ class RecipientGroup(models.Model):
         if limit == 0:
             return
         if limit < num_sms * self.calculate_cost():
-            raise ValidationError(
-                'Sorry, you can only send messages that cost no more than ${0}.'.
-                format(limit)
-            )
+            raise ValidationError('Sorry, you can only send messages that cost no more than ${0}.'.format(limit))
 
     @cached_property
     def all_recipients(self):
@@ -71,8 +64,7 @@ class RecipientGroup(models.Model):
     @cached_property
     def all_recipients_not_in_group(self):
         """Returns queryset of all recipients not in group."""
-        return Recipient.objects.filter(is_archived=False
-                                        ).exclude(groups__pk=self.pk).all()
+        return Recipient.objects.filter(is_archived=False).exclude(groups__pk=self.pk).all()
 
     @property
     def all_recipients_names(self):
@@ -118,9 +110,7 @@ class Recipient(models.Model):
         db_index=True,
     )
     number = PhoneNumberField(
-        unique=True,
-        validators=[not_twilio_num],
-        help_text="Cannot be our number, or we get an SMS loop."
+        unique=True, validators=[not_twilio_num], help_text="Cannot be our number, or we get an SMS loop."
     )
     do_not_reply = models.BooleanField(
         "Do not reply",
@@ -138,9 +128,7 @@ class Recipient(models.Model):
         """
         return message.replace('%name%', self.first_name)
 
-    def send_message(
-        self, content='test message', group=None, sent_by='', eta=None
-    ):
+    def send_message(self, content='test message', group=None, sent_by='', eta=None):
         """
         Send SMS to an individual.
 
@@ -149,10 +137,7 @@ class Recipient(models.Model):
         if self.is_blocking:
             return
         elif eta is None:
-            async(
-                'apostello.tasks.recipient_send_message_task', self.pk,
-                content, group, sent_by
-            )
+            async('apostello.tasks.recipient_send_message_task', self.pk, content, group, sent_by)
         else:
             try:
                 groupObj = RecipientGroup.objects.get(name=group)
@@ -179,15 +164,12 @@ class Recipient(models.Model):
         if limit == 0:
             return
         if limit < len(recipients) * settings.TWILIO_SENDING_COST * num_sms:
-            raise ValidationError(
-                'Sorry, you can only send messages that cost no more than ${0}.'.
-                format(limit)
-            )
+            raise ValidationError('Sorry, you can only send messages that cost no more than ${0}.'.format(limit))
 
     @cached_property
     def get_absolute_url(self):
         """Url for this recipient."""
-        return reverse('recipient', args=[str(self.pk)])
+        return "/recipient/edit/{}/".format(self.pk)
 
     @cached_property
     def full_name(self):
@@ -202,10 +184,7 @@ class Recipient(models.Model):
             msg = SmsInbound.objects.filter(sender_num=str(self.number))
             try:
                 msg = msg[0]  # sms are already sorted in time
-                last_sms = {
-                    'content': msg.content,
-                    'time_received': msg.time_received.strftime('%d %b %H:%M')
-                }
+                last_sms = {'content': msg.content, 'time_received': msg.time_received.strftime('%d %b %H:%M')}
             except IndexError:
                 last_sms = {'content': '', 'time_received': ''}
             cache.set('last_msg__{0}'.format(self.pk), last_sms, 600)
@@ -220,7 +199,6 @@ class Recipient(models.Model):
         if add_to_group_flag:
             from apostello.tasks import add_new_contact_to_groups
             async('apostello.tasks.add_new_contact_to_groups', self.pk)
-
     def __str__(self):
         """Pretty representation."""
         return self.full_name
@@ -236,9 +214,7 @@ class Keyword(models.Model):
         "Keyword",
         max_length=12,
         unique=True,
-        validators=[
-            validate_lower, gsm_validator, twilio_reserved, no_overlap_keyword
-        ]
+        validators=[validate_lower, gsm_validator, twilio_reserved, no_overlap_keyword]
     )
     description = models.CharField(
         "Keyword Description",
@@ -309,9 +285,7 @@ class Keyword(models.Model):
         help_text='Choose users that will receive daily updates of matched '
         'messages.'
     )
-    last_email_sent_time = models.DateTimeField(
-        "Time of last sent email", blank=True, null=True
-    )
+    last_email_sent_time = models.DateTimeField("Time of last sent email", blank=True, null=True)
 
     def construct_reply(self, sender):
         """Make reply to an incoming message."""
@@ -387,15 +361,11 @@ class Keyword(models.Model):
 
     def fetch_matches(self):
         """Fetch un-archived messages that match keyword."""
-        return SmsInbound.objects.filter(
-            matched_keyword=self.keyword, is_archived=False
-        )
+        return SmsInbound.objects.filter(matched_keyword=self.keyword, is_archived=False)
 
     def fetch_archived_matches(self):
         """Fetch archived messages that match keyword."""
-        return SmsInbound.objects.filter(
-            matched_keyword=self.keyword, is_archived=True
-        )
+        return SmsInbound.objects.filter(matched_keyword=self.keyword, is_archived=True)
 
     @property
     def num_matches(self):
@@ -437,9 +407,7 @@ class Keyword(models.Model):
         if self.deactivate_time is None:
             return
         if self.activate_time > self.deactivate_time:
-            raise ValidationError(
-                "The start time must be before the end time!"
-            )
+            raise ValidationError("The start time must be before the end time!")
 
     def save(self, force_insert=False, force_update=False, *args, **kwargs):
         """Force lower case keywords."""
@@ -498,8 +466,7 @@ class Keyword(models.Model):
         elif keyword == 'No Match':
             return "#B6B6B6"
         else:
-            return "#" + hashlib.md5(str(keyword).encode('utf-8')
-                                     ).hexdigest()[:6]
+            return "#" + hashlib.md5(str(keyword).encode('utf-8')).hexdigest()[:6]
 
     @staticmethod
     def get_log_link(k):
@@ -522,17 +489,10 @@ class Keyword(models.Model):
 
 class SmsInbound(models.Model):
     """A SmsInbound is a message that was sent to the twilio number."""
-    sid = models.CharField(
-        "SID",
-        max_length=34,
-        unique=True,
-        help_text="Twilio's unique ID for this SMS"
-    )
+    sid = models.CharField("SID", max_length=34, unique=True, help_text="Twilio's unique ID for this SMS")
     is_archived = models.BooleanField("Is Archived", default=False)
     dealt_with = models.BooleanField(
-        "Dealt With?",
-        default=False,
-        help_text='Used, for example, '
+        "Dealt With?", default=False, help_text='Used, for example, '
         'to mark people as registered for an event.'
     )
     content = models.CharField("Message body", blank=True, max_length=1600)
@@ -543,9 +503,7 @@ class SmsInbound(models.Model):
     matched_colour = models.CharField(max_length=7)
     matched_link = models.CharField(max_length=200)
     display_on_wall = models.BooleanField(
-        "Display on Wall?",
-        default=False,
-        help_text='If True, SMS will be shown on all live walls.'
+        "Display on Wall?", default=False, help_text='If True, SMS will be shown on all live walls.'
     )
 
     def archive(self):
@@ -557,11 +515,6 @@ class SmsInbound(models.Model):
     def __str__(self):
         """Pretty representation."""
         return self.content
-
-    @cached_property
-    def sender_url(self):
-        """Url for message sender."""
-        return Recipient.objects.get(number=self.sender_num).get_absolute_url
 
     @cached_property
     def sender_pk(self):
@@ -604,15 +557,10 @@ class QueuedSms(models.Model):
         validators=[gsm_validator],
     )
     sent_by = models.CharField(
-        "Sender",
-        max_length=200,
-        help_text='User that sent message. Stored for auditing purposes.'
+        "Sender", max_length=200, help_text='User that sent message. Stored for auditing purposes.'
     )
     recipient_group = models.ForeignKey(
-        RecipientGroup,
-        null=True,
-        blank=True,
-        help_text="Group (if any) that message was sent to"
+        RecipientGroup, null=True, blank=True, help_text="Group (if any) that message was sent to"
     )
     recipient = models.ForeignKey(Recipient, blank=True, null=True)
 
@@ -661,12 +609,7 @@ class QueuedSms(models.Model):
 
 class SmsOutbound(models.Model):
     """An SmsOutbound is an SMS that has been sent out by the app."""
-    sid = models.CharField(
-        "SID",
-        max_length=34,
-        unique=True,
-        help_text="Twilio's unique ID for this SMS"
-    )
+    sid = models.CharField("SID", max_length=34, unique=True, help_text="Twilio's unique ID for this SMS")
     content = models.CharField(
         "Message",
         max_length=1600,
@@ -674,15 +617,10 @@ class SmsOutbound(models.Model):
     )
     time_sent = models.DateTimeField(default=timezone.now)
     sent_by = models.CharField(
-        "Sender",
-        max_length=200,
-        help_text='User that sent message. Stored for auditing purposes.'
+        "Sender", max_length=200, help_text='User that sent message. Stored for auditing purposes.'
     )
     recipient_group = models.ForeignKey(
-        RecipientGroup,
-        null=True,
-        blank=True,
-        help_text="Group (if any) that message was sent to"
+        RecipientGroup, null=True, blank=True, help_text="Group (if any) that message was sent to"
     )
     recipient = models.ForeignKey(Recipient, blank=True, null=True)
 
@@ -702,10 +640,7 @@ class UserProfile(models.Model):
     """
     user = models.OneToOneField(User, unique=True)
 
-    approved = models.BooleanField(
-        default=False,
-        help_text='This must be true to grant users access to the site.'
-    )
+    approved = models.BooleanField(default=False, help_text='This must be true to grant users access to the site.')
     show_tour = models.BooleanField(
         default=True,
         help_text='If true, the user will be shown popup tour on index page.',
@@ -742,6 +677,7 @@ class UserProfile(models.Model):
         dummy_user.username = '--'
         dummy_user.is_staff = True
         dummy_user.is_social = False
+        dummy_user.pk = 0
 
         p.user = dummy_user
         p.pk = 0
@@ -756,7 +692,9 @@ class UserProfile(models.Model):
         return "Profile: " + str(self.user)
 
     class Meta:
-        ordering = ['user__email', ]
+        ordering = [
+            'user__email',
+        ]
 
     def save(self, *args, **kwargs):
         """Override save method to set approved status and invalidate navbar cache."""

@@ -23,9 +23,7 @@ class ElvantoGroup(models.Model):
 
         Creates it if it does not already exist.
         """
-        grp = RecipientGroup.objects.get_or_create(
-            name=self.apostello_group_name
-        )[0]
+        grp = RecipientGroup.objects.get_or_create(name=self.apostello_group_name)[0]
         grp.description = 'Imported from Elvanto'
         grp.save()
         return grp
@@ -52,17 +50,13 @@ class ElvantoGroup(models.Model):
             number = try_both_num_fields(prsn['mobile'], prsn['phone'])
         except NotValidPhoneNumber:
             print(
-                'Adding {0} {1} failed ({2},{3})'.format(
-                    prsn['firstname'], prsn['lastname'], prsn['mobile'],
-                    prsn['phone']
-                )
+                'Adding {0} {1} failed ({2},{3})'.
+                format(prsn['firstname'], prsn['lastname'], prsn['mobile'], prsn['phone'])
             )
             return
         # create person
         prsn_obj = Recipient.objects.get_or_create(number=number)[0]
-        prsn_obj.first_name = prsn['firstname'] if not prsn[
-            'preferred_name'
-        ] else prsn['preferred_name']
+        prsn_obj.first_name = prsn['firstname'] if not prsn['preferred_name'] else prsn['preferred_name']
         prsn_obj.last_name = prsn['lastname']
         prsn_obj.save()
         # add person to group

@@ -1,17 +1,24 @@
-module TestSerialisation exposing (suite)
+module TestSerialisation exposing (serialisation)
 
+import Data.ElvantoGroup exposing (ElvantoGroup, decodeElvantoGroup, encodeElvantoGroup)
+import Data.Keyword exposing (Keyword, decodeKeyword, encodeKeyword)
+import Data.QueuedSms exposing (QueuedSms, decodeQueuedSms, encodeQueuedSms)
+import Data.Recipient exposing (Recipient, RecipientSimple, decodeRecipient, decodeRecipientSimple, encodeRecipient, encodeRecipientSimple)
+import Data.RecipientGroup exposing (RecipientGroup, decodeRecipientGroup, encodeRecipientGroup)
+import Data.SmsInbound exposing (SmsInbound, decodeSmsInbound, encodeSmsInbound)
+import Data.SmsOutbound exposing (SmsOutbound, decodeSmsOutbound, encodeSmsOutbound)
+import Data.User exposing (User, UserProfile, decodeUser, decodeUserProfile, encodeUser, encodeUserProfile)
 import Date
 import Expect
 import Fuzz exposing (Fuzzer)
 import Json.Decode as Decode
 import Json.Encode as Encode
-import Models.Apostello as Ap
-import Test exposing (Test, fuzz, describe)
+import Test exposing (Test, describe, fuzz)
 
 
-keyword : Fuzzer Ap.Keyword
+keyword : Fuzzer Keyword
 keyword =
-    Fuzz.map Ap.Keyword Fuzz.string
+    Fuzz.map Keyword Fuzz.string
         |> Fuzz.andMap Fuzz.int
         |> Fuzz.andMap Fuzz.string
         |> Fuzz.andMap Fuzz.string
@@ -21,16 +28,25 @@ keyword =
         |> Fuzz.andMap Fuzz.string
         |> Fuzz.andMap Fuzz.string
         |> Fuzz.andMap Fuzz.bool
+        |> Fuzz.andMap Fuzz.bool
+        |> Fuzz.andMap Fuzz.string
+        |> Fuzz.andMap Fuzz.string
+        |> Fuzz.andMap Fuzz.string
+        |> Fuzz.andMap fuzzDate
+        |> Fuzz.andMap (Fuzz.maybe fuzzDate)
+        |> Fuzz.andMap (Fuzz.list Fuzz.int)
+        |> Fuzz.andMap (Fuzz.list Fuzz.int)
+        |> Fuzz.andMap (Fuzz.list Fuzz.int)
 
 
-recipientSimple : Fuzzer Ap.RecipientSimple
+recipientSimple : Fuzzer RecipientSimple
 recipientSimple =
-    Fuzz.map2 Ap.RecipientSimple Fuzz.string Fuzz.int
+    Fuzz.map2 RecipientSimple Fuzz.string Fuzz.int
 
 
-smsInbound : Fuzzer Ap.SmsInbound
+smsInbound : Fuzzer SmsInbound
 smsInbound =
-    Fuzz.map Ap.SmsInbound Fuzz.string
+    Fuzz.map SmsInbound Fuzz.string
         |> Fuzz.andMap Fuzz.int
         |> Fuzz.andMap Fuzz.string
         |> Fuzz.andMap Fuzz.string
@@ -40,23 +56,21 @@ smsInbound =
         |> Fuzz.andMap Fuzz.bool
         |> Fuzz.andMap Fuzz.string
         |> Fuzz.andMap Fuzz.string
-        |> Fuzz.andMap Fuzz.string
-        |> Fuzz.andMap (Fuzz.maybe Fuzz.string)
         |> Fuzz.andMap (Fuzz.maybe Fuzz.int)
 
 
-smsOutbound : Fuzzer Ap.SmsOutbound
+smsOutbound : Fuzzer SmsOutbound
 smsOutbound =
-    Fuzz.map Ap.SmsOutbound Fuzz.string
+    Fuzz.map SmsOutbound Fuzz.string
         |> Fuzz.andMap Fuzz.int
         |> Fuzz.andMap (Fuzz.maybe fuzzDate)
         |> Fuzz.andMap Fuzz.string
         |> Fuzz.andMap (Fuzz.maybe recipientSimple)
 
 
-userProfile : Fuzzer Ap.UserProfile
+userProfile : Fuzzer UserProfile
 userProfile =
-    Fuzz.map Ap.UserProfile Fuzz.int
+    Fuzz.map UserProfile Fuzz.int
         |> Fuzz.andMap user
         |> Fuzz.andMap Fuzz.bool
         |> Fuzz.andMap Fuzz.bool
@@ -70,12 +84,12 @@ userProfile =
         |> Fuzz.andMap Fuzz.bool
 
 
-recipient : Fuzzer Ap.Recipient
+recipient : Fuzzer Recipient
 recipient =
-    Fuzz.map Ap.Recipient Fuzz.string
+    Fuzz.map Recipient Fuzz.string
         |> Fuzz.andMap Fuzz.string
+        |> Fuzz.andMap (Fuzz.maybe Fuzz.string)
         |> Fuzz.andMap Fuzz.int
-        |> Fuzz.andMap Fuzz.string
         |> Fuzz.andMap Fuzz.string
         |> Fuzz.andMap Fuzz.bool
         |> Fuzz.andMap Fuzz.bool
@@ -83,9 +97,9 @@ recipient =
         |> Fuzz.andMap (Fuzz.maybe smsInbound)
 
 
-recipientGroup : Fuzzer Ap.RecipientGroup
+recipientGroup : Fuzzer RecipientGroup
 recipientGroup =
-    Fuzz.map Ap.RecipientGroup Fuzz.string
+    Fuzz.map RecipientGroup Fuzz.string
         |> Fuzz.andMap Fuzz.int
         |> Fuzz.andMap Fuzz.string
         |> Fuzz.andMap (Fuzz.list recipientSimple)
@@ -95,27 +109,28 @@ recipientGroup =
         |> Fuzz.andMap Fuzz.bool
 
 
-user : Fuzzer Ap.User
+user : Fuzzer User
 user =
-    Fuzz.map4 Ap.User
+    Fuzz.map5 User
+        Fuzz.int
         Fuzz.string
         Fuzz.string
         Fuzz.bool
         Fuzz.bool
 
 
-elvantoGroup : Fuzzer Ap.ElvantoGroup
+elvantoGroup : Fuzzer ElvantoGroup
 elvantoGroup =
-    Fuzz.map4 Ap.ElvantoGroup
+    Fuzz.map4 ElvantoGroup
         Fuzz.string
         Fuzz.int
         Fuzz.bool
         (Fuzz.maybe fuzzDate)
 
 
-queuedSms : Fuzzer Ap.QueuedSms
+queuedSms : Fuzzer QueuedSms
 queuedSms =
-    Fuzz.map Ap.QueuedSms Fuzz.int
+    Fuzz.map QueuedSms Fuzz.int
         |> Fuzz.andMap (Fuzz.maybe fuzzDate)
         |> Fuzz.andMap Fuzz.string
         |> Fuzz.andMap Fuzz.bool
@@ -144,27 +159,27 @@ float2DateNoMillisec f =
 
 serialisation : Test
 serialisation =
-    describe "round trip"
+    describe "serialisation round trip"
         [ fuzz keyword "keyword" <|
-            roundTrip Ap.encodeKeyword Ap.decodeKeyword
+            roundTrip encodeKeyword decodeKeyword
         , fuzz smsInbound "sms inbound" <|
-            roundTrip Ap.encodeSmsInbound Ap.decodeSmsInbound
+            roundTrip encodeSmsInbound decodeSmsInbound
         , fuzz smsOutbound "sms outbound" <|
-            roundTrip Ap.encodeSmsOutbound Ap.decodeSmsOutbound
+            roundTrip encodeSmsOutbound decodeSmsOutbound
         , fuzz recipient "recipient" <|
-            roundTrip Ap.encodeRecipient Ap.decodeRecipient
+            roundTrip encodeRecipient decodeRecipient
         , fuzz recipientGroup "recipient group" <|
-            roundTrip Ap.encodeRecipientGroup Ap.decodeRecipientGroup
+            roundTrip encodeRecipientGroup decodeRecipientGroup
         , fuzz recipientSimple "recipient (simple)" <|
-            roundTrip Ap.encodeRecipientSimple Ap.decodeRecipientSimple
+            roundTrip encodeRecipientSimple decodeRecipientSimple
         , fuzz user "user" <|
-            roundTrip Ap.encodeUser Ap.decodeUser
+            roundTrip encodeUser decodeUser
         , fuzz userProfile "user profile" <|
-            roundTrip Ap.encodeUserProfile Ap.decodeUserProfile
+            roundTrip encodeUserProfile decodeUserProfile
         , fuzz elvantoGroup "elvanto group" <|
-            roundTrip Ap.encodeElvantoGroup Ap.decodeElvantoGroup
+            roundTrip encodeElvantoGroup decodeElvantoGroup
         , fuzz queuedSms "queued sms" <|
-            roundTrip Ap.encodeQueuedSms Ap.decodeQueuedSms
+            roundTrip encodeQueuedSms decodeQueuedSms
         ]
 
 
@@ -174,8 +189,3 @@ roundTrip enc dec model =
         |> enc
         |> Decode.decodeValue dec
         |> Expect.equal (Ok model)
-
-
-suite : Test
-suite =
-    describe "serialisation" [ serialisation ]

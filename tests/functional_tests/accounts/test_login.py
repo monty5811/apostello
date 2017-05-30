@@ -4,6 +4,7 @@ from time import sleep
 
 URI = "/"
 
+
 @pytest.mark.django_db
 @pytest.mark.slow
 @pytest.mark.selenium
@@ -22,7 +23,7 @@ class TestLogin:
         password_box = browser.find_elements_by_name('password')[0]
         password_box.send_keys('top_secret')
         login_button = browser.find_element_by_id('login_button')
-        click_and_wait(login_button, 5*driver_wait_time)
+        click_and_wait(login_button, 5 * driver_wait_time)
         # check we have been redirected
         assert 'accounts' not in browser.current_url
 
@@ -30,6 +31,8 @@ class TestLogin:
         browser.get(live_server + '/accounts/logout/')
         logout_confirm = browser.find_element_by_id('logout_button')
         click_and_wait(logout_confirm, driver_wait_time)
+
         def _test():
             assert 'accounts/login' in browser.current_url
+
         assert_with_timeout(_test, 10 * driver_wait_time)

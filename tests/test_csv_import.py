@@ -12,8 +12,5 @@ class TestCSVImport:
 
     def test_csv_import_good_data(self, users):
         users['c_staff'].post(
-            '/recipient/import/', {
-                'csv_data':
-                'test,person,+447902533904,\ntest,person,+447902537994'
-            }
+            '/recipient/import/', {'csv_data': 'test,person,+447902533904,\ntest,person,+447902537994'}
         )

@@ -1,9 +1,9 @@
 {% load staticfiles %}{% load apostello_extras %}
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		{% include 'apostello/includes/head.html' %}
-		{% block morehead %}
+  <head>
+    {% include 'apostello/includes/head.html' %}
+    {% block morehead %}
     {% endblock %}
   </head>
   <body data-js-view-name="{{ js_path }}">
@@ -75,11 +75,10 @@
             async
             ></script>
     {% endif %}
-		<script src="https://code.jquery.com/jquery-3.1.0.js"
-					integrity="sha256-slogkvB1K3VOkzAI8QITxV3VzpOnkeNVsKvtkYLMjfk="
-		 crossorigin="anonymous"></script>
-		<script src="{% static 'js/vendor.js' %}"></script>
-		<script src="{% static 'js/app.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.1.0.js"
+          integrity="sha256-slogkvB1K3VOkzAI8QITxV3VzpOnkeNVsKvtkYLMjfk="
+     crossorigin="anonymous"></script>
+    <script src="{% static 'js/app.js' %}"></script>
     {% csrf_token %}
-	</body>
+  </body>
 </html>

@@ -3,8 +3,8 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 
 from apostello.validators import (
-    gsm_validator, less_than_sms_char_limit, no_overlap_keyword,
-    not_twilio_num, twilio_reserved, validate_lower, validate_starts_with_plus
+    gsm_validator, less_than_sms_char_limit, no_overlap_keyword, not_twilio_num, twilio_reserved, validate_lower,
+    validate_starts_with_plus
 )
 from site_config.models import SiteConfiguration
 
@@ -32,10 +32,7 @@ class TestNoReserved:
         twilio_reserved('not_stop')
 
     def test_match(self):
-        for x in [
-            "stop", "stopall", "unsubscribe", "cancel", "end", "quit", "start",
-            "yes", "help", "info", "name"
-        ]:
+        for x in ["stop", "stopall", "unsubscribe", "cancel", "end", "quit", "start", "yes", "help", "info", "name"]:
             with pytest.raises(ValidationError):
                 twilio_reserved(x)
 
@@ -91,10 +88,7 @@ class TestCharLimit:
         """Test shorter limit imposed with %name% present."""
         s = SiteConfiguration.get_solo()
         with pytest.raises(ValidationError):
-            less_than_sms_char_limit(
-                't %name%' *
-                (s.sms_char_limit - settings.MAX_NAME_LENGTH + len('%name%'))
-            )
+            less_than_sms_char_limit('t %name%' * (s.sms_char_limit - settings.MAX_NAME_LENGTH + len('%name%')))
 
 
 class TestStartswithPlus:

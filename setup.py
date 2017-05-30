@@ -9,9 +9,7 @@ from setuptools import find_packages, setup
 with open('VERSION', 'r') as f:
     version = f.read().strip()
 
-install_reqs = parse_requirements(
-    'requirements.txt', session=pip.download.PipSession()
-)
+install_reqs = parse_requirements('requirements.txt', session=pip.download.PipSession())
 reqs = [str(ir.req) for ir in install_reqs]
 
 description = 'sms for your church'

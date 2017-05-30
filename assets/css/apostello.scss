@@ -1,5 +1,5 @@
 @import "./../semantic/dist/semantic";
-@import "./../node_modules/datetimepicker/dist/DateTimePicker";
+@import "./elm-datetimepicker";
 
 // fab:
 .fabContainer{
@@ -37,9 +37,4 @@
 .hvr-backward:hover, .hvr-backward:focus, .hvr-backward:active {
   -webkit-transform: translateX(-8px);
   transform: translateX(-8px);
-}
-
-// override search input
-.ui.multiple.search.dropdown > input.search {
-  width: 100%;
 }

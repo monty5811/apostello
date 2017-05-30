@@ -11,12 +11,12 @@ Code Contributions
 Guidelines for code contributions:
 
 * Unless it is a small or trivial fix, please open an issue before starting
-* Any new features must include tests - if a feature requires interaction through the browser, please add selenium backed tests
+* Any new features must include tests - if a feature requires interaction through the browser, please add selenium tests
 * Please do not hit the network in tests - see how vcrpy is used in the test suite for help with this
 * Please run ``./scripts/run_yapf.py`` before committing to maintain code style
 * Please add only a single feature per pull request
 
-Please do not hesitate to ask for help in our `chat <http://chat.church.io/>`_.
+Please do not hesitate to ask for help in the `chat <http://chat.church.io/>`_.
 
 
 Development Environment
@@ -27,8 +27,9 @@ Prerequisites
 
 * `Python 3 <https://www.python.org/>`_
 * `Git <https://www.atlassian.com/git/tutorials/install-git/>`_
+* `Redis <https://redis.io/>`_
 * Optional: `Node <https://nodejs.org/>`_ for frontend development
-* Optional: Geckodriver and Firefox (>47) to run browser based tests
+* Optional: xvfb, Geckodriver and Firefox (>47) to run browser based tests
 
 Get Started
 ~~~~~~~~~~~
@@ -47,7 +48,7 @@ Create a python 3.6 virtualenv and install dependencies:
 .. code-block:: bash
 
     python3.6 -m venv venv
-    pip install -r requirements/dev.txt
+    pip install -r requirements/test.txt
 
 Create a development database (this uses sqlite, if you need to reset the database, just delete db.sqlite3 and run this command again):
 
@@ -76,8 +77,8 @@ Running Tests
 .. code-block:: bash
 
     pip install tox
-    tox # you need firefox installed
-    tox -- -m \"not slow" # runs only quick tests
+    tox # you need xvfb, firefox and geckodriver installed
+    tox -- -m \"not slow\" # runs only quick tests
 
 
 Frontend
@@ -100,3 +101,4 @@ Changes must then be compiled:
     npm run build # regenerate all the assets
     npm run watchjs # watch js and elm code for changes
     npm run prodjs # build the js and elm for production
+    npm run elm-test # run elm tests

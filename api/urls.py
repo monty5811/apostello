@@ -1,188 +1,223 @@
 from django.conf.urls import url
+from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
 
 from api import serializers as s
 from api import views as v
-from api.drf_permissions import (
-    CanImport, CanSeeContactNames, CanSeeGroups, CanSeeIncoming, CanSeeKeyword,
-    CanSeeKeywords, CanSeeOutgoing, IsStaff
-)
-from apostello.models import (
-    Keyword, QueuedSms, Recipient, RecipientGroup, SmsInbound, SmsOutbound,
-    UserProfile
-)
+from api import drf_permissions as p
+from apostello import forms as f
+from apostello import models as m
 from elvanto.models import ElvantoGroup
 
 # api
 urlpatterns = [
-    # user profiles
+    # list views:
     url(
-        r'^v1/users/profiles/$',
-        v.ApiCollection.as_view(
-            model_class=UserProfile,
-            serializer_class=s.UserProfileSerializer,
-            permission_classes=(IsAuthenticated, IsStaff),
-        ),
-        name='user_profiles'
-    ),
-    url(
-        r'^v1/users/profiles/(?P<pk>[0-9]+)/$',
-        v.ApiMember.as_view(
-            model_class=UserProfile,
-            serializer_class=s.UserProfileSerializer,
-            permission_classes=(IsAuthenticated, IsStaff),
-        ),
-        name='user_profiles_member'
-    ),
-    # sms views
-    url(
-        r'^v1/sms/send/adhoc/$',
-        v.ApiSendAdhoc.as_view(),
-        name='send_adhoc',
-    ),
-    url(
-        r'^v1/sms/send/group/$',
-        v.ApiSendGroup.as_view(),
-        name='send_group',
-    ),
-    url(
-        r'^v1/sms/in/$',
-        v.ApiSmsCollection.as_view(
-            model_class=SmsInbound,
+        r'^v2/sms/in/$',
+        v.SmsCollection.as_view(
+            model_class=m.SmsInbound,
             serializer_class=s.SmsInboundSerializer,
-            permission_classes=(IsAuthenticated, CanSeeIncoming)
+            permission_classes=(IsAuthenticated, p.CanSeeIncoming)
         ),
         name='in_log'
     ),
     url(
-        r'^v1/sms/out/$',
-        v.ApiCollection.as_view(
-            model_class=SmsOutbound,
+        r'^v2/sms/out/$',
+        v.Collection.as_view(
+            model_class=m.SmsOutbound,
             serializer_class=s.SmsOutboundSerializer,
-            permission_classes=(IsAuthenticated, CanSeeOutgoing),
+            permission_classes=(IsAuthenticated, p.CanSeeOutgoing),
             related_field='recipient',
         ),
         name='out_log'
     ),
     url(
-        r'^v1/sms/in/(?P<pk>[0-9]+)/$',
-        v.ApiMember.as_view(
-            model_class=SmsInbound,
-            serializer_class=s.SmsInboundSerializer,
-            permission_classes=(IsAuthenticated, CanSeeIncoming),
-        ),
-        name='sms_in_member'
-    ),
-    # recipient views
-    url(
-        r'^v1/recipients/$',
-        v.ApiCollection.as_view(
-            model_class=Recipient,
+        r'^v2/recipients/$',
+        v.Collection.as_view(
+            model_class=m.Recipient,
+            form_class=f.RecipientForm,
             serializer_class=s.RecipientSerializer,
-            permission_classes=(IsAuthenticated, CanSeeContactNames)
+            permission_classes=(IsAuthenticated, p.CanSeeContactNames)
         ),
         name='recipients'
     ),
     url(
-        r'^v1/recipients/(?P<pk>[0-9]+)/$',
-        v.ApiMember.as_view(
-            model_class=Recipient,
-            serializer_class=s.RecipientSerializer,
-            permission_classes=(IsAuthenticated, CanSeeContactNames)
-        ),
-        name='recipient'
-    ),
-    # group views
-    url(
-        r'^v1/groups/$',
-        v.ApiCollection.as_view(
-            model_class=RecipientGroup,
+        r'^v2/groups/$',
+        v.Collection.as_view(
+            model_class=m.RecipientGroup,
+            form_class=f.ManageRecipientGroupForm,
             serializer_class=s.RecipientGroupSerializer,
-            permission_classes=(IsAuthenticated, CanSeeGroups),
+            permission_classes=(IsAuthenticated, p.CanSeeGroups),
             prefetch_fields=['recipient_set'],
         ),
         name='recipient_groups'
     ),
     url(
-        r'^v1/groups/(?P<pk>[0-9]+)/$',
-        v.ApiMember.as_view(
-            model_class=RecipientGroup,
-            serializer_class=s.RecipientGroupSerializer,
-            permission_classes=(IsAuthenticated, CanSeeGroups)
-        ),
-        name='group'
-    ),
-    # Elvanto groups
-    url(
-        r'^v1/elvanto/groups/$',
-        v.ApiCollection.as_view(
+        r'^v2/elvanto/groups/$',
+        v.Collection.as_view(
             model_class=ElvantoGroup,
             serializer_class=s.ElvantoGroupSerializer,
-            permission_classes=(IsAuthenticated, CanSeeGroups, CanImport)
+            permission_classes=(IsAuthenticated, p.CanSeeGroups, p.CanImport)
         ),
         name='elvanto_groups'
     ),
     url(
-        r'^v1/elvanto/group/(?P<pk>[0-9]+)/$',
-        v.ApiMember.as_view(
-            model_class=ElvantoGroup,
-            serializer_class=s.ElvantoGroupSerializer,
-            permission_classes=(IsAuthenticated, CanSeeGroups, CanImport)
-        ),
-        name='elvanto_group'
-    ),
-    # Elvanto group buttons
-    url(
-        r'^v1/elvanto/group_fetch/$',
-        v.ElvantoFetchButton.as_view(),
-        name='fetch_elvanto_groups'
-    ),
-    url(
-        r'^v1/elvanto/group_pull/$',
-        v.ElvantoPullButton.as_view(),
-        name='pull_elvanto_groups'
-    ),
-    # keyword views
-    url(
-        r'^v1/keywords/$',
-        v.ApiCollection.as_view(
-            model_class=Keyword,
-            serializer_class=s.KeywordSerializer,
-            permission_classes=(IsAuthenticated, CanSeeKeywords)
-        ),
-        name='keywords'
-    ),
-    url(
-        r'^v1/keywords/(?P<keyword>[\d|\w]+)/$',
-        v.ApiMember.as_view(
-            model_class=Keyword,
-            serializer_class=s.KeywordSerializer,
-            permission_classes=(IsAuthenticated, CanSeeKeyword)
-        ),
-        name='keyword'
-    ),
-    url(
-        r'^v1/keywords/(?P<keyword>[\d|\w]+)/archive_resps/$',
-        v.ArchiveAllResponses.as_view(),
-        name='keyword_archive_all_responses',
-    ),
-    # queued messages views
-    url(
-        r'^v1/queued/sms/$',
+        r'^v2/queued/sms/$',
         v.QueuedSmsCollection.as_view(
-            model_class=QueuedSms,
+            model_class=m.QueuedSms,
             serializer_class=s.QueuedSmsSerializer,
-            permission_classes=(IsAuthenticated, IsStaff)
+            permission_classes=(IsAuthenticated, p.IsStaff)
         ),
         name='queued_smss'
     ),
     url(
-        r'^v1/queued/sms/(?P<pk>[0-9]+)/$',
-        v.ApiMember.as_view(
-            model_class=QueuedSms,
-            serializer_class=s.QueuedSmsSerializer,
-            permission_classes=(IsAuthenticated, IsStaff)
+        r'^v2/keywords/$',
+        v.Collection.as_view(
+            model_class=m.Keyword,
+            form_class=f.KeywordForm,
+            serializer_class=s.KeywordSerializer,
+            permission_classes=(IsAuthenticated, p.CanSeeKeywords)
         ),
-        name='queued_sms'
+        name='keywords'
+    ),
+    url(
+        r'^v2/users/profiles/$',
+        v.Collection.as_view(
+            model_class=m.UserProfile,
+            serializer_class=s.UserProfileSerializer,
+            permission_classes=(IsAuthenticated, p.IsStaff),
+        ),
+        name='user_profiles'
+    ),
+    url(
+        r'^v2/users/$',
+        v.UserCollection.as_view(
+            model_class=User,
+            serializer_class=s.UserSerializer,
+            permission_classes=(IsAuthenticated, p.CanSeeKeywords),
+        ),
+        name='users'
+    ),
+    url(
+        r'^v2/config/$',
+        v.ConfigView.as_view(),
+        name='site_config',
+    ),
+    # simple toggle views:
+    url(
+        r'^v2/toggle/sms/in/display_on_wall/(?P<pk>[0-9]+)/$',
+        v.ObjSimpleUpdate.as_view(
+            model_class=m.SmsInbound,
+            serializer_class=s.SmsInboundSerializer,
+            permission_classes=(IsAuthenticated, p.CanSeeIncoming),
+            field='display_on_wall',
+        ),
+        name='toggle_display_on_wall',
+    ),
+    url(
+        r'^v2/toggle/sms/in/deal_with/(?P<pk>[0-9]+)/$',
+        v.ObjSimpleUpdate.as_view(
+            model_class=m.SmsInbound,
+            serializer_class=s.SmsInboundSerializer,
+            permission_classes=(IsAuthenticated, p.CanSeeIncoming, p.CanSeeKeywords),
+            field='deal_with',
+        ),
+        name='toggle_deal_with_sms',
+    ),
+    url(
+        r'^v2/toggle/elvanto/group/sync/(?P<pk>[0-9]+)/$',
+        v.ObjSimpleUpdate.as_view(
+            model_class=ElvantoGroup,
+            serializer_class=s.ElvantoGroupSerializer,
+            permission_classes=(IsAuthenticated, ),
+            field='sync',
+        ),
+        name='toggle_elvanto_group_sync',
+    ),
+    # action views:
+    url(
+        r'^v2/actions/sms/send/adhoc/$',
+        v.SendAdhoc.as_view(),
+        name='act_send_adhoc',
+    ),
+    url(
+        r'^v2/actions/sms/send/group/$',
+        v.SendGroup.as_view(),
+        name='act_send_group',
+    ),
+    url(
+        r'^v2/actions/sms/in/archive/(?P<pk>[0-9]+)/$',
+        v.ArchiveObj.as_view(
+            model_class=m.SmsInbound,
+            serializer_class=s.SmsInboundSerializer,
+            permission_classes=(IsAuthenticated, p.CanSeeIncoming, ),
+        ),
+        name='act_archive_sms',
+    ),
+    url(
+        r'^v2/actions/recipient/archive/(?P<pk>[0-9]+)/$',
+        v.ArchiveObj.as_view(
+            model_class=m.Recipient, serializer_class=s.RecipientSerializer, permission_classes=(IsAuthenticated, )
+        ),
+        name='act_archive_recipient',
+    ),
+    url(
+        r'^v2/actions/group/archive/(?P<pk>[0-9]+)/$',
+        v.ArchiveObj.as_view(
+            model_class=m.RecipientGroup,
+            serializer_class=s.RecipientGroupSerializer,
+            permission_classes=(IsAuthenticated, )
+        ),
+        name='act_archive_group',
+    ),
+    url(
+        r'^v2/actions/keyword/archive/(?P<keyword>[\d|\w]+)/$',
+        v.ArchiveObj.as_view(
+            model_class=m.Keyword, serializer_class=s.KeywordSerializer, permission_classes=(IsAuthenticated, )
+        ),
+        name='act_archive_keyword',
+    ),
+    url(
+        r'^v2/actions/keywords/(?P<keyword>[\d|\w]+)/archive_resps/$',
+        v.ArchiveAllResponses.as_view(),
+        name='act_keyword_archive_all_responses',
+    ),
+    url(
+        r'^v2/actions/sms/in/reingest/(?P<pk>[0-9]+)/$',
+        v.ReingestObj.as_view(
+            model_class=m.SmsInbound,
+            serializer_class=s.SmsInboundSerializer,
+            permission_classes=(IsAuthenticated, p.CanSeeIncoming),
+        ),
+        name='act_reingest_sms',
+    ),
+    url(
+        r'^v2/actions/group/update_members/(?P<pk>[0-9]+)/$',
+        v.UpdateGroupMembers.as_view(
+            model_class=m.RecipientGroup,
+            serializer_class=s.RecipientGroupSerializer,
+            permission_classes=(IsAuthenticated, p.CanSeeGroups)
+        ),
+        name='act_update_group_members'
+    ),
+    url(r'^v2/actions/elvanto/group_fetch/$', v.ElvantoFetchButton.as_view(), name='act_fetch_elvanto_groups'),
+    url(r'^v2/actions/elvanto/group_pull/$', v.ElvantoPullButton.as_view(), name='act_pull_elvanto_groups'),
+    url(
+        r'^v2/actions/queued/sms/(?P<pk>[0-9]+)/$',
+        v.CancelObj.as_view(
+            model_class=m.QueuedSms,
+            serializer_class=s.QueuedSmsSerializer,
+            permission_classes=(IsAuthenticated, p.IsStaff)
+        ),
+        name='act_cancel_queued_sms'
+    ),
+    url(
+        r'^v2/actions/users/profiles/update/(?P<pk>[0-9]+)/$',
+        v.UpdateUserProfile.as_view(
+            model_class=m.UserProfile,
+            serializer_class=s.UserProfileSerializer,
+            permission_classes=(IsAuthenticated, p.IsStaff),
+        ),
+        name='user_profile_update'
     ),
 ]

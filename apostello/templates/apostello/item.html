@@ -1,13 +1,6 @@
 {% extends "apostello/django.html" %}
 {% load semanticui %}
-{% load apostello_extras %}
-{% block title %}
-  {% if not object %}
-    New {{identifier}}
-  {% else %}
-    {{object}}
-  {% endif %}
-{% endblock %}
+{% block title %}{% endblock %}
 {% block content %}
   {% if intro_text %}
     <p>{{ intro_text }}</p>
@@ -18,16 +11,4 @@
       <div id="dtBox"></div>
       <button class="ui primary button" type="submit">{{ submit_text }}</button>
   </form>
-
-  {% if sms_history %}
-    {% if user.profile.can_see_incoming %}
-      <br>
-      <h4>Recent Incoming History</h4>
-      <div id="elmContainer"></div>
-    {% endif %}
-  {% endif %}
-  {% if 'group' == identifier and object %}
-    <br>
-    <div id="elmContainer"></div>
-  {% endif %}
 {% endblock %}

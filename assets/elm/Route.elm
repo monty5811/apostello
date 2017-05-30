@@ -1,11 +1,21 @@
-module Route exposing (loc2Page, page2loc, route)
+module Route exposing (loc2Page, page2loc, route, spaLink)
 
+import Data.User exposing (UserProfile)
 import Formatting as F exposing ((<>))
+import Html exposing (Attribute, Html)
+import Html.Attributes exposing (href)
+import Html.Events exposing (onWithOptions)
+import Json.Decode as Decode
+import Messages exposing (Msg(NewUrl))
 import Models exposing (Settings)
-import Models.Apostello exposing (UserProfile)
 import Navigation
-import Pages exposing (FabOnlyPage(..), Page(..))
-import UrlParser as Url exposing ((</>), (<?>), s, int, customParam, stringParam, intParam, top, string)
+import Pages exposing (FabOnlyPage(..), Page(..), initSendAdhoc, initSendGroup)
+import Pages.ContactForm.Model exposing (initialContactFormModel)
+import Pages.FirstRun.Model exposing (initialFirstRunModel)
+import Pages.GroupComposer.Model exposing (initialGroupComposerModel)
+import Pages.GroupForm.Model exposing (initialGroupFormModel)
+import Pages.KeywordForm.Model exposing (initialKeywordFormModel)
+import UrlParser as Url exposing ((</>), (<?>), customParam, int, intParam, s, string, stringParam, top)
 
 
 loc2Page : Navigation.Location -> Settings -> Page
@@ -15,45 +25,75 @@ loc2Page location settings =
         |> checkPagePerms settings
 
 
+spaLink : (List (Attribute Msg) -> List (Html Msg) -> Html Msg) -> List (Attribute Msg) -> List (Html Msg) -> Page -> Html Msg
+spaLink node attrs nodes page =
+    let
+        uri =
+            page2loc page
+    in
+    node (List.append [ href uri, spaLinkClick <| NewUrl uri ] attrs) nodes
+
+
+spaLinkClick : msg -> Attribute msg
+spaLinkClick message =
+    onWithOptions "click" { stopPropagation = True, preventDefault = True } <|
+        Decode.andThen (maybePreventDefault message) <|
+            Decode.map3
+                (\x y z -> not <| x || y || z)
+                (Decode.field "ctrlKey" Decode.bool)
+                (Decode.field "metaKey" Decode.bool)
+                (Decode.field "shiftKey" Decode.bool)
+
+
+maybePreventDefault : msg -> Bool -> Decode.Decoder msg
+maybePreventDefault msg preventDefault =
+    case preventDefault of
+        True ->
+            Decode.succeed msg
+
+        False ->
+            Decode.fail "Normal link"
+
+
 route : Url.Parser (Page -> a) a
 route =
     Url.oneOf
         [ Url.map Home top
-        , Url.map SendAdhoc (s "send" </> s "adhoc" <?> stringParam "content" <?> intListParam "recipients")
-        , Url.map SendGroup (s "send" </> s "group" <?> stringParam "content" <?> intParam "recipient_group")
+        , Url.map initSendAdhoc (s "send" </> s "adhoc" <?> stringParam "content" <?> intListParam "recipients")
+        , Url.map initSendGroup (s "send" </> s "group" <?> stringParam "content" <?> intParam "recipient_group")
         , Url.map InboundTable (s "incoming")
         , Url.map Curator (s "incoming" </> s "curate_wall")
         , Url.map (GroupTable False) (s "group" </> s "all")
         , Url.map (GroupTable True) (s "group" </> s "archive")
-        , Url.map GroupComposer (s "group" </> s "composer")
+        , Url.map (GroupComposer initialGroupComposerModel) (s "group" </> s "composer")
         , Url.map (RecipientTable False) (s "recipient" </> s "all")
         , Url.map (RecipientTable True) (s "recipient" </> s "archive")
         , Url.map (KeywordTable False) (s "keyword" </> s "all")
         , Url.map (KeywordTable True) (s "keyword" </> s "archive")
-        , Url.map (KeyRespTable False) (s "keyword" </> s "responses" </> string)
-        , Url.map (KeyRespTable True) (s "keyword" </> s "responses" </> s "archive" </> string)
+        , Url.map (KeyRespTable False False) (s "keyword" </> s "responses" </> string)
+        , Url.map (KeyRespTable False True) (s "keyword" </> s "responses" </> s "archive" </> string)
         , Url.map OutboundTable (s "outgoing")
         , Url.map ScheduledSmsTable (s "scheduled" </> s "sms")
         , Url.map UserProfileTable (s "users" </> s "profiles")
         , Url.map ElvantoImport (s "elvanto" </> s "import")
-        , Url.map FirstRun (s "config" </> s "first_run")
+        , Url.map (FirstRun initialFirstRunModel) (s "config" </> s "first_run")
+        , Url.map (GroupForm initialGroupFormModel << Just) (s "group" </> s "edit" </> int)
+        , Url.map (GroupForm initialGroupFormModel Nothing) (s "group" </> s "new")
+        , Url.map (ContactForm initialContactFormModel << Just) (s "recipient" </> s "edit" </> int)
+        , Url.map (ContactForm initialContactFormModel Nothing) (s "recipient" </> s "new")
+        , Url.map (KeywordForm initialKeywordFormModel Nothing) (s "keyword" </> s "new")
+        , Url.map (KeywordForm initialKeywordFormModel << Just) (s "keyword" </> s "edit" </> string)
+        , Url.map (SiteConfigForm Nothing) (s "config" </> s "site")
 
         -- No Shell views:
         , Url.map Wall (s "incoming" </> s "wall")
-        , Url.map EditGroup (s "group" </> s "edit" </> int)
-        , Url.map EditContact (s "recipient" </> s "edit" </> int)
 
         -- Fab only views:
         , Url.map (FabOnlyPage Help) (s "help")
-        , Url.map (FabOnlyPage NewGroup) (s "group" </> s "new")
         , Url.map (FabOnlyPage CreateAllGroup) (s "group" </> s "create_all")
-        , Url.map (FabOnlyPage NewContact) (s "recipient" </> s "new")
-        , Url.map (FabOnlyPage NewKeyword) (s "keyword" </> s "new")
-        , Url.map (FabOnlyPage << EditKeyword) (s "keyword" </> s "edit" </> string)
         , Url.map (FabOnlyPage ContactImport) (s "recipient" </> s "import")
         , Url.map (FabOnlyPage ApiSetup) (s "api-setup")
         , Url.map (FabOnlyPage << EditUserProfile) (s "users" </> s "profiles" </> int)
-        , Url.map (FabOnlyPage EditSiteConfig) (s "config" </> s "site")
         , Url.map (FabOnlyPage EditResponses) (s "config" </> s "responses")
         ]
 
@@ -100,7 +140,7 @@ page2loc page =
         GroupTable False ->
             "/group/all/"
 
-        GroupComposer ->
+        GroupComposer _ ->
             "/group/composer/"
 
         RecipientTable True ->
@@ -130,43 +170,52 @@ page2loc page =
         ScheduledSmsTable ->
             "/scheduled/sms/"
 
-        KeyRespTable True keyword ->
+        KeyRespTable _ True keyword ->
             "/keyword/responses/archive/" ++ keyword ++ "/"
 
-        KeyRespTable False keyword ->
+        KeyRespTable _ False keyword ->
             "/keyword/responses/" ++ keyword ++ "/"
 
-        FirstRun ->
+        FirstRun _ ->
             "/config/first_run/"
 
-        SendAdhoc content pks ->
-            "/send/adhoc/" |> addAdhocParams content pks
+        SendAdhoc saModel ->
+            "/send/adhoc/" |> addAdhocParams (Just saModel.content) (Just saModel.selectedContacts)
 
-        SendGroup content pk ->
-            "/send/group/" |> addGroupParams content pk
+        SendGroup sgModel ->
+            "/send/group/" |> addGroupParams (Just sgModel.content) sgModel.selectedPk
 
-        EditGroup pk ->
-            F.print (F.s "/group/edit/" <> F.int <> F.s "/") pk
+        GroupForm _ maybePk ->
+            case maybePk of
+                Nothing ->
+                    "/group/new/"
 
-        EditContact pk ->
-            F.print (F.s "/recipient/edit/" <> F.int <> F.s "/") pk
+                Just pk ->
+                    F.print (F.s "/group/edit/" <> F.int <> F.s "/") pk
+
+        ContactForm _ maybePk ->
+            case maybePk of
+                Nothing ->
+                    "/recipient/new/"
+
+                Just pk ->
+                    F.print (F.s "/recipient/edit/" <> F.int <> F.s "/") pk
+
+        KeywordForm _ maybeK ->
+            case maybeK of
+                Nothing ->
+                    "/keyword/new/"
+
+                Just k ->
+                    F.print (F.s "/keyword/edit/" <> F.string <> F.s "/") k
+
+        SiteConfigForm _ ->
+            "/config/site/"
 
         FabOnlyPage f ->
             case f of
-                NewKeyword ->
-                    "/keyword/new/"
-
-                NewGroup ->
-                    "/group/new/"
-
-                NewContact ->
-                    "/recipient/new/"
-
                 CreateAllGroup ->
                     "/group/create_all/"
-
-                EditKeyword k ->
-                    F.print (F.s "/keyword/edit/" <> F.string <> F.s "/") k
 
                 EditUserProfile pk ->
                     F.print (F.s "/users/profiles/" <> F.int <> F.s "/") pk
@@ -176,9 +225,6 @@ page2loc page =
 
                 ApiSetup ->
                     "/api-setup/"
-
-                EditSiteConfig ->
-                    "/config/site/"
 
                 EditResponses ->
                     "/config/responses/"
@@ -202,7 +248,7 @@ addAdhocParams maybeContent maybePks url =
                 |> List.map (Maybe.withDefault "")
                 |> String.join "&"
     in
-        url ++ "?" ++ params
+    url ++ "?" ++ params
 
 
 addGroupParams : Maybe String -> Maybe Int -> String -> String
@@ -214,7 +260,7 @@ addGroupParams maybeContent maybePk url =
                 |> List.map (Maybe.withDefault "")
                 |> String.join "&"
     in
-        url ++ "?" ++ params
+    url ++ "?" ++ params
 
 
 notNothing : Maybe a -> Bool
@@ -277,7 +323,7 @@ checkPerm blockedKeywords userPerms page =
                 GroupTable True ->
                     userPerms.user.is_staff
 
-                GroupComposer ->
+                GroupComposer _ ->
                     userPerms.can_see_contact_names && userPerms.can_see_groups
 
                 RecipientTable False ->
@@ -307,39 +353,55 @@ checkPerm blockedKeywords userPerms page =
                 ScheduledSmsTable ->
                     userPerms.user.is_staff
 
-                KeyRespTable _ k ->
+                KeyRespTable _ _ k ->
                     userPerms.can_see_keywords && (List.member k blockedKeywords |> not)
 
-                FirstRun ->
+                FirstRun _ ->
                     True
 
                 AccessDenied ->
                     True
 
-                SendAdhoc _ _ ->
+                SendAdhoc _ ->
                     userPerms.can_send_sms
 
-                SendGroup _ _ ->
+                SendGroup _ ->
                     userPerms.can_send_sms
 
                 Error404 ->
                     True
 
-                EditGroup _ ->
+                GroupForm _ _ ->
                     userPerms.can_see_groups
 
-                EditContact _ ->
-                    True
+                ContactForm _ maybePk ->
+                    case maybePk of
+                        Nothing ->
+                            userPerms.can_see_contact_names
+
+                        Just _ ->
+                            userPerms.can_see_contact_nums
+
+                KeywordForm _ maybeK ->
+                    case maybeK of
+                        Nothing ->
+                            userPerms.can_see_keywords
+
+                        Just k ->
+                            userPerms.can_see_keywords && (List.member k blockedKeywords |> not)
 
                 Home ->
                     True
 
+                SiteConfigForm _ ->
+                    userPerms.user.is_staff
+
                 FabOnlyPage _ ->
                     True
     in
-        case permBool of
-            True ->
-                page
+    case permBool of
+        True ->
+            page
 
-            False ->
-                AccessDenied
+        False ->
+            AccessDenied

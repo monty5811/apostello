@@ -12,15 +12,6 @@ module.exports = {
 
   entry: {
     app: "./js/app",
-    vendor: [
-      "datetimepicker",
-      "./semantic/dist/components/transition.js",
-      "./semantic/dist/components/dropdown.js"
-    ]
-  },
-
-  externals: {
-    jquery: "jQuery"
   },
 
   output: {
@@ -30,9 +21,6 @@ module.exports = {
 
   resolve: {
     extensions: [".js", ".elm"],
-    alias: {
-      jquery: "jquery/src/jquery"
-    }
   },
 
   plugins: [
@@ -40,16 +28,6 @@ module.exports = {
       minimize: true,
       debug: false
     }),
-    //
-    new webpack.ProvidePlugin({
-      $: "jquery",
-      jQuery: "jquery"
-    }),
-    //
-    new webpack.optimize.CommonsChunkPlugin({
-      name: "vendor",
-      filename: "vendor.js"
-    })
   ],
 
   module: {

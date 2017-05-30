@@ -24,9 +24,5 @@ class FirstRunRedirect(MiddlewareMixin):
         if num_users > 0:
             return
 
-        if not request.path_info.startswith((
-            '/sms',
-            '/config',
-            '/offline',
-        )):
+        if not request.path_info.startswith(('/sms', '/config', '/offline', )):
             return HttpResponseRedirect('/config/first_run/')

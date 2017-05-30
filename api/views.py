@@ -10,11 +10,19 @@ from rest_framework import generics
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 
-from api.drf_permissions import CanSeeKeywords, CanSendSms
-from api.serializers import SmsInboundSerializer
+from api.drf_permissions import CanSeeKeywords, CanSendSms, IsStaff
+from api import serializers
+from api.forms import handle_form
 from apostello.forms import SendAdhocRecipientsForm, SendRecipientGroupForm
 from apostello.mixins import ProfilePermsMixin
 from apostello.models import Keyword, Recipient, SmsInbound, SmsOutbound
+from elvanto.models import ElvantoGroup
+from site_config.forms import SiteConfigurationForm
+from site_config.models import SiteConfiguration
+
+
+class ActionForbidden(Exception):
+    pass
 
 
 class StandardPagination(PageNumberPagination):
@@ -24,10 +32,26 @@ class StandardPagination(PageNumberPagination):
     max_page_size = 1000
 
 
-class ApiCollection(generics.ListAPIView):
+class ConfigView(APIView):
+    permission_classes = (IsAuthenticated, IsStaff)
+    model_class = SiteConfiguration
+    form_class = SiteConfigurationForm
+    serializer_class = serializers.SiteConfigurationSerializer
+
+    def get(self, request, format=None, **kwargs):
+        obj = self.model_class.get_solo()
+        serializer = self.serializer_class(obj)
+        return Response(serializer.data)
+
+    def post(self, request, format=None, **kwargs):
+        return handle_form(self, request)
+
+
+class Collection(generics.ListAPIView):
     """Basic collection view. Check user is authenticated by default."""
     permission_classes = (IsAuthenticated, )
     model_class = None
+    form_class = None
     serializer_class = None
     related_field = None
     prefetch_fields = None
@@ -45,33 +69,38 @@ class ApiCollection(generics.ListAPIView):
             objs = objs.prefetch_related(*self.prefetch_fields)
         if not self.request.user.is_staff  \
                 and self.model_class is not SmsInbound \
-                and self.model_class is not SmsOutbound:
+                and self.model_class is not SmsOutbound \
+                and self.model_class is not ElvantoGroup:
             # filter out archived items
             objs = objs.filter(is_archived=False)
         return objs
 
+    def post(self, request, format=None, **kwargs):
+        return handle_form(self, request)
 
-class ApiSmsCollection(ApiCollection):
+
+class UserCollection(Collection):
+    def _get_queryset(self):
+        return self.model_class.objects.all().order_by('email')
+
+
+class SmsCollection(Collection):
     def get_queryset(self):
         qs = self._get_queryset()
         if self.request.user.is_staff:
             return qs
 
-        blocked_keywords = [
-            x.keyword for x in Keyword.objects.all()
-            if not x.can_user_access(self.request.user)
-        ]
+        blocked_keywords = [x.keyword for x in Keyword.objects.all() if not x.can_user_access(self.request.user)]
         return qs.exclude(matched_keyword__in=blocked_keywords)
 
 
-class QueuedSmsCollection(ApiCollection):
+class QueuedSmsCollection(Collection):
     def get_queryset(self):
         """Return only messages that have not been sent"""
         return self.model_class.objects.all().filter(sent=False)
 
 
-class ApiMember(APIView):
-    """Basic member view. Check user is authenticated by default."""
+class ActionObj(APIView):
     permission_classes = (IsAuthenticated, )
     model_class = None
     serializer_class = None
@@ -88,31 +117,33 @@ class ApiMember(APIView):
         obj.save()
         return obj
 
+    def action(self, request, obj):
+        raise NotImplementedError
+
     def get_obj(self, kwargs):
         try:
             obj = get_object_or_404(self.model_class, pk=kwargs['pk'])
         except KeyError:
-            obj = get_object_or_404(
-                self.model_class, keyword=kwargs['keyword']
-            )
+            obj = get_object_or_404(self.model_class, keyword=kwargs['keyword'])
 
         return obj
 
-    def get(self, request, format=None, **kwargs):
-        """Handle get requests."""
+    def post(self, request, format=None, **kwargs):
         obj = self.get_obj(kwargs)
+        try:
+            obj = self.action(request, obj)
+        except ActionForbidden:
+            return Response({}, status=status.HTTP_403_FORBIDDEN)
 
         serializer = self.serializer_class(obj, context={'request': request})
         return Response(serializer.data)
 
-    def post(self, request, format=None, **kwargs):
+
+class ArchiveObj(ActionObj):
+    """Post to this view will archive the relevant object."""
+
+    def action(self, request, obj):
         """Handle toggle buttons."""
-        obj = self.get_obj(kwargs)
-
-        obj = self.simple_update(request, obj, 'dealt_with')
-        obj = self.simple_update(request, obj, 'display_on_wall')
-        obj = self.simple_update(request, obj, 'sync')
-
         archived = request.data.get('archived')
         if archived is not None:
             if archived:
@@ -120,14 +151,42 @@ class ApiMember(APIView):
                 obj.save()
             else:
                 # restrict permission:
-                if request.user.profile.can_archive:
+                if request.user.is_staff or request.user.profile.can_archive:
                     obj.archive()
                 else:
-                    return Response({}, status=status.HTTP_403_FORBIDDEN)
+                    raise ActionForbidden
+        return obj
 
+
+class ReingestObj(ActionObj):
+    """Post to this view will call `reingest` on object"""
+
+    def action(self, request, obj):
         if request.data.get('reingest'):
             obj = obj.reimport()
+        return obj
 
+
+class CancelObj(ActionObj):
+    """Post to this view will call `cancel` on object"""
+
+    def action(self, request, obj):
+        cancel_queued_sms = request.data.get('cancel_sms')
+        if cancel_queued_sms is not None:
+            obj.cancel()
+            return obj
+
+
+class ObjSimpleUpdate(ActionObj):
+    field = None
+
+    def action(self, request, obj):
+        obj = self.simple_update(request, obj, self.field)
+        return obj
+
+
+class UpdateUserProfile(ActionObj):
+    def action(self, request, obj):
         user_profile = request.data.get('user_profile')
         if user_profile is not None:
             user_profile.pop('user')
@@ -135,7 +194,11 @@ class ApiMember(APIView):
             for x in user_profile:
                 setattr(obj, x, user_profile[x])
             obj.save()
+        return obj
 
+
+class UpdateGroupMembers(ActionObj):
+    def action(self, request, obj):
         is_member = request.data.get('member')
         if is_member is not None:
             contact = Recipient.objects.get(pk=request.data.get('contactPk'))
@@ -146,14 +209,7 @@ class ApiMember(APIView):
 
             obj.save()
 
-        cancel_queued_sms = request.data.get('cancel_sms')
-        if cancel_queued_sms is not None:
-            r = Response({'pk': obj.pk}, status=status.HTTP_200_OK)
-            obj.cancel()
-            return r
-
-        serializer = self.serializer_class(obj, context={'request': request})
-        return Response(serializer.data)
+        return obj
 
 
 class ElvantoPullButton(ProfilePermsMixin, View):
@@ -193,7 +249,7 @@ class ArchiveAllResponses(APIView):
         return Response({}, status=status.HTTP_200_OK)
 
 
-class ApiSendAdhoc(APIView):
+class SendAdhoc(APIView):
     """Send SMS to individuals."""
     permission_classes = (IsAuthenticated, CanSendSms)
 
@@ -209,40 +265,24 @@ class ApiSendAdhoc(APIView):
                 )
 
             if form.cleaned_data['scheduled_time'] is None:
+                msg_txt = "Sending \"{0}\"...\nPlease check the logs for verification...".format(
+                    form.cleaned_data['content']
+                )
                 msg = {
-                    'type_':
-                    'info',
-                    'text':
-                    "Sending \"{0}\"...\n"
-                    "Please check the logs for verification...".
-                    format(form.cleaned_data['content'])
+                    'type_': 'info',
+                    'text': msg_txt,
                 }
             else:
                 msg = {
-                    'type_':
-                    'info',
-                    'text':
-                    "'{0}' has been successfully queued.".
-                    format(form.cleaned_data['content'])
+                    'type_': 'info',
+                    'text': "'{0}' has been successfully queued.".format(form.cleaned_data['content'])
                 }
-            return Response(
-                {
-                    'messages': [msg],
-                    'errors': {}
-                },
-                status=status.HTTP_201_CREATED
-            )
+            return Response({'messages': [msg], 'errors': {}}, status=status.HTTP_201_CREATED)
 
-        return Response(
-            {
-                'messages': [],
-                'errors': form.errors
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response({'messages': [], 'errors': form.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ApiSendGroup(APIView):
+class SendGroup(APIView):
     """Send SMS to group."""
     permission_classes = (IsAuthenticated, CanSendSms)
 
@@ -255,37 +295,19 @@ class ApiSendGroup(APIView):
                 sent_by=str(self.request.user)
             )
             if form.cleaned_data['scheduled_time'] is None:
+                msg_txt = "Sending '{0}' to '{1}'...\nPlease check the logs for verification...".format(
+                    form.cleaned_data['content'], form.cleaned_data['recipient_group']
+                )
                 msg = {
-                    'type_':
-                    'info',
-                    'text':
-                    "Sending '{0}' to '{1}'...\n"
-                    "Please check the logs for verification...".format(
-                        form.cleaned_data['content'],
-                        form.cleaned_data['recipient_group']
-                    )
+                    'type_': 'info',
+                    'text': msg_txt,
                 }
             else:
                 msg = {
-                    'type_':
-                    'info',
-                    'text':
-                    "'{0}' has been successfully queued.".
-                    format(form.cleaned_data['content']),
+                    'type_': 'info',
+                    'text': "'{0}' has been successfully queued.".format(form.cleaned_data['content']),
                 }
 
-            return Response(
-                {
-                    'messages': [msg],
-                    'errors': {}
-                },
-                status=status.HTTP_201_CREATED
-            )
+            return Response({'messages': [msg], 'errors': {}}, status=status.HTTP_201_CREATED)
 
-        return Response(
-            {
-                'messages': [],
-                'errors': form.errors
-            },
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response({'messages': [], 'errors': form.errors}, status=status.HTTP_400_BAD_REQUEST)

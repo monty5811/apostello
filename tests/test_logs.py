@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import types
 from datetime import datetime
 
@@ -63,14 +62,12 @@ class TestFetchingClients:
     @twilio_vcr
     def test_fetch_all_in(self):
         i = logs.fetch_generator('in')
-        assert isinstance(i, types.GeneratorType)
         for msg in i:
             str(i)
 
     @twilio_vcr
     def test_fetch_all_out(self):
         i = logs.fetch_generator('out')
-        assert isinstance(i, types.GeneratorType)
         for msg in i:
             str(i)
 

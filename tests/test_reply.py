@@ -11,70 +11,37 @@ class TestConstructReply:
     """Tests apostello.reply:InboundSms.construct_reply function."""
 
     def test_no_existing_keyword(self, recipients):
-        msg = InboundSms(
-            {
-                'From': str(recipients['calvin'].number),
-                'Body': 'nope'
-            }
-        )
+        msg = InboundSms({'From': str(recipients['calvin'].number), 'Body': 'nope'})
         reply = msg.construct_reply()
-        assert reply == fetch_default_reply('keyword_no_match').replace(
-            "%name%", "John"
-        )
+        assert reply == fetch_default_reply('keyword_no_match').replace("%name%", "John")
 
     def test_existing_keyword(self, recipients, keywords):
-        msg = InboundSms(
-            {
-                'From': str(recipients['calvin'].number),
-                'Body': 'test msg'
-            }
-        )
+        msg = InboundSms({'From': str(recipients['calvin'].number), 'Body': 'test msg'})
         reply = msg.construct_reply()
         assert reply == "Test custom response with John"
 
     @twilio_vcr
     def test_name(self, recipients):
-        msg = InboundSms(
-            {
-                'From': str(recipients['calvin'].number),
-                'Body': 'name John Calvin'
-            }
-        )
+        msg = InboundSms({'From': str(recipients['calvin'].number), 'Body': 'name John Calvin'})
         reply = msg.construct_reply()
         assert "John" in str(reply)
 
     @twilio_vcr
     def test_only_one_name(self, recipients):
-        msg = InboundSms(
-            {
-                'From': str(recipients['calvin'].number),
-                'Body': 'name JohnCalvin'
-            }
-        )
+        msg = InboundSms({'From': str(recipients['calvin'].number), 'Body': 'name JohnCalvin'})
         reply = msg.construct_reply()
         assert "Something went wrong" in reply
 
     @twilio_vcr
     def test_stop_start(self, recipients):
-        msg = InboundSms(
-            {
-                'From': str(recipients['calvin'].number),
-                'Body': 'stop '
-            }
-        )
+        msg = InboundSms({'From': str(recipients['calvin'].number), 'Body': 'stop '})
         reply = msg.construct_reply()
         assert len(reply) == 0
         assert Recipient.objects.get(pk=recipients['calvin'].pk).is_blocking
 
-        msg = InboundSms(
-            {
-                'From': str(recipients['calvin'].number),
-                'Body': 'start '
-            }
-        )
+        msg = InboundSms({'From': str(recipients['calvin'].number), 'Body': 'start '})
         reply = msg.construct_reply()
-        assert Recipient.objects.get(pk=recipients['calvin'].pk
-                                     ).is_blocking is False
+        assert Recipient.objects.get(pk=recipients['calvin'].pk).is_blocking is False
         assert 'signing up' in reply
 
     @twilio_vcr
@@ -84,22 +51,12 @@ class TestConstructReply:
         assert reply == "Test custom response with Unknown"
 
     def test_is_blocking_reply(self, recipients):
-        msg = InboundSms(
-            {
-                'From': str(recipients['wesley'].number),
-                'Body': 'test'
-            }
-        )
+        msg = InboundSms({'From': str(recipients['wesley'].number), 'Body': 'test'})
         reply = msg.construct_reply()
         assert len(reply) == 0
 
     def test_do_not_reply(self, recipients):
-        msg = InboundSms(
-            {
-                'From': str(recipients['beza'].number),
-                'Body': 'test'
-            }
-        )
+        msg = InboundSms({'From': str(recipients['beza'].number), 'Body': 'test'})
         reply = msg.construct_reply()
         assert len(reply) == 0
 
@@ -109,18 +66,11 @@ class TestConstructReply:
         dr.keyword_no_match = ''
         dr.clean()
         dr.save()
-        msg = InboundSms(
-            {
-                'From': str(recipients['calvin'].number),
-                'Body': 'test'
-            }
-        )
+        msg = InboundSms({'From': str(recipients['calvin'].number), 'Body': 'test'})
         reply = msg.construct_reply()
         assert len(reply) == 0
 
-    def test_contact_added_to_group_keyword(
-        self, recipients, groups, keywords
-    ):
+    def test_contact_added_to_group_keyword(self, recipients, groups, keywords):
         populated_group = groups['test_group']
         empty_group = groups['empty_group']
         assert empty_group.recipient_set.count() == 0
@@ -128,12 +78,7 @@ class TestConstructReply:
         test_keyword = keywords['test']
         test_keyword.linked_groups.add(empty_group, populated_group)
         test_keyword.save()
-        msg = InboundSms(
-            {
-                'From': str(recipients['beza'].number),
-                'Body': 'test'
-            }
-        )
+        msg = InboundSms({'From': str(recipients['beza'].number), 'Body': 'test'})
         reply = msg.construct_reply()
         grp1 = RecipientGroup.objects.get(name='Empty Group')
         assert grp1.recipient_set.all().count() == 1

@@ -4,13 +4,10 @@ from graphs import views as v
 from graphs import renderers as r
 
 urlpatterns = [
-    url(
-        r'^recent/',
-        v.GraphView.as_view(
-            graph_renderer=r.recent,
-            required_perms=[],
-        )
-    ),
+    url(r'^recent/', v.GraphView.as_view(
+        graph_renderer=r.recent,
+        required_perms=[],
+    )),
     url(r'^contacts/', v.GraphView.as_view(
         graph_renderer=r.contacts,
     )),
@@ -23,16 +20,10 @@ urlpatterns = [
     url(r'^sms/totals/', v.GraphView.as_view(
         graph_renderer=r.sms_totals,
     )),
-    url(
-        r'^sms/in/bycontact',
-        v.GraphView.as_view(
-            graph_renderer=r.incoming_by_contact,
-        )
-    ),
-    url(
-        r'^sms/out/bycontact',
-        v.GraphView.as_view(
-            graph_renderer=r.outgoing_by_contact,
-        )
-    ),
+    url(r'^sms/in/bycontact', v.GraphView.as_view(
+        graph_renderer=r.incoming_by_contact,
+    )),
+    url(r'^sms/out/bycontact', v.GraphView.as_view(
+        graph_renderer=r.outgoing_by_contact,
+    )),
 ]

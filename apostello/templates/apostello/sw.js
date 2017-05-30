@@ -3,7 +3,6 @@ const CACHE_NAME = 'apostello-cache-v1';
 const OFFLINE_URL = '/offline/?_';
 const urlsToCache = [
   OFFLINE_URL,
-  "{% static 'js/vendor.js' %}",
   "{% static 'js/app.js' %}",
   "{% static 'css/apostello.min.css' %}",
   "{% static 'css/themes/default/assets/fonts/icons.ttf' %}",

@@ -17,18 +17,11 @@ def keyword_csv(request, keyword):
     keyword = get_object_or_404(Keyword, keyword=keyword)
     # Create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="{0}.csv"'.format(
-        keyword.keyword
-    )
+    response['Content-Disposition'] = 'attachment; filename="{0}.csv"'.format(keyword.keyword)
     writer = csv.writer(response)
     writer.writerow(['From', 'Time', 'Keyword', 'Message'])
     # write response rows
     for sms_ in keyword.fetch_matches():
-        writer.writerow(
-            [
-                sms_.sender_name, sms_.time_received, sms_.matched_keyword,
-                sms_.content
-            ]
-        )
+        writer.writerow([sms_.sender_name, sms_.time_received, sms_.matched_keyword, sms_.content])
 
     return response

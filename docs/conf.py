@@ -8,7 +8,9 @@ from recommonmark.parser import CommonMarkParser
 
 # -- General configuration ------------------------------------------------
 # needs_sphinx = '1.0'
-extensions = ['sphinx.ext.autodoc', ]
+extensions = [
+    'sphinx.ext.autodoc',
+]
 templates_path = ['_templates']
 source_parsers = {'.md': CommonMarkParser}
 source_suffix = ['.rst', '.md']
@@ -75,10 +77,7 @@ latex_elements = {
     'figure_align': 'htbp',
 }
 latex_documents = [
-    (
-        master_doc, 'apostello.tex', 'apostello Documentation',
-        'Dean Montgomery', 'manual'
-    ),
+    (master_doc, 'apostello.tex', 'apostello Documentation', 'Dean Montgomery', 'manual'),
 ]
 # latex_logo = None
 # latex_use_parts = False
@@ -96,8 +95,8 @@ man_pages = [(master_doc, 'apostello', 'apostello Documentation', [author], 1)]
 
 texinfo_documents = [
     (
-        master_doc, 'apostello', 'apostello Documentation', author,
-        'apostello', 'One line description of project.', 'Miscellaneous'
+        master_doc, 'apostello', 'apostello Documentation', author, 'apostello', 'One line description of project.',
+        'Miscellaneous'
     ),
 ]
 

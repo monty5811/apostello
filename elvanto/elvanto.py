@@ -11,9 +11,7 @@ def elvanto(end_point, **kwargs):
     """Shortcut to create Elvanto API instance."""
     base_url = 'https://api.elvanto.com/v1/'
     e_url = '{0}{1}.json'.format(base_url, end_point)
-    resp = retry_request(
-        e_url, 'post', json=kwargs, auth=(settings.ELVANTO_KEY, '_')
-    )
+    resp = retry_request(e_url, 'post', json=kwargs, auth=(settings.ELVANTO_KEY, '_'))
     data = json.loads(resp.text)
     if data['status'] == 'ok':
         return data

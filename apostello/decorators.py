@@ -48,18 +48,14 @@ def check_user_perms(view=None, require=None):
         else:
             # check for anon users:
             # this hsould not be neccessary, but it works...
-            if not request.user.is_authenticated():
-                redirect_url = settings.LOGIN_URL + '?next=' + quote(
-                    request.get_full_path()
-                )
+            if not request.user.is_authenticated:
+                redirect_url = settings.LOGIN_URL + '?next=' + quote(request.get_full_path())
                 return redirect(redirect_url)
             # check approval status:
             if not request.user.profile.approved:
                 return redirect(reverse('not_approved'))
             # check user has required permissions
-            tested_perms = [
-                request.user.profile.__getattribute__(x) for x in require
-            ]
+            tested_perms = [request.user.profile.__getattribute__(x) for x in require]
             if all(tested_perms):
                 return view(*args, **kwargs)
 

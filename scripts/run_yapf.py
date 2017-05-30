@@ -5,17 +5,13 @@ try:
 except ImportError:
     from scandir import scandir
 
-IGNORE_DIRS = [
-    'migrations', 'node_modules', 'venv', '__pycache__', '.git', '.tox'
-]
+IGNORE_DIRS = ['migrations', 'node_modules', 'venv', '__pycache__', '.git', '.tox']
 
 
 def yapf_file(f):
     """Run yapf on file."""
     print(f.path)
-    subprocess.call(
-        "yapf -i {} --style scripts/.style.yapf".format(f.path), shell=True
-    )
+    subprocess.call("yapf -i {} --style scripts/.style.yapf".format(f.path), shell=True)
 
 
 def yapf_or_recr(f):

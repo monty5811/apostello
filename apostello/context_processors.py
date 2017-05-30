@@ -11,8 +11,7 @@ def global_settings(request):
         'TWILIO_SENDING_COST': settings.TWILIO_SENDING_COST,
         'DEBUG': settings.DEBUG,
         'CONFIG': SiteConfiguration.get_solo(),
-        'DISPLAY_GOOGLE_LOGIN':
-        SocialApp.objects.filter(provider='google').count(),
+        'DISPLAY_GOOGLE_LOGIN': SocialApp.objects.filter(provider='google').count(),
     }
 
 

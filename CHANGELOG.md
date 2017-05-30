@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+**Upgrade to python 3.6 - ansible and Heroku deploys now use python 3.6**
+
+### Changed
+
+ - Improve nightly email - table of responses and relevant links back to apostello
+ - Remove modal from send forms in favour of cleaner interface
+
 ## [v1.18.0]
 
 ### Changed

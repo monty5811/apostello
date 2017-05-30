@@ -1,7 +1,10 @@
+from django.contrib.auth.models import User
+from django.core.cache import cache
+from django.core.cache.utils import make_template_fragment_key
 from django.db import models
 from solo.models import SingletonModel
 
-from apostello.validators import less_than_sms_char_limit, validate_starts_with_plus
+from apostello.validators import (less_than_sms_char_limit, validate_starts_with_plus)
 
 
 class SiteConfiguration(SingletonModel):
@@ -27,8 +30,7 @@ class SiteConfiguration(SingletonModel):
         validators=[validate_starts_with_plus]
     )
     disable_all_replies = models.BooleanField(
-        default=False,
-        help_text='Tick this box to disable all automated replies.'
+        default=False, help_text='Tick this box to disable all automated replies.'
     )
     disable_email_login_form = models.BooleanField(
         default=False,
@@ -36,10 +38,7 @@ class SiteConfiguration(SingletonModel):
         ' Note, you will need to have setup login with Google, or users will'
         ' have no way into the site.'
     )
-    office_email = models.EmailField(
-        blank=True,
-        help_text='Email address that receives important notifications.'
-    )
+    office_email = models.EmailField(blank=True, help_text='Email address that receives important notifications.')
     auto_add_new_groups = models.ManyToManyField(
         'apostello.RecipientGroup',
         blank=True,
@@ -47,8 +46,7 @@ class SiteConfiguration(SingletonModel):
         ' selected here',
     )
     slack_url = models.URLField(
-        blank=True,
-        help_text='Post all incoming messages to this slack hook.'
+        blank=True, help_text='Post all incoming messages to this slack hook.'
         ' Leave blank to disable.'
     )
     sync_elvanto = models.BooleanField(
@@ -97,6 +95,12 @@ class SiteConfiguration(SingletonModel):
     def __str__(self):
         """Pretty representation."""
         return u"Site Configuration"
+
+    def save(self, *args, **kwargs):
+        super(SiteConfiguration, self).save(*args, **kwargs)
+        for u in User.objects.all():
+            key = make_template_fragment_key('elmSettings', [u])
+            cache.delete(key)
 
     class Meta:
         verbose_name = "Site Configuration"

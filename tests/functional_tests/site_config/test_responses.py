@@ -34,6 +34,7 @@ class TestDefaultResponses:
         input_box.submit()
 
         from site_config.models import DefaultResponses
+
         def _test():
             resps = DefaultResponses.get_solo()
             assert 'Thank you for signing up' in resps.start_reply

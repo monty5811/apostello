@@ -6,9 +6,7 @@ APPEND_SLASH = True
 # Django settings
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-SECRET_KEY = os.environ.get(
-    'DJANGO_SECRET_KEY', 'w;ioufpwqofjpwoifwpa09fuq039uq3u4uepoivqnwjdfvlwdv'
-)
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'w;ioufpwqofjpwoifwpa09fuq039uq3u4uepoivqnwjdfvlwdv')
 
 INSTALLED_APPS = [
     # built in apps
@@ -35,7 +33,6 @@ INSTALLED_APPS = [
     'django_extensions',
     'solo',
     'django_redis',
-    'django_twilio',
     'django_q',
     # auth
     'allauth',
@@ -132,14 +129,11 @@ Q_CLUSTER = {
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
-    'DEFAULT_PERMISSION_CLASSES':
-    ['rest_framework.permissions.DjangoModelPermissions'],
+    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.DjangoModelPermissions'],
     'DEFAULT_PAGINATION_CLASS':
     'rest_framework.pagination.PageNumberPagination',
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
-    ),
+    'DEFAULT_AUTHENTICATION_CLASSES':
+    ('rest_framework.authentication.SessionAuthentication', 'rest_framework.authentication.TokenAuthentication', ),
 }
 
 # email settings
@@ -160,11 +154,8 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.environ.get(
-    'ACCOUNT_DEFAULT_HTTP_PROTOCOL', 'https'
-)
-WHITELISTED_LOGIN_DOMAINS = os.environ.get('WHITELISTED_LOGIN_DOMAINS',
-                                           '').split(',')
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.environ.get('ACCOUNT_DEFAULT_HTTP_PROTOCOL', 'https')
+WHITELISTED_LOGIN_DOMAINS = os.environ.get('WHITELISTED_LOGIN_DOMAINS', '').split(',')
 
 LOGIN_REDIRECT_URL = '/'
 
@@ -175,8 +166,7 @@ ELVANTO_KEY = os.environ.get('ELVANTO_KEY', '')
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID', 'no SID found')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN', 'no auth token found')
 TWILIO_FROM_NUM = os.environ.get('TWILIO_FROM_NUM', 'no number found')
-TWILIO_SENDING_COST = float(os.environ.get('TWILIO_SENDING_COST', '0.04')
-                            )  # cost in USD
+TWILIO_SENDING_COST = float(os.environ.get('TWILIO_SENDING_COST', '0.04'))  # cost in USD
 
 # Sms settings - note that messages over 160 will be charged twice
 MAX_NAME_LENGTH = 16

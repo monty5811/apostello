@@ -10,22 +10,15 @@ class TestRecipientGroup:
 
     @twilio_vcr
     def test_sending(self, groups):
-        groups['test_group'].send_message(
-            content='test content', sent_by="user"
-        )
-        groups['empty_group'].send_message(
-            content='test content', sent_by="user"
-        )
+        groups['test_group'].send_message(content='test content', sent_by="user")
+        groups['empty_group'].send_message(content='test content', sent_by="user")
 
     def test_all_recipients_names(self, groups):
-        assert ['John Calvin', 'Johannes Oecolampadius'
-                ] == groups['test_group'].all_recipients_names
+        assert ['John Calvin', 'Johannes Oecolampadius'] == groups['test_group'].all_recipients_names
         assert [] == groups['empty_group'].all_recipients_names
 
     def test_get_abs_url(self, groups):
-        assert '/group/edit/{0}/'.format(
-            groups['test_group'].pk
-        ) == groups['test_group'].get_absolute_url
+        assert '/group/edit/{0}/'.format(groups['test_group'].pk) == groups['test_group'].get_absolute_url
 
     def test_calculate_cost(self, groups):
         assert 0.08 == groups['test_group'].calculate_cost()

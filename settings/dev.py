@@ -45,8 +45,7 @@ LOGGING = {
     'disable_existing_loggers': True,
     'formatters': {
         'verbose': {
-            'format':
-            '[%(asctime)s][%(levelname)s][%(module)s.py][%(process)d][%(thread)d] %(message)s'
+            'format': '[%(asctime)s][%(levelname)s][%(module)s.py][%(process)d][%(thread)d] %(message)s'
         },
     },
     'handlers': {

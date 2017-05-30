@@ -1,9 +1,10 @@
 import logging
 
-from django_twilio.decorators import twilio_view
-from twilio import twiml
+from django.http import HttpResponse
+from twilio.twiml.messaging_response import MessagingResponse
 
 from apostello.reply import InboundSms
+from apostello.twilio import twilio_view
 from site_config.models import SiteConfiguration
 
 logger = logging.getLogger('apostello')
@@ -17,7 +18,7 @@ def sms(request):
     This is the start of the message processing pipeline.
     """
     logger.info('Received new sms')
-    r = twiml.Response()
+    r = MessagingResponse()
     msg = InboundSms(request.POST)
     msg.start_bg_tasks()
 
@@ -27,4 +28,4 @@ def sms(request):
         r.message(msg.reply)
 
     logger.info('Return response to Twilio')
-    return r
+    return HttpResponse(str(r), content_type='application/xml')

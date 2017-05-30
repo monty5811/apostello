@@ -1,11 +1,10 @@
 import logging
 
 from django.conf import settings
-from django.utils import timezone
-from django_twilio.client import twilio_client
-from twilio.rest.exceptions import TwilioRestException
+from twilio.base.exceptions import TwilioRestException
 
 from apostello.models import Keyword, Recipient, SmsInbound, SmsOutbound
+from apostello.twilio import twilio_client
 
 logger = logging.getLogger('apostello')
 
@@ -21,9 +20,7 @@ def handle_incoming_sms(msg):
             sender.save()
 
         sms.content = msg.body
-        sms.time_received = timezone.make_aware(
-            msg.date_created, timezone.get_current_timezone()
-        )
+        sms.time_received = msg.date_created
         sms.sender_name = str(sender)
         sms.sender_num = msg.from_
         matched_keyword = Keyword.match(msg.body)
@@ -45,24 +42,20 @@ def handle_outgoing_sms(msg):
                 recip.save()
 
             sms.content = msg.body
-            sms.time_sent = timezone.make_aware(
-                msg.date_sent, timezone.get_current_timezone()
-            )
+            sms.time_sent = msg.date_sent
             sms.sent_by = "[Imported]"
             sms.recipient = recip
             sms.save()
     except Exception:
-        logger.error(
-            'Could not import sms.', exc_info=True, extra={'msg': msg}
-        )
+        logger.error('Could not import sms.', exc_info=True, extra={'msg': msg})
 
 
 def fetch_generator(direction):
     """Fetch generator from twilio."""
     if direction == 'in':
-        return twilio_client.messages.iter(to_=settings.TWILIO_FROM_NUM)
+        return twilio_client.messages.list(to=settings.TWILIO_FROM_NUM)
     if direction == 'out':
-        return twilio_client.messages.iter(from_=settings.TWILIO_FROM_NUM)
+        return twilio_client.messages.list(from_=settings.TWILIO_FROM_NUM)
     return []
 
 

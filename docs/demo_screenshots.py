@@ -4,68 +4,23 @@ from time import sleep
 
 from selenium import webdriver
 
-DEMO_URL = "https://apostello-demo.herokuapp.com"
+DEMO_URL = "https://apostello-testing.herokuapp.com"
 PAGES = [
-    (
-        '/accounts/signup',
-        'Signup',
-    ),
-    (
-        '/accounts/login',
-        'Login',
-    ),
-    (
-        '/accounts/logout',
-        'Logout',
-    ),
-    (
-        '/send/adhoc/',
-        'SendtoIndividuals',
-    ),
-    (
-        '/send/group/',
-        'SendtoGroup',
-    ),
-    (
-        '/recipient/all/',
-        'Recipients',
-    ),
-    (
-        '/recipient/edit/1/',
-        'RecipientEdit',
-    ),
-    (
-        '/keyword/all/',
-        'Keywords',
-    ),
-    (
-        '/keyword/edit/1/',
-        'KeywordEdit',
-    ),
-    (
-        '/keyword/responses/1/',
-        'KeywordResponses',
-    ),
-    (
-        '/incoming/',
-        'IncomingLog',
-    ),
-    (
-        '/incoming/wall/',
-        'IncomingWall',
-    ),
-    (
-        '/outgoing/',
-        'OutgoingLog',
-    ),
-    (
-        '/elvanto/import',
-        'ElvantoSync',
-    ),
-    (
-        '/',
-        'Home',
-    ),
+    ('/accounts/signup/', 'Signup', ),
+    ('/accounts/login/', 'Login', ),
+    ('/accounts/logout/', 'Logout', ),
+    ('/send/adhoc/', 'SendtoIndividuals', ),
+    ('/send/group/', 'SendtoGroup', ),
+    ('/recipient/all/', 'Recipients', ),
+    ('/recipient/edit/1/', 'RecipientEdit', ),
+    ('/keyword/all/', 'Keywords', ),
+    ('/keyword/edit/1/', 'KeywordEdit', ),
+    ('/keyword/responses/1/', 'KeywordResponses', ),
+    ('/incoming/', 'IncomingLog', ),
+    ('/incoming/wall/', 'IncomingWall', ),
+    ('/outgoing/', 'OutgoingLog', ),
+    ('/elvanto/import/', 'ElvantoSync', ),
+    ('/', 'Home', ),
 ]
 
 
@@ -85,9 +40,9 @@ def login(d):
     email_box.send_keys('test@example.com')
     password_box = d.find_elements_by_name('password')[0]
     password_box.send_keys('apostello')
-    login_button = d.find_elements_by_xpath('/html/body/div/div/form/button'
-                                            )[0]
+    login_button = d.find_element_by_id('login_button')
     login_button.click()
+    sleep(5)
 
 
 def grab_page(d, uri, desc):
@@ -98,7 +53,7 @@ def grab_page(d, uri, desc):
     with open('screenshots/{0}.png'.format(desc), 'wb') as f:
         f.write(d.get_screenshot_as_png())
 
-    if uri == '/accounts/login':
+    if '/accounts/login/' in uri:
         login(d)
 
 

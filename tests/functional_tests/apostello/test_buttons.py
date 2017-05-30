@@ -24,8 +24,7 @@ class TestButton:
         ]
     )
     def test_archive_all(
-        self, uri, query_set, live_server, browser_in, keywords, recipients,
-        groups, smsin, driver_wait_time
+        self, uri, query_set, live_server, browser_in, keywords, recipients, groups, smsin, driver_wait_time
     ):
         """Test archive item buttons."""
         # load page
@@ -50,20 +49,16 @@ class TestButton:
             assert obj.is_archived
 
     def test_keyword_resp_table_archive(
-        self, live_server, browser_in, keywords, recipients, groups, smsin,
-        driver_wait_time
+        self, live_server, browser_in, keywords, recipients, groups, smsin, driver_wait_time
     ):
         """Test archive sms button."""
         uri = keywords['test'].get_responses_url
         query_set = models.SmsInbound.objects.filter(matched_keyword='test')
         self.test_archive_all(
-            uri, query_set, live_server, browser_in, keywords, recipients,
-            groups, smsin, driver_wait_time
+            uri, query_set, live_server, browser_in, keywords, recipients, groups, smsin, driver_wait_time
         )
 
-    def test_unarchive_keyword(
-        self, live_server, browser_in, keywords, driver_wait_time
-    ):
+    def test_unarchive_keyword(self, live_server, browser_in, keywords, driver_wait_time):
         """Test restore from archive button."""
         k = models.Keyword.objects.get(keyword='test')
         k.is_archived = True
@@ -79,9 +74,7 @@ class TestButton:
         k.refresh_from_db()
         assert k.is_archived is False
 
-    def test_display_on_wall_toggle(
-        self, live_server, browser_in, smsin, driver_wait_time
-    ):
+    def test_display_on_wall_toggle(self, live_server, browser_in, smsin, driver_wait_time):
         """Test display on wall buttons."""
         sms = models.SmsInbound.objects.get(sid=smsin['sms1'].sid)
         sms.display_on_wall = False
@@ -107,18 +100,14 @@ class TestButton:
         num_buttons = len(displaying_buttons)
         while len(displaying_buttons) > 0:
             click_and_wait(displaying_buttons[0], driver_wait_time)
-            displaying_buttons = browser_in.find_elements_by_class_name(
-                'green'
-            )
+            displaying_buttons = browser_in.find_elements_by_class_name('green')
             assert num_buttons - 1 == len(displaying_buttons)
             num_buttons = len(displaying_buttons)
         sleep(driver_wait_time)
         sms.refresh_from_db()
         assert sms.display_on_wall is False
 
-    def test_reingest_button(
-        self, live_server, browser_in, smsin, driver_wait_time
-    ):
+    def test_reingest_button(self, live_server, browser_in, smsin, driver_wait_time):
         """Test reingest sms button."""
         sms = models.SmsInbound.objects.create(
             sid='tmp_____',
@@ -135,24 +124,18 @@ class TestButton:
         sms.refresh_from_db()
         assert sms.matched_keyword == 'test'
 
-    def test_keyword_resp_table_dealt_with(
-        self, live_server, browser_in, smsin, keywords, driver_wait_time
-    ):
+    def test_keyword_resp_table_dealt_with(self, live_server, browser_in, smsin, keywords, driver_wait_time):
         browser_in.get(live_server + keywords['test'].get_responses_url)
         sleep(driver_wait_time)
         for button in browser_in.find_elements_by_class_name('positive'):
-            browser_in.execute_script(
-                "return arguments[0].scrollIntoView();", button
-            )
+            browser_in.execute_script("return arguments[0].scrollIntoView();", button)
             sleep(driver_wait_time)
             button.click()
         sleep(driver_wait_time)
         for k in models.SmsInbound.objects.filter(matched_keyword='test'):
             assert k.dealt_with is False
 
-    def test_archive_without_permission(
-        self, live_server, browser_in, recipients, driver_wait_time
-    ):
+    def test_archive_without_permission(self, live_server, browser_in, recipients, driver_wait_time):
         # remove priveleges:
         u = User.objects.get(username='test')
         u.is_staff = False
@@ -171,9 +154,7 @@ class TestButton:
         click_and_wait(toggle_buttons[0], driver_wait_time)
         check_and_close_msg(browser_in, driver_wait_time)
 
-    def test_cancel_sms(
-        self, live_server, browser_in, recipients, groups, driver_wait_time
-    ):
+    def test_cancel_sms(self, live_server, browser_in, recipients, groups, driver_wait_time):
         """Test the scheduled messages table."""
         # create a couple of scheduled sms
         models.QueuedSms.objects.create(
@@ -182,8 +163,7 @@ class TestButton:
             recipient_group=None,
             sent_by="admin",
             time_to_send=timezone.make_aware(
-                datetime.strptime('Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'),
-                timezone.get_current_timezone()
+                datetime.strptime('Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'), timezone.get_current_timezone()
             )
         )
         models.QueuedSms.objects.create(
@@ -192,8 +172,7 @@ class TestButton:
             recipient_group=groups['test_group'],
             sent_by="admin",
             time_to_send=timezone.make_aware(
-                datetime.strptime('Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'),
-                timezone.get_current_timezone()
+                datetime.strptime('Jun 1 2400  1:33PM', '%b %d %Y %I:%M%p'), timezone.get_current_timezone()
             )
         )
         # verify tasks are shown in table

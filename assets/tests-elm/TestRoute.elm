@@ -1,14 +1,19 @@
 module TestRoute exposing (suite)
 
 import Expect
+import Fuzz as F
 import List.Extra exposing (uncons)
 import Models exposing (Model)
-import Pages exposing (Page(..), FabOnlyPage(..))
 import Navigation
-import Route exposing (route, page2loc)
-import Test exposing (describe, test, fuzz, Test)
+import Pages exposing (FabOnlyPage(..), Page(..), initSendAdhoc, initSendGroup)
+import Pages.ContactForm.Model exposing (initialContactFormModel)
+import Pages.FirstRun.Model exposing (initialFirstRunModel)
+import Pages.GroupComposer.Model exposing (initialGroupComposerModel)
+import Pages.GroupForm.Model exposing (initialGroupFormModel)
+import Pages.KeywordForm.Model exposing (initialKeywordFormModel)
+import Route exposing (page2loc, route)
+import Test exposing (Test, describe, fuzz, test)
 import UrlParser as Url
-import Fuzz as F
 
 
 page2str2page : Page -> Page
@@ -45,7 +50,7 @@ easyPages =
     , InboundTable
     , GroupTable True
     , GroupTable False
-    , GroupComposer
+    , GroupComposer initialGroupComposerModel
     , RecipientTable True
     , RecipientTable False
     , KeywordTable True
@@ -55,35 +60,35 @@ easyPages =
     , Curator
     , UserProfileTable
     , ScheduledSmsTable
-    , KeyRespTable True "test"
-    , KeyRespTable False "test"
-    , FirstRun
-    , SendAdhoc Nothing Nothing
-    , SendAdhoc (Just "test") Nothing
-    , SendAdhoc Nothing (Just [ 1 ])
-    , SendAdhoc (Just "test") (Just [ 1 ])
-    , SendGroup Nothing Nothing
-    , SendGroup (Just "test") Nothing
-    , SendGroup Nothing (Just 1)
-    , SendGroup (Just "test") (Just 1)
+    , KeyRespTable False True "test"
+    , KeyRespTable False False "test"
+    , FirstRun initialFirstRunModel
+    , initSendAdhoc Nothing Nothing
+    , initSendAdhoc (Just "test") Nothing
+    , initSendAdhoc Nothing (Just [ 1 ])
+    , initSendAdhoc (Just "test") (Just [ 1 ])
+    , initSendGroup Nothing Nothing
+    , initSendGroup (Just "test") Nothing
+    , initSendGroup Nothing (Just 1)
+    , initSendGroup (Just "test") (Just 1)
+    , SiteConfigForm Nothing
+    , GroupForm initialGroupFormModel Nothing
+    , GroupForm initialGroupFormModel <| Just 1
     , FabOnlyPage <| Help
-    , FabOnlyPage <| NewGroup
     , FabOnlyPage <| CreateAllGroup
-    , FabOnlyPage <| NewContact
-    , FabOnlyPage <| NewKeyword
-    , FabOnlyPage <| EditKeyword "test"
+    , ContactForm initialContactFormModel Nothing
+    , ContactForm initialContactFormModel <| Just 1
+    , KeywordForm initialKeywordFormModel Nothing
+    , KeywordForm initialKeywordFormModel <| Just "test"
     , FabOnlyPage <| ContactImport
     , FabOnlyPage <| ApiSetup
-    , FabOnlyPage <| EditSiteConfig
     , FabOnlyPage <| EditResponses
     ]
 
 
 editPages : List (Int -> Page)
 editPages =
-    [ EditGroup
-    , EditContact
-    , FabOnlyPage << EditUserProfile
+    [ FabOnlyPage << EditUserProfile
     ]
 
 
@@ -107,4 +112,4 @@ loc url =
                 Just s ->
                     "?" ++ (s |> Tuple.second |> String.join "?")
     in
-        Navigation.Location url "" "" "" "" "" path search "" "" ""
+    Navigation.Location url "" "" "" "" "" path search "" "" ""

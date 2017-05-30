@@ -24,14 +24,8 @@ class InboundSms:
         try:
             return Recipient.objects.get(number=self.contact_number), False
         except Recipient.DoesNotExist:
-            logger.info(
-                'Contact (%s) does not exist, creating', self.contact_number
-            )
-            contact = Recipient.objects.create(
-                number=self.contact_number,
-                first_name='Unknown',
-                last_name='Person'
-            )
+            logger.info('Contact (%s) does not exist, creating', self.contact_number)
+            contact = Recipient.objects.create(number=self.contact_number, first_name='Unknown', last_name='Person')
             contact.save()
             return contact, not self.keyword == "name"
 
@@ -46,22 +40,10 @@ class InboundSms:
             * Ask the contact for their name if we don't have it
             * Schedules a task to check the outgoing log one minute from now
         """
-        async(
-            'apostello.tasks.log_msg_in', self.msg_params,
-            timezone.now(), self.contact.pk
-        )
-        async(
-            'apostello.tasks.sms_to_slack', self.sms_body,
-            str(self.contact), str(self.keyword)
-        )
-        async(
-            'apostello.tasks.blacklist_notify', self.contact.pk, self.sms_body,
-            self.keyword
-        )
-        async(
-            'apostello.tasks.ask_for_name', self.contact.pk, self.sms_body,
-            self.send_name_sms
-        )
+        async('apostello.tasks.log_msg_in', self.msg_params, timezone.now(), self.contact.pk)
+        async('apostello.tasks.sms_to_slack', self.sms_body, str(self.contact), str(self.keyword))
+        async('apostello.tasks.blacklist_notify', self.contact.pk, self.sms_body, self.keyword)
+        async('apostello.tasks.ask_for_name', self.contact.pk, self.sms_body, self.send_name_sms)
         # update outgoing log 1 minute from now:
         schedule(
             'apostello.tasks.check_outgoing_log',
@@ -77,10 +59,7 @@ class InboundSms:
 
     def reply_to_stop(self):
         """Handle the "stop" keyword."""
-        logger.info(
-            "%s (%s) has black listed us.", self.contact.number,
-            self.contact.full_name
-        )
+        logger.info("%s (%s) has black listed us.", self.contact.number, self.contact.full_name)
         self.contact.is_blocking = True
         self.contact.save()
         return ''
@@ -110,16 +89,12 @@ class InboundSms:
                 ),
             )
             # TODO update to use .format() and add help text to model
-            return fetch_default_reply(
-                'name_update_reply'
-            ) % self.contact.first_name
+            return fetch_default_reply('name_update_reply') % self.contact.first_name
         except (ValidationError, IndexError):
             async(
                 'apostello.tasks.notify_office_mail',
                 '[Apostello] New Signup - FAILED!',
-                'SMS:\n\t{0}\nFrom:\n\t{1}\n'.format(
-                    self.sms_body, self.contact_number
-                ),
+                'SMS:\n\t{0}\nFrom:\n\t{1}\n'.format(self.sms_body, self.contact_number),
             )
             return fetch_default_reply('name_failure_reply')
 

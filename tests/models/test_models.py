@@ -28,9 +28,7 @@ class TestSms:
 class TestUserProfile:
     def test_display(self):
         user_staff = User.objects.create_superuser(
-            username='test_staff',
-            email='test3@example.com',
-            password='top_secret'
+            username='test_staff', email='test3@example.com', password='top_secret'
         )
         assert "Profile: test_staff" == str(user_staff.profile)
 
@@ -38,9 +36,7 @@ class TestUserProfile:
 @pytest.mark.django_db
 class TestSiteConfig:
     def test_display(self):
-        assert "Site Configuration" == str(
-            smodels.SiteConfiguration.get_solo()
-        )
+        assert "Site Configuration" == str(smodels.SiteConfiguration.get_solo())
 
 
 @pytest.mark.django_db

@@ -1,11 +1,25 @@
-module Helpers exposing (handleNotSaved, formatDate, calculateSmsCost, decodeAlwaysTrue)
+module Helpers exposing (..)
 
 import Date
 import Date.Format
+import Html exposing (Attribute, Html, a, td, text)
+import Html.Attributes exposing (class)
+import Html.Events exposing (onWithOptions)
 import Json.Decode as Decode
+import List.Extra as LE
 import Messages exposing (Msg)
 import Models exposing (Model)
-import Update.Notification as Notif
+import Pages.Fragments.Notification.Update as Notif
+
+
+toggleSelectedPk : Int -> List Int -> List Int
+toggleSelectedPk pk pks =
+    case List.member pk pks of
+        True ->
+            LE.remove pk pks
+
+        False ->
+            pk :: pks
 
 
 decodeAlwaysTrue : Decode.Decoder Bool
@@ -23,7 +37,7 @@ handleNotSaved model =
         ( newModel, cmd ) =
             Notif.createNotSaved model
     in
-        ( newModel, [ cmd ] )
+    ( newModel, [ cmd ] )
 
 
 
@@ -53,3 +67,25 @@ calculateSmsCost smsCostPerMsg msg =
         |> ceiling
         |> toFloat
         |> (*) smsCostPerMsg
+
+
+archiveCell : Bool -> Msg -> Html Msg
+archiveCell isArchived msg =
+    td [ class "collapsing" ]
+        [ a [ class "ui tiny grey button", onClick msg ] [ text <| archiveText isArchived ]
+        ]
+
+
+archiveText : Bool -> String
+archiveText isArchived =
+    case isArchived of
+        True ->
+            "UnArchive"
+
+        False ->
+            "Archive"
+
+
+onClick : msg -> Attribute msg
+onClick message =
+    onWithOptions "click" { stopPropagation = True, preventDefault = True } (Decode.succeed message)
