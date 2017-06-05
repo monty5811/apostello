@@ -49,6 +49,14 @@ urlpatterns += [
     url(r"^accounts/password/change/$", PasswordChangeView.as_view(success_url='/'), name="account_change_password"),
     url(r'^accounts/', include('allauth.urls')),
 ]
+
+# debug toolbar
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += [
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    ]
+
 # apps etc
 urlpatterns += [
     url(r'^config/', include('site_config.urls', namespace='site_config')),
@@ -62,10 +70,3 @@ urlpatterns += [
     ),
     url(r'^.*$', v.SimpleView.as_view(template_name="apostello/spa.html", required_perms=[]), name='spa'),
 ]
-
-# debu toolbar
-if settings.DEBUG:
-    import debug_toolbar
-    urlpatterns += [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
-    ]
