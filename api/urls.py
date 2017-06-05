@@ -76,7 +76,8 @@ urlpatterns = [
             model_class=m.Keyword,
             form_class=f.KeywordForm,
             serializer_class=s.KeywordSerializer,
-            permission_classes=(IsAuthenticated, p.CanSeeKeywords)
+            permission_classes=(IsAuthenticated, p.CanSeeKeywords),
+            prefetch_fields=['linked_groups', 'owners', 'subscribed_to_digest',],
         ),
         name='keywords'
     ),
