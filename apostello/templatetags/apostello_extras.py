@@ -28,7 +28,9 @@ def elm_settings(user):
         'smsCharLimit': config.sms_char_limit,
         'defaultNumberPrefix': config.default_number_prefix,
         'noAccessMessage': config.not_approved_msg,
-        'blockedKeywords': [x.keyword for x in Keyword.objects.all() if x.is_locked and not x.can_user_access(user)],
+        'blockedKeywords': [
+            x.keyword for x in Keyword.objects.all().prefetch_related('owners') if x.is_locked and not x.can_user_access(user)
+        ],
     }
     return mark_safe(json.dumps(elm))
 
