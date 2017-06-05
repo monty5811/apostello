@@ -490,7 +490,7 @@ class Keyword(models.Model):
 class SmsInbound(models.Model):
     """A SmsInbound is a message that was sent to the twilio number."""
     sid = models.CharField("SID", max_length=34, unique=True, help_text="Twilio's unique ID for this SMS")
-    is_archived = models.BooleanField("Is Archived", default=False)
+    is_archived = models.BooleanField("Is Archived", default=False, db_index=True)
     dealt_with = models.BooleanField(
         "Dealt With?", default=False, help_text='Used, for example, '
         'to mark people as registered for an event.'
@@ -499,7 +499,7 @@ class SmsInbound(models.Model):
     time_received = models.DateTimeField(blank=True, null=True)
     sender_name = models.CharField("Sent by", max_length=200)
     sender_num = models.CharField("Sent from", max_length=200)
-    matched_keyword = models.CharField(max_length=12)
+    matched_keyword = models.CharField(max_length=12, db_index=True)
     matched_colour = models.CharField(max_length=7)
     matched_link = models.CharField(max_length=200)
     display_on_wall = models.BooleanField(
@@ -544,6 +544,7 @@ class SmsInbound(models.Model):
 
     class Meta:
         ordering = ['-time_received']
+        index_together = ['is_archived', 'matched_keyword']
 
 
 class QueuedSms(models.Model):
