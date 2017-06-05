@@ -29,7 +29,7 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
     ),
 ]
 
-STATIC_ROOT = '/webapps/apostello/static/'
+STATIC_ROOT = '/../../static/'
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
 LOGGING = {
