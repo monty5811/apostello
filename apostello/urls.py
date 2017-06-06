@@ -68,5 +68,6 @@ urlpatterns += [
         TemplateView.as_view(template_name="apostello/offline.html"),
         name='offline',
     ),
-    url(r'^.*$', v.SimpleView.as_view(template_name="apostello/spa.html", required_perms=[]), name='spa'),
+    url(r'^.*/$', v.SimpleView.as_view(template_name="apostello/spa.html", required_perms=[]), name='spa'),
+    url(r'^$', v.SimpleView.as_view(template_name="apostello/spa.html", required_perms=[]), name='spa'),
 ]
