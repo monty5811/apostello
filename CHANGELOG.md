@@ -10,6 +10,12 @@ All notable changes to this project will be documented in this file.
  - Improve nightly email - table of responses and relevant links back to apostello
  - Remove modal from send forms in favour of cleaner interface
 
+### Added
+
+ - Pagination on tables
+ - A few performance optimisations
+ - Logout button added to not approved page
+
 ## [v1.18.0]
 
 ### Changed

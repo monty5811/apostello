@@ -370,12 +370,26 @@ class Keyword(models.Model):
     @property
     def num_matches(self):
         """Fetch number of un-archived messages that match keyword."""
-        return self.fetch_matches().count()
+        cache_key = 'keyword_{0}_num_resps'.format(self.pk)
+        cached_val = cache.get(cache_key)
+        if cached_val is None:
+            new_val = self.fetch_matches().count()
+            cache.set(cache_key, new_val, 600)
+            return new_val
+        else:
+            return cached_val
 
     @property
     def num_archived_matches(self):
         """Fetch number of archived messages that match keyword."""
-        return self.fetch_archived_matches().count()
+        cache_key = 'keyword_{0}_num_arch_resps'.format(self.pk)
+        cached_val = cache.get(cache_key)
+        if cached_val is None:
+            new_val = self.fetch_archived_matches().count()
+            cache.set(cache_key, new_val, 600)
+            return new_val
+        else:
+            return cached_val
 
     @property
     def is_locked(self):
@@ -413,6 +427,7 @@ class Keyword(models.Model):
         """Force lower case keywords."""
         self.keyword = self.keyword.lower()
         super(Keyword, self).save(force_insert, force_update, *args, **kwargs)
+        async('apostello.tasks.populate_keyword_response_count', pk=self.pk)
 
     @cached_property
     def get_absolute_url(self):
@@ -541,6 +556,8 @@ class SmsInbound(models.Model):
         super(SmsInbound, self).save(*args, **kwargs)
         # invalidate per person last sms cache
         cache.set('last_msg__{0}'.format(self.sender_num), None, 0)
+        # update number of matched responses caches
+        async('apostello.tasks.populate_keyword_response_count')
 
     class Meta:
         ordering = ['-time_received']

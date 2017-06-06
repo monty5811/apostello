@@ -3,6 +3,7 @@ import logging
 
 import requests
 from django.conf import settings
+from django.core.cache import cache
 from django.core.mail import get_connection, send_mail
 from django.utils import timezone
 from django_q.tasks import async
@@ -260,3 +261,21 @@ def add_new_contact_to_groups(contact_pk):
         contact.groups.add(grp)
         contact.save()
         logger.info('Added %s to %s', contact.full_name, grp.name)
+
+
+# Keyword number of matches cache:
+def populate_keyword_response_count(pk=None):
+    """
+    Populate cache that counts matched keywords.
+
+    If a pk is passed, only update cache for that pk.
+    If no pk is passed, update cache for all keywords.
+    """
+    from apostello.models import Keyword
+    if pk is None:
+        keywords = Keyword.objects.all()
+    else:
+        keywords = [Keyword.objects.get(pk=pk)]
+    for k in keywords:
+        cache.set('keyword_{0}_num_resps'.format(pk), k.fetch_matches().count(), 600)
+        cache.set('keyword_{0}_num_arch_resps'.format(pk), k.fetch_archived_matches().count(), 600)

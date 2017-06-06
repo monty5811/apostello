@@ -95,41 +95,6 @@ def groups(recipients):
 
 
 @pytest.fixture
-def smsin():
-    """Create some messages."""
-    sms1 = SmsInbound.objects.create(
-        content='test message',
-        time_received=timezone.now(),
-        sender_name="John Calvin",
-        sender_num="+447927401749",
-        matched_keyword="test",
-        sid='12345'
-    )
-    sms1.save()
-    sms3 = SmsInbound.objects.create(
-        content='test message',
-        time_received=timezone.now(),
-        sender_name="John Calvin",
-        sender_num="+447927401749",
-        matched_keyword="test",
-        sid='123456789'
-    )
-    sms3.save()
-    sms2 = SmsInbound.objects.create(
-        content='archived message',
-        time_received=timezone.now(),
-        sender_name="John Calvin",
-        sender_num="+447927401749",
-        matched_keyword="test",
-        sid='123456789a',
-        is_archived=True
-    )
-    sms2.save()
-    objs = {'sms1': sms1, 'sms2': sms2, 'sms3': sms3}
-    return objs
-
-
-@pytest.fixture
 @pytest.mark.usefixtures("recipients", "groups")
 def smsout(recipients, groups):
     """Create a single outbound message."""
@@ -265,6 +230,41 @@ def keywords():
         'test_do_not_reply': test_do_not_reply,
     }
     return keywords
+
+
+@pytest.fixture
+def smsin():
+    """Create some messages."""
+    sms1 = SmsInbound.objects.create(
+        content='test message',
+        time_received=timezone.now(),
+        sender_name="John Calvin",
+        sender_num="+447927401749",
+        matched_keyword="test",
+        sid='12345'
+    )
+    sms1.save()
+    sms3 = SmsInbound.objects.create(
+        content='test message',
+        time_received=timezone.now(),
+        sender_name="John Calvin",
+        sender_num="+447927401749",
+        matched_keyword="test",
+        sid='123456789'
+    )
+    sms3.save()
+    sms2 = SmsInbound.objects.create(
+        content='archived message',
+        time_received=timezone.now(),
+        sender_name="John Calvin",
+        sender_num="+447927401749",
+        matched_keyword="test",
+        sid='123456789a',
+        is_archived=True
+    )
+    sms2.save()
+    objs = {'sms1': sms1, 'sms2': sms2, 'sms3': sms3}
+    return objs
 
 
 @pytest.mark.usefixtures("recipients", "keywords")

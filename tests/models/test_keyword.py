@@ -57,9 +57,11 @@ class TestKeywords():
                    ) == str(SmsInbound.objects.filter(content="archived message")[0])
 
     def test_num_matches(self, keywords, smsin):
+        keywords['test'].save()  # refresh cache
         assert keywords['test'].num_matches == 2
 
     def test_num_archived_matches(self, keywords, smsin):
+        keywords['test'].save()  # refresh cache
         assert keywords['test'].num_archived_matches == 1
 
     def test_archiving(self, keywords, smsin):
