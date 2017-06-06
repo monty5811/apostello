@@ -1,5 +1,7 @@
 {
     "name": "apostello",
+    "short_name": "apostello",
+    "start_url": "/../../../../",
     "icons": [
         {
             "src": "\/static\/images\/favicons\/android-chrome-36x36.png",
