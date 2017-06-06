@@ -56,7 +56,7 @@ class RecipientSerializer(BaseModelSerializer):
 
     def get_number(self, obj):
         user = self.context['request'].user
-        if user.userprofile.can_see_contact_nums or user.is_staff:
+        if user.profile.can_see_contact_nums or user.is_staff:
             return str(obj.number)
 
         return ''
