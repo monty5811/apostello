@@ -53,41 +53,41 @@ content : Model -> Html Msg
 content model =
     case model.page of
         OutboundTable ->
-            OT.view model.filterRegex model.dataStore.outboundSms
+            OT.view model.table model.dataStore.outboundSms
 
         InboundTable ->
-            IT.view model.filterRegex model.dataStore.inboundSms
+            IT.view model.table model.dataStore.inboundSms
 
         GroupTable viewingArchive ->
-            GT.view model.filterRegex (Store.filterArchived viewingArchive model.dataStore.groups)
+            GT.view model.table (Store.filterArchived viewingArchive model.dataStore.groups)
 
         GroupComposer composerModel ->
             GC.view composerModel (Store.filterArchived False model.dataStore.groups)
 
         RecipientTable viewingArchive ->
-            RT.view model.filterRegex <| Store.filterArchived viewingArchive model.dataStore.recipients
+            RT.view model.table <| Store.filterArchived viewingArchive model.dataStore.recipients
 
         KeywordTable viewingArchive ->
-            KT.view model.filterRegex <| Store.filterArchived viewingArchive model.dataStore.keywords
+            KT.view model.table <| Store.filterArchived viewingArchive model.dataStore.keywords
 
         ElvantoImport ->
-            EI.view model.filterRegex model.dataStore.elvantoGroups
+            EI.view model.table model.dataStore.elvantoGroups
 
         Wall ->
             W.view (model.dataStore.inboundSms |> Store.filterArchived False |> Store.filter (\s -> s.display_on_wall))
 
         Curator ->
-            C.view model.filterRegex (model.dataStore.inboundSms |> Store.filterArchived False)
+            C.view model.table (model.dataStore.inboundSms |> Store.filterArchived False)
 
         UserProfileTable ->
-            UPT.view model.filterRegex model.dataStore.userprofiles
+            UPT.view model.table model.dataStore.userprofiles
 
         ScheduledSmsTable ->
-            SST.view model.filterRegex model.currentTime model.dataStore.queuedSms
+            SST.view model.table model.currentTime model.dataStore.queuedSms
 
         KeyRespTable keyRespModel viewingArchive currentKeyword ->
             KRT.view viewingArchive
-                model.filterRegex
+                model.table
                 (model.dataStore.inboundSms |> Store.filterArchived viewingArchive |> Store.filter (filterByMatchedKeyword currentKeyword))
                 keyRespModel
                 currentKeyword
@@ -129,7 +129,7 @@ content model =
                             Nothing
 
                         Just pk ->
-                            Just <| IT.view model.filterRegex (model.dataStore.inboundSms |> Store.filter (filterBySenderPk pk))
+                            Just <| IT.view model.table (model.dataStore.inboundSms |> Store.filter (filterBySenderPk pk))
             in
             CF.view
                 model.settings

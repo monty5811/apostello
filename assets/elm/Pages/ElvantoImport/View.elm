@@ -3,25 +3,25 @@ module Pages.ElvantoImport.View exposing (view)
 import Data.ElvantoGroup exposing (ElvantoGroup)
 import Data.Request exposing (StoreMsg(ToggleElvantoGroupSync))
 import Data.Store as Store
-import FilteringTable exposing (filteringTable)
+import FilteringTable.Model as FTM
+import FilteringTable.View exposing (filteringTable)
 import Helpers exposing (formatDate)
 import Html exposing (Html, a, br, div, td, text, th, thead, tr)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
 import Messages exposing (Msg)
 import Pages.ElvantoImport.Messages exposing (ElvantoMsg(..))
-import Regex
 
 
 -- Main view
 
 
-view : Regex.Regex -> Store.RemoteList ElvantoGroup -> Html Msg
-view filterRegex groups =
+view : FTM.Model -> Store.RemoteList ElvantoGroup -> Html Msg
+view tableModel groups =
     div []
         [ div [ class "ui fluid buttons" ] [ fetchButton, pullButton ]
         , br [] []
-        , filteringTable "ui striped compact definition table" tableHead filterRegex groupRow groups
+        , filteringTable "ui striped compact definition table" tableHead tableModel groupRow groups
         ]
 
 

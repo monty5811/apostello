@@ -2,7 +2,8 @@ module Pages.RecipientTable.View exposing (view)
 
 import Data.Recipient exposing (Recipient)
 import Data.Store as Store
-import FilteringTable exposing (uiTable)
+import FilteringTable.Model as FTM
+import FilteringTable.View exposing (uiTable)
 import Helpers exposing (archiveCell, formatDate)
 import Html exposing (Html, a, div, td, text, th, thead, tr)
 import Html.Attributes as A
@@ -10,15 +11,14 @@ import Messages exposing (Msg(RecipientTableMsg))
 import Pages exposing (Page(ContactForm))
 import Pages.ContactForm.Model exposing (initialContactFormModel)
 import Pages.RecipientTable.Messages exposing (RecipientTableMsg(ToggleRecipientArchive))
-import Regex
 import Route exposing (spaLink)
 
 
 -- Main view
 
 
-view : Regex.Regex -> Store.RemoteList Recipient -> Html Msg
-view filterRegex recipients =
+view : FTM.Model -> Store.RemoteList Recipient -> Html Msg
+view tableModel recipients =
     let
         head =
             thead []
@@ -30,7 +30,7 @@ view filterRegex recipients =
                     ]
                 ]
     in
-    uiTable head filterRegex recipientRow recipients
+    uiTable head tableModel recipientRow recipients
 
 
 recipientRow : Recipient -> Html Msg

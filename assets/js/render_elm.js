@@ -9,15 +9,18 @@ function getDataStoreCache(userEmail) {
   if (item === null) {
     return null;
   }
-  if (item.userEmail === userEmail && item.expires < Date.now()) {
-    return item.data;
+  const cache = JSON.parse(item);
+  const cachedEmail = cache.userEmail;
+  const cacheExpires = cache.expires;
+  if (cachedEmail === userEmail && cacheExpires > Date.now()) {
+    return JSON.stringify(cache.data);
   }
   return null;
 }
 
 function setDataStoreCache(newValue, userEmail) {
   const cacheItem = {
-    expires: Date.now() + 600,
+    expires: Date.now() + (600 * 1000),
     userEmail,
     data: newValue,
   };

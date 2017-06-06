@@ -4,7 +4,8 @@ import Data.QueuedSms exposing (QueuedSms)
 import Data.RecipientGroup exposing (RecipientGroup)
 import Data.Store as Store
 import Date
-import FilteringTable exposing (uiTable)
+import FilteringTable.Model as FTM
+import FilteringTable.View exposing (uiTable)
 import Html exposing (Html, a, div, td, text, th, thead, tr)
 import Html.Attributes as A
 import Html.Events exposing (onClick)
@@ -13,7 +14,6 @@ import Pages exposing (Page(ContactForm, GroupForm))
 import Pages.ContactForm.Model exposing (initialContactFormModel)
 import Pages.GroupForm.Model exposing (initialGroupFormModel)
 import Pages.ScheduledSmsTable.Messages exposing (ScheduledSmsTableMsg(CancelSms))
-import Regex
 import Route exposing (spaLink)
 import Time
 
@@ -21,11 +21,11 @@ import Time
 -- Main view
 
 
-view : Regex.Regex -> Time.Time -> Store.RemoteList QueuedSms -> Html Msg
-view filterRegex currentTime sms =
+view : FTM.Model -> Time.Time -> Store.RemoteList QueuedSms -> Html Msg
+view tableModel currentTime sms =
     sms
         |> Store.filter (onlyFuture currentTime)
-        |> uiTable tableHead filterRegex smsRow
+        |> uiTable tableHead tableModel smsRow
 
 
 tableHead : Html Msg

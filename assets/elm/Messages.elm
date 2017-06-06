@@ -4,6 +4,7 @@ import Data.Keyword exposing (Keyword)
 import Data.Recipient exposing (Recipient)
 import Data.RecipientGroup exposing (RecipientGroup)
 import Data.Request exposing (StoreMsg)
+import FilteringTable.Messages exposing (TableMsg)
 import Http
 import Navigation
 import Pages.ContactForm.Messages exposing (ContactFormMsg)
@@ -40,7 +41,7 @@ type Msg
     | UrlChange Navigation.Location
     | NewUrl String
     | FormMsg FormMsg
-    | UpdateTableFilter String
+    | TableMsg TableMsg
     | ElvantoMsg ElvantoMsg
     | InboundTableMsg InboundTableMsg
     | RecipientTableMsg RecipientTableMsg

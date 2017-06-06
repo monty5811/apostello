@@ -1,6 +1,6 @@
 module Pages.GroupForm.Update exposing (update)
 
-import FilteringTable as FT
+import FilteringTable.Util as FT
 import Pages.GroupForm.Messages exposing (GroupFormMsg(..))
 import Pages.GroupForm.Model exposing (GroupFormModel)
 

@@ -2,7 +2,8 @@ module Pages.KeyRespTable.View exposing (view)
 
 import Data.SmsInbound exposing (SmsInbound)
 import Data.Store as Store
-import FilteringTable exposing (uiTable)
+import FilteringTable.Model as FTM
+import FilteringTable.View exposing (uiTable)
 import Helpers exposing (archiveCell, formatDate)
 import Html exposing (Html, a, br, button, div, i, input, label, td, text, th, thead, tr)
 import Html.Attributes exposing (attribute, checked, class, id, name, style, type_)
@@ -11,17 +12,16 @@ import Messages exposing (Msg(KeyRespTableMsg))
 import Pages exposing (Page(ContactForm), initSendAdhoc)
 import Pages.ContactForm.Model exposing (initialContactFormModel)
 import Pages.KeyRespTable.Messages exposing (KeyRespTableMsg(..))
-import Regex
 import Route exposing (spaLink)
 
 
 -- Main view
 
 
-view : Bool -> Regex.Regex -> Store.RemoteList SmsInbound -> Bool -> String -> Html Msg
-view viewingArchive filterRegex sms ticked keyword =
+view : Bool -> FTM.Model -> Store.RemoteList SmsInbound -> Bool -> String -> Html Msg
+view viewingArchive tableModel sms ticked keyword =
     div []
-        [ uiTable tableHead filterRegex smsRow sms
+        [ uiTable tableHead tableModel smsRow sms
         , br [] []
         , archiveAllForm viewingArchive ticked keyword
         ]

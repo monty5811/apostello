@@ -2,7 +2,8 @@ module Pages.InboundTable.View exposing (view)
 
 import Data.SmsInbound exposing (SmsInbound)
 import Data.Store as Store
-import FilteringTable exposing (uiTable)
+import FilteringTable.Model as FTM
+import FilteringTable.View exposing (uiTable)
 import Helpers exposing (formatDate)
 import Html exposing (Html, a, b, i, td, text, th, thead, tr)
 import Html.Attributes as A
@@ -12,15 +13,14 @@ import Pages exposing (Page(ContactForm, KeywordForm), initSendAdhoc)
 import Pages.ContactForm.Model exposing (initialContactFormModel)
 import Pages.InboundTable.Messages exposing (InboundTableMsg(..))
 import Pages.KeywordForm.Model exposing (initialKeywordFormModel)
-import Regex
 import Route exposing (spaLink)
 
 
 -- Main view
 
 
-view : Regex.Regex -> Store.RemoteList SmsInbound -> Html Msg
-view filterRegex sms =
+view : FTM.Model -> Store.RemoteList SmsInbound -> Html Msg
+view tableModel sms =
     let
         head =
             thead []
@@ -33,7 +33,7 @@ view filterRegex sms =
                     ]
                 ]
     in
-    uiTable head filterRegex smsRow sms
+    uiTable head tableModel smsRow sms
 
 
 smsRow : SmsInbound -> Html Msg

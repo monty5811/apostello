@@ -2,23 +2,23 @@ module Pages.OutboundTable exposing (view)
 
 import Data.SmsOutbound exposing (SmsOutbound)
 import Data.Store as Store
-import FilteringTable exposing (uiTable)
+import FilteringTable.Model as FTM
+import FilteringTable.View exposing (uiTable)
 import Helpers exposing (formatDate)
 import Html exposing (Html, a, td, text, th, thead, tr)
 import Html.Attributes as A
 import Messages exposing (Msg)
 import Pages exposing (Page(ContactForm))
 import Pages.ContactForm.Model exposing (initialContactFormModel)
-import Regex
 import Route exposing (spaLink)
 
 
 -- Main view
 
 
-view : Regex.Regex -> Store.RemoteList SmsOutbound -> Html Msg
-view filterRegex sms =
-    uiTable tableHead filterRegex smsRow sms
+view : FTM.Model -> Store.RemoteList SmsOutbound -> Html Msg
+view tableModel sms =
+    uiTable tableHead tableModel smsRow sms
 
 
 tableHead : Html Msg

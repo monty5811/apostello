@@ -1,6 +1,6 @@
 module Pages.KeywordForm.Update exposing (update)
 
-import FilteringTable as FT
+import FilteringTable.Util as FT
 import Helpers exposing (toggleSelectedPk)
 import Pages.KeywordForm.Messages exposing (KeywordFormMsg(..))
 import Pages.KeywordForm.Model exposing (KeywordFormModel)

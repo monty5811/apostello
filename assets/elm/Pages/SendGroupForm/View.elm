@@ -4,7 +4,7 @@ import Data.RecipientGroup exposing (RecipientGroup)
 import Data.Store as Store
 import Date
 import DateTimePicker
-import FilteringTable exposing (filterRecord)
+import FilteringTable.Util exposing (filterRecord)
 import Forms.Model exposing (Field, FieldMeta, FormStatus)
 import Forms.View exposing (form)
 import Forms.View.Send exposing (contentField, sendButton, timeField)

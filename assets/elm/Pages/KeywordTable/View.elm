@@ -2,7 +2,8 @@ module Pages.KeywordTable.View exposing (view)
 
 import Data.Keyword exposing (Keyword)
 import Data.Store as Store
-import FilteringTable exposing (filteringTable)
+import FilteringTable.Model as FTM
+import FilteringTable.View exposing (filteringTable)
 import Helpers exposing (archiveCell)
 import Html exposing (Html, a, div, td, text, th, thead, tr)
 import Html.Attributes exposing (class)
@@ -10,16 +11,15 @@ import Messages exposing (Msg(KeywordTableMsg))
 import Pages exposing (Page(KeyRespTable, KeywordForm))
 import Pages.KeywordForm.Model exposing (initialKeywordFormModel)
 import Pages.KeywordTable.Messages exposing (KeywordTableMsg(ToggleKeywordArchive))
-import Regex
 import Route exposing (spaLink)
 
 
 -- Main view
 
 
-view : Regex.Regex -> Store.RemoteList Keyword -> Html Msg
-view filterRegex keywords =
-    filteringTable "ui striped definition table" tableHead filterRegex keywordRow keywords
+view : FTM.Model -> Store.RemoteList Keyword -> Html Msg
+view tableModel keywords =
+    filteringTable "ui striped definition table" tableHead tableModel keywordRow keywords
 
 
 tableHead : Html Msg

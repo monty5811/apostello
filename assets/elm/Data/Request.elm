@@ -6,7 +6,7 @@ import Data.RecipientGroup exposing (RecipientGroup)
 import Http
 import Json.Decode as Decode
 import Pages exposing (FabOnlyPage(..), Page(..))
-import String.Extra
+import Regex
 import Urls
 
 
@@ -235,7 +235,13 @@ increasePageSize : String -> String
 increasePageSize url =
     case String.contains "page_size" url of
         True ->
-            String.Extra.replace "page=2&page_size=100$" "page_size=1000" url
+            Regex.replace Regex.All
+                (Regex.regex "page=2&page_size=100$")
+                (\_ -> "page_size=1000")
+                url
 
         False ->
-            String.Extra.replace "page=2$" "page_size=100" url
+            Regex.replace Regex.All
+                (Regex.regex "page=2$")
+                (\_ -> "page_size=100")
+                url

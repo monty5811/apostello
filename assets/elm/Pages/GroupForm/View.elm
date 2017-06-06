@@ -4,7 +4,7 @@ import Data.Recipient exposing (RecipientSimple)
 import Data.RecipientGroup exposing (RecipientGroup)
 import Data.Request exposing (StoreMsg(ToggleGroupMembership))
 import Data.Store as Store
-import FilteringTable exposing (filterRecord)
+import FilteringTable.Util exposing (filterRecord)
 import Forms.Model exposing (Field, FieldMeta, FormStatus)
 import Forms.View exposing (..)
 import Helpers exposing (onClick)

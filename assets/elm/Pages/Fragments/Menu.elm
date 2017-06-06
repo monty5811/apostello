@@ -3,6 +3,7 @@ module Pages.Fragments.Menu exposing (menu)
 import Data.User exposing (UserProfile)
 import Html exposing (Html, a, div, i, text)
 import Html.Attributes exposing (class, href)
+import Html.Keyed as Keyed
 import Messages exposing (Msg)
 import Models exposing (Settings)
 import Pages exposing (FabOnlyPage(..), Page(..), initSendAdhoc, initSendGroup)
@@ -10,8 +11,13 @@ import Pages.GroupComposer.Model exposing (initialGroupComposerModel)
 import Route exposing (page2loc, spaLink)
 
 
-menu : Settings -> Html Msg
-menu settings =
+{-
+   Use keyed elements so the menu closes when the page changes on mobile.
+-}
+
+
+menu : Page -> Settings -> Html Msg
+menu page settings =
     let
         userPerms =
             settings.userPerms
@@ -25,31 +31,34 @@ menu settings =
         itemSpa =
             lockedSpaItem isStaff
     in
-    div [ class "ui top attached inverted violet menu" ]
-        [ itemSpa Home "Home" True
-        , div [ class "ui simple dropdown item" ]
-            [ text "Menu "
-            , i [ class "dropdown icon" ] []
-            , div [ class "ui vertical menu" ]
-                [ itemSpa (KeywordTable False) "Keywords" userPerms.can_see_keywords
-                , maybeDivider (isStaff || userPerms.can_see_keywords)
-                , itemSpa (initSendAdhoc Nothing Nothing) "Send to Individuals" userPerms.can_send_sms
-                , itemSpa (initSendGroup Nothing Nothing) "Send to a Group" userPerms.can_send_sms
-                , itemSpa ScheduledSmsTable "Scheduled Messages" isStaff
-                , maybeDivider (isStaff || userPerms.can_send_sms)
-                , itemSpa (RecipientTable False) "Contacts" userPerms.can_see_contact_names
-                , itemSpa (GroupTable False) "Groups" userPerms.can_see_groups
-                , divider
-                , itemSpa InboundTable "Incoming SMS" userPerms.can_see_incoming
-                , itemSpa OutboundTable "Outgoing SMS" userPerms.can_see_outgoing
-                , divider
-                , lockedItem False "/accounts/password/change" "Change Password" userPerms.user.is_social
-                , item "/accounts/logout/" "Logout" True
-                , divider
-                , div [ class "header" ] [ text settings.twilioFromNumber ]
+    Keyed.node "div"
+        [ class "ui top attached inverted violet menu" ]
+        [ ( "home", itemSpa Home "Home" True )
+        , ( "menu" ++ toString page
+          , div [ class "ui simple dropdown item" ]
+                [ text "Menu "
+                , i [ class "dropdown icon" ] []
+                , div [ class "ui vertical menu" ]
+                    [ itemSpa (KeywordTable False) "Keywords" userPerms.can_see_keywords
+                    , maybeDivider (isStaff || userPerms.can_see_keywords)
+                    , itemSpa (initSendAdhoc Nothing Nothing) "Send to Individuals" userPerms.can_send_sms
+                    , itemSpa (initSendGroup Nothing Nothing) "Send to a Group" userPerms.can_send_sms
+                    , itemSpa ScheduledSmsTable "Scheduled Messages" isStaff
+                    , maybeDivider (isStaff || userPerms.can_send_sms)
+                    , itemSpa (RecipientTable False) "Contacts" userPerms.can_see_contact_names
+                    , itemSpa (GroupTable False) "Groups" userPerms.can_see_groups
+                    , divider
+                    , itemSpa InboundTable "Incoming SMS" userPerms.can_see_incoming
+                    , itemSpa OutboundTable "Outgoing SMS" userPerms.can_see_outgoing
+                    , divider
+                    , lockedItem False "/accounts/password/change" "Change Password" userPerms.user.is_social
+                    , item "/accounts/logout/" "Logout" True
+                    , divider
+                    , div [ class "header" ] [ text settings.twilioFromNumber ]
+                    ]
                 ]
-            ]
-        , maybeToolsMenu isStaff userPerms
+          )
+        , ( "tools" ++ toString page, maybeToolsMenu isStaff userPerms )
         ]
 
 

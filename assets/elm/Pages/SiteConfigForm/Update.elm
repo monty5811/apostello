@@ -1,6 +1,6 @@
 module Pages.SiteConfigForm.Update exposing (update)
 
-import FilteringTable as FT
+import FilteringTable.Util as FT
 import Helpers exposing (toggleSelectedPk)
 import Pages.SiteConfigForm.Messages exposing (SiteConfigFormMsg(..))
 import Pages.SiteConfigForm.Model exposing (SiteConfigFormModel)

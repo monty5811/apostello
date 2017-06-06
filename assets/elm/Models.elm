@@ -11,11 +11,11 @@ module Models
 import Data.Store exposing (DataStore, decodeDataStore, emptyDataStore)
 import Data.User exposing (UserProfile)
 import Dict exposing (Dict)
+import FilteringTable.Model as FT
 import Forms.Model exposing (FormStatus(NoAction))
 import Json.Decode as Decode
 import Pages exposing (Page)
 import Pages.Fragments.Notification.Model exposing (DjangoMessage, Notification, NotificationType(..))
-import Regex
 import Time
 
 
@@ -24,7 +24,7 @@ import Time
 
 type alias Model =
     { page : Page
-    , filterRegex : Regex.Regex
+    , table : FT.Model
     , settings : Settings
     , dataStore : DataStore
     , fabModel : FabModel
@@ -37,7 +37,7 @@ type alias Model =
 initialModel : Settings -> String -> Page -> Model
 initialModel settings dataStoreCache page =
     { page = page
-    , filterRegex = Regex.regex ""
+    , table = FT.initial
     , settings = settings
     , dataStore = Result.withDefault emptyDataStore <| Decode.decodeString decodeDataStore dataStoreCache
     , fabModel = initialFabModel

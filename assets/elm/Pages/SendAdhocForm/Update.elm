@@ -1,6 +1,6 @@
 module Pages.SendAdhocForm.Update exposing (update)
 
-import FilteringTable as FT
+import FilteringTable.Util as FT
 import Helpers exposing (calculateSmsCost, toggleSelectedPk)
 import Pages.SendAdhocForm.Messages exposing (SendAdhocMsg(..))
 import Pages.SendAdhocForm.Model exposing (SendAdhocModel)

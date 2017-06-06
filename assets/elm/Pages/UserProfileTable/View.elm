@@ -2,22 +2,22 @@ module Pages.UserProfileTable.View exposing (view)
 
 import Data.Store as Store
 import Data.User exposing (UserProfile)
-import FilteringTable exposing (filteringTable)
+import FilteringTable.Model as FTM
+import FilteringTable.View exposing (filteringTable)
 import Formatting as F exposing ((<>))
 import Html exposing (Html, a, button, i, td, text, th, thead, tr)
 import Html.Attributes exposing (class, href)
 import Html.Events exposing (onClick)
 import Messages exposing (Msg)
 import Pages.UserProfileTable.Messages exposing (UserProfileTableMsg(ToggleField))
-import Regex
 
 
 -- Main view
 
 
-view : Regex.Regex -> Store.RemoteList UserProfile -> Html Msg
-view filterRegex profiles =
-    filteringTable "ui collapsing celled very basic table" tableHead filterRegex userprofileRow profiles
+view : FTM.Model -> Store.RemoteList UserProfile -> Html Msg
+view tableModel profiles =
+    filteringTable "ui collapsing celled very basic table" tableHead tableModel userprofileRow profiles
 
 
 tableHead : Html Msg

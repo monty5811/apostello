@@ -85,7 +85,7 @@ view model mainContent fab =
 commonShell : Model -> Html Msg -> Html Msg -> Html Msg
 commonShell model mainContent fab =
     div []
-        [ Menu.menu model.settings
+        [ Menu.menu model.page model.settings
         , div [ class "ui hidden divider" ] []
         , div [ class "ui stackable grid container" ]
             [ div [ class "fourteen wide centered column" ]

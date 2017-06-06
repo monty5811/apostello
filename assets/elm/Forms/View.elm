@@ -6,7 +6,7 @@ import Date.Format
 import DateTimePicker
 import DateTimePicker.Config
 import Dict
-import FilteringTable exposing (filterRecord)
+import FilteringTable.Util exposing (filterRecord)
 import Forms.Model exposing (..)
 import Html exposing (Html, button, div, i, input, label, text, textarea)
 import Html.Attributes as A

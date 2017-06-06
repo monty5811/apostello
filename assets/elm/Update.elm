@@ -5,7 +5,8 @@ import Data.Store as Store
 import Data.Store.Update as SU
 import Date
 import DateTimePicker
-import FilteringTable as FT
+import FilteringTable.Model as FTModel
+import FilteringTable.Update as FT
 import Forms.Update as F
 import Messages exposing (..)
 import Models exposing (FabModel(..), Model, Settings)
@@ -36,7 +37,6 @@ import Pages.SiteConfigForm.Update as SCF
 import Pages.UserProfileTable.Update as UPT
 import Pages.Wall.Update as Wall
 import Ports exposing (saveDataStore)
-import Regex
 import Route exposing (loc2Page)
 
 
@@ -71,7 +71,7 @@ updateHelper msg model =
             ( { model
                 | page = page
                 , dataStore = Store.resetStatus model.dataStore
-                , filterRegex = Regex.regex ""
+                , table = FTModel.initial
               }
             , []
             )
@@ -217,8 +217,8 @@ updateHelper msg model =
                     ( model, [] )
 
         -- Filtering Table
-        UpdateTableFilter filterText ->
-            ( { model | filterRegex = FT.textToRegex filterText }, [] )
+        TableMsg subMsg ->
+            ( { model | table = FT.update subMsg model.table }, [] )
 
         CurrentTime t ->
             ( { model | currentTime = t }, [] )
