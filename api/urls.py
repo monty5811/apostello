@@ -121,7 +121,7 @@ urlpatterns = [
             model_class=m.SmsInbound,
             serializer_class=s.SmsInboundSerializer,
             permission_classes=(IsAuthenticated, p.CanSeeIncoming, p.CanSeeKeywords),
-            field='deal_with',
+            field='dealt_with',
         ),
         name='toggle_deal_with_sms',
     ),
