@@ -1,21 +1,24 @@
 module Models
     exposing
-        ( CSRFToken
-        , FabModel(..)
+        ( FabModel(..)
         , Flags
         , Model
         , Settings
+        , decodeFlags
         , initialModel
         )
 
-import Data.Store exposing (DataStore, decodeDataStore, emptyDataStore)
-import Data.User exposing (UserProfile)
+import Data.User exposing (UserProfile, decodeUserProfile)
 import Dict exposing (Dict)
+import DjangoSend exposing (CSRFToken(CSRFToken))
 import FilteringTable.Model as FT
 import Forms.Model exposing (FormStatus(NoAction))
 import Json.Decode as Decode
+import Json.Decode.Pipeline exposing (decode, required)
 import Pages exposing (Page)
 import Pages.Fragments.Notification.Model exposing (DjangoMessage, Notification, NotificationType(..))
+import Store.Decode exposing (decodeDataStore)
+import Store.Model exposing (DataStore, emptyDataStore)
 import Time
 
 
@@ -62,23 +65,33 @@ type alias Settings =
     }
 
 
+decodeSettings : Decode.Decoder Settings
+decodeSettings =
+    decode Settings
+        |> required "csrftoken" (Decode.string |> Decode.andThen (\t -> Decode.succeed (CSRFToken t)))
+        |> required "userPerms" decodeUserProfile
+        |> required "twilioSendingCost" Decode.float
+        |> required "twilioFromNumber" Decode.string
+        |> required "smsCharLimit" Decode.int
+        |> required "defaultNumberPrefix" Decode.string
+        |> required "blockedKeywords" (Decode.list Decode.string)
+
+
 
 --
 
 
 type alias Flags =
     { settings : Settings
-    , messages : List DjangoMessage
     , dataStoreCache : Maybe String
     }
 
 
-
--- CSRF Token - required for post requests
-
-
-type alias CSRFToken =
-    String
+decodeFlags : Decode.Decoder Flags
+decodeFlags =
+    decode Flags
+        |> required "settings" decodeSettings
+        |> required "dataStoreCache" (Decode.maybe Decode.string)
 
 
 

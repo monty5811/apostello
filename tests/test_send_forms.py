@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
-from tests.conftest import twilio_vcr
 
 import pytest
-from apostello import models
-from apostello import tasks
+from tests.conftest import twilio_vcr
+
+from apostello import models, tasks
 
 
 @pytest.mark.slow
@@ -124,23 +124,21 @@ class TestGroupForm:
 
     def test_create_all_group_form(self, users, recipients):
         """Test the form to create a group composed of all recipients."""
-        resp = users['c_staff'].post('/group/create_all/', {
-            'group_name': 'test',
+        num_groups = models.RecipientGroup.objects.all().count()
+        resp = users['c_staff'].post('/api/v2/actions/group/create_all/', {
+            'group_name': 'test all group',
         })
-        assert resp.status_code == 302
-        assert resp.url == '/group/all/'
-        assert len(models.RecipientGroup.objects.all()) == 1
-        assert models.RecipientGroup.objects.all()[0].name == 'test'
-        assert len(models.RecipientGroup.objects.all()[0].all_recipients) == 6
+        assert resp.status_code == 201
+        assert models.RecipientGroup.objects.all().count() == num_groups + 1
+        assert models.RecipientGroup.objects.get(name='test all group').all_recipients.count() == 6
 
     def test_create_all_group_form_update(self, users, recipients, groups):
         """Test the form to create a group composed of all recipients.
         Test populating an already existing group.
         """
-        resp = users['c_staff'].post('/group/create_all/', {
+        resp = users['c_staff'].post('/api/v2/actions/group/create_all/', {
             'group_name': 'Empty Group',
         })
-        assert resp.status_code == 302
-        assert resp.url == '/group/all/'
+        assert resp.status_code == 201
         g = models.RecipientGroup.objects.get(name='Empty Group')
         assert len(g.all_recipients) == 6

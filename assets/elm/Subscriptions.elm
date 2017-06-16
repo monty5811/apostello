@@ -1,11 +1,11 @@
 module Subscriptions exposing (subscriptions)
 
-import Data.Request exposing (StoreMsg(LoadData, LoadDataStore))
-import Data.Store as Store
 import Messages as M
 import Models exposing (Model)
 import Pages exposing (Page(Curator, SendAdhoc, SendGroup, Wall))
 import Ports exposing (loadDataStore)
+import Store.Messages exposing (StoreMsg(LoadData, LoadDataStore))
+import Store.Model as Store
 import Time exposing (Time, second)
 
 

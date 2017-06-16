@@ -3,9 +3,9 @@ from time import sleep
 import pytest
 from django.contrib.auth.models import User
 from django.core import mail
+from tests.functional_tests.utils import assert_with_timeout, click_and_wait
 
 from site_config.models import SiteConfiguration
-from tests.functional_tests.utils import assert_with_timeout, click_and_wait
 
 
 @pytest.mark.django_db

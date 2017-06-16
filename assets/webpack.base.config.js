@@ -33,11 +33,6 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.jsx?$/,
-        exclude: /node_modules/,
-        loader: "babel-loader"
-      },
-      {
         test: /\.elm?$/,
         exclude: [/elm-stuff/, /node_modules/],
         loader: elmLoader
@@ -51,7 +46,6 @@ module.exports = {
     hints: false
   },
 
-  devtool: "cheap-module-source-map",
   watchOptions: {
     poll: 500
   }

@@ -1,6 +1,5 @@
 import pytest
 from django.utils import timezone
-
 from tests.conftest import twilio_vcr
 
 

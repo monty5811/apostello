@@ -1,35 +1,26 @@
 module Messages exposing (..)
 
-import Data.Keyword exposing (Keyword)
-import Data.Recipient exposing (Recipient)
-import Data.RecipientGroup exposing (RecipientGroup)
-import Data.Request exposing (StoreMsg)
 import FilteringTable.Messages exposing (TableMsg)
 import Http
 import Navigation
-import Pages.ContactForm.Messages exposing (ContactFormMsg)
-import Pages.ContactForm.Model exposing (ContactFormModel)
+import Pages.ApiSetup.Messages exposing (ApiSetupMsg)
 import Pages.ElvantoImport.Messages exposing (ElvantoMsg)
 import Pages.FirstRun.Messages exposing (FirstRunMsg)
+import Pages.Forms.Contact.Messages exposing (ContactFormMsg)
+import Pages.Forms.ContactImport.Messages exposing (ContactImportMsg)
+import Pages.Forms.CreateAllGroup.Messages exposing (CreateAllGroupMsg)
+import Pages.Forms.DefaultResponses.Messages exposing (DefaultResponsesFormMsg)
+import Pages.Forms.DefaultResponses.Model exposing (DefaultResponsesFormModel)
+import Pages.Forms.Group.Messages exposing (GroupFormMsg)
+import Pages.Forms.Keyword.Messages exposing (KeywordFormMsg)
+import Pages.Forms.SendAdhoc.Messages exposing (SendAdhocMsg)
+import Pages.Forms.SendGroup.Messages exposing (SendGroupMsg)
+import Pages.Forms.SiteConfig.Messages exposing (SiteConfigFormMsg)
+import Pages.Forms.SiteConfig.Model exposing (SiteConfigFormModel)
+import Pages.Forms.UserProfile.Messages exposing (UserProfileFormMsg)
 import Pages.GroupComposer.Messages exposing (GroupComposerMsg)
-import Pages.GroupForm.Messages exposing (GroupFormMsg)
-import Pages.GroupForm.Model exposing (GroupFormModel)
-import Pages.GroupTable.Messages exposing (GroupTableMsg)
-import Pages.InboundTable.Messages exposing (InboundTableMsg)
 import Pages.KeyRespTable.Messages exposing (KeyRespTableMsg)
-import Pages.KeywordForm.Messages exposing (KeywordFormMsg)
-import Pages.KeywordForm.Model exposing (KeywordFormModel)
-import Pages.KeywordTable.Messages exposing (KeywordTableMsg)
-import Pages.RecipientTable.Messages exposing (RecipientTableMsg)
-import Pages.ScheduledSmsTable.Messages exposing (ScheduledSmsTableMsg)
-import Pages.SendAdhocForm.Messages exposing (SendAdhocMsg)
-import Pages.SendAdhocForm.Model exposing (SendAdhocModel)
-import Pages.SendGroupForm.Messages exposing (SendGroupMsg)
-import Pages.SendGroupForm.Model exposing (SendGroupModel)
-import Pages.SiteConfigForm.Messages exposing (SiteConfigFormMsg)
-import Pages.SiteConfigForm.Model exposing (SiteConfigFormModel)
-import Pages.UserProfileTable.Messages exposing (UserProfileTableMsg)
-import Pages.Wall.Messages exposing (WallMsg)
+import Store.Messages exposing (StoreMsg)
 import Time
 
 
@@ -43,26 +34,13 @@ type Msg
     | FormMsg FormMsg
     | TableMsg TableMsg
     | ElvantoMsg ElvantoMsg
-    | InboundTableMsg InboundTableMsg
-    | RecipientTableMsg RecipientTableMsg
-    | KeywordTableMsg KeywordTableMsg
-    | GroupTableMsg GroupTableMsg
     | GroupComposerMsg GroupComposerMsg
-    | GroupFormMsg GroupFormMsg
-    | ContactFormMsg ContactFormMsg
-    | KeywordFormMsg KeywordFormMsg
-    | WallMsg WallMsg
-    | UserProfileTableMsg UserProfileTableMsg
-    | ScheduledSmsTableMsg ScheduledSmsTableMsg
     | KeyRespTableMsg KeyRespTableMsg
     | FirstRunMsg FirstRunMsg
-    | SendAdhocMsg SendAdhocMsg
-    | SendGroupMsg SendGroupMsg
-    | SiteConfigFormMsg SiteConfigFormMsg
     | FabMsg FabMsg
+    | ApiSetupMsg ApiSetupMsg
     | NotificationMsg NotificationMsg
     | CurrentTime Time.Time
-    | ReceiveSiteConfigFormModel (Result Http.Error SiteConfigFormModel)
     | Nope
 
 
@@ -77,10 +55,17 @@ type FabMsg
 
 
 type FormMsg
-    = PostKeywordForm KeywordFormModel (Maybe Keyword)
-    | PostContactForm ContactFormModel (Maybe Recipient)
-    | PostGroupForm GroupFormModel (Maybe RecipientGroup)
-    | PostAdhocForm SendAdhocModel
-    | PostSGForm SendGroupModel
-    | PostSiteConfigForm SiteConfigFormModel
+    = PostForm (Cmd Msg)
     | ReceiveFormResp (List (Cmd Msg)) (Result Http.Error { body : String, code : Int })
+    | GroupFormMsg GroupFormMsg
+    | ContactFormMsg ContactFormMsg
+    | KeywordFormMsg KeywordFormMsg
+    | UserProfileFormMsg UserProfileFormMsg
+    | SiteConfigFormMsg SiteConfigFormMsg
+    | DefaultResponsesFormMsg DefaultResponsesFormMsg
+    | CreateAllGroupMsg CreateAllGroupMsg
+    | ContactImportMsg ContactImportMsg
+    | ReceiveSiteConfigFormModel (Result Http.Error SiteConfigFormModel)
+    | ReceiveDefaultResponsesFormModel (Result Http.Error DefaultResponsesFormModel)
+    | SendAdhocMsg SendAdhocMsg
+    | SendGroupMsg SendGroupMsg

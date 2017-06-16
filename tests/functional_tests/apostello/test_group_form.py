@@ -1,9 +1,9 @@
 from time import sleep
 
 import pytest
+from tests.functional_tests.utils import assert_with_timeout, click_and_wait
 
 from apostello import models
-from tests.functional_tests.utils import assert_with_timeout, click_and_wait
 
 NEW_URI = '/group/new/'
 
@@ -127,3 +127,16 @@ class TestGroupForm:
             cards = browser_in.find_elements_by_xpath(member_xpath)
         sleep(driver_wait_time)
         assert grp.all_recipients.count() == 0
+
+    def test_create_all_group_form(self, live_server, browser_in, recipients, groups, driver_wait_time):
+        """Test form to create group with all contacts."""
+        b = load_page(browser_in, driver_wait_time, live_server + '/group/create_all/')
+
+        name_box = b.find_element_by_name('group_name')
+        name_box.clear()
+        name_box.send_keys('Test All Group')
+        sleep(driver_wait_time)
+
+        send_form(b, driver_wait_time)
+        assert '/group/all/' in b.current_url
+        assert models.RecipientGroup.objects.get(name='Test All Group').all_recipients_not_in_group.count() == 0

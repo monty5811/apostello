@@ -1,21 +1,22 @@
 module Pages.Fragments.Fab.View exposing (view)
 
 import Data.Keyword exposing (Keyword)
-import Data.Store as Store
 import Html exposing (..)
 import Html.Attributes exposing (class, href, id)
 import Html.Events exposing (onClick)
 import Messages exposing (..)
 import Models exposing (FabModel(..))
-import Pages exposing (FabOnlyPage(..), Page(..))
-import Pages.ContactForm.Model exposing (initialContactFormModel)
-import Pages.GroupForm.Model exposing (initialGroupFormModel)
-import Pages.KeywordForm.Model exposing (initialKeywordFormModel)
+import Pages exposing (Page(..))
+import Pages.Forms.Contact.Model exposing (initialContactFormModel)
+import Pages.Forms.Group.Model exposing (initialGroupFormModel)
+import Pages.Forms.Keyword.Model exposing (initialKeywordFormModel)
 import Route exposing (page2loc, spaLink)
+import Store.Model exposing (DataStore)
+import Store.RemoteList as RL
 import Urls as U
 
 
-view : Store.DataStore -> Page -> FabModel -> Bool -> Html Msg
+view : DataStore -> Page -> FabModel -> Bool -> Html Msg
 view ds page model canArchive =
     div []
         [ fabDimView model
@@ -28,7 +29,7 @@ view ds page model canArchive =
         ]
 
 
-fabDropdownView : Store.DataStore -> Page -> FabModel -> Bool -> Html Msg
+fabDropdownView : DataStore -> Page -> FabModel -> Bool -> Html Msg
 fabDropdownView ds page model canArchive =
     case model of
         MenuHidden ->
@@ -58,11 +59,11 @@ fabButtonView =
         ]
 
 
-fabLinks : Store.DataStore -> Page -> Bool -> List (Html Msg)
+fabLinks : DataStore -> Page -> Bool -> List (Html Msg)
 fabLinks ds page canArchive =
     case page of
         OutboundTable ->
-            defaultLinksSpa
+            defaultLinks
 
         InboundTable ->
             [ incomingWall, wallCurator ]
@@ -107,7 +108,7 @@ fabLinks ds page canArchive =
             [ newKeywordSpa, otherLink ]
 
         ElvantoImport ->
-            defaultLinksSpa
+            defaultLinks
 
         Wall ->
             []
@@ -119,13 +120,13 @@ fabLinks ds page canArchive =
             [ fabLink "/admin/auth/user/" Table "Admin: Users" ]
 
         ScheduledSmsTable ->
-            defaultLinksSpa
+            defaultLinks
 
         KeyRespTable _ _ k ->
             let
                 keyword =
                     ds.keywords
-                        |> Store.toList
+                        |> RL.toList
                         |> List.filter (\x -> x.keyword == k)
                         |> List.head
             in
@@ -139,30 +140,30 @@ fabLinks ds page canArchive =
             []
 
         AccessDenied ->
-            defaultLinksSpa
+            defaultLinks
 
         SendAdhoc _ ->
-            defaultLinksSpa
+            defaultLinks
 
         SendGroup _ ->
-            defaultLinksSpa
+            defaultLinks
 
         Error404 ->
-            defaultLinksSpa
+            defaultLinks
 
         Home ->
-            defaultLinksSpa
+            defaultLinks
 
         GroupForm _ maybePk ->
             case maybePk of
                 Nothing ->
-                    defaultLinksSpa
+                    defaultLinks
 
                 Just pk ->
                     let
                         isArchived =
                             ds.groups
-                                |> Store.toList
+                                |> RL.toList
                                 |> List.filter (\x -> x.pk == pk)
                                 |> List.head
                                 |> Maybe.map .is_archived
@@ -176,13 +177,13 @@ fabLinks ds page canArchive =
         ContactForm _ maybePk ->
             case maybePk of
                 Nothing ->
-                    defaultLinksSpa
+                    defaultLinks
 
                 Just pk ->
                     let
                         isArchived =
                             ds.recipients
-                                |> Store.toList
+                                |> RL.toList
                                 |> List.filter (\x -> x.pk == pk)
                                 |> List.head
                                 |> Maybe.map .is_archived
@@ -196,13 +197,13 @@ fabLinks ds page canArchive =
         KeywordForm _ maybeK ->
             case maybeK of
                 Nothing ->
-                    defaultLinksSpa
+                    defaultLinks
 
                 Just k ->
                     let
                         keyword =
                             ds.keywords
-                                |> Store.toList
+                                |> RL.toList
                                 |> List.filter (\x -> x.keyword == k)
                                 |> List.head
 
@@ -219,30 +220,28 @@ fabLinks ds page canArchive =
                     ]
 
         SiteConfigForm _ ->
-            defaultLinksHref
+            defaultLinks
 
-        FabOnlyPage fabPage ->
-            case fabPage of
-                Help ->
-                    defaultLinksHref
+        DefaultResponsesForm _ ->
+            defaultLinks
 
-                CreateAllGroup ->
-                    [ newGroupHard
-                    , groups
-                    , groupsArchive
-                    ]
+        CreateAllGroup _ ->
+            [ newGroupSpa, groupsSpa, groupsArchiveSpa ]
 
-                ContactImport ->
-                    defaultLinksHref
+        Usage ->
+            []
 
-                ApiSetup ->
-                    defaultLinksHref
+        Help ->
+            defaultLinks
 
-                EditUserProfile _ ->
-                    defaultLinksHref
+        UserProfileForm _ _ ->
+            defaultLinks
 
-                EditResponses ->
-                    defaultLinksHref
+        ContactImport _ ->
+            defaultLinks
+
+        ApiSetup _ ->
+            defaultLinks
 
 
 fabLink : String -> Icon -> String -> Html Msg
@@ -335,25 +334,12 @@ iconString icon =
             "edit"
 
 
-defaultLinksHref : List (Html Msg)
-defaultLinksHref =
-    [ newKeywordHard
-    , newContactHard
-    , newGroupHard
-    ]
-
-
-defaultLinksSpa : List (Html Msg)
-defaultLinksSpa =
+defaultLinks : List (Html Msg)
+defaultLinks =
     [ newKeywordSpa
     , newContactSpa
     , newGroupSpa
     ]
-
-
-newKeywordHard : Html Msg
-newKeywordHard =
-    fabLink (page2loc <| KeywordForm initialKeywordFormModel Nothing) Plus "New Keyword"
 
 
 newKeywordSpa : Html Msg
@@ -408,7 +394,7 @@ keywordResponses maybeK =
             fabLink "#" Inbox "..."
 
         Just k ->
-            fabLink (page2loc <| KeyRespTable False False k.keyword) Inbox ("Replies (" ++ k.num_replies ++ ")")
+            fabSpaLink (KeyRespTable False False k.keyword) Inbox ("Replies (" ++ k.num_replies ++ ")")
 
 
 keywordArchiveResponses : Maybe Keyword -> Html Msg
@@ -418,12 +404,7 @@ keywordArchiveResponses k =
             fabLink "#" Inbox "..."
 
         Just keyword ->
-            fabLink (page2loc <| KeyRespTable False True keyword.keyword) Inbox ("Archived Replies (" ++ keyword.num_archived_replies ++ ")")
-
-
-newContactHard : Html Msg
-newContactHard =
-    fabLink (page2loc <| ContactForm initialContactFormModel Nothing) Plus "New Contact"
+            fabSpaLink (KeyRespTable False True keyword.keyword) Inbox ("Archived Replies (" ++ keyword.num_archived_replies ++ ")")
 
 
 newContactSpa : Html Msg
@@ -446,24 +427,9 @@ groupsArchiveSpa =
     fabSpaLink (GroupTable True) Table "Archived Groups"
 
 
-groupsArchive : Html Msg
-groupsArchive =
-    fabLink (page2loc <| GroupTable True) Table "Archived Groups"
-
-
 groupsSpa : Html Msg
 groupsSpa =
     fabSpaLink (GroupTable False) Table "Groups"
-
-
-groups : Html Msg
-groups =
-    fabLink (page2loc <| GroupTable False) Table "Groups"
-
-
-newGroupHard : Html Msg
-newGroupHard =
-    fabLink (page2loc <| GroupForm initialGroupFormModel Nothing) Plus "New Group"
 
 
 newGroupSpa : Html Msg

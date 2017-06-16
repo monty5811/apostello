@@ -1,21 +1,21 @@
 module Pages.Curator exposing (view)
 
 import Data.SmsInbound exposing (SmsInbound)
-import Data.Store as Store
 import FilteringTable.Model as FTM
 import FilteringTable.View exposing (uiTable)
 import Helpers exposing (formatDate)
 import Html exposing (Html, a, td, text, th, thead, tr)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
-import Messages exposing (Msg(WallMsg))
-import Pages.Wall.Messages exposing (WallMsg(ToggleWallDisplay))
+import Messages exposing (Msg(StoreMsg))
+import Store.Messages exposing (StoreMsg(ToggleWallDisplay))
+import Store.RemoteList as RL
 
 
 -- Main view
 
 
-view : FTM.Model -> Store.RemoteList SmsInbound -> Html Msg
+view : FTM.Model -> RL.RemoteList SmsInbound -> Html Msg
 view tableModel sms =
     let
         head =
@@ -64,7 +64,7 @@ curateToggleCell sms =
     td [ class "collapsing" ]
         [ a
             [ class className
-            , onClick (WallMsg (ToggleWallDisplay sms.display_on_wall sms.pk))
+            , onClick (StoreMsg (ToggleWallDisplay sms.display_on_wall sms.pk))
             ]
             [ text text_ ]
         ]

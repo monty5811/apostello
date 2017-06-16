@@ -1,6 +1,7 @@
+from time import sleep
+
 import pytest
 from tests.functional_tests.utils import assert_with_timeout, click_and_wait
-from time import sleep
 
 URI = "/"
 

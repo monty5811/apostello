@@ -1,24 +1,29 @@
+import csv
+import io
+
 from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.generic import View
 from django_q.tasks import async
+from phonenumber_field.validators import validate_international_phonenumber
+from rest_framework import generics, status
+from rest_framework.authtoken.models import Token
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import generics
-from rest_framework import status
-from rest_framework.pagination import PageNumberPagination
 
-from api.drf_permissions import CanSeeKeywords, CanSendSms, IsStaff
 from api import serializers
+from api.drf_permissions import CanImport, CanSeeKeywords, CanSendSms, IsStaff
 from api.forms import handle_form
-from apostello.forms import SendAdhocRecipientsForm, SendRecipientGroupForm
+from apostello.forms import (CsvImport, GroupAllCreateForm, SendAdhocRecipientsForm, SendRecipientGroupForm)
 from apostello.mixins import ProfilePermsMixin
-from apostello.models import Keyword, Recipient, SmsInbound, SmsOutbound
+from apostello.models import (Keyword, Recipient, RecipientGroup, SmsInbound, SmsOutbound)
 from elvanto.models import ElvantoGroup
-from site_config.forms import SiteConfigurationForm
-from site_config.models import SiteConfiguration
+from site_config.forms import DefaultResponsesForm, SiteConfigurationForm
+from site_config.models import DefaultResponses, SiteConfiguration
 
 
 class ActionForbidden(Exception):
@@ -45,6 +50,114 @@ class ConfigView(APIView):
 
     def post(self, request, format=None, **kwargs):
         return handle_form(self, request)
+
+
+class ResponsesView(APIView):
+    permission_classes = (IsAuthenticated, IsStaff)
+    model_class = DefaultResponses
+    form_class = DefaultResponsesForm
+    serializer_class = serializers.DefaultResponsesSerializer
+
+    def get(self, request, format=None, **kwargs):
+        obj = self.model_class.get_solo()
+        serializer = self.serializer_class(obj)
+        return Response(serializer.data)
+
+    def post(self, request, format=None, **kwargs):
+        return handle_form(self, request)
+
+
+class CSVImport(APIView):
+    permission_classes = (IsAuthenticated, CanImport)
+    form_class = CsvImport
+
+    def post(self, request, format=None, **kwargs):
+        form = self.form_class(request.data)
+        if not form.is_valid():
+            return Response(
+                {
+                    'messages': [{
+                        'type_': 'warning',
+                        'text': 'That doesn\'t look right...'
+                    }],
+                    'errors': {},
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        csv_string = u"first_name,last_name,number\n" + form.cleaned_data['csv_data']
+        data = [x for x in csv.DictReader(io.StringIO(csv_string))]
+        bad_rows = list()
+        for row in data:
+            try:
+                validate_international_phonenumber(row['number'])
+                obj = Recipient.objects.get_or_create(number=row['number'])[0]
+                obj.first_name = row['first_name'].strip()
+                obj.last_name = row['last_name'].strip()
+                obj.is_archived = False
+                obj.full_clean()
+                obj.save()
+            except Exception:
+                # catch bad rows and display to the user
+                bad_rows.append('{first_name},{last_name},{number}'.format(**row))
+
+        if bad_rows:
+            msg_text = "Uh oh, something went wrong with these imports!\n\n"
+            msg_text = msg_text + "\n".join(bad_rows)
+            msg_text = msg_text + "\n\nTry inputting these failed items manually to see what went wrong."
+            return Response(
+                {
+                    'messages': [{
+                        'type_': 'warning',
+                        'text': msg_text
+                    }],
+                    'errors': {},
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        else:
+            msg = {
+                'type_': 'info',
+                'text': 'Importing your data now...',
+            }
+            return Response(
+                {
+                    'messages': [msg],
+                    'errors': {},
+                }, status=status.HTTP_200_OK
+            )
+
+
+class SetupView(APIView):
+    permission_classes = (IsAuthenticated, IsStaff)
+
+    def get(self, request, *args, **kwargs):
+        """Handle get requests."""
+        try:
+            api_token = request.user.auth_token
+        except ObjectDoesNotExist:
+            api_token = 'No API Token Generated'
+
+        return Response({'token': str(api_token)}, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        """Handle token generation."""
+        if request.data.get('regen'):
+            token, created = Token.objects.get_or_create(user=request.user)
+            if not created:
+                # delete token and make a new one
+                token.delete()
+                token = Token.objects.create(user=request.user)
+
+        if request.data.get('delete'):
+            try:
+                token = Token.objects.get(user=request.user)
+                token.delete()
+            except Token.DoesNotExist:
+                # no token to delete, just continue
+                pass
+            token = 'No API Token Generated'
+
+        return Response({'token': str(token)}, status=status.HTTP_200_OK)
 
 
 class Collection(generics.ListAPIView):
@@ -308,6 +421,30 @@ class SendGroup(APIView):
                     'text': "'{0}' has been successfully queued.".format(form.cleaned_data['content']),
                 }
 
+            return Response({'messages': [msg], 'errors': {}}, status=status.HTTP_201_CREATED)
+
+        return Response({'messages': [], 'errors': form.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CreateAllGroup(APIView):
+    """View to handle creation of an 'all' group."""
+    permission_classes = (IsAuthenticated, IsStaff)
+
+    def post(self, request, format=None, **kwargs):
+        """Create the group and add all active users."""
+        form = GroupAllCreateForm(request.data)
+        if form.is_valid():
+            g, created = RecipientGroup.objects.get_or_create(
+                name=form.cleaned_data['group_name'],
+                defaults={'description': 'Created using "All" form'},
+            )
+            if not created:
+                g.recipient_set.clear()
+            for r in Recipient.objects.filter(is_archived=False):
+                g.recipient_set.add(r)
+            g.save()
+
+            msg = {'type_': 'info', 'text': 'Group created.'}
             return Response({'messages': [msg], 'errors': {}}, status=status.HTTP_201_CREATED)
 
         return Response({'messages': [], 'errors': form.errors}, status=status.HTTP_400_BAD_REQUEST)

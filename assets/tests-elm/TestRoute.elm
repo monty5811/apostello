@@ -5,12 +5,14 @@ import Fuzz as F
 import List.Extra exposing (uncons)
 import Models exposing (Model)
 import Navigation
-import Pages exposing (FabOnlyPage(..), Page(..), initSendAdhoc, initSendGroup)
-import Pages.ContactForm.Model exposing (initialContactFormModel)
+import Pages exposing (Page(..), initSendAdhoc, initSendGroup)
 import Pages.FirstRun.Model exposing (initialFirstRunModel)
+import Pages.Forms.Contact.Model exposing (initialContactFormModel)
+import Pages.Forms.ContactImport.Model exposing (initialContactImportModel)
+import Pages.Forms.Group.Model exposing (initialGroupFormModel)
+import Pages.Forms.Keyword.Model exposing (initialKeywordFormModel)
+import Pages.Forms.UserProfile.Model exposing (initialUserProfileFormModel)
 import Pages.GroupComposer.Model exposing (initialGroupComposerModel)
-import Pages.GroupForm.Model exposing (initialGroupFormModel)
-import Pages.KeywordForm.Model exposing (initialKeywordFormModel)
 import Route exposing (page2loc, route)
 import Test exposing (Test, describe, fuzz, test)
 import UrlParser as Url
@@ -25,26 +27,18 @@ page2str2page page =
         |> Maybe.withDefault Error404
 
 
-testEasyPage : Page -> Test
-testEasyPage page =
+testPage : Page -> Test
+testPage page =
     test (toString page) <| \() -> Expect.equal page (page2str2page page)
 
 
 suite : Test
 suite =
-    describe "Routing Test Suite"
-        [ describe "Easy Pages" (List.map testEasyPage easyPages)
-        , describe "Edit Pages (pk)" (List.map fuzzEditPage editPages)
-        ]
+    describe "Routing Test Suite" (List.map testPage pages)
 
 
-fuzzEditPage : (Int -> Page) -> Test
-fuzzEditPage page =
-    fuzz F.int "Edit Pages" (\pk -> Expect.equal (page pk) (page pk |> page2str2page))
-
-
-easyPages : List Page
-easyPages =
+pages : List Page
+pages =
     [ Home
     , OutboundTable
     , InboundTable
@@ -74,21 +68,17 @@ easyPages =
     , SiteConfigForm Nothing
     , GroupForm initialGroupFormModel Nothing
     , GroupForm initialGroupFormModel <| Just 1
-    , FabOnlyPage <| Help
-    , FabOnlyPage <| CreateAllGroup
+    , Help
+    , Usage
+    , CreateAllGroup ""
     , ContactForm initialContactFormModel Nothing
     , ContactForm initialContactFormModel <| Just 1
     , KeywordForm initialKeywordFormModel Nothing
     , KeywordForm initialKeywordFormModel <| Just "test"
-    , FabOnlyPage <| ContactImport
-    , FabOnlyPage <| ApiSetup
-    , FabOnlyPage <| EditResponses
-    ]
-
-
-editPages : List (Int -> Page)
-editPages =
-    [ FabOnlyPage << EditUserProfile
+    , ContactImport initialContactImportModel
+    , ApiSetup Nothing
+    , DefaultResponsesForm Nothing
+    , UserProfileForm initialUserProfileFormModel 1
     ]
 
 

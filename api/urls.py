@@ -2,9 +2,9 @@ from django.conf.urls import url
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
 
+from api import drf_permissions as p
 from api import serializers as s
 from api import views as v
-from api import drf_permissions as p
 from apostello import forms as f
 from apostello import models as m
 from elvanto.models import ElvantoGroup
@@ -41,6 +41,7 @@ urlpatterns = [
         ),
         name='recipients'
     ),
+    url(r'^v2/recipients/import/csv/$', v.CSVImport.as_view(), name='recipients_import_csv'),
     url(
         r'^v2/groups/$',
         v.Collection.as_view(
@@ -77,7 +78,11 @@ urlpatterns = [
             form_class=f.KeywordForm,
             serializer_class=s.KeywordSerializer,
             permission_classes=(IsAuthenticated, p.CanSeeKeywords),
-            prefetch_fields=['linked_groups', 'owners', 'subscribed_to_digest',],
+            prefetch_fields=[
+                'linked_groups',
+                'owners',
+                'subscribed_to_digest',
+            ],
         ),
         name='keywords'
     ),
@@ -85,6 +90,7 @@ urlpatterns = [
         r'^v2/users/profiles/$',
         v.Collection.as_view(
             model_class=m.UserProfile,
+            form_class=f.UserProfileForm,
             serializer_class=s.UserProfileSerializer,
             permission_classes=(IsAuthenticated, p.IsStaff),
         ),
@@ -103,6 +109,11 @@ urlpatterns = [
         r'^v2/config/$',
         v.ConfigView.as_view(),
         name='site_config',
+    ),
+    url(
+        r'^v2/responses/$',
+        v.ResponsesView.as_view(),
+        name='default_responses',
     ),
     # simple toggle views:
     url(
@@ -221,4 +232,11 @@ urlpatterns = [
         ),
         name='user_profile_update'
     ),
+    url(
+        r'^v2/actions/group/create_all/$',
+        v.CreateAllGroup.as_view(),
+        name='act_create_all_group',
+    ),
+    # api setup
+    url(r'^v2/setup/$', v.SetupView.as_view(), name='setup'),
 ]

@@ -9,12 +9,14 @@ import Json.Decode as Decode
 import Messages exposing (Msg(NewUrl))
 import Models exposing (Settings)
 import Navigation
-import Pages exposing (FabOnlyPage(..), Page(..), initSendAdhoc, initSendGroup)
-import Pages.ContactForm.Model exposing (initialContactFormModel)
+import Pages exposing (Page(..), initSendAdhoc, initSendGroup)
 import Pages.FirstRun.Model exposing (initialFirstRunModel)
+import Pages.Forms.Contact.Model exposing (initialContactFormModel)
+import Pages.Forms.ContactImport.Model exposing (initialContactImportModel)
+import Pages.Forms.Group.Model exposing (initialGroupFormModel)
+import Pages.Forms.Keyword.Model exposing (initialKeywordFormModel)
+import Pages.Forms.UserProfile.Model exposing (initialUserProfileFormModel)
 import Pages.GroupComposer.Model exposing (initialGroupComposerModel)
-import Pages.GroupForm.Model exposing (initialGroupFormModel)
-import Pages.KeywordForm.Model exposing (initialKeywordFormModel)
 import UrlParser as Url exposing ((</>), (<?>), customParam, int, intParam, s, string, stringParam, top)
 
 
@@ -84,17 +86,16 @@ route =
         , Url.map (KeywordForm initialKeywordFormModel Nothing) (s "keyword" </> s "new")
         , Url.map (KeywordForm initialKeywordFormModel << Just) (s "keyword" </> s "edit" </> string)
         , Url.map (SiteConfigForm Nothing) (s "config" </> s "site")
+        , Url.map (DefaultResponsesForm Nothing) (s "config" </> s "responses")
+        , Url.map (CreateAllGroup "") (s "group" </> s "create_all")
+        , Url.map (UserProfileForm initialUserProfileFormModel) (s "users" </> s "profiles" </> int)
+        , Url.map (ContactImport initialContactImportModel) (s "recipient" </> s "import")
+        , Url.map (ApiSetup Nothing) (s "api-setup")
+        , Url.map Help (s "help")
 
         -- No Shell views:
         , Url.map Wall (s "incoming" </> s "wall")
-
-        -- Fab only views:
-        , Url.map (FabOnlyPage Help) (s "help")
-        , Url.map (FabOnlyPage CreateAllGroup) (s "group" </> s "create_all")
-        , Url.map (FabOnlyPage ContactImport) (s "recipient" </> s "import")
-        , Url.map (FabOnlyPage ApiSetup) (s "api-setup")
-        , Url.map (FabOnlyPage << EditUserProfile) (s "users" </> s "profiles" </> int)
-        , Url.map (FabOnlyPage EditResponses) (s "config" </> s "responses")
+        , Url.map Usage (s "usage")
         ]
 
 
@@ -212,25 +213,26 @@ page2loc page =
         SiteConfigForm _ ->
             "/config/site/"
 
-        FabOnlyPage f ->
-            case f of
-                CreateAllGroup ->
-                    "/group/create_all/"
+        DefaultResponsesForm _ ->
+            "/config/responses/"
 
-                EditUserProfile pk ->
-                    F.print (F.s "/users/profiles/" <> F.int <> F.s "/") pk
+        CreateAllGroup _ ->
+            "/group/create_all/"
 
-                ContactImport ->
-                    "/recipient/import/"
+        Usage ->
+            "/usage/"
 
-                ApiSetup ->
-                    "/api-setup/"
+        Help ->
+            "/help/"
 
-                EditResponses ->
-                    "/config/responses/"
+        UserProfileForm _ pk ->
+            F.print (F.s "/users/profiles/" <> F.int <> F.s "/") pk
 
-                Help ->
-                    "/help/"
+        ContactImport _ ->
+            "/recipient/import/"
+
+        ApiSetup _ ->
+            "/api-setup/"
 
         AccessDenied ->
             "/"
@@ -396,8 +398,26 @@ checkPerm blockedKeywords userPerms page =
                 SiteConfigForm _ ->
                     userPerms.user.is_staff
 
-                FabOnlyPage _ ->
+                DefaultResponsesForm _ ->
+                    userPerms.user.is_staff
+
+                CreateAllGroup _ ->
+                    userPerms.user.is_staff
+
+                Usage ->
+                    userPerms.user.is_staff
+
+                Help ->
                     True
+
+                UserProfileForm _ _ ->
+                    userPerms.user.is_staff
+
+                ContactImport _ ->
+                    userPerms.can_import
+
+                ApiSetup _ ->
+                    userPerms.user.is_staff
     in
     case permBool of
         True ->

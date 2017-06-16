@@ -3,39 +3,17 @@ import traceback
 from collections import namedtuple
 
 from django.conf import settings
-from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.views.generic import TemplateView, View
-from django.views.generic.edit import UpdateView
 from rest_framework.parsers import JSONParser
 from twilio.base.exceptions import TwilioException
 
-from apostello.mixins import ProfilePermsMixin
 from apostello.twilio import twilio_client
-from site_config.forms import DefaultResponsesForm
-from site_config.models import DefaultResponses
 
 EnvVarSetting = namedtuple('EnvVarSetting', ['env_var_name', 'info', 'val'])
-
-
-class ResponsesView(ProfilePermsMixin, UpdateView):
-    """View to handle default responses form."""
-    template_name = 'site_config/edit_responses.html'
-    form_class = DefaultResponsesForm
-    required_perms = []
-    success_url = '/'
-
-    def get_object(self):
-        """Retreive the config instance."""
-        return DefaultResponses.get_solo()
-
-    def form_valid(self, form):
-        """Handle successful form submission."""
-        messages.success(self.request, 'Responses updated')
-        return super(ResponsesView, self).form_valid(form)
 
 
 class FirstRunView(TemplateView):

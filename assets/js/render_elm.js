@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 
-/* global elmSettings, elmMessages */
+/* global elmSettings */
 
 const lsKey = 'elm-apostello-datastore-v1';
 
@@ -20,8 +20,8 @@ function getDataStoreCache(userEmail) {
 
 function setDataStoreCache(newValue, userEmail) {
   const cacheItem = {
-    expires: Date.now() + (600 * 1000),
-    userEmail,
+    expires: Date.now() + 600 * 1000,
+    userEmail: userEmail,
     data: newValue,
   };
   localStorage.setItem(lsKey, JSON.stringify(cacheItem));
@@ -36,15 +36,14 @@ function renderElm() {
     const Elm = require('../elm/Main.elm');
     const app = Elm.Main.embed(node, {
       settings: elmSettings,
-      messages: elmMessages,
       dataStoreCache: getDataStoreCache(elmSettings.userPerms.user.email),
     });
 
-    app.ports.saveDataStore.subscribe(data => {
+    app.ports.saveDataStore.subscribe(function(data) {
       setDataStoreCache(data, elmSettings.userPerms.user.email);
     });
 
-    window.addEventListener('storage', event => {
+    window.addEventListener('storage', function(event) {
       if (event.key === lsKey) {
         app.ports.loadDataStore.send(event.newValue);
       }

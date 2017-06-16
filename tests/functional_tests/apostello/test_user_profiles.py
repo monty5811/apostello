@@ -2,6 +2,7 @@ from time import sleep
 
 import pytest
 from tests.functional_tests.utils import assert_with_timeout
+from django.contrib.auth.models import User
 
 
 @pytest.mark.django_db
@@ -37,12 +38,13 @@ class TestUserProfiles:
     def test_user_profile_form(self, live_server, browser_in, users, driver_wait_time):
         """Test an individual user profile form."""
         uri = users['staff'].profile.get_absolute_url()
+        assert users['staff'].profile.can_archive
         # load page
         browser_in.get(live_server + uri)
         assert uri in browser_in.current_url
         sleep(driver_wait_time)
         # toggle
-        toggle_button = browser_in.find_elements_by_class_name('checkbox')[0]
+        toggle_button = browser_in.find_elements_by_class_name('checkbox')[-1]
         toggle_button.click()
         # submit
         save_button = browser_in.find_elements_by_class_name('primary')[0]
@@ -50,5 +52,7 @@ class TestUserProfiles:
 
         def _test():
             assert uri not in browser_in.current_url
+            u = User.objects.get(pk=users['staff'].pk)
+            assert u.profile.can_archive is False
 
         assert_with_timeout(_test, 10 * driver_wait_time)

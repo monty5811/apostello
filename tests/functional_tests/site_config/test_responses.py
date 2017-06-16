@@ -1,5 +1,4 @@
 import pytest
-
 from tests.functional_tests.utils import assert_with_timeout
 
 
@@ -38,3 +37,5 @@ class TestDefaultResponses:
         def _test():
             resps = DefaultResponses.get_solo()
             assert 'Thank you for signing up' in resps.start_reply
+
+        assert_with_timeout(_test, 10)

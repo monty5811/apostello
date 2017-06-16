@@ -1,6 +1,5 @@
 module FilteringTable.View exposing (filteringTable, uiTable)
 
-import Data.Store as Store
 import FilteringTable.Messages
     exposing
         ( TableMsg
@@ -9,12 +8,13 @@ import FilteringTable.Messages
             )
         )
 import FilteringTable.Model exposing (Model)
-import FilteringTable.Util exposing (filterRecord, textToRegex)
+import FilteringTable.Util exposing (filterRecord)
 import Html exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
 import List.Extra as LE
 import Messages exposing (Msg(Nope, TableMsg))
+import Store.RemoteList as RL
 
 
 emptyView : Html Msg
@@ -27,16 +27,16 @@ loadingView =
     Html.div [ A.class "ui active loader" ] []
 
 
-uiTable : Html Msg -> Model -> (a -> Html Msg) -> Store.RemoteList a -> Html Msg
+uiTable : Html Msg -> Model -> (a -> Html Msg) -> RL.RemoteList a -> Html Msg
 uiTable tableHead tableModel rowConstructor data =
     filteringTable "ui table" tableHead tableModel rowConstructor data
 
 
-filteringTable : String -> Html Msg -> Model -> (a -> Html Msg) -> Store.RemoteList a -> Html Msg
+filteringTable : String -> Html Msg -> Model -> (a -> Html Msg) -> RL.RemoteList a -> Html Msg
 filteringTable tableClass tableHead model rowConstructor data =
     let
         items =
-            Store.toList data
+            RL.toList data
 
         filteredItems =
             List.filter (filterRecord model.filter) items
@@ -53,10 +53,10 @@ filteringTable tableClass tableHead model rowConstructor data =
     case List.length items of
         0 ->
             case data of
-                Store.NotAsked _ ->
+                RL.NotAsked _ ->
                     loadingView
 
-                Store.WaitingForFirstResp _ ->
+                RL.WaitingForFirstResp _ ->
                     loadingView
 
                 _ ->
@@ -108,30 +108,40 @@ buttons curPage numPages =
     let
         middleButtons =
             if curPage == 1 then
-                [ pageButton 1 curPage numPages ]
-                    ++ rightButtons curPage numPages
-                    ++ [ pageButton numPages curPage numPages ]
+                List.concat
+                    [ [ pageButton 1 curPage ]
+                    , rightButtons curPage numPages
+                    , [ pageButton numPages curPage ]
+                    ]
             else if curPage == numPages then
-                [ pageButton 1 curPage numPages ]
-                    ++ leftButtons curPage numPages
-                    ++ [ pageButton numPages curPage numPages ]
+                List.concat
+                    [ [ pageButton 1 curPage ]
+                    , leftButtons curPage
+                    , [ pageButton numPages curPage ]
+                    ]
             else
-                [ pageButton 1 curPage numPages ]
-                    ++ leftButtons curPage numPages
-                    ++ [ pageButton curPage curPage numPages ]
-                    ++ rightButtons curPage numPages
-                    ++ [ pageButton numPages curPage numPages ]
+                List.concat
+                    [ [ pageButton 1 curPage ]
+                    , leftButtons curPage
+                    , [ pageButton curPage curPage ]
+                    , rightButtons curPage numPages
+                    , [ pageButton numPages curPage ]
+                    ]
     in
-    [ prevButton curPage ] ++ middleButtons ++ [ nextButton curPage numPages ]
+    List.concat
+        [ [ prevButton curPage ]
+        , middleButtons
+        , [ nextButton curPage numPages ]
+        ]
 
 
-leftButtons : Int -> Int -> List (Html Msg)
-leftButtons curPage numPages =
+leftButtons : Int -> List (Html Msg)
+leftButtons curPage =
     if curPage == 2 then
         [ Html.text "" ]
     else
         [ Html.div [ A.class "disabled item" ] [ Html.text "..." ]
-        , pageButton (curPage - 1) curPage numPages
+        , pageButton (curPage - 1) curPage
         ]
 
 
@@ -140,7 +150,7 @@ rightButtons curPage numPages =
     if curPage == numPages - 1 then
         [ Html.text "" ]
     else
-        [ pageButton (curPage + 1) curPage numPages
+        [ pageButton (curPage + 1) curPage
         , Html.div [ A.class "disabled item" ] [ Html.text "..." ]
         ]
 
@@ -173,8 +183,8 @@ nextButton curPage numPages =
     Html.a [ A.class class, E.onClick click ] [ Html.i [ A.class "right chevron icon" ] [] ]
 
 
-pageButton : Int -> Int -> Int -> Html Msg
-pageButton goToPage curPage numPages =
+pageButton : Int -> Int -> Html Msg
+pageButton goToPage curPage =
     let
         class =
             case curPage == goToPage of

@@ -1,11 +1,11 @@
 import types
-from datetime import datetime
 
 import pytest
 from django.conf import settings
+from django.utils import timezone
+from tests.conftest import twilio_vcr
 
 from apostello import logs, models
-from tests.conftest import twilio_vcr
 
 
 class MockMsg:
@@ -14,8 +14,8 @@ class MockMsg:
         self.body = 'test message'
         self.from_ = from_
         self.to = settings.to = '447922537999'
-        self.date_created = datetime.now()
-        self.date_sent = datetime.now()
+        self.date_created = timezone.now()
+        self.date_sent = timezone.now()
 
 
 @pytest.mark.django_db

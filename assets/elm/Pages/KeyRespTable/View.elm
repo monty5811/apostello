@@ -1,24 +1,25 @@
 module Pages.KeyRespTable.View exposing (view)
 
 import Data.SmsInbound exposing (SmsInbound)
-import Data.Store as Store
 import FilteringTable.Model as FTM
 import FilteringTable.View exposing (uiTable)
 import Helpers exposing (archiveCell, formatDate)
 import Html exposing (Html, a, br, button, div, i, input, label, td, text, th, thead, tr)
 import Html.Attributes exposing (attribute, checked, class, id, name, style, type_)
 import Html.Events exposing (onClick, onSubmit)
-import Messages exposing (Msg(KeyRespTableMsg))
+import Messages exposing (Msg(KeyRespTableMsg, StoreMsg))
 import Pages exposing (Page(ContactForm), initSendAdhoc)
-import Pages.ContactForm.Model exposing (initialContactFormModel)
+import Pages.Forms.Contact.Model exposing (initialContactFormModel)
 import Pages.KeyRespTable.Messages exposing (KeyRespTableMsg(..))
 import Route exposing (spaLink)
+import Store.Messages exposing (StoreMsg(ToggleInboundSmsArchive, ToggleInboundSmsDealtWith))
+import Store.RemoteList as RL
 
 
 -- Main view
 
 
-view : Bool -> FTM.Model -> Store.RemoteList SmsInbound -> Bool -> String -> Html Msg
+view : Bool -> FTM.Model -> RL.RemoteList SmsInbound -> Bool -> String -> Html Msg
 view viewingArchive tableModel sms ticked keyword =
     div []
         [ uiTable tableHead tableModel smsRow sms
@@ -93,7 +94,7 @@ smsRow sms =
         , td [ class "collapsing" ] [ text (formatDate sms.time_received) ]
         , td [] [ text sms.content ]
         , td [ class "collapsing" ] [ dealtWithButton sms ]
-        , archiveCell sms.is_archived (KeyRespTableMsg (ToggleInboundSmsArchive sms.is_archived sms.pk))
+        , archiveCell sms.is_archived (StoreMsg (ToggleInboundSmsArchive sms.is_archived sms.pk))
         ]
 
 
@@ -118,13 +119,13 @@ dealtWithButton sms =
         True ->
             button
                 [ class "ui tiny positive icon button"
-                , onClick (KeyRespTableMsg (ToggleInboundSmsDealtWith sms.dealt_with sms.pk))
+                , onClick (StoreMsg (ToggleInboundSmsDealtWith sms.dealt_with sms.pk))
                 ]
                 [ i [ class "checkmark icon" ] [], text "Dealt With" ]
 
         False ->
             button
                 [ class "ui tiny orange icon button"
-                , onClick (KeyRespTableMsg (ToggleInboundSmsDealtWith sms.dealt_with sms.pk))
+                , onClick (StoreMsg (ToggleInboundSmsDealtWith sms.dealt_with sms.pk))
                 ]
                 [ i [ class "attention icon" ] [], text "Requires Action" ]

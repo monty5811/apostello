@@ -29,7 +29,7 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
     ),
 ]
 
-STATIC_ROOT = '/../../static/'
+STATIC_ROOT = os.path.join(BASE_DIR, '../static/')  # store static files outside deployed git repo
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
 LOGGING = {

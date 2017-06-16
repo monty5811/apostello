@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 import ipdb
@@ -6,7 +7,6 @@ from django.core.management.base import BaseCommand
 from apostello import forms as ap_forms
 from site_config import forms as sc_forms
 
-
 FORMS = {
     'SiteConfig': sc_forms.SiteConfigurationForm,
     'Keyword': ap_forms.KeywordForm,
@@ -14,6 +14,10 @@ FORMS = {
     'Group': ap_forms.ManageRecipientGroupForm,
     'SendAdhoc': ap_forms.SendAdhocRecipientsForm,
     'SendGroup': ap_forms.SendRecipientGroupForm,
+    'CreateAllGroup': ap_forms.GroupAllCreateForm,
+    'DefaultResponses': sc_forms.DefaultResponsesForm,
+    'UserProfile': ap_forms.UserProfileForm,
+    'ContactImport': ap_forms.CsvImport,
 }
 
 
@@ -43,7 +47,7 @@ def field_text(field_name, field):
 
 def write_form(name, form_):
     form = form_()
-    elm = f'module Pages.{name}Form.Meta exposing (meta)\n'
+    elm = f'module Pages.Forms.{name}.Meta exposing (meta)\n'
     elm += 'import Forms.Model exposing (FieldMeta)\n'
     elm += 'meta : {'
     elm += ','.join([f'{name} : FieldMeta' for name in form.base_fields])
@@ -53,7 +57,10 @@ def write_form(name, form_):
         [field_text(field_name, field) for field_name, field in form.base_fields.items()]
     )
     elm += f'{fields_text}\n}}'
-    fname = f'assets/elm/Pages/{name}Form/Meta.elm'
+    dir_name = f'assets/elm/Pages/Forms/{name}'
+    fname = os.path.join(dir_name, 'Meta.elm')
+    if not os.path.exists(dir_name):
+        os.mkdir(dir_name)
     with open(fname, 'w') as f:
         f.write(elm)
     subprocess.run(f'elm-format --yes {fname}'.split())

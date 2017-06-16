@@ -1,6 +1,6 @@
+from allauth.account.signals import user_signed_up
 from django.dispatch import receiver
 
-from allauth.account.signals import user_signed_up
 from apostello.tasks import send_async_mail
 
 

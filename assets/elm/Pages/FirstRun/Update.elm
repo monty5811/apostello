@@ -1,11 +1,11 @@
 module Pages.FirstRun.Update exposing (update)
 
-import DjangoSend exposing (post)
+import DjangoSend exposing (CSRFToken, post)
 import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Messages exposing (Msg(FirstRunMsg))
-import Models exposing (CSRFToken, Model)
+import Models exposing (Model)
 import Pages exposing (Page)
 import Pages.FirstRun.Messages exposing (FirstRunMsg(..))
 import Pages.FirstRun.Model exposing (FirstRunFormStatus(..), FirstRunModel, decodeFirstRunResp)
@@ -17,7 +17,7 @@ update msg model =
         Pages.FirstRun oldModel ->
             let
                 ( newFrModel, cmds ) =
-                    updateFRModel msg model.settings.csrftoken oldModel
+                    updateFRModel model.settings.csrftoken msg oldModel
             in
             ( { model | page = Pages.FirstRun newFrModel }, cmds )
 
@@ -25,8 +25,8 @@ update msg model =
             ( model, [] )
 
 
-updateFRModel : FirstRunMsg -> CSRFToken -> FirstRunModel -> ( FirstRunModel, List (Cmd Msg) )
-updateFRModel msg csrftoken model =
+updateFRModel : CSRFToken -> FirstRunMsg -> FirstRunModel -> ( FirstRunModel, List (Cmd Msg) )
+updateFRModel csrf msg model =
     case msg of
         UpdateAdminEmailField text ->
             ( { model | adminEmail = text }, [] )
@@ -40,7 +40,7 @@ updateFRModel msg csrftoken model =
         CreateAdminUser ->
             case model.adminPass1 == model.adminPass2 of
                 True ->
-                    ( { model | adminFormStatus = InProgress }, [ createAdminUser csrftoken model ] )
+                    ( { model | adminFormStatus = InProgress }, [ createAdminUser csrf model ] )
 
                 False ->
                     ( { model | adminFormStatus = Failed "Passwords do not match" }, [] )
@@ -58,7 +58,7 @@ updateFRModel msg csrftoken model =
             ( { model | testEmailBody = text }, [] )
 
         SendTestEmail ->
-            ( { model | testEmailFormStatus = InProgress }, [ sendTestEmail csrftoken model ] )
+            ( { model | testEmailFormStatus = InProgress }, [ sendTestEmail csrf model ] )
 
         ReceiveSendTestEmail (Ok _) ->
             ( { model | testEmailFormStatus = Success }, [] )
@@ -73,7 +73,7 @@ updateFRModel msg csrftoken model =
             ( { model | testSmsBody = text }, [] )
 
         SendTestSms ->
-            ( { model | testSmsFormStatus = InProgress }, [ sendTestSms csrftoken model ] )
+            ( { model | testSmsFormStatus = InProgress }, [ sendTestSms csrf model ] )
 
         ReceiveSendTestSms (Ok _) ->
             ( { model | testSmsFormStatus = Success }, [] )
@@ -105,36 +105,36 @@ pullOutError e =
 
 
 createAdminUser : CSRFToken -> FirstRunModel -> Cmd Msg
-createAdminUser csrftoken model =
+createAdminUser csrf model =
     let
         body =
             [ ( "email_", Encode.string model.adminEmail )
             , ( "pass_", Encode.string model.adminPass1 )
             ]
     in
-    post csrftoken "/config/create_admin_user/" body decodeFirstRunResp
+    post csrf "/config/create_admin_user/" body decodeFirstRunResp
         |> Http.send (FirstRunMsg << ReceiveCreateAdminUser)
 
 
 sendTestSms : CSRFToken -> FirstRunModel -> Cmd Msg
-sendTestSms csrftoken model =
+sendTestSms csrf model =
     let
         body =
             [ ( "to_", Encode.string model.testSmsTo )
             , ( "body_", Encode.string model.testSmsBody )
             ]
     in
-    post csrftoken "/config/send_test_sms/" body decodeFirstRunResp
+    post csrf "/config/send_test_sms/" body decodeFirstRunResp
         |> Http.send (FirstRunMsg << ReceiveSendTestSms)
 
 
 sendTestEmail : CSRFToken -> FirstRunModel -> Cmd Msg
-sendTestEmail csrftoken model =
+sendTestEmail csrf model =
     let
         body =
             [ ( "to_", Encode.string model.testEmailTo )
             , ( "body_", Encode.string model.testEmailBody )
             ]
     in
-    post csrftoken "/config/send_test_email/" body decodeFirstRunResp
+    post csrf "/config/send_test_email/" body decodeFirstRunResp
         |> Http.send (FirstRunMsg << ReceiveSendTestEmail)

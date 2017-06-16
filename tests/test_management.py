@@ -1,7 +1,6 @@
 import pytest
 from django.core.management import call_command
 from django_q.models import Schedule
-
 from tests.conftest import twilio_vcr
 
 

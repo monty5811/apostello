@@ -101,7 +101,7 @@ class KeywordForm(forms.ModelForm):
 
 class CsvImport(forms.Form):
     """Handle CSV imports."""
-    csv_data = forms.CharField(help_text='John, Calvin, +447095237960', widget=forms.Textarea)
+    csv_data = forms.CharField(help_text='John, Calvin, +447095237960', label="CSV Data")
 
 
 class UserProfileForm(forms.ModelForm):
@@ -111,6 +111,7 @@ class UserProfileForm(forms.ModelForm):
         model = UserProfile
         exclude = [
             'user',
+            'show_tour',
         ]
 
 
@@ -122,4 +123,5 @@ class GroupAllCreateForm(forms.Form):
         help_text='Name of group.\n'
         'If this group already exists it will be overwritten.',
         max_length=150,
+        label='Group Name',
     )

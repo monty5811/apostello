@@ -73,6 +73,7 @@ userProfile =
     Fuzz.map UserProfile Fuzz.int
         |> Fuzz.andMap user
         |> Fuzz.andMap Fuzz.bool
+        |> Fuzz.andMap Fuzz.float
         |> Fuzz.andMap Fuzz.bool
         |> Fuzz.andMap Fuzz.bool
         |> Fuzz.andMap Fuzz.bool

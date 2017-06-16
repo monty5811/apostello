@@ -3,8 +3,8 @@ module Pages.Home exposing (view)
 import Html exposing (Html, a, br, div, embed, figure, p, text)
 import Html.Attributes exposing (href, src, type_)
 import Messages exposing (Msg)
-import Pages exposing (FabOnlyPage(Help), Page(FabOnlyPage))
-import Route exposing (page2loc)
+import Pages exposing (Page(Help))
+import Route exposing (spaLink)
 
 
 view : Html Msg
@@ -21,8 +21,7 @@ view =
         , p []
             [ text "Additionally, try not to send too many messages - do not abuse this system, people do not like being bombarded with messages all day." ]
         , p []
-            [ a [ href <| page2loc <| FabOnlyPage <| Help ]
-                [ text "FAQs/Help" ]
+            [ spaLink a [] [ text "FAQs/Help" ] Help
             ]
         , br []
             []

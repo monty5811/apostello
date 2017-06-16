@@ -4,11 +4,6 @@ from site_config import views
 
 urlpatterns = [
     url(
-        r'^responses/',
-        views.ResponsesView.as_view(),
-        name='responses',
-    ),
-    url(
         r'^first_run/',
         views.FirstRunView.as_view(),
         name='first_run',

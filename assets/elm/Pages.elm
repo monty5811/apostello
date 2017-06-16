@@ -1,23 +1,26 @@
-module Pages exposing (FabOnlyPage(..), Page(..), initSendAdhoc, initSendGroup)
+module Pages exposing (Page(..), initSendAdhoc, initSendGroup)
 
-import Pages.ContactForm.Model exposing (ContactFormModel)
 import Pages.FirstRun.Model exposing (FirstRunModel)
+import Pages.Forms.Contact.Model exposing (ContactFormModel)
+import Pages.Forms.ContactImport.Model exposing (ContactImportModel)
+import Pages.Forms.DefaultResponses.Model exposing (DefaultResponsesFormModel)
+import Pages.Forms.Group.Model exposing (GroupFormModel)
+import Pages.Forms.Keyword.Model exposing (KeywordFormModel)
+import Pages.Forms.SendAdhoc.Model exposing (SendAdhocModel, initialSendAdhocModel)
+import Pages.Forms.SendGroup.Model exposing (SendGroupModel, initialSendGroupModel)
+import Pages.Forms.SiteConfig.Model exposing (SiteConfigFormModel)
+import Pages.Forms.UserProfile.Model exposing (UserProfileFormModel)
 import Pages.GroupComposer.Model exposing (GroupComposerModel)
-import Pages.GroupForm.Model exposing (GroupFormModel)
-import Pages.KeywordForm.Model exposing (KeywordFormModel)
-import Pages.SendAdhocForm.Model exposing (SendAdhocModel, initialSendAdhocModel)
-import Pages.SendGroupForm.Model exposing (SendGroupModel, initialSendGroupModel)
-import Pages.SiteConfigForm.Model exposing (SiteConfigFormModel)
 
 
 type Page
     = Home
     | AccessDenied
     | ContactForm ContactFormModel (Maybe Int)
+    | CreateAllGroup String
     | Curator
     | ElvantoImport
     | Error404
-    | FabOnlyPage FabOnlyPage
     | FirstRun FirstRunModel
     | GroupComposer GroupComposerModel
     | GroupForm GroupFormModel (Maybe Int)
@@ -34,15 +37,12 @@ type Page
     | UserProfileTable
     | Wall
     | SiteConfigForm (Maybe SiteConfigFormModel)
-
-
-type FabOnlyPage
-    = Help
-    | CreateAllGroup
-    | ContactImport
-    | ApiSetup
-    | EditUserProfile Int
-    | EditResponses
+    | DefaultResponsesForm (Maybe DefaultResponsesFormModel)
+    | Usage
+    | UserProfileForm UserProfileFormModel Int
+    | Help
+    | ContactImport ContactImportModel
+    | ApiSetup (Maybe String)
 
 
 type alias IsArchive =

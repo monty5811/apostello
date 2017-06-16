@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
-from graphs import views as v
 from graphs import renderers as r
+from graphs import views as v
 
 urlpatterns = [
     url(r'^recent/', v.GraphView.as_view(

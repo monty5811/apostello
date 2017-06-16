@@ -1,11 +1,11 @@
 from django.contrib.auth.models import User
 from django.contrib.humanize.templatetags.humanize import naturaltime
-from rest_framework import serializers
 from drf_queryfields import QueryFieldsMixin
+from rest_framework import serializers
 
 from apostello.models import (Keyword, QueuedSms, Recipient, RecipientGroup, SmsInbound, SmsOutbound, UserProfile)
 from elvanto.models import ElvantoGroup
-from site_config.models import SiteConfiguration
+from site_config.models import DefaultResponses, SiteConfiguration
 
 
 class BaseModelSerializer(QueryFieldsMixin, serializers.ModelSerializer):
@@ -112,12 +112,14 @@ class UserSerializer(BaseModelSerializer):
 class UserProfileSerializer(BaseModelSerializer):
     """Serialize apostello.models.UserProfile for use in table."""
     user = UserSerializer(read_only=True)
+    message_cost_limit = serializers.FloatField()
 
     class Meta:
         model = UserProfile
         fields = (
-            'pk', 'user', 'approved', 'can_see_groups', 'can_see_contact_names', 'can_see_keywords', 'can_see_outgoing',
-            'can_see_incoming', 'can_send_sms', 'can_see_contact_nums', 'can_import', 'can_archive',
+            'pk', 'user', 'approved', 'message_cost_limit', 'can_see_groups', 'can_see_contact_names',
+            'can_see_keywords', 'can_see_outgoing', 'can_see_incoming', 'can_send_sms', 'can_see_contact_nums',
+            'can_import', 'can_archive',
         )
 
 
@@ -153,3 +155,9 @@ class SiteConfigurationSerializer(BaseModelSerializer):
             'office_email', 'auto_add_new_groups', 'slack_url', 'sync_elvanto', 'not_approved_msg', 'email_host',
             'email_port', 'email_username', 'email_password', 'email_from',
         )
+
+
+class DefaultResponsesSerializer(BaseModelSerializer):
+    class Meta:
+        model = DefaultResponses
+        fields = '__all__'

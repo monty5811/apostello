@@ -11,8 +11,8 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils import timezone
 from django.utils.functional import cached_property
-from django_q.tasks import async, schedule
 from django_q.models import Schedule
+from django_q.tasks import async, schedule
 from phonenumber_field.modelfields import PhoneNumberField
 
 from apostello.exceptions import NoKeywordMatchException
@@ -428,7 +428,6 @@ class Keyword(models.Model):
         self.keyword = self.keyword.lower()
         super(Keyword, self).save(force_insert, force_update, *args, **kwargs)
         async('apostello.tasks.populate_keyword_response_count', pk=self.pk)
-
     @cached_property
     def get_absolute_url(self):
         """Url for this group."""
@@ -558,7 +557,6 @@ class SmsInbound(models.Model):
         cache.set('last_msg__{0}'.format(self.sender_num), None, 0)
         # update number of matched responses caches
         async('apostello.tasks.populate_keyword_response_count')
-
     class Meta:
         ordering = ['-time_received']
         index_together = ['is_archived', 'matched_keyword']
@@ -703,7 +701,7 @@ class UserProfile(models.Model):
 
     def get_absolute_url(self):
         """Url for this user profile."""
-        return '/users/profiles/{}/'.format(self.pk)
+        return '/users/profiles/{}/'.format(self.user.pk)
 
     def __str__(self):
         """Pretty representation."""

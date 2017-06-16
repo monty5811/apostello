@@ -3,10 +3,10 @@ from time import sleep
 import pytest
 from selenium.common.exceptions import ElementNotVisibleException
 from selenium.webdriver.common.keys import Keys
-
-from apostello.models import SmsOutbound
 from tests.conftest import twilio_vcr
 from tests.functional_tests.utils import assert_with_timeout, click_and_wait
+
+from apostello.models import SmsOutbound
 
 ADHOC_URI = '/send/adhoc/'
 GROUP_URI = '/send/group/'
@@ -101,7 +101,8 @@ class TestSendAdhoc:
 
         def _test():
             assert '/scheduled/sms/' in b.current_url
-        assert_with_timeout(_test, 10*driver_wait_time)
+
+        assert_with_timeout(_test, 10 * driver_wait_time)
 
     def test_too_expensive(self, live_server, browser_in, users, driver_wait_time, recipients):
         """Test good form submission but with a too expensive message."""

@@ -1,11 +1,11 @@
 from time import sleep
 
+import pytest
 from django.contrib.auth.models import User
 from django.core import mail
 from tests.conftest import twilio_vcr
 from tests.functional_tests.utils import click_and_wait
 
-import pytest
 from apostello.models import SmsOutbound
 
 URI = '/config/first_run/'

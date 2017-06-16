@@ -1,7 +1,6 @@
 module Pages.OutboundTable exposing (view)
 
 import Data.SmsOutbound exposing (SmsOutbound)
-import Data.Store as Store
 import FilteringTable.Model as FTM
 import FilteringTable.View exposing (uiTable)
 import Helpers exposing (formatDate)
@@ -9,14 +8,15 @@ import Html exposing (Html, a, td, text, th, thead, tr)
 import Html.Attributes as A
 import Messages exposing (Msg)
 import Pages exposing (Page(ContactForm))
-import Pages.ContactForm.Model exposing (initialContactFormModel)
+import Pages.Forms.Contact.Model exposing (initialContactFormModel)
 import Route exposing (spaLink)
+import Store.RemoteList as RL
 
 
 -- Main view
 
 
-view : FTM.Model -> Store.RemoteList SmsOutbound -> Html Msg
+view : FTM.Model -> RL.RemoteList SmsOutbound -> Html Msg
 view tableModel sms =
     uiTable tableHead tableModel smsRow sms
 

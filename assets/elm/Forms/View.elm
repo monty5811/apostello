@@ -1,6 +1,5 @@
 module Forms.View exposing (..)
 
-import Data.Store as Store
 import Date
 import Date.Format
 import DateTimePicker
@@ -13,6 +12,7 @@ import Html.Attributes as A
 import Html.Events as E
 import Messages exposing (Msg)
 import Regex
+import Store.RemoteList as RL
 
 
 form : FormStatus -> List Field -> Msg -> Html Msg -> Html Msg
@@ -153,25 +153,57 @@ addDefaultInt defaultValue attrs =
             (A.defaultValue <| toString num) :: attrs
 
 
+simpleFloatField : FieldMeta -> Maybe Float -> (String -> Msg) -> List (Html Msg)
+simpleFloatField meta defaultValue inputMsg =
+    [ label [ A.for meta.id ] [ text meta.label ]
+    , input
+        (addDefaultFloat defaultValue
+            [ A.id meta.id
+            , A.name meta.name
+            , E.onInput inputMsg
+            , A.type_ "number"
+            , A.step "0.01"
+            , A.min "0"
+            ]
+        )
+        []
+    , helpLabel meta
+    ]
+
+
+addDefaultFloat : Maybe Float -> List (Html.Attribute Msg) -> List (Html.Attribute Msg)
+addDefaultFloat defaultValue attrs =
+    case defaultValue of
+        Nothing ->
+            attrs
+
+        Just num ->
+            (A.defaultValue <| toString num) :: attrs
+
+
 checkboxField : FieldMeta -> Maybe a -> (a -> Bool) -> (Maybe a -> Msg) -> List (Html Msg)
 checkboxField meta maybeRec getter toggleMsg =
     let
         checked =
-            case Maybe.withDefault False <| Maybe.map getter maybeRec of
+            Maybe.map getter maybeRec |> Maybe.withDefault False
+
+        divClass =
+            case checked of
                 True ->
-                    " checked"
+                    "ui checked checkbox"
 
                 False ->
-                    ""
+                    "ui checkbox"
     in
     [ div
-        [ A.class <| "ui checkbox" ++ checked
+        [ A.class divClass
         , E.onClick <| toggleMsg maybeRec
         ]
         [ input
             [ A.id meta.id
             , A.name meta.name
             , A.type_ "checkbox"
+            , A.checked checked
             ]
             []
         , label [] [ text meta.label ]
@@ -213,7 +245,7 @@ submitButton maybeItem showAN =
 
 
 type alias MultiSelectField a =
-    { items : Store.RemoteList a
+    { items : RL.RemoteList a
     , selectedPks : Maybe (List Int)
     , defaultPks : Maybe (List Int)
     , filter : Regex.Regex
@@ -255,7 +287,7 @@ multiSelectField meta props =
                 ]
             ]
             (props.items
-                |> Store.toList
+                |> RL.toList
                 |> List.filter (filterRecord props.filter)
                 |> List.map (props.itemView pks)
             )
@@ -263,16 +295,16 @@ multiSelectField meta props =
     ]
 
 
-loadingMessage : Store.RemoteList a -> Html Msg
+loadingMessage : RL.RemoteList a -> Html Msg
 loadingMessage rl =
     case rl of
-        Store.FinalPageReceived _ ->
+        RL.FinalPageReceived _ ->
             text ""
 
-        Store.WaitingOnRefresh _ ->
+        RL.WaitingOnRefresh _ ->
             text ""
 
-        Store.RespFailed _ _ ->
+        RL.RespFailed _ _ ->
             text "Uh oh, something went wrong there. Maybe try reloading the page?"
 
         _ ->

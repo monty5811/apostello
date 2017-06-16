@@ -13,19 +13,19 @@ StatusCode = namedtuple('StatusCode', 'anon, user, staff')
 @pytest.mark.parametrize(
     "url,status_code", [
         ('/', StatusCode(302, 200, 200)),
-        ('/api-setup/', StatusCode(302, 302, 200)),
         ('/api/v2/config/', StatusCode(403, 403, 200)),
         ('/api/v2/elvanto/groups/', StatusCode(403, 403, 200)),
         ('/api/v2/groups/', StatusCode(403, 200, 200)),
         ('/api/v2/keywords/', StatusCode(403, 200, 200)),
         ('/api/v2/queued/sms/', StatusCode(403, 403, 200)),
         ('/api/v2/recipients/', StatusCode(403, 200, 200)),
+        ('/api/v2/responses/', StatusCode(403, 403, 200)),
+        ('/api/v2/setup/', StatusCode(403, 403, 200)),
         ('/api/v2/sms/in/', StatusCode(403, 200, 200)),
         ('/api/v2/sms/out/', StatusCode(403, 200, 200)),
         ('/api/v2/users/', StatusCode(403, 200, 200)),
         ('/api/v2/users/profiles/', StatusCode(403, 403, 200)),
         ('/config/first_run/', StatusCode(302, 302, 302)),
-        ('/config/responses/', StatusCode(302, 302, 200)),
         ('/graphs/contacts/', StatusCode(302, 302, 200)),
         ('/graphs/groups/', StatusCode(302, 302, 200)),
         ('/graphs/keywords/', StatusCode(302, 302, 200)),
@@ -33,10 +33,8 @@ StatusCode = namedtuple('StatusCode', 'anon, user, staff')
         ('/graphs/sms/in/bycontact/', StatusCode(302, 302, 200)),
         ('/graphs/sms/out/bycontact/', StatusCode(302, 302, 200)),
         ('/graphs/sms/totals/', StatusCode(302, 302, 200)),
-        ('/group/create_all/', StatusCode(302, 302, 200)),
         ('/keyword/responses/csv/test/', StatusCode(302, 302, 200)),
         ('/not_approved/', StatusCode(200, 200, 200)),
-        ('/recipient/import/', StatusCode(302, 302, 200)),
         ('/recipient/new/', StatusCode(302, 200, 200)),
     ]
 )

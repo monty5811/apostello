@@ -16,7 +16,6 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'django.contrib.messages',
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     # apostello

@@ -1,11 +1,11 @@
 module Pages.ElvantoImport.Update exposing (update)
 
-import DjangoSend exposing (post)
+import DjangoSend exposing (CSRFToken, post)
 import Helpers exposing (handleNotSaved)
 import Http
 import Json.Decode as Decode
 import Messages exposing (Msg)
-import Models exposing (CSRFToken, Model)
+import Models exposing (Model)
 import Pages.ElvantoImport.Messages exposing (ElvantoMsg(..))
 import Pages.Fragments.Notification.Update exposing (createInfo, createSuccess)
 import Urls
@@ -44,6 +44,6 @@ update msg model =
 
 
 buttonReq : CSRFToken -> String -> Cmd Msg
-buttonReq csrftoken url =
-    post csrftoken url [] (Decode.succeed True)
+buttonReq csrf url =
+    post csrf url [] (Decode.succeed True)
         |> Http.send (Messages.ElvantoMsg << ReceiveButtonResp)

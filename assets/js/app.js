@@ -8,7 +8,7 @@ function handleDOMContentLoaded() {
 window.addEventListener('DOMContentLoaded', handleDOMContentLoaded, false);
 
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
+  window.addEventListener('load', function() {
     navigator.serviceWorker.register('/sw.js');
   });
 }

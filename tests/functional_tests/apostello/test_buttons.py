@@ -1,13 +1,13 @@
 from datetime import datetime
 from time import sleep
 
+import pytest
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django_q.models import Schedule
-
-import pytest
-from apostello import models
 from tests.functional_tests.utils import check_and_close_msg, click_and_wait
+
+from apostello import models
 
 
 @pytest.mark.django_db

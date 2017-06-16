@@ -1,11 +1,12 @@
 {
     "version": "1.0.0",
     "summary": "helpful summary of your project, less than 80 characters",
-    "repository": "https://github.com/user/project.git",
+    "repository": "https://github.com/monty5811/apostello.git",
     "license": "BSD3",
     "source-directories": [
         "./elm"
     ],
+    "native-modules": true,
     "exposed-modules": [],
     "dependencies": {
         "NoRedInk/elm-decode-pipeline": "3.0.0 <= v < 4.0.0",

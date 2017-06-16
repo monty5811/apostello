@@ -1,61 +1,31 @@
 module Forms.Update exposing (update)
 
-import Data.Keyword exposing (Keyword)
-import Data.Recipient exposing (Recipient)
-import Data.RecipientGroup exposing (RecipientGroup)
-import Date
-import DjangoSend exposing (rawPost)
-import Encode exposing (encodeDate, encodeMaybe, encodeMaybeDate)
 import Forms.Model exposing (FormErrors, FormStatus(Failed, InProgress, Success), decodeFormResp, formDecodeError, noErrors)
 import Http
 import Json.Decode as Decode
-import Json.Encode as Encode
-import Messages exposing (FormMsg(..), Msg(FormMsg))
-import Models exposing (CSRFToken, Model)
-import Navigation as Nav
+import Messages exposing (FormMsg(..), Msg)
+import Models exposing (Model, Settings)
 import Pages as P
-import Pages.ContactForm.Model exposing (ContactFormModel)
+import Pages.Forms.Contact.Update as CF
+import Pages.Forms.ContactImport.Update as CI
+import Pages.Forms.CreateAllGroup.Update as CAG
+import Pages.Forms.DefaultResponses.Update as DRF
+import Pages.Forms.Group.Update as GF
+import Pages.Forms.Keyword.Update as KF
+import Pages.Forms.SendAdhoc.Update as SA
+import Pages.Forms.SendGroup.Update as SG
+import Pages.Forms.SiteConfig.Model exposing (SiteConfigFormModel)
+import Pages.Forms.SiteConfig.Update as SCF
+import Pages.Forms.UserProfile.Update as UPF
 import Pages.Fragments.Notification.Update as Notif
-import Pages.GroupForm.Model exposing (GroupFormModel)
-import Pages.KeywordForm.Model exposing (KeywordFormModel)
-import Pages.SendAdhocForm.Model exposing (SendAdhocModel)
-import Pages.SendGroupForm.Model exposing (SendGroupModel)
-import Pages.SiteConfigForm.Model exposing (SiteConfigFormModel)
-import Route exposing (page2loc)
-import Time
-import Urls
+import Store.RemoteList as RL
 
 
 update : FormMsg -> Model -> ( Model, List (Cmd Msg) )
 update msg model =
     case msg of
-        PostKeywordForm kfModel maybeKeyword ->
-            ( { model | formStatus = InProgress }, [ postKeywordForm model.currentTime model.settings.csrftoken kfModel maybeKeyword ] )
-
-        PostContactForm cfModel maybeContact ->
-            ( { model | formStatus = InProgress }, [ postContactForm model.settings.csrftoken cfModel maybeContact ] )
-
-        PostGroupForm gfModel maybeGroup ->
-            ( { model | formStatus = InProgress }, [ postGroupForm model.settings.csrftoken gfModel maybeGroup ] )
-
-        PostAdhocForm saModel ->
-            case saModel.cost of
-                Nothing ->
-                    ( model, [] )
-
-                Just _ ->
-                    ( { model | formStatus = InProgress }, [ postAdhocForm model.settings.csrftoken saModel ] )
-
-        PostSGForm sgModel ->
-            case sgModel.cost of
-                Nothing ->
-                    ( model, [] )
-
-                Just _ ->
-                    ( { model | formStatus = InProgress }, [ postSGForm model.settings.csrftoken sgModel ] )
-
-        PostSiteConfigForm scModel ->
-            ( { model | formStatus = InProgress }, [ postSCForm model.settings.csrftoken scModel ] )
+        PostForm cmd ->
+            ( { model | formStatus = InProgress }, [ cmd ] )
 
         ReceiveFormResp okMsg (Ok resp) ->
             case Decode.decodeString decodeFormResp resp.body of
@@ -88,191 +58,150 @@ update msg model =
                     , []
                     )
 
+        ReceiveSiteConfigFormModel (Ok scModel) ->
+            let
+                newModel =
+                    case model.page of
+                        P.SiteConfigForm _ ->
+                            { model | page = P.SiteConfigForm <| Just scModel }
 
-postAdhocForm : CSRFToken -> SendAdhocModel -> Cmd Msg
-postAdhocForm csrftoken model =
-    let
-        body =
-            [ ( "content", Encode.string model.content )
-            , ( "recipients", Encode.list (model.selectedContacts |> List.map Encode.int) )
-            , ( "scheduled_time", encodeMaybeDate model.date )
-            ]
+                        _ ->
+                            model
+            in
+            ( { newModel | settings = updateSettings scModel newModel.settings }, [] )
 
-        newLoc =
-            case model.date of
-                Nothing ->
-                    P.OutboundTable
+        ReceiveSiteConfigFormModel (Err _) ->
+            ( model, [] )
 
-                Just _ ->
-                    P.ScheduledSmsTable
-    in
-    rawPost csrftoken Urls.api_act_send_adhoc body
-        |> Http.send (FormMsg << ReceiveFormResp [ Nav.newUrl <| page2loc newLoc ])
+        ReceiveDefaultResponsesFormModel (Ok drModel) ->
+            case model.page of
+                P.DefaultResponsesForm _ ->
+                    ( { model | page = P.DefaultResponsesForm <| Just drModel }, [] )
 
+                _ ->
+                    ( model, [] )
 
-postSGForm : CSRFToken -> SendGroupModel -> Cmd Msg
-postSGForm csrftoken model =
-    let
-        body =
-            [ ( "content", Encode.string model.content )
-            , ( "recipient_group", Encode.int (Maybe.withDefault 0 model.selectedPk) )
-            , ( "scheduled_time", encodeMaybeDate model.date )
-            ]
+        ReceiveDefaultResponsesFormModel (Err _) ->
+            ( model, [] )
 
-        newLoc =
-            case model.date of
-                Nothing ->
-                    P.OutboundTable
+        UserProfileFormMsg subMsg ->
+            case model.page of
+                P.UserProfileForm upfModel pk ->
+                    ( { model | page = P.UserProfileForm (UPF.update subMsg upfModel) pk }
+                    , []
+                    )
 
-                Just _ ->
-                    P.ScheduledSmsTable
-    in
-    rawPost csrftoken Urls.api_act_send_group body
-        |> Http.send (FormMsg << ReceiveFormResp [ Nav.newUrl <| page2loc newLoc ])
+                _ ->
+                    ( model, [] )
 
+        GroupFormMsg subMsg ->
+            case model.page of
+                P.GroupForm gfModel maybePk ->
+                    ( { model | page = P.GroupForm (GF.update subMsg gfModel) maybePk }
+                    , []
+                    )
 
-postGroupForm : CSRFToken -> GroupFormModel -> Maybe RecipientGroup -> Cmd Msg
-postGroupForm csrftoken model maybeGroup =
-    let
-        body =
-            [ ( "name", Encode.string <| extractField .name model.name maybeGroup )
-            , ( "description", Encode.string <| extractField .description model.description maybeGroup )
-            ]
-                |> addPk maybeGroup
-    in
-    rawPost csrftoken Urls.api_recipient_groups body
-        |> Http.send (FormMsg << ReceiveFormResp [ Nav.newUrl <| page2loc <| P.GroupTable False ])
+                _ ->
+                    ( model, [] )
 
+        ContactFormMsg subMsg ->
+            case model.page of
+                P.ContactForm cfModel maybePk ->
+                    ( { model
+                        | page =
+                            P.ContactForm (CF.update subMsg cfModel)
+                                maybePk
+                      }
+                    , []
+                    )
 
-extractField : (a -> String) -> Maybe String -> Maybe a -> String
-extractField fn field maybeRec =
-    case field of
-        Nothing ->
-            -- never edited the field, use existing group or default to ""
-            Maybe.map fn maybeRec
-                |> Maybe.withDefault ""
+                _ ->
+                    ( model, [] )
 
-        Just s ->
-            s
+        KeywordFormMsg subMsg ->
+            case model.page of
+                P.KeywordForm kfModel maybeK ->
+                    ( { model
+                        | page =
+                            P.KeywordForm (KF.update subMsg kfModel)
+                                maybeK
+                      }
+                    , []
+                    )
 
+                _ ->
+                    ( model, [] )
 
-postContactForm : CSRFToken -> ContactFormModel -> Maybe Recipient -> Cmd Msg
-postContactForm csrftoken model maybeContact =
-    let
-        body =
-            [ ( "first_name", Encode.string <| extractField .first_name model.first_name maybeContact )
-            , ( "last_name", Encode.string <| extractField .last_name model.last_name maybeContact )
-            , ( "number", Encode.string <| extractField (Maybe.withDefault "" << .number) model.number maybeContact )
-            , ( "do_not_reply", Encode.bool <| extractBool .do_not_reply model.do_not_reply maybeContact )
-            ]
-                |> addPk maybeContact
-    in
-    rawPost csrftoken Urls.api_recipients body
-        |> Http.send (FormMsg << ReceiveFormResp [ Nav.newUrl <| page2loc <| P.RecipientTable False ])
+        SiteConfigFormMsg subMsg ->
+            case model.page of
+                P.SiteConfigForm _ ->
+                    ( { model
+                        | page =
+                            P.SiteConfigForm <| Just <| SCF.update subMsg
+                      }
+                    , []
+                    )
 
+                _ ->
+                    ( model, [] )
 
-postKeywordForm : Time.Time -> CSRFToken -> KeywordFormModel -> Maybe Keyword -> Cmd Msg
-postKeywordForm now csrftoken model maybeKeyword =
-    let
-        body =
-            [ ( "keyword", Encode.string <| extractField .keyword model.keyword maybeKeyword )
-            , ( "description", Encode.string <| extractField .description model.description maybeKeyword )
-            , ( "disable_all_replies", Encode.bool <| extractBool .disable_all_replies model.disable_all_replies maybeKeyword )
-            , ( "custom_response", Encode.string <| extractField .custom_response model.custom_response maybeKeyword )
-            , ( "deactivated_response", Encode.string <| extractField .deactivated_response model.deactivated_response maybeKeyword )
-            , ( "too_early_response", Encode.string <| extractField .too_early_response model.too_early_response maybeKeyword )
-            , ( "activate_time", encodeDate <| extractDate now .activate_time model.activate_time maybeKeyword )
-            , ( "deactivate_time", encodeMaybeDate <| extractMaybeDate .deactivate_time model.deactivate_time maybeKeyword )
-            , ( "linked_groups", Encode.list <| List.map Encode.int <| extractPks .linked_groups model.linked_groups maybeKeyword )
-            , ( "owners", Encode.list <| List.map Encode.int <| extractPks .owners model.owners maybeKeyword )
-            , ( "subscribed_to_digest", Encode.list <| List.map Encode.int <| extractPks .subscribed_to_digest model.subscribers maybeKeyword )
-            ]
-                |> addPk maybeKeyword
-    in
-    rawPost csrftoken Urls.api_keywords body
-        |> Http.send (FormMsg << ReceiveFormResp [ Nav.newUrl <| page2loc <| P.KeywordTable False ])
+        DefaultResponsesFormMsg subMsg ->
+            case model.page of
+                P.DefaultResponsesForm _ ->
+                    ( { model
+                        | page = P.DefaultResponsesForm <| Just <| DRF.update subMsg
+                      }
+                    , []
+                    )
 
+                _ ->
+                    ( model, [] )
 
-postSCForm : CSRFToken -> SiteConfigFormModel -> Cmd Msg
-postSCForm csrftoken model =
-    let
-        body =
-            [ ( "site_name", Encode.string model.site_name )
-            , ( "sms_char_limit", Encode.int model.sms_char_limit )
-            , ( "default_number_prefix", Encode.string model.default_number_prefix )
-            , ( "disable_all_replies", Encode.bool model.disable_all_replies )
-            , ( "disable_email_login_form", Encode.bool model.disable_email_login_form )
-            , ( "office_email", Encode.string model.office_email )
-            , ( "auto_add_new_groups", Encode.list (List.map Encode.int model.auto_add_new_groups) )
-            , ( "slack_url", Encode.string model.slack_url )
-            , ( "sync_elvanto", Encode.bool model.sync_elvanto )
-            , ( "not_approved_msg", Encode.string model.not_approved_msg )
-            , ( "email_host", Encode.string model.email_host )
-            , ( "email_port", encodeMaybe Encode.int model.email_port )
-            , ( "email_username", Encode.string model.email_username )
-            , ( "email_password", Encode.string model.email_password )
-            , ( "email_from", Encode.string model.email_from )
-            ]
-    in
-    rawPost csrftoken Urls.api_site_config body
-        |> Http.send (FormMsg << ReceiveFormResp [ Nav.newUrl <| page2loc <| P.Home ])
+        SendAdhocMsg subMsg ->
+            case model.page of
+                P.SendAdhoc saModel ->
+                    ( { model | page = P.SendAdhoc <| SA.update model.settings.twilioSendingCost subMsg saModel }, [] )
 
+                _ ->
+                    ( model, [] )
 
-addPk : Maybe { a | pk : Int } -> List ( String, Encode.Value ) -> List ( String, Encode.Value )
-addPk maybeRecord body =
-    case maybeRecord of
-        Nothing ->
-            body
+        SendGroupMsg subMsg ->
+            case model.page of
+                P.SendGroup sgModel ->
+                    ( { model
+                        | page =
+                            P.SendGroup <|
+                                SG.update
+                                    (RL.toList model.dataStore.groups)
+                                    subMsg
+                                    sgModel
+                      }
+                    , []
+                    )
 
-        Just rec ->
-            ( "pk", Encode.int rec.pk ) :: body
+                _ ->
+                    ( model, [] )
 
+        CreateAllGroupMsg subMsg ->
+            case model.page of
+                P.CreateAllGroup _ ->
+                    ( { model | page = P.CreateAllGroup <| CAG.update subMsg }, [] )
 
-extractDate : Time.Time -> (Keyword -> Date.Date) -> Maybe Date.Date -> Maybe Keyword -> Date.Date
-extractDate now fn field maybeKeyword =
-    case field of
-        Nothing ->
-            Maybe.map fn maybeKeyword
-                |> Maybe.withDefault (Date.fromTime now)
+                _ ->
+                    ( model, [] )
 
-        Just d ->
-            d
+        ContactImportMsg subMsg ->
+            case model.page of
+                P.ContactImport ciModel ->
+                    ( { model | page = P.ContactImport <| CI.update subMsg ciModel }, [] )
+
+                _ ->
+                    ( model, [] )
 
 
-extractMaybeDate : (Keyword -> Maybe Date.Date) -> Maybe Date.Date -> Maybe Keyword -> Maybe Date.Date
-extractMaybeDate fn field maybeKeyword =
-    case field of
-        Nothing ->
-            -- never edited the field, use existing group or default to ""
-            case maybeKeyword of
-                Nothing ->
-                    Nothing
-
-                Just k ->
-                    fn k
-
-        Just s ->
-            Just s
-
-
-extractPks : (Keyword -> List Int) -> Maybe (List Int) -> Maybe Keyword -> List Int
-extractPks fn field maybeKeyword =
-    case field of
-        Nothing ->
-            -- never edited the field, use existing group or default to []
-            Maybe.map fn maybeKeyword
-                |> Maybe.withDefault []
-
-        Just pks ->
-            pks
-
-
-extractBool : (a -> Bool) -> Maybe Bool -> Maybe a -> Bool
-extractBool fn field maybeRec =
-    case field of
-        Nothing ->
-            Maybe.map fn maybeRec
-                |> Maybe.withDefault False
-
-        Just b ->
-            b
+updateSettings : SiteConfigFormModel -> Settings -> Settings
+updateSettings newSCModel settings =
+    { settings
+        | smsCharLimit = newSCModel.sms_char_limit
+        , defaultNumberPrefix = newSCModel.default_number_prefix
+    }

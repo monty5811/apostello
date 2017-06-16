@@ -3,8 +3,6 @@ module Pages.GroupComposer.View exposing (parenPairs, parseQueryString, runQuery
 import Array.Hamt as Array
 import Data.Recipient exposing (RecipientSimple)
 import Data.RecipientGroup exposing (GroupPk, RecipientGroup, nullGroup)
-import Data.Request exposing (StoreMsg(LoadData))
-import Data.Store as Store
 import Html exposing (..)
 import Html.Attributes as A
 import Html.Events as E
@@ -16,16 +14,18 @@ import Pages.GroupComposer.Model exposing (GroupComposerModel, ParenLoc, Query, 
 import Regex exposing (regex)
 import Route exposing (spaLink)
 import Set exposing (Set)
+import Store.Messages exposing (StoreMsg(LoadData))
+import Store.RemoteList as RL
 
 
 -- Main view
 
 
-view : GroupComposerModel -> Store.RemoteList RecipientGroup -> Html Msg
+view : GroupComposerModel -> RL.RemoteList RecipientGroup -> Html Msg
 view model groups_ =
     let
         groups =
-            Store.toList groups_
+            RL.toList groups_
 
         ( activePeople, activeGroupPks ) =
             runQuery groups (collectPeople groups) (Maybe.withDefault "" model)

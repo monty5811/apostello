@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import subprocess
+
 try:
     from os import scandir
 except ImportError:

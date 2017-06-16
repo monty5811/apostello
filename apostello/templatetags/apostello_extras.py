@@ -22,14 +22,21 @@ def elm_settings(user):
 
     config = SiteConfiguration.get_solo()
     elm = {
-        'userPerms': UserProfileSerializer(profile).data,
-        'twilioSendingCost': settings.TWILIO_SENDING_COST,
-        'twilioFromNumber': settings.TWILIO_FROM_NUM,
-        'smsCharLimit': config.sms_char_limit,
-        'defaultNumberPrefix': config.default_number_prefix,
-        'noAccessMessage': config.not_approved_msg,
+        'userPerms':
+        UserProfileSerializer(profile).data,
+        'twilioSendingCost':
+        settings.TWILIO_SENDING_COST,
+        'twilioFromNumber':
+        settings.TWILIO_FROM_NUM,
+        'smsCharLimit':
+        config.sms_char_limit,
+        'defaultNumberPrefix':
+        config.default_number_prefix,
+        'noAccessMessage':
+        config.not_approved_msg,
         'blockedKeywords': [
-            x.keyword for x in Keyword.objects.all().prefetch_related('owners') if x.is_locked and not x.can_user_access(user)
+            x.keyword for x in Keyword.objects.all().prefetch_related('owners')
+            if x.is_locked and not x.can_user_access(user)
         ],
     }
     return mark_safe(json.dumps(elm))

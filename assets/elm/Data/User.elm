@@ -9,6 +9,7 @@ type alias UserProfile =
     { pk : Int
     , user : User
     , approved : Bool
+    , message_cost_limit : Float
     , can_see_groups : Bool
     , can_see_contact_names : Bool
     , can_see_keywords : Bool
@@ -27,6 +28,7 @@ decodeUserProfile =
         |> required "pk" Decode.int
         |> required "user" decodeUser
         |> required "approved" Decode.bool
+        |> required "message_cost_limit" Decode.float
         |> required "can_see_groups" Decode.bool
         |> required "can_see_contact_names" Decode.bool
         |> required "can_see_keywords" Decode.bool
@@ -44,6 +46,7 @@ encodeUserProfile record =
         [ ( "pk", Encode.int record.pk )
         , ( "user", encodeUser record.user )
         , ( "approved", Encode.bool record.approved )
+        , ( "message_cost_limit", Encode.float record.message_cost_limit )
         , ( "can_see_groups", Encode.bool record.can_see_groups )
         , ( "can_see_contact_names", Encode.bool record.can_see_contact_names )
         , ( "can_see_keywords", Encode.bool record.can_see_keywords )

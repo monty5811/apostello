@@ -2,8 +2,9 @@ from time import sleep
 
 import pytest
 import vcr
-from elvanto.models import ElvantoGroup
 from tests.functional_tests.utils import check_and_close_msg, click_and_wait
+
+from elvanto.models import ElvantoGroup
 
 my_vcr = vcr.VCR(record_mode='none', ignore_localhost=True)
 

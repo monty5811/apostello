@@ -1,13 +1,13 @@
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django_q.models import Schedule
+from django_q.tasks import async, schedule
 
 from apostello.models import Keyword, Recipient
 from apostello.utils import fetch_default_reply
-from django_q.models import Schedule
-from django_q.tasks import async, schedule
 
 logger = logging.getLogger('apostello')
 

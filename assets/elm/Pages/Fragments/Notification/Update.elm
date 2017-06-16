@@ -1,4 +1,13 @@
-module Pages.Fragments.Notification.Update exposing (..)
+module Pages.Fragments.Notification.Update
+    exposing
+        ( addListOfDjangoMessagesNoDestroy
+        , createInfo
+        , createLoadingFailed
+        , createNotSaved
+        , createSuccess
+        , refreshNotifMessage
+        , update
+        )
 
 import Dict
 import Messages exposing (Msg(NotificationMsg), NotificationMsg(RemoveNotification))
@@ -45,11 +54,6 @@ create model text type_ =
     )
 
 
-addDjangoMessages : List DjangoMessage -> Model -> Model
-addDjangoMessages messages model =
-    List.foldl createFromDjangoMessageNoDestroy model messages
-
-
 createFromDjangoMessage : DjangoMessage -> Model -> ( Model, Cmd Msg )
 createFromDjangoMessage dm model =
     let
@@ -87,11 +91,6 @@ addListOfDjangoMessagesNoDestroy msgs model =
 refreshNotifMessage : DjangoMessage
 refreshNotifMessage =
     DjangoMessage "error" "Something went wrong there, try refreshing the page and going again."
-
-
-checkLogNotifMessage : DjangoMessage
-checkLogNotifMessage =
-    DjangoMessage "error" "Something went wrong there, you may want to check the logs before trying again"
 
 
 createWarning : Model -> String -> ( Model, Cmd Msg )

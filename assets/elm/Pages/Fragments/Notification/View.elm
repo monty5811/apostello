@@ -1,7 +1,7 @@
 module Pages.Fragments.Notification.View exposing (view)
 
 import Dict
-import Html exposing (Html, div, i, text)
+import Html exposing (Html)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Messages exposing (Msg(NotificationMsg), NotificationMsg(RemoveNotification))
@@ -35,12 +35,18 @@ tView ( id, notification ) =
 
         className =
             "ui floating " ++ messageType ++ " message"
+
+        text =
+            notification.text
+                |> String.split "\n"
+                |> List.map Html.text
+                |> List.intersperse (Html.br [] [])
     in
-    div [ class className ]
-        [ i
+    Html.div [ class className ] <|
+        [ Html.i
             [ class "close icon"
             , onClick <| NotificationMsg <| RemoveNotification id
             ]
             []
-        , text notification.text
         ]
+            ++ text

@@ -1,18 +1,31 @@
-{% extends "apostello/base.html" %}
-{% load cache %}
-{% block main %}
-<noscript>
-  <div class="ui top attached inverted violet menu">
-    <a href="/" class="item">Home</a>
-    {% cache 1800 topbar request.user %}
-    {% include 'apostello/top_menu.html' %}
+{% load staticfiles %}{% load cache %}
+{% load apostello_extras %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% include 'apostello/includes/head.html' %}
+    {% block morehead %}
+    {% endblock %}
+  </head>
+  <body>
+    <div id="elmContainer"></div>
+    <script>
+    {% cache 60 elmSettings request.user %}
+      var elmSettings = {% elm_settings request.user %};
     {% endcache %}
-  </div>
-  <div class="ui hidden divider"></div>
-  <div class="ui stackable grid container">
-    <div class="fourteen wide centered column">
-      <p>apostello cannot function without javascript...</p>
-    </div>
-  </div>
-</noscript>
-{% endblock %}
+    </script>
+    {% include 'apostello/includes/js.html' %}
+    {% block morejs %}{% endblock %}
+    <noscript>
+      <div class="ui top attached inverted violet menu">
+        <a href="/" class="item">Home</a>
+      </div>
+      <div class="ui hidden divider"></div>
+      <div class="ui stackable grid container">
+        <div class="fourteen wide centered column">
+          <p>apostello cannot function without javascript...</p>
+        </div>
+      </div>
+    </noscript>
+  </body>
+</html>

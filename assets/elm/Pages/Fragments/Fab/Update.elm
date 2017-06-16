@@ -1,6 +1,6 @@
 module Pages.Fragments.Fab.Update exposing (update)
 
-import DjangoSend exposing (archivePost)
+import DjangoSend exposing (CSRFToken, archivePost)
 import Helpers exposing (decodeAlwaysTrue)
 import Http
 import Messages
@@ -12,7 +12,7 @@ import Messages
             )
         , Msg(FabMsg)
         )
-import Models exposing (CSRFToken, FabModel(..), Model)
+import Models exposing (FabModel(..), Model)
 import Navigation
 
 
@@ -43,6 +43,6 @@ toggleFabView model =
 
 
 archiveItem : CSRFToken -> String -> String -> Bool -> Cmd Msg
-archiveItem csrftoken redirectUrl url isArchived =
-    archivePost csrftoken url isArchived decodeAlwaysTrue
+archiveItem csrf redirectUrl url isArchived =
+    archivePost csrf url isArchived decodeAlwaysTrue
         |> Http.send (FabMsg << ReceiveArchiveResp redirectUrl)

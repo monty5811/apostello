@@ -1,8 +1,7 @@
+import pytest
 from django.core import mail
 from django.test import Client
 from tests.conftest import post_json, twilio_vcr
-
-import pytest
 
 
 @pytest.mark.slow

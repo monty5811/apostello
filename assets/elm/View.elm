@@ -1,34 +1,41 @@
 module View exposing (view)
 
-import Data.Store as Store
-import Html exposing (Html, text)
+import Html exposing (Html)
 import Messages exposing (Msg)
 import Models exposing (Model)
-import Pages exposing (FabOnlyPage(..), Page(..))
+import Pages exposing (Page(..))
 import Pages.AccessDenied as AD
-import Pages.ContactForm.View as CF
+import Pages.ApiSetup.View as ApiSetup
 import Pages.Curator as C
 import Pages.ElvantoImport.View as EI
 import Pages.Error404 as E404
 import Pages.FirstRun.View as FR
+import Pages.Forms.Contact.View as CF
+import Pages.Forms.ContactImport.View as CI
+import Pages.Forms.CreateAllGroup.View as CAG
+import Pages.Forms.DefaultResponses.View as DRF
+import Pages.Forms.Group.View as GF
+import Pages.Forms.Keyword.View as KF
+import Pages.Forms.SendAdhoc.View as SA
+import Pages.Forms.SendGroup.View as SG
+import Pages.Forms.SiteConfig.View as SCF
+import Pages.Forms.UserProfile.View as UPF
 import Pages.Fragments.Fab.View as F
 import Pages.Fragments.Shell as Shell
 import Pages.GroupComposer.View as GC
-import Pages.GroupForm.View as GF
-import Pages.GroupTable.View as GT
+import Pages.GroupTable as GT
+import Pages.Help as Help
 import Pages.Home as H
-import Pages.InboundTable.View as IT
+import Pages.InboundTable as IT
 import Pages.KeyRespTable.View as KRT
-import Pages.KeywordForm.View as KF
-import Pages.KeywordTable.View as KT
+import Pages.KeywordTable as KT
 import Pages.OutboundTable as OT
-import Pages.RecipientTable.View as RT
-import Pages.ScheduledSmsTable.View as SST
-import Pages.SendAdhocForm.View as SA
-import Pages.SendGroupForm.View as SG
-import Pages.SiteConfigForm.View as SCF
-import Pages.UserProfileTable.View as UPT
-import Pages.Wall.View as W
+import Pages.RecipientTable as RT
+import Pages.ScheduledSmsTable as SST
+import Pages.Usage as Usage
+import Pages.UserProfileTable as UPT
+import Pages.Wall as W
+import Store.RemoteList as RL
 
 
 view : Model -> Html Msg
@@ -59,25 +66,25 @@ content model =
             IT.view model.table model.dataStore.inboundSms
 
         GroupTable viewingArchive ->
-            GT.view model.table (Store.filterArchived viewingArchive model.dataStore.groups)
+            GT.view model.table (RL.filterArchived viewingArchive model.dataStore.groups)
 
         GroupComposer composerModel ->
-            GC.view composerModel (Store.filterArchived False model.dataStore.groups)
+            GC.view composerModel (RL.filterArchived False model.dataStore.groups)
 
         RecipientTable viewingArchive ->
-            RT.view model.table <| Store.filterArchived viewingArchive model.dataStore.recipients
+            RT.view model.table <| RL.filterArchived viewingArchive model.dataStore.recipients
 
         KeywordTable viewingArchive ->
-            KT.view model.table <| Store.filterArchived viewingArchive model.dataStore.keywords
+            KT.view model.table <| RL.filterArchived viewingArchive model.dataStore.keywords
 
         ElvantoImport ->
             EI.view model.table model.dataStore.elvantoGroups
 
         Wall ->
-            W.view (model.dataStore.inboundSms |> Store.filterArchived False |> Store.filter (\s -> s.display_on_wall))
+            W.view (model.dataStore.inboundSms |> RL.filterArchived False |> RL.filter (\s -> s.display_on_wall))
 
         Curator ->
-            C.view model.table (model.dataStore.inboundSms |> Store.filterArchived False)
+            C.view model.table (model.dataStore.inboundSms |> RL.filterArchived False)
 
         UserProfileTable ->
             UPT.view model.table model.dataStore.userprofiles
@@ -88,7 +95,7 @@ content model =
         KeyRespTable keyRespModel viewingArchive currentKeyword ->
             KRT.view viewingArchive
                 model.table
-                (model.dataStore.inboundSms |> Store.filterArchived viewingArchive |> Store.filter (filterByMatchedKeyword currentKeyword))
+                (model.dataStore.inboundSms |> RL.filterArchived viewingArchive |> RL.filter (filterByMatchedKeyword currentKeyword))
                 keyRespModel
                 currentKeyword
 
@@ -102,14 +109,14 @@ content model =
             SA.view
                 model.settings
                 saModel
-                (Store.filterArchived False model.dataStore.recipients)
+                (RL.filterArchived False model.dataStore.recipients)
                 model.formStatus
 
         SendGroup sgModel ->
             SG.view
                 model.settings
                 sgModel
-                (Store.filterArchived False model.dataStore.groups |> Store.filter (\x -> x.cost > 0))
+                (RL.filterArchived False model.dataStore.groups |> RL.filter (\x -> x.cost > 0))
                 model.formStatus
 
         Error404 ->
@@ -118,8 +125,22 @@ content model =
         Home ->
             H.view
 
+        Help ->
+            Help.view
+
+        ContactImport ciModel ->
+            CI.view
+                model.settings.csrftoken
+                model.formStatus
+                ciModel
+
         GroupForm gfModel maybePk ->
-            GF.view maybePk model.dataStore.groups gfModel model.formStatus
+            GF.view
+                model.settings.csrftoken
+                maybePk
+                model.dataStore.groups
+                gfModel
+                model.formStatus
 
         ContactForm cfModel maybePk ->
             let
@@ -129,7 +150,11 @@ content model =
                             Nothing
 
                         Just pk ->
-                            Just <| IT.view model.table (model.dataStore.inboundSms |> Store.filter (filterBySenderPk pk))
+                            Just <|
+                                IT.view model.table
+                                    (model.dataStore.inboundSms
+                                        |> RL.filter (filterBySenderPk pk)
+                                    )
             in
             CF.view
                 model.settings
@@ -141,6 +166,8 @@ content model =
 
         KeywordForm kfModel maybeK ->
             KF.view
+                model.settings.csrftoken
+                model.currentTime
                 model.dataStore
                 maybeK
                 kfModel
@@ -148,12 +175,36 @@ content model =
 
         SiteConfigForm scModel ->
             SCF.view
+                model.settings.csrftoken
                 model.dataStore
                 scModel
                 model.formStatus
 
-        FabOnlyPage _ ->
-            text ""
+        DefaultResponsesForm drModel ->
+            DRF.view
+                model.settings.csrftoken
+                drModel
+                model.formStatus
+
+        CreateAllGroup cagModel ->
+            CAG.view
+                model.settings.csrftoken
+                cagModel
+                model.formStatus
+
+        UserProfileForm upfModel pk ->
+            UPF.view
+                model.settings.csrftoken
+                pk
+                model.dataStore.userprofiles
+                upfModel
+                model.formStatus
+
+        ApiSetup maybeKey ->
+            ApiSetup.view maybeKey
+
+        Usage ->
+            Usage.view
 
 
 

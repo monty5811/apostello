@@ -33,13 +33,10 @@
     "grid",
     "menu",
     "message",
-    "modal",
     "table",
     "card",
     "checkbox",
-    "dimmer",
     "dropdown",
-    "transition",
     "segment"
   ],
   "version": "2.2.10",

@@ -11,7 +11,7 @@ config.plugins = config.plugins.concat([
     }
   }),
   // minifies code
-  new webpack.optimize.UglifyJsPlugin({})
+  new webpack.optimize.UglifyJsPlugin({ sourceMap: false }),
 ]);
 
 module.exports = config;

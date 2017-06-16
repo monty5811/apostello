@@ -6,9 +6,11 @@ import Html.Attributes exposing (class, href)
 import Html.Keyed as Keyed
 import Messages exposing (Msg)
 import Models exposing (Settings)
-import Pages exposing (FabOnlyPage(..), Page(..), initSendAdhoc, initSendGroup)
+import Pages exposing (Page(..), initSendAdhoc, initSendGroup)
+import Pages.Forms.ContactImport.Model exposing (initialContactImportModel)
 import Pages.GroupComposer.Model exposing (initialGroupComposerModel)
-import Route exposing (page2loc, spaLink)
+import Route exposing (spaLink)
+import Urls
 
 
 {-
@@ -51,8 +53,8 @@ menu page settings =
                     , itemSpa InboundTable "Incoming SMS" userPerms.can_see_incoming
                     , itemSpa OutboundTable "Outgoing SMS" userPerms.can_see_outgoing
                     , divider
-                    , lockedItem False "/accounts/password/change" "Change Password" userPerms.user.is_social
-                    , item "/accounts/logout/" "Logout" True
+                    , lockedItem False Urls.account_change_password "Change Password" (not userPerms.user.is_social)
+                    , item Urls.account_logout "Logout" True
                     , divider
                     , div [ class "header" ] [ text settings.twilioFromNumber ]
                     ]
@@ -78,18 +80,18 @@ maybeToolsMenu isStaff userPerms =
                 , i [ class "dropdown icon" ] []
                 , div [ class "menu" ]
                     [ itemSpa (SiteConfigForm Nothing) "Site Configuration" isStaff
-                    , item (page2loc <| FabOnlyPage EditResponses) "Default Responses" isStaff
+                    , itemSpa (DefaultResponsesForm Nothing) "Default Responses" isStaff
                     , maybeDivider isStaff
                     , itemSpa UserProfileTable "User Permissions" isStaff
-                    , item "/usage/" "Usage Dashboard" isStaff
+                    , itemSpa Usage "Usage Dashboard" isStaff
                     , item "/admin/" "Admin" isStaff
-                    , item (page2loc <| FabOnlyPage ApiSetup) "API Setup" isStaff
+                    , itemSpa (ApiSetup Nothing) "API Setup" isStaff
                     , maybeDivider isStaff
-                    , item (page2loc <| FabOnlyPage CreateAllGroup) "Create \"all\" group" isStaff
+                    , itemSpa (CreateAllGroup "") "Create \"all\" group" isStaff
                     , itemSpa (GroupComposer initialGroupComposerModel) "Compose group" userPerms.can_see_groups
                     , maybeDivider isStaff
                     , div [ class "header" ] [ text "Import" ]
-                    , item (page2loc <| FabOnlyPage ContactImport) "CSV" userPerms.can_import
+                    , itemSpa (ContactImport initialContactImportModel) "CSV" userPerms.can_import
                     , itemSpa ElvantoImport "Elvanto" userPerms.can_import
                     ]
                 ]

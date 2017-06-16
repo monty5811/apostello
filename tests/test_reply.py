@@ -1,9 +1,9 @@
 import pytest
+from tests.conftest import twilio_vcr
 
 from apostello.models import Recipient, RecipientGroup
 from apostello.reply import InboundSms
 from apostello.utils import fetch_default_reply
-from tests.conftest import twilio_vcr
 
 
 @pytest.mark.django_db
