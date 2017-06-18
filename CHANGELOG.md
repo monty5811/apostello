@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [v2.0.0]
+
 **Upgrade to python 3.6 - ansible and Heroku deploys now use python 3.6**
 
 ### Changed
