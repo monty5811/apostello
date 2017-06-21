@@ -16,12 +16,12 @@ import Messages exposing (Msg)
 import Models exposing (Model)
 import Pages.FirstRun.Model exposing (decodeFirstRunResp)
 import Pages.Fragments.Notification.Update as Notif
+import RemoteList as RL
 import Store.DataTypes exposing (RemoteDataType(..))
 import Store.Decode exposing (decodeDataStore)
 import Store.Messages exposing (StoreMsg(..))
 import Store.Model exposing (..)
 import Store.Optimistic as O
-import Store.RemoteList as RL
 import Store.Request exposing (dataFromResp, fetchData, increasePageSize, maybeFetchData)
 import Store.Toggle as T
 
@@ -41,19 +41,24 @@ update msg model =
             in
             ( { model | dataStore = ds }, [] )
 
-        ReceiveRawResp dt (Ok resp) ->
+        ReceiveRawResp dt ignorePageInfo (Ok resp) ->
             let
                 cmds =
-                    case resp.next of
-                        Nothing ->
+                    case ignorePageInfo of
+                        True ->
                             []
 
-                        Just url ->
-                            [ fetchData ( dt, increasePageSize url ) ]
-            in
-            ( updateNewData dt resp model, cmds )
+                        False ->
+                            case resp.next of
+                                Nothing ->
+                                    []
 
-        ReceiveRawResp dt (Err e) ->
+                                Just url ->
+                                    [ fetchData ( dt, ( False, increasePageSize url ) ) ]
+            in
+            ( updateNewData ignorePageInfo dt resp model, cmds )
+
+        ReceiveRawResp dt _ (Err e) ->
             handleLoadingFailed dt e model
 
         -- toggle group membership
@@ -65,7 +70,7 @@ update msg model =
                         , nonmembers = O.updateGroupMembers group.nonmembers contact
                     }
             in
-            ( { model | dataStore = updateGroups model.dataStore [ updatedGroup ] <| Just "dummy" }
+            ( { model | dataStore = updateGroups False model.dataStore [ updatedGroup ] <| Just "dummy" }
             , [ T.groupMembership
                     model.settings.csrftoken
                     group.pk
@@ -75,7 +80,7 @@ update msg model =
             )
 
         ReceiveToggleGroupMembership (Ok group) ->
-            ( { model | dataStore = updateGroups model.dataStore [ group ] <| Just "dummy" }, [] )
+            ( { model | dataStore = updateGroups False model.dataStore [ group ] <| Just "dummy" }, [] )
 
         ReceiveToggleGroupMembership (Err _) ->
             handleNotSaved model
@@ -87,7 +92,7 @@ update msg model =
             )
 
         ReceiveToggleElvantoGroupSync (Ok group) ->
-            ( { model | dataStore = updateElvantoGroups model.dataStore [ group ] <| Just "dummy" }, [] )
+            ( { model | dataStore = updateElvantoGroups False model.dataStore [ group ] <| Just "dummy" }, [] )
 
         ReceiveToggleElvantoGroupSync (Err _) ->
             handleNotSaved model
@@ -121,7 +126,7 @@ update msg model =
             ( model, [ T.reprocessSms model.settings.csrftoken pk ] )
 
         ReceiveReprocessSms (Ok sms) ->
-            ( { model | dataStore = updateSmsInbounds model.dataStore [ sms ] <| Just "dummy" }, [] )
+            ( { model | dataStore = updateSmsInbounds False model.dataStore [ sms ] <| Just "dummy" }, [] )
 
         ReceiveReprocessSms (Err _) ->
             handleNotSaved model
@@ -143,7 +148,7 @@ update msg model =
             )
 
         ReceiveToggleInboundSmsDealtWith (Ok sms) ->
-            ( { model | dataStore = updateSmsInbounds model.dataStore [ sms ] <| Just "dummy" }, [] )
+            ( { model | dataStore = updateSmsInbounds False model.dataStore [ sms ] <| Just "dummy" }, [] )
 
         ReceiveToggleInboundSmsDealtWith (Err _) ->
             handleNotSaved model
@@ -153,7 +158,7 @@ update msg model =
             ( model, [ T.wallDisplay model.settings.csrftoken isDisplayed pk ] )
 
         ReceiveToggleWallDisplay (Ok sms) ->
-            ( { model | dataStore = updateSmsInbounds model.dataStore [ sms ] <| Just "dummy" }, [] )
+            ( { model | dataStore = updateSmsInbounds True model.dataStore [ sms ] Nothing }, [] )
 
         ReceiveToggleWallDisplay (Err _) ->
             handleNotSaved model
@@ -161,14 +166,14 @@ update msg model =
         -- user profile
         ToggleProfileField profile ->
             ( { model
-                | dataStore = updateUserProfiles model.dataStore [ profile ] <| Just "dummy"
+                | dataStore = updateUserProfiles False model.dataStore [ profile ] <| Just "dummy"
               }
             , [ T.profileField model.settings.csrftoken profile ]
             )
 
         ReceiveToggleProfileField (Ok profile) ->
             ( { model
-                | dataStore = updateUserProfiles model.dataStore [ profile ] <| Just "dummy"
+                | dataStore = updateUserProfiles False model.dataStore [ profile ] <| Just "dummy"
               }
             , []
             )
@@ -206,129 +211,134 @@ handleNotSaved model =
     ( newModel, [ cmd ] )
 
 
-updateNewData : RemoteDataType -> RawResponse -> Model -> Model
-updateNewData dt rawResp model =
+updateNewData : Bool -> RemoteDataType -> RawResponse -> Model -> Model
+updateNewData ignorePageInfo dt rawResp model =
     case dt of
         OutgoingSms ->
-            { model | dataStore = updateSmsOutbounds model.dataStore (dataFromResp decodeSmsOutbound rawResp) rawResp.next }
+            { model | dataStore = updateSmsOutbounds ignorePageInfo model.dataStore (dataFromResp decodeSmsOutbound rawResp) rawResp.next }
 
         IncomingSms ->
-            { model | dataStore = updateSmsInbounds model.dataStore (dataFromResp decodeSmsInbound rawResp) rawResp.next }
+            { model | dataStore = updateSmsInbounds ignorePageInfo model.dataStore (dataFromResp decodeSmsInbound rawResp) rawResp.next }
 
-        Groups ->
-            { model | dataStore = updateGroups model.dataStore (dataFromResp decodeRecipientGroup rawResp) rawResp.next }
+        Groups _ ->
+            { model | dataStore = updateGroups ignorePageInfo model.dataStore (dataFromResp decodeRecipientGroup rawResp) rawResp.next }
 
-        Contacts ->
-            { model | dataStore = updateRecipients model.dataStore (dataFromResp decodeRecipient rawResp) rawResp.next }
+        Contacts _ ->
+            { model | dataStore = updateRecipients ignorePageInfo model.dataStore (dataFromResp decodeRecipient rawResp) rawResp.next }
 
-        Keywords ->
-            { model | dataStore = updateKeywords model.dataStore (dataFromResp decodeKeyword rawResp) rawResp.next }
+        Keywords _ ->
+            { model | dataStore = updateKeywords ignorePageInfo model.dataStore (dataFromResp decodeKeyword rawResp) rawResp.next }
 
         ElvantoGroups ->
-            { model | dataStore = updateElvantoGroups model.dataStore (dataFromResp decodeElvantoGroup rawResp) rawResp.next }
+            { model | dataStore = updateElvantoGroups ignorePageInfo model.dataStore (dataFromResp decodeElvantoGroup rawResp) rawResp.next }
 
         UserProfiles ->
-            { model | dataStore = updateUserProfiles model.dataStore (dataFromResp decodeUserProfile rawResp) rawResp.next }
+            { model | dataStore = updateUserProfiles ignorePageInfo model.dataStore (dataFromResp decodeUserProfile rawResp) rawResp.next }
 
         ScheduledSms ->
-            { model | dataStore = updateQueuedSms model.dataStore (dataFromResp decodeQueuedSms rawResp) rawResp.next }
+            { model | dataStore = updateQueuedSms ignorePageInfo model.dataStore (dataFromResp decodeQueuedSms rawResp) rawResp.next }
 
         Users ->
-            { model | dataStore = updateUsers model.dataStore (dataFromResp decodeUser rawResp) rawResp.next }
+            { model | dataStore = updateUsers ignorePageInfo model.dataStore (dataFromResp decodeUser rawResp) rawResp.next }
 
 
-updateStatus : Maybe String -> RL.RemoteList a -> RL.RemoteList a
-updateStatus next rl =
-    case next of
-        Nothing ->
-            RL.FinalPageReceived <| RL.toList rl
+updateStatus : Bool -> Maybe String -> RL.RemoteList a -> RL.RemoteList a
+updateStatus ignorePageInfo next rl =
+    case ignorePageInfo of
+        True ->
+            rl
 
-        _ ->
-            RL.waitingHelper <| rl
+        False ->
+            case next of
+                Nothing ->
+                    RL.FinalPageReceived <| RL.toList rl
+
+                _ ->
+                    setLoadDataStatusHelp <| rl
 
 
 
 -- Helpers
 
 
-updateSmsOutbounds : DataStore -> List SmsOutbound -> Maybe String -> DataStore
-updateSmsOutbounds ds sms next =
+updateSmsOutbounds : Bool -> DataStore -> List SmsOutbound -> Maybe String -> DataStore
+updateSmsOutbounds ignorePageInfo ds sms next =
     { ds
         | outboundSms =
-            RL.updateList (List.sortBy compareByTS >> List.reverse) mergeItems sms ds.outboundSms
-                |> updateStatus next
+            RL.apply (mergeItems sms >> List.sortBy compareByTS >> List.reverse) ds.outboundSms
+                |> updateStatus ignorePageInfo next
     }
 
 
-updateSmsInbounds : DataStore -> List SmsInbound -> Maybe String -> DataStore
-updateSmsInbounds ds newSms next =
+updateSmsInbounds : Bool -> DataStore -> List SmsInbound -> Maybe String -> DataStore
+updateSmsInbounds ignorePageInfo ds newSms next =
     { ds
         | inboundSms =
-            RL.updateList sortByTimeReceived mergeItems newSms ds.inboundSms
-                |> updateStatus next
+            RL.apply (mergeItems newSms >> sortByTimeReceived) ds.inboundSms
+                |> updateStatus ignorePageInfo next
     }
 
 
-updateQueuedSms : DataStore -> List QueuedSms -> Maybe String -> DataStore
-updateQueuedSms ds newSms next =
+updateQueuedSms : Bool -> DataStore -> List QueuedSms -> Maybe String -> DataStore
+updateQueuedSms ignorePageInfo ds newSms next =
     { ds
         | queuedSms =
-            RL.updateList (List.sortBy compareByT2S) mergeItems newSms ds.queuedSms
-                |> updateStatus next
+            RL.apply (List.sortBy compareByT2S << mergeItems newSms) ds.queuedSms
+                |> updateStatus ignorePageInfo next
     }
 
 
-updateKeywords : DataStore -> List Keyword -> Maybe String -> DataStore
-updateKeywords ds keywords next =
+updateKeywords : Bool -> DataStore -> List Keyword -> Maybe String -> DataStore
+updateKeywords ignorePageInfo ds keywords next =
     { ds
         | keywords =
-            RL.updateList (List.sortBy .keyword) mergeItems keywords ds.keywords
-                |> updateStatus next
+            RL.apply (List.sortBy .keyword << mergeItems keywords) ds.keywords
+                |> updateStatus ignorePageInfo next
     }
 
 
-updateRecipients : DataStore -> List Recipient -> Maybe String -> DataStore
-updateRecipients dataStore newRecipients next =
+updateRecipients : Bool -> DataStore -> List Recipient -> Maybe String -> DataStore
+updateRecipients ignorePageInfo dataStore newRecipients next =
     { dataStore
         | recipients =
-            RL.updateList (List.sortBy .last_name) mergeItems newRecipients dataStore.recipients
-                |> updateStatus next
+            RL.apply (List.sortBy .last_name << mergeItems newRecipients) dataStore.recipients
+                |> updateStatus ignorePageInfo next
     }
 
 
-updateGroups : DataStore -> List RecipientGroup -> Maybe String -> DataStore
-updateGroups ds groups next =
+updateGroups : Bool -> DataStore -> List RecipientGroup -> Maybe String -> DataStore
+updateGroups ignorePageInfo ds groups next =
     { ds
         | groups =
-            RL.updateList (List.sortBy .name) mergeItems groups ds.groups
-                |> updateStatus next
+            RL.apply (List.sortBy .name << mergeItems groups) ds.groups
+                |> updateStatus ignorePageInfo next
     }
 
 
-updateUserProfiles : DataStore -> List UserProfile -> Maybe String -> DataStore
-updateUserProfiles dataStore profiles next =
+updateUserProfiles : Bool -> DataStore -> List UserProfile -> Maybe String -> DataStore
+updateUserProfiles ignorePageInfo dataStore profiles next =
     { dataStore
         | userprofiles =
-            RL.updateList (List.sortBy (.email << .user)) mergeItems profiles dataStore.userprofiles
-                |> updateStatus next
+            RL.apply (List.sortBy (.email << .user) << mergeItems profiles) dataStore.userprofiles
+                |> updateStatus ignorePageInfo next
     }
 
 
-updateElvantoGroups : DataStore -> List ElvantoGroup -> Maybe String -> DataStore
-updateElvantoGroups ds newGroups next =
+updateElvantoGroups : Bool -> DataStore -> List ElvantoGroup -> Maybe String -> DataStore
+updateElvantoGroups ignorePageInfo ds newGroups next =
     { ds
         | elvantoGroups =
-            RL.updateList (List.sortBy .name) mergeItems newGroups ds.elvantoGroups
-                |> updateStatus next
+            RL.apply (List.sortBy .name << mergeItems newGroups) ds.elvantoGroups
+                |> updateStatus ignorePageInfo next
     }
 
 
-updateUsers : DataStore -> List User -> Maybe String -> DataStore
-updateUsers ds newUsers next =
+updateUsers : Bool -> DataStore -> List User -> Maybe String -> DataStore
+updateUsers ignorePageInfo ds newUsers next =
     { ds
         | users =
-            RL.updateList (List.sortBy .email) mergeItems newUsers ds.users
-                |> updateStatus next
+            RL.apply (List.sortBy .email << mergeItems newUsers) ds.users
+                |> updateStatus ignorePageInfo next
     }
 
 
@@ -337,7 +347,7 @@ updateUsers ds newUsers next =
 
 
 mergeItems : List { a | pk : Int } -> List { a | pk : Int } -> List { a | pk : Int }
-mergeItems existingItems newItems =
+mergeItems newItems existingItems =
     existingItems
         |> List.map (\x -> ( x.pk, x ))
         |> Dict.fromList

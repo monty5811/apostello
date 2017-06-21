@@ -14,7 +14,7 @@ import Html.Attributes as A
 import Html.Events as E
 import List.Extra as LE
 import Messages exposing (Msg(Nope, TableMsg))
-import Store.RemoteList as RL
+import RemoteList as RL
 
 
 emptyView : Html Msg

@@ -32,7 +32,7 @@ urlpatterns = [
         name='out_log'
     ),
     url(
-        r'^v2/recipients/$',
+        r'^v2/recipients/(?:(?P<pk>\d+)/)?$',
         v.Collection.as_view(
             model_class=m.Recipient,
             form_class=f.RecipientForm,
@@ -43,7 +43,7 @@ urlpatterns = [
     ),
     url(r'^v2/recipients/import/csv/$', v.CSVImport.as_view(), name='recipients_import_csv'),
     url(
-        r'^v2/groups/$',
+        r'^v2/groups/(?:(?P<pk>\d+)/)?$',
         v.Collection.as_view(
             model_class=m.RecipientGroup,
             form_class=f.ManageRecipientGroupForm,
@@ -72,7 +72,7 @@ urlpatterns = [
         name='queued_smss'
     ),
     url(
-        r'^v2/keywords/$',
+        r'^v2/keywords/(?:(?P<keyword>\w+)/)?$',
         v.Collection.as_view(
             model_class=m.Keyword,
             form_class=f.KeywordForm,

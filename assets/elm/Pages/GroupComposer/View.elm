@@ -12,10 +12,10 @@ import Pages exposing (Page, initSendAdhoc)
 import Pages.GroupComposer.Messages exposing (GroupComposerMsg(UpdateQueryString))
 import Pages.GroupComposer.Model exposing (GroupComposerModel, ParenLoc, Query, QueryOp(..))
 import Regex exposing (regex)
+import RemoteList as RL
 import Route exposing (spaLink)
 import Set exposing (Set)
 import Store.Messages exposing (StoreMsg(LoadData))
-import Store.RemoteList as RL
 
 
 -- Main view

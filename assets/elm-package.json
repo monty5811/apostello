@@ -1,12 +1,11 @@
 {
     "version": "1.0.0",
-    "summary": "helpful summary of your project, less than 80 characters",
+    "summary": "apostello",
     "repository": "https://github.com/monty5811/apostello.git",
     "license": "BSD3",
     "source-directories": [
         "./elm"
     ],
-    "native-modules": true,
     "exposed-modules": [],
     "dependencies": {
         "NoRedInk/elm-decode-pipeline": "3.0.0 <= v < 4.0.0",
@@ -22,6 +21,7 @@
         "evancz/url-parser": "2.0.1 <= v < 3.0.0",
         "krisajenkins/formatting": "4.2.0 <= v < 5.0.0",
         "mgold/elm-date-format": "1.2.0 <= v < 2.0.0",
+        "monty5811/remote-list": "1.0.0 <= v < 2.0.0",
         "myrho/elm-round": "1.0.1 <= v < 2.0.0"
     },
     "elm-version": "0.18.0 <= v < 0.19.0"

@@ -9,8 +9,8 @@ import Messages exposing (Msg(KeyRespTableMsg))
 import Models exposing (Model)
 import Pages exposing (Page(KeyRespTable))
 import Pages.KeyRespTable.Messages exposing (KeyRespTableMsg(..))
+import RemoteList as RL
 import Store.Model as Store
-import Store.RemoteList as RL
 import Urls
 
 

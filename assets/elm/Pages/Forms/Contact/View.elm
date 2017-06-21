@@ -9,12 +9,13 @@ import Html.Attributes as A
 import Messages exposing (FormMsg(ContactFormMsg, PostForm), Msg(FormMsg, Nope))
 import Models exposing (Settings)
 import Pages exposing (Page(ContactForm))
+import Pages.Error404 as E404
 import Pages.Forms.Contact.Messages exposing (ContactFormMsg(..))
 import Pages.Forms.Contact.Meta exposing (meta)
 import Pages.Forms.Contact.Model exposing (ContactFormModel, initialContactFormModel)
 import Pages.Forms.Contact.Remote exposing (postCmd)
+import RemoteList as RL
 import Route exposing (spaLink)
-import Store.RemoteList as RL
 
 
 -- Main view
@@ -22,17 +23,52 @@ import Store.RemoteList as RL
 
 view : Settings -> Maybe (Html Msg) -> Maybe Int -> RL.RemoteList Recipient -> ContactFormModel -> FormStatus -> Html Msg
 view settings maybeTable maybePk contacts_ model status =
+    case maybePk of
+        Nothing ->
+            -- creating a new contact:
+            creating settings contacts_ model status
+
+        Just pk ->
+            -- trying to edit an existing contact:
+            editing settings maybeTable pk contacts_ model status
+
+
+creating : Settings -> RL.RemoteList Recipient -> ContactFormModel -> FormStatus -> Html Msg
+creating settings contacts model status =
+    viewHelp settings Nothing Nothing contacts model status
+
+
+editing : Settings -> Maybe (Html Msg) -> Int -> RL.RemoteList Recipient -> ContactFormModel -> FormStatus -> Html Msg
+editing settings maybeTable pk contacts model status =
+    let
+        currentContact =
+            contacts
+                |> RL.toList
+                |> List.filter (\x -> x.pk == pk)
+                |> List.head
+    in
+    case currentContact of
+        Just contact ->
+            -- contact exists, show the form:
+            viewHelp settings maybeTable (Just contact) contacts model status
+
+        Nothing ->
+            -- contact does not exist:
+            case contacts of
+                RL.FinalPageReceived _ ->
+                    -- show 404 if we have finished loading
+                    E404.view
+
+                _ ->
+                    -- show loader while we wait
+                    Html.div [ A.class "ui active loader" ] []
+
+
+viewHelp : Settings -> Maybe (Html Msg) -> Maybe Recipient -> RL.RemoteList Recipient -> ContactFormModel -> FormStatus -> Html Msg
+viewHelp settings maybeTable currentContact contacts_ model status =
     let
         contacts =
             RL.toList contacts_
-
-        pk =
-            Maybe.withDefault 0 maybePk
-
-        currentContact =
-            contacts
-                |> List.filter (\x -> x.pk == pk)
-                |> List.head
 
         showAN =
             showArchiveNotice contacts currentContact model

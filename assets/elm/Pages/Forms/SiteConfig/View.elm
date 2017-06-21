@@ -13,8 +13,8 @@ import Pages.Forms.SiteConfig.Messages exposing (SiteConfigFormMsg(..))
 import Pages.Forms.SiteConfig.Meta exposing (meta)
 import Pages.Forms.SiteConfig.Model exposing (SiteConfigFormModel)
 import Pages.Forms.SiteConfig.Remote exposing (postCmd)
-import Store.Model exposing (DataStore)
-import Store.RemoteList as RL
+import RemoteList as RL
+import Store.Model exposing (DataStore, filterArchived)
 
 
 -- Main view
@@ -29,7 +29,7 @@ view csrf dataStore maybeModel status =
         Just model ->
             let
                 groups =
-                    RL.filterArchived False dataStore.groups
+                    filterArchived False dataStore.groups
 
                 fields =
                     [ Field meta.site_name (siteNameField meta.site_name model)

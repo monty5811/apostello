@@ -10,7 +10,7 @@ import Html.Events exposing (onClick)
 import Messages exposing (Msg)
 import Pages.ElvantoImport.Messages exposing (ElvantoMsg(..))
 import Store.Messages exposing (StoreMsg(ToggleElvantoGroupSync))
-import Store.RemoteList as RL
+import RemoteList as RL
 
 
 -- Main view

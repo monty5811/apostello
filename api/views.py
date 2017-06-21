@@ -170,6 +170,19 @@ class Collection(generics.ListAPIView):
     prefetch_fields = None
     pagination_class = StandardPagination
 
+    def filter_objs(self, objs):
+        identifier = self.kwargs.get('pk')
+        if identifier is None:
+            identifier = self.kwargs.get('keyword')
+
+        if identifier is None:
+            return objs
+
+        try:
+            return objs.filter(pk=identifier)
+        except ValueError:
+            return objs.filter(keyword=identifier)
+
     def get_queryset(self):
         return self._get_queryset()
 
@@ -186,7 +199,8 @@ class Collection(generics.ListAPIView):
                 and self.model_class is not ElvantoGroup:
             # filter out archived items
             objs = objs.filter(is_archived=False)
-        return objs
+
+        return self.filter_objs(objs)
 
     def post(self, request, format=None, **kwargs):
         return handle_form(self, request)

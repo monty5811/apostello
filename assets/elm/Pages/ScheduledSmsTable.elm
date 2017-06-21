@@ -14,7 +14,7 @@ import Pages.Forms.Contact.Model exposing (initialContactFormModel)
 import Pages.Forms.Group.Model exposing (initialGroupFormModel)
 import Route exposing (spaLink)
 import Store.Messages exposing (StoreMsg(CancelSms))
-import Store.RemoteList as RL
+import RemoteList as RL
 import Time
 
 

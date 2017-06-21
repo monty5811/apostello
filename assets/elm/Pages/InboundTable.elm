@@ -11,9 +11,9 @@ import Messages exposing (Msg(StoreMsg))
 import Pages exposing (Page(ContactForm, KeywordForm), initSendAdhoc)
 import Pages.Forms.Contact.Model exposing (initialContactFormModel)
 import Pages.Forms.Keyword.Model exposing (initialKeywordFormModel)
+import RemoteList as RL
 import Route exposing (spaLink)
 import Store.Messages exposing (StoreMsg(ReprocessSms))
-import Store.RemoteList as RL
 
 
 -- Main view
@@ -66,6 +66,9 @@ keywordCell : SmsInbound -> Html Msg
 keywordCell sms =
     case sms.matched_keyword of
         "#" ->
+            td [] [ b [] [ text sms.matched_keyword ] ]
+
+        "No Match" ->
             td [] [ b [] [ text sms.matched_keyword ] ]
 
         _ ->

@@ -10,8 +10,8 @@ import Data.SmsOutbound exposing (SmsOutbound, decodeSmsOutbound)
 import Data.User exposing (User, UserProfile, decodeUser, decodeUserProfile)
 import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (decode, required)
+import RemoteList exposing (RemoteList(NotAsked))
 import Store.Model exposing (DataStore)
-import Store.RemoteList exposing (RemoteList(NotAsked))
 
 
 remoteList : List a -> Decode.Decoder (RemoteList a)

@@ -7,44 +7,59 @@ import Urls
 type RemoteDataType
     = IncomingSms
     | OutgoingSms
-    | Contacts
-    | Groups
-    | Keywords
+    | Contacts (Maybe Int)
+    | Groups (Maybe Int)
+    | Keywords (Maybe String)
     | ScheduledSms
     | ElvantoGroups
     | UserProfiles
     | Users
 
 
-dt2Url : RemoteDataType -> String
+dt2Url : RemoteDataType -> ( Bool, String )
 dt2Url dt =
     case dt of
         IncomingSms ->
-            Urls.api_in_log
+            ( False, Urls.api_in_log )
 
         OutgoingSms ->
-            Urls.api_out_log
+            ( False, Urls.api_out_log )
 
-        Contacts ->
-            Urls.api_recipients
+        Contacts maybePk ->
+            case maybePk of
+                Just pk ->
+                    ( True, Urls.api_recipients ++ "?pk=" ++ toString pk )
 
-        Groups ->
-            Urls.api_recipient_groups
+                Nothing ->
+                    ( False, Urls.api_recipients )
 
-        Keywords ->
-            Urls.api_keywords
+        Groups maybePk ->
+            case maybePk of
+                Just pk ->
+                    ( True, Urls.api_recipient_groups ++ "?pk=" ++ toString pk )
+
+                Nothing ->
+                    ( False, Urls.api_recipient_groups )
+
+        Keywords maybeK ->
+            case maybeK of
+                Nothing ->
+                    ( False, Urls.api_keywords )
+
+                Just k ->
+                    ( True, Urls.api_keywords ++ "?keyword=" ++ k )
 
         ScheduledSms ->
-            Urls.api_queued_smss
+            ( False, Urls.api_queued_smss )
 
         ElvantoGroups ->
-            Urls.api_elvanto_groups
+            ( False, Urls.api_elvanto_groups )
 
         UserProfiles ->
-            Urls.api_user_profiles
+            ( False, Urls.api_user_profiles )
 
         Users ->
-            Urls.api_users
+            ( False, Urls.api_users )
 
 
 dt_from_page : Page -> List RemoteDataType
@@ -57,16 +72,16 @@ dt_from_page p =
             [ IncomingSms ]
 
         GroupTable _ ->
-            [ Groups ]
+            [ Groups Nothing ]
 
         GroupComposer _ ->
-            [ Groups ]
+            [ Groups Nothing ]
 
         RecipientTable _ ->
-            [ Contacts ]
+            [ Contacts Nothing ]
 
         KeywordTable _ ->
-            [ Keywords ]
+            [ Keywords Nothing ]
 
         ElvantoImport ->
             [ ElvantoGroups ]
@@ -84,7 +99,7 @@ dt_from_page p =
             [ ScheduledSms ]
 
         KeyRespTable _ _ _ ->
-            [ IncomingSms, Keywords ]
+            [ IncomingSms, Keywords Nothing ]
 
         FirstRun _ ->
             []
@@ -93,24 +108,24 @@ dt_from_page p =
             []
 
         SendAdhoc _ ->
-            [ Contacts ]
+            [ Contacts Nothing ]
 
         SendGroup _ ->
-            [ Groups ]
+            [ Groups Nothing ]
 
         GroupForm _ _ ->
-            [ Groups ]
+            [ Groups Nothing ]
 
         ContactForm _ maybePk ->
             case maybePk of
                 Nothing ->
-                    [ Contacts ]
+                    [ Contacts maybePk ]
 
                 Just _ ->
-                    [ IncomingSms, Contacts ]
+                    [ IncomingSms, Contacts maybePk ]
 
-        KeywordForm _ _ ->
-            [ Keywords, Groups, Users ]
+        KeywordForm _ maybeK ->
+            [ Keywords maybeK, Groups Nothing, Users ]
 
         Error404 ->
             []
@@ -119,7 +134,7 @@ dt_from_page p =
             []
 
         SiteConfigForm _ ->
-            [ Groups ]
+            [ Groups Nothing ]
 
         DefaultResponsesForm _ ->
             []

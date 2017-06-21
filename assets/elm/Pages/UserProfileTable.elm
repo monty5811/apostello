@@ -9,7 +9,7 @@ import Html.Attributes exposing (class, href)
 import Html.Events exposing (onClick)
 import Messages exposing (Msg)
 import Store.Messages exposing (StoreMsg(ToggleProfileField))
-import Store.RemoteList as RL
+import RemoteList as RL
 
 
 -- Main view

@@ -21,7 +21,7 @@ import Pages.Forms.SendGroup.Meta exposing (meta)
 import Pages.Forms.SendGroup.Model exposing (SendGroupModel)
 import Pages.Forms.SendGroup.Remote exposing (postCmd)
 import Route exposing (spaLink)
-import Store.RemoteList as RL
+import RemoteList as RL
 
 
 -- Form

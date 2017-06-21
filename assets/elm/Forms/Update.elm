@@ -18,7 +18,7 @@ import Pages.Forms.SiteConfig.Model exposing (SiteConfigFormModel)
 import Pages.Forms.SiteConfig.Update as SCF
 import Pages.Forms.UserProfile.Update as UPF
 import Pages.Fragments.Notification.Update as Notif
-import Store.RemoteList as RL
+import RemoteList as RL
 
 
 update : FormMsg -> Model -> ( Model, List (Cmd Msg) )

@@ -12,7 +12,7 @@ import Pages.Forms.Group.Model exposing (initialGroupFormModel)
 import Pages.Forms.Keyword.Model exposing (initialKeywordFormModel)
 import Route exposing (page2loc, spaLink)
 import Store.Model exposing (DataStore)
-import Store.RemoteList as RL
+import RemoteList as RL
 import Urls as U
 
 

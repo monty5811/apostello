@@ -12,32 +12,68 @@ import Html.Attributes as A
 import Html.Events exposing (onInput)
 import Messages exposing (FormMsg(GroupFormMsg, PostForm), Msg(FormMsg, Nope, StoreMsg))
 import Pages exposing (Page(GroupForm))
+import Pages.Error404 as E404
 import Pages.Forms.Group.Messages exposing (GroupFormMsg(..))
 import Pages.Forms.Group.Meta exposing (meta)
 import Pages.Forms.Group.Model exposing (GroupFormModel, initialGroupFormModel)
 import Pages.Forms.Group.Remote exposing (postCmd)
 import Regex
+import RemoteList as RL
 import Route exposing (spaLink)
 import Store.Messages exposing (StoreMsg(ToggleGroupMembership))
-import Store.RemoteList as RL
 
 
 -- Main view
 
 
 view : CSRFToken -> Maybe Int -> RL.RemoteList RecipientGroup -> GroupFormModel -> FormStatus -> Html Msg
-view csrf maybePk groups_ model status =
+view csrf maybePk groups model status =
+    case maybePk of
+        Nothing ->
+            -- creating a new group
+            creating csrf groups model status
+
+        Just pk ->
+            -- trying to edit an existing group:
+            editing csrf pk groups model status
+
+
+creating : CSRFToken -> RL.RemoteList RecipientGroup -> GroupFormModel -> FormStatus -> Html Msg
+creating csrf groups model status =
+    viewHelp csrf Nothing groups model status
+
+
+editing : CSRFToken -> Int -> RL.RemoteList RecipientGroup -> GroupFormModel -> FormStatus -> Html Msg
+editing csrf pk groups model status =
+    let
+        currentGroup =
+            groups
+                |> RL.toList
+                |> List.filter (\x -> x.pk == pk)
+                |> List.head
+    in
+    case currentGroup of
+        Just grp ->
+            -- group exists, show the form:
+            viewHelp csrf (Just grp) groups model status
+
+        Nothing ->
+            -- group does not exist:
+            case groups of
+                RL.FinalPageReceived _ ->
+                    -- show 404 if we have finished loading
+                    E404.view
+
+                _ ->
+                    -- show loader while we wait
+                    Html.div [ A.class "ui active loader" ] []
+
+
+viewHelp : CSRFToken -> Maybe RecipientGroup -> RL.RemoteList RecipientGroup -> GroupFormModel -> FormStatus -> Html Msg
+viewHelp csrf currentGroup groups_ model status =
     let
         groups =
             RL.toList groups_
-
-        pk =
-            Maybe.withDefault 0 maybePk
-
-        currentGroup =
-            groups
-                |> List.filter (\x -> x.pk == pk)
-                |> List.head
 
         showAN =
             showArchiveNotice groups currentGroup model

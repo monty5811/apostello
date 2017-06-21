@@ -11,7 +11,7 @@ import Pages exposing (Page(KeyRespTable, KeywordForm))
 import Pages.Forms.Keyword.Model exposing (initialKeywordFormModel)
 import Route exposing (spaLink)
 import Store.Messages exposing (StoreMsg(ToggleKeywordArchive))
-import Store.RemoteList as RL
+import RemoteList as RL
 
 
 -- Main view

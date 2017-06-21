@@ -21,7 +21,7 @@ import Pages.Forms.SendAdhoc.Meta exposing (meta)
 import Pages.Forms.SendAdhoc.Model exposing (SendAdhocModel)
 import Pages.Forms.SendAdhoc.Remote exposing (postCmd)
 import Route exposing (spaLink)
-import Store.RemoteList as RL
+import RemoteList as RL
 
 
 -- Form

@@ -35,7 +35,8 @@ import Pages.ScheduledSmsTable as SST
 import Pages.Usage as Usage
 import Pages.UserProfileTable as UPT
 import Pages.Wall as W
-import Store.RemoteList as RL
+import RemoteList as RL
+import Store.Model exposing (filterArchived)
 
 
 view : Model -> Html Msg
@@ -66,25 +67,25 @@ content model =
             IT.view model.table model.dataStore.inboundSms
 
         GroupTable viewingArchive ->
-            GT.view model.table (RL.filterArchived viewingArchive model.dataStore.groups)
+            GT.view model.table (filterArchived viewingArchive model.dataStore.groups)
 
         GroupComposer composerModel ->
-            GC.view composerModel (RL.filterArchived False model.dataStore.groups)
+            GC.view composerModel (filterArchived False model.dataStore.groups)
 
         RecipientTable viewingArchive ->
-            RT.view model.table <| RL.filterArchived viewingArchive model.dataStore.recipients
+            RT.view model.table <| filterArchived viewingArchive model.dataStore.recipients
 
         KeywordTable viewingArchive ->
-            KT.view model.table <| RL.filterArchived viewingArchive model.dataStore.keywords
+            KT.view model.table <| filterArchived viewingArchive model.dataStore.keywords
 
         ElvantoImport ->
             EI.view model.table model.dataStore.elvantoGroups
 
         Wall ->
-            W.view (model.dataStore.inboundSms |> RL.filterArchived False |> RL.filter (\s -> s.display_on_wall))
+            W.view (model.dataStore.inboundSms |> filterArchived False |> RL.filter (\s -> s.display_on_wall))
 
         Curator ->
-            C.view model.table (model.dataStore.inboundSms |> RL.filterArchived False)
+            C.view model.table (model.dataStore.inboundSms |> filterArchived False)
 
         UserProfileTable ->
             UPT.view model.table model.dataStore.userprofiles
@@ -95,7 +96,7 @@ content model =
         KeyRespTable keyRespModel viewingArchive currentKeyword ->
             KRT.view viewingArchive
                 model.table
-                (model.dataStore.inboundSms |> RL.filterArchived viewingArchive |> RL.filter (filterByMatchedKeyword currentKeyword))
+                (model.dataStore.inboundSms |> filterArchived viewingArchive |> RL.filter (filterByMatchedKeyword currentKeyword))
                 keyRespModel
                 currentKeyword
 
@@ -109,14 +110,14 @@ content model =
             SA.view
                 model.settings
                 saModel
-                (RL.filterArchived False model.dataStore.recipients)
+                (filterArchived False model.dataStore.recipients)
                 model.formStatus
 
         SendGroup sgModel ->
             SG.view
                 model.settings
                 sgModel
-                (RL.filterArchived False model.dataStore.groups |> RL.filter (\x -> x.cost > 0))
+                (filterArchived False model.dataStore.groups |> RL.filter (\x -> x.cost > 0))
                 model.formStatus
 
         Error404 ->

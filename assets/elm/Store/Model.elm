@@ -9,8 +9,8 @@ import Data.SmsInbound exposing (SmsInbound)
 import Data.SmsOutbound exposing (SmsOutbound)
 import Data.User exposing (User, UserProfile)
 import Pages exposing (Page)
+import RemoteList as RL
 import Store.DataTypes exposing (..)
-import Store.RemoteList as RL
 
 
 -- Data Store - shared data we pull from the server and re-use in different views/pages
@@ -49,35 +49,54 @@ emptyDataStore =
     }
 
 
+filterArchived : Bool -> RL.RemoteList { a | is_archived : Bool } -> RL.RemoteList { a | is_archived : Bool }
+filterArchived viewingArchive data =
+    data
+        |> RL.filter (\x -> x.is_archived == viewingArchive)
+
+
 setLoadDataStatus : RemoteDataType -> DataStore -> DataStore
 setLoadDataStatus dt ds =
     case dt of
         IncomingSms ->
-            { ds | inboundSms = RL.waitingHelper ds.inboundSms }
+            { ds | inboundSms = setLoadDataStatusHelp ds.inboundSms }
 
         OutgoingSms ->
-            { ds | outboundSms = RL.waitingHelper ds.outboundSms }
+            { ds | outboundSms = setLoadDataStatusHelp ds.outboundSms }
 
-        Contacts ->
-            { ds | recipients = RL.waitingHelper ds.recipients }
+        Contacts _ ->
+            { ds | recipients = setLoadDataStatusHelp ds.recipients }
 
-        Groups ->
-            { ds | groups = RL.waitingHelper ds.groups }
+        Groups _ ->
+            { ds | groups = setLoadDataStatusHelp ds.groups }
 
-        Keywords ->
-            { ds | keywords = RL.waitingHelper ds.keywords }
+        Keywords _ ->
+            { ds | keywords = setLoadDataStatusHelp ds.keywords }
 
         ScheduledSms ->
-            { ds | queuedSms = RL.waitingHelper ds.queuedSms }
+            { ds | queuedSms = setLoadDataStatusHelp ds.queuedSms }
 
         ElvantoGroups ->
-            { ds | elvantoGroups = RL.waitingHelper ds.elvantoGroups }
+            { ds | elvantoGroups = setLoadDataStatusHelp ds.elvantoGroups }
 
         UserProfiles ->
-            { ds | userprofiles = RL.waitingHelper ds.userprofiles }
+            { ds | userprofiles = setLoadDataStatusHelp ds.userprofiles }
 
         Users ->
-            { ds | users = RL.waitingHelper ds.users }
+            { ds | users = setLoadDataStatusHelp ds.users }
+
+
+setLoadDataStatusHelp : RL.RemoteList a -> RL.RemoteList a
+setLoadDataStatusHelp rl =
+    case rl of
+        RL.WaitingOnRefresh d ->
+            RL.WaitingOnRefresh d
+
+        RL.NotAsked d ->
+            RL.WaitingForFirstResp d
+
+        _ ->
+            RL.WaitingForPage <| RL.toList rl
 
 
 resetStatus : DataStore -> DataStore
@@ -110,13 +129,13 @@ dt2Finished ds dt =
         OutgoingSms ->
             ds.outboundSms |> RL.hasFinished
 
-        Contacts ->
+        Contacts _ ->
             ds.recipients |> RL.hasFinished
 
-        Groups ->
+        Groups _ ->
             ds.groups |> RL.hasFinished
 
-        Keywords ->
+        Keywords _ ->
             ds.keywords |> RL.hasFinished
 
         ScheduledSms ->
@@ -147,13 +166,13 @@ dt2Failed ds dt =
         OutgoingSms ->
             ds.outboundSms |> RL.hasFailed
 
-        Contacts ->
+        Contacts _ ->
             ds.recipients |> RL.hasFailed
 
-        Groups ->
+        Groups _ ->
             ds.groups |> RL.hasFailed
 
-        Keywords ->
+        Keywords _ ->
             ds.keywords |> RL.hasFailed
 
         ScheduledSms ->
@@ -178,13 +197,13 @@ handleFailed dt err ds =
         OutgoingSms ->
             { ds | outboundSms = RL.RespFailed err <| RL.toList ds.outboundSms }
 
-        Contacts ->
+        Contacts _ ->
             { ds | recipients = RL.RespFailed err <| RL.toList ds.recipients }
 
-        Groups ->
+        Groups _ ->
             { ds | groups = RL.RespFailed err <| RL.toList ds.groups }
 
-        Keywords ->
+        Keywords _ ->
             { ds | keywords = RL.RespFailed err <| RL.toList ds.keywords }
 
         ScheduledSms ->

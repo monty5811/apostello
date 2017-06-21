@@ -4,7 +4,7 @@ import Data.SmsInbound exposing (SmsInbound)
 import Html exposing (Html, div, p, span, text)
 import Html.Attributes exposing (class, style)
 import Messages exposing (Msg)
-import Store.RemoteList as RL
+import RemoteList as RL
 
 
 -- Main view

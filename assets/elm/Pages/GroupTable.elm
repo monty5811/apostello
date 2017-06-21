@@ -12,7 +12,7 @@ import Pages.Forms.Group.Model exposing (initialGroupFormModel)
 import Round
 import Route exposing (spaLink)
 import Store.Messages exposing (StoreMsg(ToggleGroupArchive))
-import Store.RemoteList as RL
+import RemoteList as RL
 
 
 -- Main view

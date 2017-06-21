@@ -14,13 +14,14 @@ import Html.Events as E
 import Html.Keyed
 import Messages exposing (FormMsg(KeywordFormMsg, PostForm), Msg(FormMsg, Nope))
 import Pages exposing (Page(KeywordForm))
+import Pages.Error404 as E404
 import Pages.Forms.Keyword.Messages exposing (KeywordFormMsg(..))
 import Pages.Forms.Keyword.Meta exposing (meta)
 import Pages.Forms.Keyword.Model exposing (KeywordFormModel, initialKeywordFormModel)
 import Pages.Forms.Keyword.Remote exposing (postCmd)
+import RemoteList as RL
 import Route exposing (spaLink)
-import Store.Model exposing (DataStore)
-import Store.RemoteList as RL
+import Store.Model exposing (DataStore, filterArchived)
 import Time
 
 
@@ -29,23 +30,58 @@ import Time
 
 view : CSRFToken -> Time.Time -> DataStore -> Maybe String -> KeywordFormModel -> FormStatus -> Html Msg
 view csrf now dataStore maybeK model status =
+    case maybeK of
+        Nothing ->
+            -- creating a new keyword:
+            creating csrf now dataStore model status
+
+        Just k ->
+            -- trying to edit an existing keyword:
+            editing csrf now dataStore k model status
+
+
+creating : CSRFToken -> Time.Time -> DataStore -> KeywordFormModel -> FormStatus -> Html Msg
+creating csrf now dataStore model status =
+    viewHelp csrf now dataStore Nothing model status
+
+
+editing : CSRFToken -> Time.Time -> DataStore -> String -> KeywordFormModel -> FormStatus -> Html Msg
+editing csrf now dataStore keyword model status =
+    let
+        currentKeyword =
+            dataStore.keywords
+                |> RL.toList
+                |> List.filter (\x -> x.keyword == keyword)
+                |> List.head
+    in
+    case currentKeyword of
+        Just k ->
+            -- keyword exists, show the form:
+            viewHelp csrf now dataStore (Just k) model status
+
+        Nothing ->
+            -- keyword does not exist:
+            case dataStore.keywords of
+                RL.FinalPageReceived _ ->
+                    -- show 404 if we have finished loading
+                    E404.view
+
+                _ ->
+                    -- show loader while we wait
+                    Html.div [ A.class "ui active loader" ] []
+
+
+viewHelp : CSRFToken -> Time.Time -> DataStore -> Maybe Keyword -> KeywordFormModel -> FormStatus -> Html Msg
+viewHelp csrf now dataStore currentKeyword model status =
     let
         keywords =
             RL.toList dataStore.keywords
 
         groups =
-            RL.filterArchived False dataStore.groups
+            filterArchived False dataStore.groups
 
         users =
             dataStore.users
-
-        k =
-            Maybe.withDefault "" maybeK
-
-        currentKeyword =
-            keywords
-                |> List.filter (\x -> x.keyword == k)
-                |> List.head
 
         showAN =
             showArchiveNotice keywords currentKeyword model

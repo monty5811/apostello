@@ -28,10 +28,10 @@ maybeFetchData ( model, cmds ) =
     ( { model | dataStore = newDs }, List.concat [ fetchCmds, cmds ] )
 
 
-fetchData : ( RemoteDataType, String ) -> Cmd Msg
-fetchData ( dt, url ) =
+fetchData : ( RemoteDataType, ( Bool, String ) ) -> Cmd Msg
+fetchData ( dt, ( ignorePageInfo, url ) ) =
     makeRequest url
-        |> Http.send (StoreMsg << ReceiveRawResp dt)
+        |> Http.send (StoreMsg << ReceiveRawResp dt ignorePageInfo)
 
 
 dataFromResp : Decode.Decoder a -> RawResponse -> List a

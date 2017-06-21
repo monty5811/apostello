@@ -11,7 +11,7 @@ import Pages.Forms.UserProfile.Messages exposing (UserProfileFormMsg(..))
 import Pages.Forms.UserProfile.Meta exposing (meta)
 import Pages.Forms.UserProfile.Model exposing (UserProfileFormModel)
 import Pages.Forms.UserProfile.Remote exposing (postCmd)
-import Store.RemoteList as RL
+import RemoteList as RL
 
 
 view : CSRFToken -> Int -> RL.RemoteList UserProfile -> UserProfileFormModel -> FormStatus -> Html Msg

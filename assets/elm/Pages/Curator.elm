@@ -9,7 +9,7 @@ import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Messages exposing (Msg(StoreMsg))
 import Store.Messages exposing (StoreMsg(ToggleWallDisplay))
-import Store.RemoteList as RL
+import RemoteList as RL
 
 
 -- Main view

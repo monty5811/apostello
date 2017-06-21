@@ -10,7 +10,7 @@ import Messages exposing (Msg)
 import Pages exposing (Page(ContactForm))
 import Pages.Forms.Contact.Model exposing (initialContactFormModel)
 import Route exposing (spaLink)
-import Store.RemoteList as RL
+import RemoteList as RL
 
 
 -- Main view

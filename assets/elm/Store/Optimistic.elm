@@ -4,7 +4,7 @@ import Data.ElvantoGroup exposing (ElvantoGroup)
 import Data.Recipient exposing (RecipientSimple)
 import Data.SmsInbound exposing (SmsInbound)
 import Store.Model exposing (DataStore)
-import Store.RemoteList as RL
+import RemoteList as RL
 
 
 archiveSms : DataStore -> Int -> DataStore

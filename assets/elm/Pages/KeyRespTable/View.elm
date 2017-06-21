@@ -13,7 +13,7 @@ import Pages.Forms.Contact.Model exposing (initialContactFormModel)
 import Pages.KeyRespTable.Messages exposing (KeyRespTableMsg(..))
 import Route exposing (spaLink)
 import Store.Messages exposing (StoreMsg(ToggleInboundSmsArchive, ToggleInboundSmsDealtWith))
-import Store.RemoteList as RL
+import RemoteList as RL
 
 
 -- Main view

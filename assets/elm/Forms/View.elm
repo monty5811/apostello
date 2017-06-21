@@ -12,7 +12,7 @@ import Html.Attributes as A
 import Html.Events as E
 import Messages exposing (Msg)
 import Regex
-import Store.RemoteList as RL
+import RemoteList as RL
 
 
 form : FormStatus -> List Field -> Msg -> Html Msg -> Html Msg
