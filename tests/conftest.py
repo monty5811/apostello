@@ -327,14 +327,27 @@ def driver_wait_time():
     return int(os.environ.get('SELENIUM_IMPLICIT_WAIT', 1))
 
 
+def create_browser(request, driver_wait_time, tries=0):
+    """This sometimes fails to start firefox on CI, so we retry..."""
+    max_tries = 5
+    try:
+        driver = webdriver.Firefox()
+        driver.implicitly_wait(driver_wait_time)
+        driver.set_window_size(800, 1200)
+
+        request.node._driver = driver
+        return driver
+    except Exception as e:
+        if tries < max_tries:
+            return create_browser(request, driver_wait_time, tries=tries + 1)
+        else:
+            raise e
+
+
 @pytest.fixture(scope='session')
 def browser(request, driver_wait_time):
     """Setup selenium browser."""
-    driver = webdriver.Firefox()
-    driver.implicitly_wait(driver_wait_time)
-    driver.set_window_size(800, 1200)
-
-    request.node._driver = driver
+    driver = create_browser(request, driver_wait_time)
     yield driver
     driver.quit()
 
@@ -343,9 +356,7 @@ def browser(request, driver_wait_time):
 @pytest.yield_fixture()
 def browser_in(request, live_server, users, driver_wait_time):
     """Setup selenium browser and log in."""
-    driver = webdriver.Firefox()
-    driver.implicitly_wait(driver_wait_time)
-    driver.set_window_size(800, 1200)
+    driver = create_browser(request, driver_wait_time)
     driver.get(live_server + '/')
     driver.add_cookie(
         {
@@ -366,9 +377,7 @@ def browser_in(request, live_server, users, driver_wait_time):
 @pytest.yield_fixture()
 def browser_in_not_staff(request, live_server, users, driver_wait_time):
     """Setup selenium browser and log in."""
-    driver = webdriver.Firefox()
-    driver.implicitly_wait(driver_wait_time)
-    driver.set_window_size(800, 1200)
+    driver = create_browser(request, driver_wait_time)
     driver.get(live_server + '/')
     driver.add_cookie(
         {
