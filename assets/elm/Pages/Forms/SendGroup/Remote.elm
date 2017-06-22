@@ -1,5 +1,6 @@
 module Pages.Forms.SendGroup.Remote exposing (postCmd)
 
+import Data.User exposing (UserProfile)
 import DjangoSend exposing (CSRFToken, rawPost)
 import Encode exposing (encodeMaybeDate)
 import Http
@@ -12,8 +13,8 @@ import Route exposing (page2loc)
 import Urls
 
 
-postCmd : CSRFToken -> SendGroupModel -> Cmd Msg
-postCmd csrf model =
+postCmd : CSRFToken -> UserProfile -> SendGroupModel -> Cmd Msg
+postCmd csrf userPerms model =
     let
         body =
             [ ( "content", Encode.string model.content )
@@ -27,7 +28,12 @@ postCmd csrf model =
                     P.OutboundTable
 
                 Just _ ->
-                    P.ScheduledSmsTable
+                    case userPerms.user.is_staff of
+                        True ->
+                            P.ScheduledSmsTable
+
+                        False ->
+                            P.OutboundTable
     in
     rawPost csrf Urls.api_act_send_group body
         |> Http.send (FormMsg << ReceiveFormResp [ Nav.newUrl <| page2loc newLoc ])

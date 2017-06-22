@@ -20,8 +20,8 @@ import Pages.Forms.SendAdhoc.Messages exposing (SendAdhocMsg(ToggleSelectedConta
 import Pages.Forms.SendAdhoc.Meta exposing (meta)
 import Pages.Forms.SendAdhoc.Model exposing (SendAdhocModel)
 import Pages.Forms.SendAdhoc.Remote exposing (postCmd)
-import Route exposing (spaLink)
 import RemoteList as RL
+import Route exposing (spaLink)
 
 
 -- Form
@@ -62,7 +62,7 @@ sendForm settings model contacts status =
     in
     div []
         [ p [] [ text "Send a message to a single person or to an ad-hoc group of people:" ]
-        , form status fields (FormMsg <| PostForm <| postCmd settings.csrftoken model) (sendButton model.cost)
+        , form status fields (FormMsg <| PostForm <| postCmd settings.csrftoken settings.userPerms model) (sendButton model.cost)
         ]
 
 

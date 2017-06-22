@@ -113,8 +113,8 @@ dt_from_page p =
         SendGroup _ ->
             [ Groups Nothing ]
 
-        GroupForm _ _ ->
-            [ Groups Nothing ]
+        GroupForm _ maybepK ->
+            [ Groups Nothing, Groups maybepK ]
 
         ContactForm _ maybePk ->
             case maybePk of
@@ -122,10 +122,10 @@ dt_from_page p =
                     [ Contacts maybePk ]
 
                 Just _ ->
-                    [ IncomingSms, Contacts maybePk ]
+                    [ IncomingSms, Contacts maybePk, Contacts Nothing ]
 
         KeywordForm _ maybeK ->
-            [ Keywords maybeK, Groups Nothing, Users ]
+            [ Keywords maybeK, Keywords Nothing, Groups Nothing, Users ]
 
         Error404 ->
             []

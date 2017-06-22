@@ -10,6 +10,7 @@ import Pages exposing (Page(..), initSendAdhoc, initSendGroup)
 import Pages.Forms.ContactImport.Model exposing (initialContactImportModel)
 import Pages.GroupComposer.Model exposing (initialGroupComposerModel)
 import Route exposing (spaLink)
+import Store.Model as Store
 import Urls
 
 
@@ -18,8 +19,8 @@ import Urls
 -}
 
 
-menu : Page -> Settings -> Html Msg
-menu page settings =
+menu : Page -> Settings -> Store.DataStore -> Html Msg
+menu page settings dataStore =
     let
         userPerms =
             settings.userPerms
@@ -34,7 +35,7 @@ menu page settings =
             lockedSpaItem isStaff
     in
     Keyed.node "div"
-        [ class "ui top attached inverted violet menu" ]
+        [ class "ui top attached inverted violet borderless menu" ]
         [ ( "home", itemSpa Home "Home" True )
         , ( "menu" ++ toString page
           , div [ class "ui simple dropdown item" ]
@@ -61,7 +62,22 @@ menu page settings =
                 ]
           )
         , ( "tools" ++ toString page, maybeToolsMenu isStaff userPerms )
+        , ( "loading", loadingIndicator page dataStore )
         ]
+
+
+loadingIndicator : Page -> Store.DataStore -> Html Msg
+loadingIndicator page dataStore =
+    let
+        spinnerClass =
+            if Store.allFinished page dataStore then
+                ""
+            else if Store.anyFailed page dataStore then
+                "red spinner icon"
+            else
+                "green spinner icon"
+    in
+    div [ class "right aligned item" ] [ i [ class spinnerClass ] [] ]
 
 
 maybeToolsMenu : Bool -> UserProfile -> Html Msg

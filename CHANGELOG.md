@@ -3,6 +3,22 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+ - Title to tell you what page you are on
+ - Loading status indicator in top menu
+
+### Changed
+
+ - Edit forms eagerly load current item instead of paging through all results
+
+### Fixed
+ 
+ - Edit forms show a 404 if an item does not exist
+ - Don't redirect a user to the scheduled queue if they can't view it
+ - Don't try to link to "No Match" keyword
+
+
 ## [v2.0.0]
 
 **Upgrade to python 3.6 - ansible and Heroku deploys now use python 3.6**
