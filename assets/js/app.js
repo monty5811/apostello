@@ -2,7 +2,17 @@ import renderElm from './render_elm';
 
 function handleDOMContentLoaded() {
   // start elm
-  const elmApp = renderElm();
+  try {
+    const elmApp = renderElm();
+  } catch (e) {
+    const node = document.getElementById('elmContainer');
+    const style =
+      'width:100vw;height:100vh;background:#5a589b;color:#fff;font-size:xx-large;';
+    node.innerHTML =
+      '<div style="' +
+      style +
+      '"><p>Something broke there, try reloading the page...</p></div>';
+  }
 }
 
 window.addEventListener('DOMContentLoaded', handleDOMContentLoaded, false);

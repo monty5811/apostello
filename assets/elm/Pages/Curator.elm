@@ -8,8 +8,8 @@ import Html exposing (Html, a, td, text, th, thead, tr)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Messages exposing (Msg(StoreMsg))
-import Store.Messages exposing (StoreMsg(ToggleWallDisplay))
 import RemoteList as RL
+import Store.Messages exposing (StoreMsg(ToggleWallDisplay))
 
 
 -- Main view

@@ -8,8 +8,8 @@ import Html exposing (Html, a, button, i, td, text, th, thead, tr)
 import Html.Attributes exposing (class, href)
 import Html.Events exposing (onClick)
 import Messages exposing (Msg)
-import Store.Messages exposing (StoreMsg(ToggleProfileField))
 import RemoteList as RL
+import Store.Messages exposing (StoreMsg(ToggleProfileField))
 
 
 -- Main view

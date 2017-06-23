@@ -9,10 +9,10 @@ import Html.Attributes exposing (class)
 import Messages exposing (Msg(StoreMsg))
 import Pages exposing (Page(GroupForm))
 import Pages.Forms.Group.Model exposing (initialGroupFormModel)
+import RemoteList as RL
 import Round
 import Route exposing (spaLink)
 import Store.Messages exposing (StoreMsg(ToggleGroupArchive))
-import RemoteList as RL
 
 
 -- Main view

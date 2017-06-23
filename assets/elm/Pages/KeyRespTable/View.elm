@@ -11,9 +11,9 @@ import Messages exposing (Msg(KeyRespTableMsg, StoreMsg))
 import Pages exposing (Page(ContactForm), initSendAdhoc)
 import Pages.Forms.Contact.Model exposing (initialContactFormModel)
 import Pages.KeyRespTable.Messages exposing (KeyRespTableMsg(..))
+import RemoteList as RL
 import Route exposing (spaLink)
 import Store.Messages exposing (StoreMsg(ToggleInboundSmsArchive, ToggleInboundSmsDealtWith))
-import RemoteList as RL
 
 
 -- Main view

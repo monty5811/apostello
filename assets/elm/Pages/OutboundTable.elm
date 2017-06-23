@@ -9,8 +9,8 @@ import Html.Attributes as A
 import Messages exposing (Msg)
 import Pages exposing (Page(ContactForm))
 import Pages.Forms.Contact.Model exposing (initialContactFormModel)
-import Route exposing (spaLink)
 import RemoteList as RL
+import Route exposing (spaLink)
 
 
 -- Main view

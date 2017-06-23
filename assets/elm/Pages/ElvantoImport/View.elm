@@ -9,8 +9,8 @@ import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
 import Messages exposing (Msg)
 import Pages.ElvantoImport.Messages exposing (ElvantoMsg(..))
-import Store.Messages exposing (StoreMsg(ToggleElvantoGroupSync))
 import RemoteList as RL
+import Store.Messages exposing (StoreMsg(ToggleElvantoGroupSync))
 
 
 -- Main view

@@ -9,8 +9,8 @@ import Data.SmsInbound exposing (SmsInbound, encodeSmsInbound)
 import Data.SmsOutbound exposing (SmsOutbound, encodeSmsOutbound)
 import Data.User exposing (User, UserProfile, encodeUser, encodeUserProfile)
 import Json.Encode as Encode
-import Store.Model exposing (DataStore)
 import RemoteList as RL
+import Store.Model exposing (DataStore)
 
 
 encodeDataStore : DataStore -> Encode.Value

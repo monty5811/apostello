@@ -3,8 +3,8 @@ module Store.Optimistic exposing (..)
 import Data.ElvantoGroup exposing (ElvantoGroup)
 import Data.Recipient exposing (RecipientSimple)
 import Data.SmsInbound exposing (SmsInbound)
-import Store.Model exposing (DataStore)
 import RemoteList as RL
+import Store.Model exposing (DataStore)
 
 
 archiveSms : DataStore -> Int -> DataStore

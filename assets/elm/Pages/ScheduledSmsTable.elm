@@ -12,9 +12,9 @@ import Messages exposing (Msg(StoreMsg))
 import Pages exposing (Page(ContactForm, GroupForm))
 import Pages.Forms.Contact.Model exposing (initialContactFormModel)
 import Pages.Forms.Group.Model exposing (initialGroupFormModel)
+import RemoteList as RL
 import Route exposing (spaLink)
 import Store.Messages exposing (StoreMsg(CancelSms))
-import RemoteList as RL
 import Time
 
 

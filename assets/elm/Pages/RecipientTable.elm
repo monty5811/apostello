@@ -9,9 +9,9 @@ import Html.Attributes as A
 import Messages exposing (Msg(StoreMsg))
 import Pages exposing (Page(ContactForm))
 import Pages.Forms.Contact.Model exposing (initialContactFormModel)
+import RemoteList as RL
 import Route exposing (spaLink)
 import Store.Messages exposing (StoreMsg(ToggleRecipientArchive))
-import RemoteList as RL
 
 
 -- Main view
