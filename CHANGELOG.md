@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [v2.1.0]
+
 ### Added
 
  - Title to tell you what page you are on
