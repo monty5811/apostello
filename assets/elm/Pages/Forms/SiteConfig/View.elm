@@ -15,6 +15,7 @@ import Pages.Forms.SiteConfig.Messages exposing (SiteConfigFormMsg(..))
 import Pages.Forms.SiteConfig.Meta exposing (meta)
 import Pages.Forms.SiteConfig.Model exposing (SiteConfigFormModel)
 import Pages.Forms.SiteConfig.Remote exposing (postCmd)
+import Pages.Fragments.Loader exposing (loader)
 import RemoteList as RL
 import Store.Model exposing (DataStore, filterArchived)
 
@@ -26,7 +27,7 @@ view : CSRFToken -> DataStore -> Maybe SiteConfigFormModel -> FormStatus -> Html
 view csrf dataStore maybeModel status =
     case maybeModel of
         Nothing ->
-            Html.div [ A.class "ui active loader" ] []
+            loader
 
         Just model ->
             let

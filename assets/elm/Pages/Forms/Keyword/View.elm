@@ -19,6 +19,7 @@ import Pages.Forms.Keyword.Messages exposing (KeywordFormMsg(..))
 import Pages.Forms.Keyword.Meta exposing (meta)
 import Pages.Forms.Keyword.Model exposing (KeywordFormModel, initialKeywordFormModel)
 import Pages.Forms.Keyword.Remote exposing (postCmd)
+import Pages.Fragments.Loader exposing (loader)
 import RemoteList as RL
 import Route exposing (spaLink)
 import Store.Model exposing (DataStore, filterArchived)
@@ -68,7 +69,7 @@ editing csrf now dataStore keyword model status =
 
                 _ ->
                     -- show loader while we wait
-                    Html.div [ A.class "ui active loader" ] []
+                    loader
 
 
 viewHelp : CSRFToken -> Time.Time -> DataStore -> Maybe Keyword -> KeywordFormModel -> FormStatus -> Html Msg

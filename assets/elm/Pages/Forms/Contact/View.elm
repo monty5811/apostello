@@ -14,6 +14,7 @@ import Pages.Forms.Contact.Messages exposing (ContactFormMsg(..))
 import Pages.Forms.Contact.Meta exposing (meta)
 import Pages.Forms.Contact.Model exposing (ContactFormModel, initialContactFormModel)
 import Pages.Forms.Contact.Remote exposing (postCmd)
+import Pages.Fragments.Loader exposing (loader)
 import RemoteList as RL
 import Route exposing (spaLink)
 
@@ -61,7 +62,7 @@ editing settings maybeTable pk contacts model status =
 
                 _ ->
                     -- show loader while we wait
-                    Html.div [ A.class "ui active loader" ] []
+                    loader
 
 
 viewHelp : Settings -> Maybe (Html Msg) -> Maybe Recipient -> RL.RemoteList Recipient -> ContactFormModel -> FormStatus -> Html Msg

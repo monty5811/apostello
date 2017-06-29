@@ -17,6 +17,7 @@ import Pages.Forms.Group.Messages exposing (GroupFormMsg(..))
 import Pages.Forms.Group.Meta exposing (meta)
 import Pages.Forms.Group.Model exposing (GroupFormModel, initialGroupFormModel)
 import Pages.Forms.Group.Remote exposing (postCmd)
+import Pages.Fragments.Loader exposing (loader)
 import Regex
 import RemoteList as RL
 import Route exposing (spaLink)
@@ -66,7 +67,7 @@ editing csrf pk groups model status =
 
                 _ ->
                     -- show loader while we wait
-                    Html.div [ A.class "ui active loader" ] []
+                    loader
 
 
 viewHelp : CSRFToken -> Maybe RecipientGroup -> RL.RemoteList RecipientGroup -> GroupFormModel -> FormStatus -> Html Msg

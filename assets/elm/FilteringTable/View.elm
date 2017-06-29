@@ -14,17 +14,13 @@ import Html.Attributes as A
 import Html.Events as E
 import List.Extra as LE
 import Messages exposing (Msg(Nope, TableMsg))
+import Pages.Fragments.Loader exposing (loader)
 import RemoteList as RL
 
 
 emptyView : Html Msg
 emptyView =
     Html.div [ A.class "ui message" ] [ Html.text "No data to display" ]
-
-
-loadingView : Html Msg
-loadingView =
-    Html.div [ A.class "ui active loader" ] []
 
 
 uiTable : Html Msg -> Model -> (a -> Html Msg) -> RL.RemoteList a -> Html Msg
@@ -54,10 +50,10 @@ filteringTable tableClass tableHead model rowConstructor data =
         0 ->
             case data of
                 RL.NotAsked _ ->
-                    loadingView
+                    loader
 
                 RL.WaitingForFirstResp _ ->
-                    loadingView
+                    loader
 
                 _ ->
                     emptyView

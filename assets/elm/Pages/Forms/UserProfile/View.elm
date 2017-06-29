@@ -5,12 +5,12 @@ import DjangoSend exposing (CSRFToken)
 import Forms.Model exposing (Field, FieldMeta, FormStatus)
 import Forms.View exposing (..)
 import Html exposing (Html)
-import Html.Attributes as A
 import Messages exposing (FormMsg(PostForm, UserProfileFormMsg), Msg(FormMsg))
 import Pages.Forms.UserProfile.Messages exposing (UserProfileFormMsg(..))
 import Pages.Forms.UserProfile.Meta exposing (meta)
 import Pages.Forms.UserProfile.Model exposing (UserProfileFormModel)
 import Pages.Forms.UserProfile.Remote exposing (postCmd)
+import Pages.Fragments.Loader exposing (loader)
 import RemoteList as RL
 
 
@@ -27,7 +27,7 @@ view csrf pk profiles_ model status =
     in
     case currentProfile of
         Nothing ->
-            Html.div [ A.class "ui active loader" ] []
+            loader
 
         Just prof ->
             viewHelp csrf model status prof

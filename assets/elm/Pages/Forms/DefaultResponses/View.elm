@@ -10,13 +10,14 @@ import Pages.Forms.DefaultResponses.Messages exposing (DefaultResponsesFormMsg(.
 import Pages.Forms.DefaultResponses.Meta exposing (meta)
 import Pages.Forms.DefaultResponses.Model exposing (DefaultResponsesFormModel)
 import Pages.Forms.DefaultResponses.Remote exposing (postCmd)
+import Pages.Fragments.Loader exposing (loader)
 
 
 view : CSRFToken -> Maybe DefaultResponsesFormModel -> FormStatus -> Html Msg
 view csrf maybeModel status =
     case maybeModel of
         Nothing ->
-            Html.div [ A.class "ui active loader" ] []
+            loader
 
         Just model ->
             let
