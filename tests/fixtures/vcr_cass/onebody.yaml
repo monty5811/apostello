@@ -1,0 +1,83 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.13.0]
+    method: GET
+    uri: http://127.0.0.1:4000/people.csv
+  response:
+    body: {string: '<html><body>You are being <a href="http://127.0.0.1:4000/generated_files/80c2f420-d74a-4a83-bec1-ee4f4dc1255f">redirected</a>.</body></html>'}
+    headers:
+      Cache-Control: [no-cache]
+      Connection: [close]
+      Content-Type: [text/csv; charset=utf-8]
+      Location: ['http://127.0.0.1:4000/generated_files/80c2f420-d74a-4a83-bec1-ee4f4dc1255f']
+      Server: [thin]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [3e7b3895-bc1d-4de5-92f1-90ee60ffcdf7]
+      X-Runtime: ['0.103560']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 302, message: Moved Temporarily}
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.13.0]
+    method: GET
+    uri: http://127.0.0.1:4000/generated_files/80c2f420-d74a-4a83-bec1-ee4f4dc1255f
+  response:
+    body: {string: 'family_id,position,gender,first_name,last_name,mobile_phone,work_phone,fax,birthday,email,website,classes,shepherd,mail_group,about,testimony,share_mobile_phone,share_work_phone,share_fax,share_email,share_birthday,share_address,share_anniversary,share_home_phone,business_category,business_name,business_description,business_address,business_phone,business_email,business_website,legacy_id,suffix,anniversary,updated_at,alternate_email,account_frozen,messages_enabled,visible,parental_consent,friends_enabled,member,staff,elder,deacon,status,legacy_family_id,share_activity,child,custom_type,description,family_name,family_last_name,family_address1,family_address2,family_city,family_state,family_zip,family_home_phone,family_legacy_id,family_updated_at,family_visible
+
+        1,1,,test,test,,,,,test@example.com,,,,,,,false,false,false,false,true,true,true,true,,,,,,,,,,,2017-06-29
+        11:42:08 UTC,,false,true,true,,true,false,false,false,false,active,,true,false,,,test
+        family,test,,,,,,,,2017-06-29 11:42:07 UTC,true
+
+        2,1,,John,Calvin,447927401749,,,,john.calvin@example.com,,,,,,,false,false,false,false,true,true,true,true,,,,,,,,,,,2017-06-29
+        11:42:08 UTC,,false,true,true,,true,false,false,false,false,active,,true,false,,,Calvin,Calvin,,,,,,,,2017-06-29
+        11:42:08 UTC,true
+
+        3,1,,Johannes,Oecolampadius,447927401740,,,,johannes.oecolampadius@example.com,,,,,,,false,false,false,false,true,true,true,true,,,,,,,,,,,2017-06-29
+        11:42:08 UTC,,false,true,true,,true,false,false,false,false,active,,true,false,,,Oecolampadius,Oecolampadius,,,,,,,,2017-06-29
+        11:42:08 UTC,true
+
+        4,1,,John,Knox,447928401745,,,,john.knox@example.com,,,,,,,false,false,false,false,true,true,true,true,,,,,,,,,,,2017-06-29
+        11:42:08 UTC,,false,true,true,,true,false,false,false,false,active,,true,false,,,Knox,Knox,,,,,,,,2017-06-29
+        11:42:08 UTC,true
+
+        5,1,,John,Wesley,447927401745,,,,john.wesley@example.com,,,,,,,false,false,false,false,true,true,true,true,,,,,,,,,,,2017-06-29
+        11:42:08 UTC,,false,true,true,,true,false,false,false,false,active,,true,false,,,Wesley,Wesley,,,,,,,,2017-06-29
+        11:42:08 UTC,true
+
+        6,1,,John,Owen,15005550004,,,,john.owen@example.com,,,,,,,false,false,false,false,true,true,true,true,,,,,,,,,,,2017-06-29
+        11:42:08 UTC,,false,true,true,,true,false,false,false,false,active,,true,false,,,Owen,Owen,,,,,,,,2017-06-29
+        11:42:08 UTC,true
+
+        7,1,,Thomas,Chalmers,15005550009,,,,thomas.chalmers@example.com,,,,,,,false,false,false,false,true,true,true,true,,,,,,,,,,,2017-06-29
+        11:42:08 UTC,,false,true,true,,true,false,false,false,false,active,,true,false,,,Chalmers,Chalmers,,,,,,,,2017-06-29
+        11:42:08 UTC,true
+
+        8,1,,Theodore,Beza,447927411115,,,,theodore.beza@example.com,,,,,,,false,false,false,false,true,true,true,true,,,,,,,,,,,2017-06-29
+        11:42:08 UTC,,false,true,true,,true,false,false,false,false,active,,true,false,,,Beza,Beza,,,,,,,,2017-06-29
+        11:42:08 UTC,true
+
+'}
+    headers:
+      Cache-Control: [private]
+      Connection: [close]
+      Content-Disposition: [attachment; filename="people.csv"]
+      Content-Transfer-Encoding: [binary]
+      Content-Type: [text/plain]
+      Server: [thin]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [617c3a99-7cb5-4389-9cc3-5075de9905eb]
+      X-Runtime: ['0.089237']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1

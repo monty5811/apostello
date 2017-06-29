@@ -23,6 +23,6 @@ class TestManagementCommands():
     def test_setup_scheduled_tasks(self):
         """Test setup of perdiodic tasks and ensure function is idempotent."""
         call_command('setup_periodic_tasks')
-        assert Schedule.objects.all().count() == 5
+        assert Schedule.objects.all().count() == 6
         call_command('setup_periodic_tasks')
-        assert Schedule.objects.all().count() == 5
+        assert Schedule.objects.all().count() == 6

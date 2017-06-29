@@ -1,0 +1,25 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      User-Agent: [python-requests/2.13.0]
+    method: GET
+    uri: http://127.0.0.1:4000/people.csv
+  response:
+    body: {string: '<html><body>You are being <a href="http://127.0.0.1:4000/generated_files/80c2f420-d74a-4a83-bec1-ee4f4dc1255f">redirected</a>.</body></html>'}
+    headers:
+      Cache-Control: [no-cache]
+      Connection: [close]
+      Content-Type: [text/csv; charset=utf-8]
+      Location: ['http://127.0.0.1:4000/generated_files/80c2f420-d74a-4a83-bec1-ee4f4dc1255f']
+      Server: [thin]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-Request-Id: [3e7b3895-bc1d-4de5-92f1-90ee60ffcdf7]
+      X-Runtime: ['0.103560']
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 302, message: Moved Temporarily}
+version: 1

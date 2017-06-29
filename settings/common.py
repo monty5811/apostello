@@ -160,6 +160,13 @@ LOGIN_REDIRECT_URL = '/'
 
 # Elvanto credentials
 ELVANTO_KEY = os.environ.get('ELVANTO_KEY', '')
+# Onebody credentials - if left blank, no syncing will be done, otherwise, data
+# is pulled automatically once a day
+# details on how to obtain the api key:
+# https://github.com/churchio/onebody/wiki/API
+ONEBODY_BASE_URL = os.environ.get('ONEBODY_BASE_URL')
+ONEBODY_USER_EMAIL = os.environ.get('ONEBODY_USER_EMAIL')
+ONEBODY_API_KEY = os.environ.get('ONEBODY_API_KEY')
 
 # Twilio credentials
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID', 'no SID found')

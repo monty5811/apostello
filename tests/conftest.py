@@ -419,6 +419,16 @@ elvanto_vcr = base_vcr.use_cassette(
     'tests/fixtures/vcr_cass/elv.yaml',
     filter_headers=['authorization'],
 )
+onebody_vcr = base_vcr.use_cassette(
+    'tests/fixtures/vcr_cass/onebody.yaml',
+    filter_headers=['authorization'],
+    ignore_localhost=False,
+)
+onebody_no_csv_vcr = base_vcr.use_cassette(
+    'tests/fixtures/vcr_cass/onebody_no_csv.yaml',
+    filter_headers=['authorization'],
+    ignore_localhost=False,
+)
 
 
 def post_json(client, url, data):

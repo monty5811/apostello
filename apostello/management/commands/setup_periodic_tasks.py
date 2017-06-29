@@ -49,6 +49,14 @@ class Command(BaseCommand):
                 next_run=next_230am,
             )
 
+        if Schedule.objects.filter(func='apostello.tasks.pull_onebody_csv').count() < 1:
+            Schedule.objects.create(
+                func='apostello.tasks.pull_onebody_csv',
+                schedule_type=Schedule.DAILY,
+                repeats=-1,
+                next_run=next_230am,
+            )
+
         if Schedule.objects.filter(func='apostello.tasks.send_keyword_digest').count() < 1:
             Schedule.objects.create(
                 func='apostello.tasks.send_keyword_digest',

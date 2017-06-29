@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 import pytest
-from tests.conftest import twilio_vcr
+from tests.conftest import onebody_vcr, twilio_vcr
 from twilio.base.exceptions import TwilioRestException
 
 from apostello.models import *
@@ -104,3 +104,11 @@ class TestTasks:
         )
         assert grp.recipient_set.count() == 1
         assert new_c in grp.recipient_set.all()
+
+    @onebody_vcr
+    def test_onebody_csv(self):
+        """Test fetching people from onebody."""
+        pull_onebody_csv()
+        assert RecipientGroup.objects.count() == 1
+        assert Recipient.objects.count() == 7
+        assert RecipientGroup.objects.get(name='[onebody]').recipient_set.count() == 7

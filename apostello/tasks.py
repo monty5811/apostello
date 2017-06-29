@@ -254,6 +254,10 @@ def pull_elvanto_groups(force=False):
         from elvanto.models import ElvantoGroup
         ElvantoGroup.pull_all_groups()
 
+# Onebody import
+def pull_onebody_csv():
+    from onebody.importer import import_onebody_csv
+    import_onebody_csv()
 
 #
 def add_new_contact_to_groups(contact_pk):
