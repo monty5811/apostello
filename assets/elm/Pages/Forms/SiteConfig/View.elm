@@ -1,6 +1,8 @@
 module Pages.Forms.SiteConfig.View exposing (view)
 
 import Data.RecipientGroup exposing (RecipientGroup)
+import Date
+import DateTimePicker
 import DjangoSend exposing (CSRFToken)
 import Forms.Model exposing (Field, FieldMeta, FormStatus)
 import Forms.View as FV
@@ -39,6 +41,7 @@ view csrf dataStore maybeModel status =
                     , Field meta.disable_email_login_form (emailLoginField meta.disable_email_login_form model)
                     , Field meta.office_email (officeEmailField meta.office_email model)
                     , Field meta.auto_add_new_groups (autoNewGroupsField groups meta.auto_add_new_groups model)
+                    , Field meta.sms_expiration_date (smsExpirationDateField meta.sms_expiration_date model)
                     , Field meta.slack_url (slackField meta.slack_url model)
                     , Field meta.sync_elvanto (syncElvField meta.sync_elvanto model)
                     , Field meta.not_approved_msg (notAppField meta.not_approved_msg model)
@@ -120,6 +123,16 @@ autoNewGroupsField groups meta_ model =
             (FormMsg << SiteConfigFormMsg << UpdateGroupsFilter model)
             (groupView model)
         )
+
+
+smsExpirationDateField : FieldMeta -> SiteConfigFormModel -> List (Html Msg)
+smsExpirationDateField meta_ model =
+    FV.dateField (updateExpDate model) meta_ model.datePickerSmsExpiredState model.sms_expiration_date
+
+
+updateExpDate : SiteConfigFormModel -> DateTimePicker.State -> Maybe Date.Date -> Msg
+updateExpDate model state maybeDate =
+    FormMsg <| SiteConfigFormMsg <| UpdateSmsExpiredDate model state maybeDate
 
 
 groupView : SiteConfigFormModel -> Maybe (List Int) -> RecipientGroup -> Html Msg

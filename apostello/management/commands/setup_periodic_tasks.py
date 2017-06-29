@@ -56,3 +56,11 @@ class Command(BaseCommand):
                 repeats=-1,
                 next_run=next_2130,
             )
+
+        if Schedule.objects.filter(func='apostello.tasks.cleanup_expired_sms').count() < 1:
+            Schedule.objects.create(
+                func='apostello.tasks.cleanup_expired_sms',
+                schedule_type=Schedule.DAILY,
+                repeats=-1,
+                next_run=next_3am,
+            )

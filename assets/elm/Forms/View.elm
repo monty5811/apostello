@@ -73,7 +73,7 @@ dateTimeField msg meta datePickerState date =
         i18nConfig =
             DateTimePicker.Config.defaultDateTimeI18n
     in
-    [ label [ A.id meta.id ] [ text meta.label ]
+    [ label [ A.for meta.id ] [ text meta.label ]
     , DateTimePicker.dateTimePickerWithConfig
         { config
             | timePickerType = DateTimePicker.Config.Digital
@@ -82,6 +82,38 @@ dateTimeField msg meta datePickerState date =
                 { i18nConfig
                     | inputFormat =
                         { inputFormatter = Date.Format.format "%Y-%m-%d %H:%M"
+                        , inputParser = Date.fromString >> Result.toMaybe
+                        }
+                }
+        }
+        [ A.class meta.name
+        , A.id meta.id
+        , A.name meta.name
+        , A.type_ "text"
+        ]
+        datePickerState
+        date
+    , helpLabel meta
+    ]
+
+
+dateField : (DateTimePicker.State -> Maybe Date.Date -> Msg) -> FieldMeta -> DateTimePicker.State -> Maybe Date.Date -> List (Html Msg)
+dateField msg meta datePickerState date =
+    let
+        config =
+            DateTimePicker.Config.defaultDatePickerConfig msg
+
+        i18nConfig =
+            DateTimePicker.Config.defaultDateI18n
+    in
+    [ label [ A.for meta.id ] [ text meta.label ]
+    , DateTimePicker.datePickerWithConfig
+        { config
+            | autoClose = True
+            , i18n =
+                { i18nConfig
+                    | inputFormat =
+                        { inputFormatter = Date.Format.format "%Y-%m-%d"
                         , inputParser = Date.fromString >> Result.toMaybe
                         }
                 }

@@ -1,7 +1,7 @@
 module Pages.Forms.SiteConfig.Remote exposing (..)
 
 import DjangoSend exposing (CSRFToken, rawPost)
-import Encode exposing (encodeMaybe)
+import Encode exposing (encodeMaybe, encodeMaybeDateOnly)
 import Http
 import Json.Encode as Encode
 import Messages exposing (FormMsg(ReceiveFormResp, ReceiveSiteConfigFormModel), Msg(FormMsg))
@@ -38,6 +38,7 @@ postCmd csrf model =
             , ( "disable_email_login_form", Encode.bool model.disable_email_login_form )
             , ( "office_email", Encode.string model.office_email )
             , ( "auto_add_new_groups", Encode.list (List.map Encode.int model.auto_add_new_groups) )
+            , ( "sms_expiration_date", encodeMaybeDateOnly model.sms_expiration_date )
             , ( "slack_url", Encode.string model.slack_url )
             , ( "sync_elvanto", Encode.bool model.sync_elvanto )
             , ( "not_approved_msg", Encode.string model.not_approved_msg )

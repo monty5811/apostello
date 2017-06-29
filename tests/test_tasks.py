@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytest
 from tests.conftest import twilio_vcr
@@ -6,6 +6,7 @@ from twilio.base.exceptions import TwilioRestException
 
 from apostello.models import *
 from apostello.tasks import *
+from site_config.models import SiteConfiguration
 
 
 @pytest.mark.django_db
@@ -74,8 +75,23 @@ class TestTasks:
     def test_warn_on_blacklist_receipt(self, recipients):
         blacklist_notify(recipients['wesley'].pk, 'stop it', 'stop')
 
+    def test_cleanup_expired_sms(self, smsin):
+        config = SiteConfiguration.get_solo()
+        config.sms_expiration_date = None
+        config.save()
+        for sms in SmsInbound.objects.all():
+            # move back in time so they can be deleted
+            sms.time_received = sms.time_received - timedelta(days=5)
+            sms.save()
+        cleanup_expired_sms()
+        assert SmsInbound.objects.count() == len(smsin)
+        config = SiteConfiguration.get_solo()
+        config.sms_expiration_date = timezone.localdate()
+        config.save()
+        cleanup_expired_sms()
+        assert SmsInbound.objects.count() == 0
+
     def test_add_new_ppl_to_groups(self, groups):
-        from site_config.models import SiteConfiguration
         config = SiteConfiguration.get_solo()
         grp = groups['empty_group']
         assert grp.recipient_set.count() == 0

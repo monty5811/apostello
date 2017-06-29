@@ -124,6 +124,12 @@ def update_msgs_name(person_pk):
         sms.save()
 
 
+def cleanup_expired_sms():
+    """Remove expired messages."""
+    from apostello import logs
+    logs.cleanup_expired_sms()
+
+
 # notifications, email, slack etc
 
 

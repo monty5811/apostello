@@ -153,7 +153,7 @@ class SiteConfigurationSerializer(BaseModelSerializer):
         fields = (
             'site_name', 'sms_char_limit', 'default_number_prefix', 'disable_all_replies', 'disable_email_login_form',
             'office_email', 'auto_add_new_groups', 'slack_url', 'sync_elvanto', 'not_approved_msg', 'email_host',
-            'email_port', 'email_username', 'email_password', 'email_from',
+            'email_port', 'email_username', 'email_password', 'email_from', 'sms_expiration_date',
         )
 
 

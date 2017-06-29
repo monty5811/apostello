@@ -45,6 +45,12 @@ class SiteConfiguration(SingletonModel):
         help_text='Any brand new people will be added to the groups'
         ' selected here',
     )
+    sms_expiration_date = models.DateField(
+        "SMS Expiration Date",
+        null=True,
+        help_text='If this date is set, any messages older than this will be'
+        ' removed from the database.'
+    )
     slack_url = models.URLField(
         blank=True, help_text='Post all incoming messages to this slack hook.'
         ' Leave blank to disable.'

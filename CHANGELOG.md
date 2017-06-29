@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+ - Optional expiration date for SMS
+
 ## [v2.1.0]
 
 ### Added

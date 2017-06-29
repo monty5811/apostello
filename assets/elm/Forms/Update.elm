@@ -1,5 +1,6 @@
 module Forms.Update exposing (update)
 
+import Forms.DatePickers exposing (initDateTimePickers)
 import Forms.Model exposing (FormErrors, FormStatus(Failed, InProgress, Success), decodeFormResp, formDecodeError, noErrors)
 import Http
 import Json.Decode as Decode
@@ -69,6 +70,7 @@ update msg model =
                             model
             in
             ( { newModel | settings = updateSettings scModel newModel.settings }, [] )
+                |> initDateTimePickers
 
         ReceiveSiteConfigFormModel (Err _) ->
             ( model, [] )

@@ -1,21 +1,16 @@
 module Update exposing (update)
 
-import Date
-import DateTimePicker
 import FilteringTable.Model as FTModel
 import FilteringTable.Update as FT
+import Forms.DatePickers exposing (initDateTimePickers)
 import Forms.Update as F
 import Messages exposing (..)
 import Models exposing (FabModel(..), Model, Settings)
 import Navigation
-import Pages as P
 import Pages.ApiSetup.Update as ApiSetup
 import Pages.ElvantoImport.Update as ElvImp
 import Pages.FirstRun.Update as FR
 import Pages.Forms.DefaultResponses.Remote as DRFR
-import Pages.Forms.Keyword.Messages as KFM
-import Pages.Forms.SendAdhoc.Messages as SAM
-import Pages.Forms.SendGroup.Messages as SGM
 import Pages.Forms.SiteConfig.Remote as SCFR
 import Pages.Fragments.Fab.Update as Fab
 import Pages.Fragments.Notification.Update as Notif
@@ -130,46 +125,3 @@ addSaveDataStoreCmd oldModel newModel cmds =
         False ->
             (saveDataStore <| encodeDataStore newModel.dataStore)
                 :: cmds
-
-
-initDateTimePickers : ( Model, List (Cmd Msg) ) -> ( Model, List (Cmd Msg) )
-initDateTimePickers ( model, msgs ) =
-    ( model, msgs ++ initDateTimePickersHelp model.page )
-
-
-initDateTimePickersHelp : P.Page -> List (Cmd Msg)
-initDateTimePickersHelp page =
-    case page of
-        P.KeywordForm model _ ->
-            [ DateTimePicker.initialCmd initActTime model.datePickerActState
-            , DateTimePicker.initialCmd initDeactTime model.datePickerDeactState
-            ]
-
-        P.SendAdhoc model ->
-            [ DateTimePicker.initialCmd initSendAdhocDate model.datePickerState ]
-
-        P.SendGroup model ->
-            [ DateTimePicker.initialCmd initSendGroupDate model.datePickerState ]
-
-        _ ->
-            []
-
-
-initActTime : DateTimePicker.State -> Maybe Date.Date -> Msg
-initActTime state maybeDate =
-    FormMsg <| KeywordFormMsg <| KFM.UpdateActivateTime state maybeDate
-
-
-initDeactTime : DateTimePicker.State -> Maybe Date.Date -> Msg
-initDeactTime state maybeDate =
-    FormMsg <| KeywordFormMsg <| KFM.UpdateDeactivateTime state maybeDate
-
-
-initSendAdhocDate : DateTimePicker.State -> Maybe Date.Date -> Msg
-initSendAdhocDate state maybeDate =
-    FormMsg <| SendAdhocMsg <| SAM.UpdateDate state maybeDate
-
-
-initSendGroupDate : DateTimePicker.State -> Maybe Date.Date -> Msg
-initSendGroupDate state maybeDate =
-    FormMsg <| SendGroupMsg <| SGM.UpdateSGDate state maybeDate

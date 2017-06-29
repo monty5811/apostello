@@ -35,6 +35,9 @@ update msg =
         UpdateAutoAddGroupsField model pk ->
             { model | auto_add_new_groups = toggleSelectedPk pk model.auto_add_new_groups }
 
+        UpdateSmsExpiredDate model state maybeDate ->
+            { model | sms_expiration_date = maybeDate, datePickerSmsExpiredState = state }
+
         UpdateSlackUrlField model text ->
             { model | slack_url = text }
 

@@ -1,6 +1,9 @@
 module Pages.Forms.SiteConfig.Model exposing (SiteConfigFormModel, decodeSiteConfigFormModel)
 
+import Date
+import DateTimePicker
 import Json.Decode as Decode
+import Json.Decode.Extra exposing (date)
 import Json.Decode.Pipeline exposing (decode, hardcoded, required)
 import Regex
 
@@ -13,6 +16,8 @@ type alias SiteConfigFormModel =
     , disable_email_login_form : Bool
     , office_email : String
     , auto_add_new_groups : List Int
+    , sms_expiration_date : Maybe Date.Date
+    , datePickerSmsExpiredState : DateTimePicker.State
     , slack_url : String
     , sync_elvanto : Bool
     , not_approved_msg : String
@@ -35,6 +40,8 @@ decodeSiteConfigFormModel =
         |> required "disable_email_login_form" Decode.bool
         |> required "office_email" Decode.string
         |> required "auto_add_new_groups" (Decode.list Decode.int)
+        |> required "sms_expiration_date" (Decode.maybe date)
+        |> hardcoded DateTimePicker.initialState
         |> required "slack_url" Decode.string
         |> required "sync_elvanto" Decode.bool
         |> required "not_approved_msg" Decode.string

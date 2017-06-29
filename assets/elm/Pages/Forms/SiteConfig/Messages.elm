@@ -1,5 +1,7 @@
 module Pages.Forms.SiteConfig.Messages exposing (SiteConfigFormMsg(..))
 
+import Date
+import DateTimePicker
 import Pages.Forms.SiteConfig.Model exposing (SiteConfigFormModel)
 
 
@@ -11,6 +13,7 @@ type SiteConfigFormMsg
     | UpdateDisableLoginEmailField SiteConfigFormModel
     | UpdateOfficeEmailField SiteConfigFormModel String
     | UpdateAutoAddGroupsField SiteConfigFormModel Int
+    | UpdateSmsExpiredDate SiteConfigFormModel DateTimePicker.State (Maybe Date.Date)
     | UpdateSlackUrlField SiteConfigFormModel String
     | UpdateSyncElvantoField SiteConfigFormModel
     | UpdateNotApprovedField SiteConfigFormModel String
