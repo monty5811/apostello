@@ -3,9 +3,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [v2.2.0]
+
 ### Added
 
  - Optional expiration date for SMS
+ - Expiremental onebody integration - see [b72101a](https://github.com/monty5811/apostello/commit/b72101a13dc4004fa644cefa8de73a31fc1b7278) for details
 
 ## [v2.1.0]
 
