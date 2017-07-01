@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 import subprocess
-
-try:
-    from os import scandir
-except ImportError:
-    from scandir import scandir
+from os import scandir
 
 IGNORE_DIRS = ['migrations', 'node_modules', 'venv', '__pycache__', '.git', '.tox']
 
