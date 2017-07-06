@@ -63,20 +63,24 @@ def add_linked_groups(b, wt):
 
 
 def add_owner(b, wt):
-    user = b.find_element_by_xpath('//*[@id="elmContainer"]/div/div[3]/div/div/form/div[10]/div[2]/div[2]/div[1]')
+    user = b.find_element_by_xpath(
+        '//*[@id="elmContainer"]/div/div[3]/div/div/form/div[6]/div/div/div[2]/div[2]/div[3]/div[1]'
+        )
     user.click()
     return b
 
 
 def add_subscriber(b, wt):
-    user = b.find_element_by_xpath('//*[@id="elmContainer"]/div/div[3]/div/div/form/div[11]/div[2]/div[2]/div[1]')
+    user = b.find_element_by_xpath(
+        '//*[@id="elmContainer"]/div/div[3]/div/div/form/div[6]/div/div/div[3]/div[2]/div[3]/div[1]'
+        )
     user.click()
     return b
 
 
 @pytest.mark.slow
 @pytest.mark.selenium
-class TestContactForm:
+class TestKeywordForm:
     def test_create_new_keyword(self, live_server, browser_in, keywords, groups, users, driver_wait_time):
         """Test good form submission."""
         assert len(keywords) == models.Keyword.objects.count()

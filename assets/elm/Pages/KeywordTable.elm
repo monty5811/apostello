@@ -1,8 +1,7 @@
 module Pages.KeywordTable exposing (view)
 
 import Data.Keyword exposing (Keyword)
-import FilteringTable.Model as FTM
-import FilteringTable.View exposing (filteringTable)
+import FilteringTable as FT
 import Helpers exposing (archiveCell)
 import Html exposing (Html, a, div, td, text, th, thead, tr)
 import Html.Attributes exposing (class)
@@ -17,9 +16,9 @@ import Store.Messages exposing (StoreMsg(ToggleKeywordArchive))
 -- Main view
 
 
-view : FTM.Model -> RL.RemoteList Keyword -> Html Msg
+view : FT.Model -> RL.RemoteList Keyword -> Html Msg
 view tableModel keywords =
-    filteringTable "ui striped definition table" tableHead tableModel keywordRow keywords
+    FT.filteringTable "ui striped definition table" tableHead tableModel keywordRow keywords
 
 
 tableHead : Html Msg

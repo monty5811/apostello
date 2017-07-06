@@ -1,7 +1,7 @@
 module Pages.Forms.CreateAllGroup.View exposing (view)
 
 import DjangoSend exposing (CSRFToken)
-import Forms.Model exposing (Field, FieldMeta, FormStatus)
+import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus)
 import Forms.View exposing (..)
 import Html exposing (Html)
 import Messages exposing (FormMsg(CreateAllGroupMsg, PostForm), Msg(FormMsg))
@@ -16,6 +16,7 @@ view csrf model status =
         field =
             simpleTextField meta.group_name (Just model) (FormMsg << CreateAllGroupMsg << UpdateGroupName)
                 |> Field meta.group_name
+                |> FormField
 
         button =
             submitButton Nothing (String.length model < 1)

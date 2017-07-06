@@ -3,8 +3,8 @@ module Pages.Forms.SendAdhoc.View exposing (view)
 import Data.Recipient exposing (Recipient)
 import Date
 import DateTimePicker
-import FilteringTable.Util exposing (filterRecord)
-import Forms.Model exposing (Field, FieldMeta, FormStatus)
+import FilteringTable exposing (filterRecord)
+import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus)
 import Forms.View exposing (form)
 import Forms.View.Send exposing (contentField, sendButton, timeField)
 import Helpers exposing (onClick)
@@ -59,6 +59,7 @@ sendForm settings model contacts status =
             , Field meta.recipients <| contactsField meta.recipients model contacts
             , Field meta.scheduled_time <| timeField updateSADate meta.scheduled_time model.datePickerState model.date
             ]
+                |> List.map FormField
     in
     div []
         [ p [] [ text "Send a message to a single person or to an ad-hoc group of people:" ]
@@ -102,6 +103,7 @@ contactsField meta_ model contacts =
     [ label [ A.for meta_.id ] [ text meta_.label ]
     , div [ A.class "ui raised segment" ]
         [ loadingMessage contacts
+        , selectedContacts model.selectedContacts contacts
         , div [ A.class "ui left icon large transparent fluid input" ]
             [ input
                 [ A.placeholder "Filter..."
@@ -128,10 +130,34 @@ contactsField meta_ model contacts =
     ]
 
 
+selectedContacts : List Int -> RL.RemoteList Recipient -> Html Msg
+selectedContacts selectedPks contacts_ =
+    let
+        selected =
+            contacts_
+                |> RL.toList
+                |> List.filter (\c -> List.member c.pk selectedPks)
+                |> List.map contactLabel
+    in
+    Html.div [] selected
+
+
+contactLabel : Recipient -> Html Msg
+contactLabel contact =
+    Html.div
+        [ A.class "ui violet basic label"
+        , A.style [ ( "user-select", "none" ) ]
+        , onClick <| FormMsg <| SendAdhocMsg <| ToggleSelectedContact contact.pk
+        ]
+        [ Html.text contact.full_name ]
+
+
 contactItem : List Int -> Recipient -> Html Msg
 contactItem selectedPks contact =
     Html.Keyed.node "div"
-        [ A.class "item", onClick <| FormMsg <| SendAdhocMsg <| ToggleSelectedContact contact.pk ]
+        [ A.class "item"
+        , onClick <| FormMsg <| SendAdhocMsg <| ToggleSelectedContact contact.pk
+        ]
         [ ( toString contact.pk, contactItemHelper selectedPks contact ) ]
 
 

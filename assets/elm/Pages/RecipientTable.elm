@@ -1,8 +1,7 @@
 module Pages.RecipientTable exposing (view)
 
 import Data.Recipient exposing (Recipient)
-import FilteringTable.Model as FTM
-import FilteringTable.View exposing (uiTable)
+import FilteringTable as FT
 import Helpers exposing (archiveCell, formatDate)
 import Html exposing (Html, a, div, td, text, th, thead, tr)
 import Html.Attributes as A
@@ -17,7 +16,7 @@ import Store.Messages exposing (StoreMsg(ToggleRecipientArchive))
 -- Main view
 
 
-view : FTM.Model -> RL.RemoteList Recipient -> Html Msg
+view : FT.Model -> RL.RemoteList Recipient -> Html Msg
 view tableModel recipients =
     let
         head =
@@ -30,7 +29,7 @@ view tableModel recipients =
                     ]
                 ]
     in
-    uiTable head tableModel recipientRow recipients
+    FT.uiTable head tableModel recipientRow recipients
 
 
 recipientRow : Recipient -> Html Msg

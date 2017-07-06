@@ -14,7 +14,7 @@ from elvanto.exceptions import NotValidPhoneNumber
 
 logger = logging.getLogger('apostello')
 
-WAIT_TIME = 10
+WAIT_TIME = settings.ONEBODY_WAIT_TIME
 
 
 class OnebodyException(Exception):

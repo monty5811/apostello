@@ -61,7 +61,9 @@ Q_CLUSTER = {
 
 PASSWORD_HASHERS = ('django.contrib.auth.hashers.MD5PasswordHasher', )
 
-DJANGO_TWILIO_FORGERY_PROTECTION = False
+DJANGO_TWILIO_FORGERY_PROTECTION = True
+
+ONEBODY_WAIT_TIME = 1
 
 EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'

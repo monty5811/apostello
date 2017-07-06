@@ -13,7 +13,6 @@ type alias RecipientGroup =
     , members : List RecipientSimple
     , nonmembers : List RecipientSimple
     , cost : Float
-    , url : String
     , is_archived : Bool
     }
 
@@ -24,7 +23,7 @@ type alias GroupPk =
 
 nullGroup : RecipientGroup
 nullGroup =
-    RecipientGroup "" 0 "" [] [] 0 "" False
+    RecipientGroup "" 0 "" [] [] 0 False
 
 
 decodeRecipientGroup : Decode.Decoder RecipientGroup
@@ -36,7 +35,6 @@ decodeRecipientGroup =
         |> optional "members" (Decode.list decodeRecipientSimple) []
         |> optional "nonmembers" (Decode.list decodeRecipientSimple) []
         |> required "cost" Decode.float
-        |> required "url" Decode.string
         |> required "is_archived" Decode.bool
 
 
@@ -49,6 +47,5 @@ encodeRecipientGroup group =
         , ( "members", Encode.list (List.map encodeRecipientSimple group.members) )
         , ( "nonmembers", Encode.list (List.map encodeRecipientSimple group.nonmembers) )
         , ( "cost", Encode.float group.cost )
-        , ( "url", Encode.string group.url )
         , ( "is_archived", Encode.bool group.is_archived )
         ]

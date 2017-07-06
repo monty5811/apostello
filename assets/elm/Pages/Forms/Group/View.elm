@@ -3,8 +3,8 @@ module Pages.Forms.Group.View exposing (view)
 import Data.Recipient exposing (RecipientSimple)
 import Data.RecipientGroup exposing (RecipientGroup)
 import DjangoSend exposing (CSRFToken)
-import FilteringTable.Util exposing (filterRecord)
-import Forms.Model exposing (Field, FieldMeta, FormStatus)
+import FilteringTable exposing (filterRecord)
+import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus)
 import Forms.View exposing (..)
 import Helpers exposing (onClick)
 import Html exposing (Html)
@@ -83,6 +83,7 @@ viewHelp csrf currentGroup groups_ model status =
             [ Field meta.name (nameField meta.name currentGroup)
             , Field meta.description (descField meta.description currentGroup)
             ]
+                |> List.map FormField
     in
     Html.div []
         [ archiveNotice showAN groups model.name
@@ -179,14 +180,14 @@ membershipToggles maybeGroup model =
                         [ Html.h4 [] [ Html.text "Non-Members" ]
                         , Html.div []
                             [ filter (FormMsg << GroupFormMsg << UpdateNonMemberFilter)
-                            , cardContainer model.nonmembersFilterRegex group.nonmembers group
+                            , cardContainer "nonmembers" model.nonmembersFilterRegex group.nonmembers group
                             ]
                         ]
                     , Html.div [ A.class "ui column" ]
                         [ Html.h4 [] [ Html.text "Members" ]
                         , Html.div []
                             [ filter (FormMsg << GroupFormMsg << UpdateMemberFilter)
-                            , cardContainer model.membersFilterRegex group.members group
+                            , cardContainer "members" model.membersFilterRegex group.members group
                             ]
                         ]
                     ]
@@ -201,11 +202,11 @@ filter handleInput =
         ]
 
 
-cardContainer : Regex.Regex -> List RecipientSimple -> RecipientGroup -> Html Msg
-cardContainer filterRegex contacts group =
+cardContainer : String -> Regex.Regex -> List RecipientSimple -> RecipientGroup -> Html Msg
+cardContainer id_ filterRegex contacts group =
     Html.div []
         [ Html.br [] []
-        , Html.div [ A.class "ui three stackable cards" ]
+        , Html.div [ A.class "ui three stackable cards", A.id <| id_ ++ "_list" ]
             (contacts
                 |> List.filter (filterRecord filterRegex)
                 |> List.map (card group)

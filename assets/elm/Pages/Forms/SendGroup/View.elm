@@ -3,8 +3,8 @@ module Pages.Forms.SendGroup.View exposing (view)
 import Data.RecipientGroup exposing (RecipientGroup)
 import Date
 import DateTimePicker
-import FilteringTable.Util exposing (filterRecord)
-import Forms.Model exposing (Field, FieldMeta, FormStatus)
+import FilteringTable exposing (filterRecord)
+import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus)
 import Forms.View exposing (form)
 import Forms.View.Send exposing (contentField, sendButton, timeField)
 import Helpers exposing (onClick)
@@ -59,6 +59,7 @@ sendForm settings model groups status =
             , Field meta.recipient_group <| groupField meta.recipient_group model groups
             , Field meta.scheduled_time <| timeField updateSGDate meta.scheduled_time model.datePickerState model.date
             ]
+                |> List.map FormField
     in
     div []
         [ p [] [ text "Send a message to a single person or to an ad-hoc group of people:" ]

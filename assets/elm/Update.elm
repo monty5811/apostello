@@ -1,7 +1,7 @@
 module Update exposing (update)
 
-import FilteringTable.Model as FTModel
-import FilteringTable.Update as FT
+import Dict
+import FilteringTable as FT
 import Forms.DatePickers exposing (initDateTimePickers)
 import Forms.Update as F
 import Messages exposing (..)
@@ -44,7 +44,10 @@ updateHelper msg model =
             ( model, [] )
 
         NewUrl str ->
-            ( { model | fabModel = MenuHidden }
+            ( { model
+                | fabModel = MenuHidden
+                , notifications = Dict.empty
+              }
             , [ Navigation.newUrl str ]
             )
 
@@ -56,7 +59,7 @@ updateHelper msg model =
             ( { model
                 | page = page
                 , dataStore = Store.resetStatus model.dataStore
-                , table = FTModel.initial
+                , table = FT.initialModel
               }
             , []
             )

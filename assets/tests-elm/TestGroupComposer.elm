@@ -26,11 +26,11 @@ bill =
 
 testGroups : List RecipientGroup
 testGroups =
-    [ RecipientGroup "all" 123 "" [ john, bob, bill ] [] 0 "" False
-    , RecipientGroup "john" 1 "" [ john ] [] 0 "" False
-    , RecipientGroup "bob" 2 "" [ bob ] [] 0 "" False
-    , RecipientGroup "bill" 3 "" [ bill ] [] 0 "" False
-    , RecipientGroup "john,bob" 12 "" [ john, bob ] [] 0 "" False
+    [ RecipientGroup "all" 123 "" [ john, bob, bill ] [] 0 False
+    , RecipientGroup "john" 1 "" [ john ] [] 0 False
+    , RecipientGroup "bob" 2 "" [ bob ] [] 0 False
+    , RecipientGroup "bill" 3 "" [ bill ] [] 0 False
+    , RecipientGroup "john,bob" 12 "" [ john, bob ] [] 0 False
     ]
 
 

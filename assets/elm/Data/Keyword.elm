@@ -14,8 +14,6 @@ type alias Keyword =
     , description : String
     , current_response : String
     , is_live : Bool
-    , url : String
-    , responses_url : String
     , num_replies : String
     , num_archived_replies : String
     , is_archived : Bool
@@ -39,8 +37,6 @@ decodeKeyword =
         |> required "description" Decode.string
         |> required "current_response" Decode.string
         |> required "is_live" Decode.bool
-        |> required "url" Decode.string
-        |> required "responses_url" Decode.string
         |> required "num_replies" Decode.string
         |> required "num_archived_replies" Decode.string
         |> required "is_archived" Decode.bool
@@ -63,8 +59,6 @@ encodeKeyword keyword =
         , ( "description", Encode.string keyword.description )
         , ( "current_response", Encode.string keyword.current_response )
         , ( "is_live", Encode.bool keyword.is_live )
-        , ( "url", Encode.string keyword.url )
-        , ( "responses_url", Encode.string keyword.responses_url )
         , ( "num_replies", Encode.string keyword.num_replies )
         , ( "num_archived_replies", Encode.string keyword.num_archived_replies )
         , ( "is_archived", Encode.bool keyword.is_archived )

@@ -52,7 +52,7 @@ class TestButton:
         self, live_server, browser_in, keywords, recipients, groups, smsin, driver_wait_time
     ):
         """Test archive sms button."""
-        uri = keywords['test'].get_responses_url
+        uri = '/keyword/responses/test/'
         query_set = models.SmsInbound.objects.filter(matched_keyword='test')
         self.test_archive_all(
             uri, query_set, live_server, browser_in, keywords, recipients, groups, smsin, driver_wait_time
@@ -63,8 +63,7 @@ class TestButton:
         k = models.Keyword.objects.get(keyword='test')
         k.is_archived = True
         k.save()
-        uri = k.get_absolute_url
-        browser_in.get(live_server + uri)
+        browser_in.get(live_server + '/keyword/edit/test/')
         sleep(driver_wait_time)
         wrench = browser_in.find_elements_by_class_name('wrench')[0]
         click_and_wait(wrench, driver_wait_time)
@@ -125,7 +124,8 @@ class TestButton:
         assert sms.matched_keyword == 'test'
 
     def test_keyword_resp_table_dealt_with(self, live_server, browser_in, smsin, keywords, driver_wait_time):
-        browser_in.get(live_server + keywords['test'].get_responses_url)
+        uri = '/keywords/edit/' + keywords['test'].keyword
+        browser_in.get(live_server + uri)
         sleep(driver_wait_time)
         for button in browser_in.find_elements_by_class_name('positive'):
             browser_in.execute_script("return arguments[0].scrollIntoView();", button)

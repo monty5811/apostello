@@ -3,8 +3,7 @@ module Pages.ScheduledSmsTable exposing (view)
 import Data.QueuedSms exposing (QueuedSms)
 import Data.RecipientGroup exposing (RecipientGroup)
 import Date
-import FilteringTable.Model as FTM
-import FilteringTable.View exposing (uiTable)
+import FilteringTable as FT
 import Html exposing (Html, a, div, td, text, th, thead, tr)
 import Html.Attributes as A
 import Html.Events exposing (onClick)
@@ -21,11 +20,11 @@ import Time
 -- Main view
 
 
-view : FTM.Model -> Time.Time -> RL.RemoteList QueuedSms -> Html Msg
+view : FT.Model -> Time.Time -> RL.RemoteList QueuedSms -> Html Msg
 view tableModel currentTime sms =
     sms
         |> RL.filter (onlyFuture currentTime)
-        |> uiTable tableHead tableModel smsRow
+        |> FT.uiTable tableHead tableModel smsRow
 
 
 tableHead : Html Msg

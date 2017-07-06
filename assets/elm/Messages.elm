@@ -1,6 +1,5 @@
 module Messages exposing (..)
 
-import FilteringTable.Messages exposing (TableMsg)
 import Http
 import Navigation
 import Pages.ApiSetup.Messages exposing (ApiSetupMsg)
@@ -52,6 +51,11 @@ type FabMsg
     = ArchiveItem String String Bool
     | ReceiveArchiveResp String (Result Http.Error Bool)
     | ToggleFabView
+
+
+type TableMsg
+    = UpdateFilter String
+    | GoToPage Int
 
 
 type FormMsg

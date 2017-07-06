@@ -1,8 +1,7 @@
 module Pages.KeyRespTable.View exposing (view)
 
 import Data.SmsInbound exposing (SmsInbound)
-import FilteringTable.Model as FTM
-import FilteringTable.View exposing (uiTable)
+import FilteringTable as FT
 import Helpers exposing (archiveCell, formatDate)
 import Html exposing (Html, a, br, button, div, i, input, label, td, text, th, thead, tr)
 import Html.Attributes exposing (attribute, checked, class, id, name, style, type_)
@@ -19,10 +18,10 @@ import Store.Messages exposing (StoreMsg(ToggleInboundSmsArchive, ToggleInboundS
 -- Main view
 
 
-view : Bool -> FTM.Model -> RL.RemoteList SmsInbound -> Bool -> String -> Html Msg
+view : Bool -> FT.Model -> RL.RemoteList SmsInbound -> Bool -> String -> Html Msg
 view viewingArchive tableModel sms ticked keyword =
     div []
-        [ uiTable tableHead tableModel smsRow sms
+        [ FT.uiTable tableHead tableModel smsRow sms
         , br [] []
         , archiveAllForm viewingArchive ticked keyword
         ]

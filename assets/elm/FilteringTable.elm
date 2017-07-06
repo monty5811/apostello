@@ -1,21 +1,73 @@
-module FilteringTable.View exposing (filteringTable, uiTable)
-
-import FilteringTable.Messages
+module FilteringTable
     exposing
-        ( TableMsg
-            ( GoToPage
-            , UpdateFilter
-            )
+        ( Model
+        , filterRecord
+        , filteringTable
+        , initialModel
+        , textToRegex
+        , uiTable
+        , update
         )
-import FilteringTable.Model exposing (Model)
-import FilteringTable.Util exposing (filterRecord)
+
 import Html exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
 import List.Extra as LE
-import Messages exposing (Msg(Nope, TableMsg))
+import Messages exposing (Msg(Nope, TableMsg), TableMsg(GoToPage, UpdateFilter))
 import Pages.Fragments.Loader exposing (loader)
+import Regex
 import RemoteList as RL
+
+
+-- Model
+
+
+type alias Model =
+    { filter : Regex.Regex
+    , page : Int
+    }
+
+
+initialModel : Model
+initialModel =
+    { filter = Regex.regex ""
+    , page = 1
+    }
+
+
+
+-- Update
+
+
+update : TableMsg -> Model -> Model
+update msg model =
+    case msg of
+        UpdateFilter filterText ->
+            { model | filter = textToRegex filterText }
+
+        GoToPage page ->
+            { model | page = page }
+
+
+
+-- Helpers
+
+
+filterRecord : Regex.Regex -> a -> Bool
+filterRecord regex record =
+    Regex.contains regex (toString record)
+
+
+textToRegex : String -> Regex.Regex
+textToRegex t =
+    t
+        |> Regex.escape
+        |> Regex.regex
+        |> Regex.caseInsensitive
+
+
+
+-- View
 
 
 emptyView : Html Msg

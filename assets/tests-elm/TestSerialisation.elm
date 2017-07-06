@@ -25,8 +25,6 @@ keyword =
         |> Fuzz.andMap Fuzz.bool
         |> Fuzz.andMap Fuzz.string
         |> Fuzz.andMap Fuzz.string
-        |> Fuzz.andMap Fuzz.string
-        |> Fuzz.andMap Fuzz.string
         |> Fuzz.andMap Fuzz.bool
         |> Fuzz.andMap Fuzz.bool
         |> Fuzz.andMap Fuzz.string
@@ -106,7 +104,6 @@ recipientGroup =
         |> Fuzz.andMap (Fuzz.list recipientSimple)
         |> Fuzz.andMap (Fuzz.list recipientSimple)
         |> Fuzz.andMap (Fuzz.floatRange 0 10)
-        |> Fuzz.andMap Fuzz.string
         |> Fuzz.andMap Fuzz.bool
 
 

@@ -2,7 +2,7 @@ module Pages.Forms.UserProfile.View exposing (view)
 
 import Data.User exposing (UserProfile)
 import DjangoSend exposing (CSRFToken)
-import Forms.Model exposing (Field, FieldMeta, FormStatus)
+import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus)
 import Forms.View exposing (..)
 import Html exposing (Html)
 import Messages exposing (FormMsg(PostForm, UserProfileFormMsg), Msg(FormMsg))
@@ -49,6 +49,7 @@ viewHelp csrf model status profile =
             , Field meta.can_import (checkboxField meta.can_import (Just profile) .can_import (FormMsg << UserProfileFormMsg << UpdateCanImport))
             , Field meta.can_archive (checkboxField meta.can_archive (Just profile) .can_archive (FormMsg << UserProfileFormMsg << UpdateCanArchive))
             ]
+                |> List.map FormField
     in
     Html.div []
         [ Html.h3 [] [ Html.text <| "User Profile: " ++ profile.user.email ]

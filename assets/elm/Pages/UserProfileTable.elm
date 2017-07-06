@@ -1,8 +1,7 @@
 module Pages.UserProfileTable exposing (view)
 
 import Data.User exposing (UserProfile)
-import FilteringTable.Model as FTM
-import FilteringTable.View exposing (filteringTable)
+import FilteringTable as FT
 import Formatting as F exposing ((<>))
 import Html exposing (Html, a, button, i, td, text, th, thead, tr)
 import Html.Attributes exposing (class, href)
@@ -15,9 +14,9 @@ import Store.Messages exposing (StoreMsg(ToggleProfileField))
 -- Main view
 
 
-view : FTM.Model -> RL.RemoteList UserProfile -> Html Msg
+view : FT.Model -> RL.RemoteList UserProfile -> Html Msg
 view tableModel profiles =
-    filteringTable "ui collapsing celled very basic table" tableHead tableModel userprofileRow profiles
+    FT.filteringTable "ui collapsing celled very basic table" tableHead tableModel userprofileRow profiles
 
 
 tableHead : Html Msg

@@ -167,6 +167,7 @@ ELVANTO_KEY = os.environ.get('ELVANTO_KEY', '')
 ONEBODY_BASE_URL = os.environ.get('ONEBODY_BASE_URL')
 ONEBODY_USER_EMAIL = os.environ.get('ONEBODY_USER_EMAIL')
 ONEBODY_API_KEY = os.environ.get('ONEBODY_API_KEY')
+ONEBODY_WAIT_TIME = 10
 
 # Twilio credentials
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID', 'no SID found')

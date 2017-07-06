@@ -2,7 +2,7 @@ module Pages.Forms.Contact.View exposing (view)
 
 import Data.Recipient exposing (Recipient)
 import DjangoSend exposing (CSRFToken)
-import Forms.Model exposing (Field, FieldMeta, FormStatus)
+import Forms.Model exposing (Field, FieldMeta, FormItem(FieldGroup, FormField), FormStatus, defaultFieldGroupConfig)
 import Forms.View exposing (checkboxField, form, simpleTextField, submitButton)
 import Html exposing (Html, a, div, p, text)
 import Html.Attributes as A
@@ -75,10 +75,12 @@ viewHelp settings maybeTable currentContact contacts_ model status =
             showArchiveNotice contacts currentContact model
 
         fields =
-            [ Field meta.first_name <| firstNameField meta.first_name currentContact
-            , Field meta.last_name <| lastNameField meta.last_name currentContact
-            , Field meta.number <| numberField meta.number settings.defaultNumberPrefix currentContact
-            , Field meta.do_not_reply <| doNotReplyField meta.do_not_reply currentContact
+            [ FieldGroup { defaultFieldGroupConfig | sideBySide = True, useSegment = False }
+                [ Field meta.first_name <| firstNameField meta.first_name currentContact
+                , Field meta.last_name <| lastNameField meta.last_name currentContact
+                ]
+            , FormField <| Field meta.number <| numberField meta.number settings.defaultNumberPrefix currentContact
+            , FormField <| Field meta.do_not_reply <| doNotReplyField meta.do_not_reply currentContact
             ]
     in
     div []

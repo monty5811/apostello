@@ -23,8 +23,6 @@ class ElvantoGroupSerializer(BaseModelSerializer):
 
 class KeywordSerializer(BaseModelSerializer):
     """Serialize apostello.models.Keyword for use in table."""
-    url = serializers.CharField(source='get_absolute_url')
-    responses_url = serializers.CharField(source='get_responses_url')
     num_replies = serializers.CharField(source='num_matches')
     num_archived_replies = serializers.CharField(source='num_archived_matches')
     is_live = serializers.BooleanField()
@@ -32,7 +30,7 @@ class KeywordSerializer(BaseModelSerializer):
     class Meta:
         model = Keyword
         fields = (
-            'keyword', 'pk', 'description', 'current_response', 'is_live', 'url', 'responses_url', 'num_replies',
+            'keyword', 'pk', 'description', 'current_response', 'is_live', 'num_replies',
             'num_archived_replies', 'is_archived', 'disable_all_replies', 'custom_response', 'deactivated_response',
             'too_early_response', 'activate_time', 'deactivate_time', 'linked_groups', 'owners', 'subscribed_to_digest',
         )
@@ -88,13 +86,12 @@ class SmsOutboundSerializer(BaseModelSerializer):
 class RecipientGroupSerializer(BaseModelSerializer):
     """Serialize apostello.models.RecipientGroup for use in edit page."""
     cost = serializers.FloatField(source='calculate_cost')
-    url = serializers.CharField(source='get_absolute_url')
     members = RecipientSimpleSerializer(many=True, read_only=True, source='recipient_set')
     nonmembers = RecipientSimpleSerializer(many=True, read_only=True, source='all_recipients_not_in_group')
 
     class Meta:
         model = RecipientGroup
-        fields = ('name', 'pk', 'description', 'members', 'nonmembers', 'cost', 'url', 'is_archived', )
+        fields = ('name', 'pk', 'description', 'members', 'nonmembers', 'cost', 'is_archived', )
 
 
 class UserSerializer(BaseModelSerializer):

@@ -1,8 +1,7 @@
 module Pages.OutboundTable exposing (view)
 
 import Data.SmsOutbound exposing (SmsOutbound)
-import FilteringTable.Model as FTM
-import FilteringTable.View exposing (uiTable)
+import FilteringTable as FT
 import Helpers exposing (formatDate)
 import Html exposing (Html, a, td, text, th, thead, tr)
 import Html.Attributes as A
@@ -16,9 +15,9 @@ import Route exposing (spaLink)
 -- Main view
 
 
-view : FTM.Model -> RL.RemoteList SmsOutbound -> Html Msg
+view : FT.Model -> RL.RemoteList SmsOutbound -> Html Msg
 view tableModel sms =
-    uiTable tableHead tableModel smsRow sms
+    FT.uiTable tableHead tableModel smsRow sms
 
 
 tableHead : Html Msg

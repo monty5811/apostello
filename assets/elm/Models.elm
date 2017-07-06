@@ -11,7 +11,7 @@ module Models
 import Data.User exposing (UserProfile, decodeUserProfile)
 import Dict exposing (Dict)
 import DjangoSend exposing (CSRFToken(CSRFToken))
-import FilteringTable.Model as FT
+import FilteringTable as FT
 import Forms.Model exposing (FormStatus(NoAction))
 import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (decode, required)
@@ -40,7 +40,7 @@ type alias Model =
 initialModel : Settings -> String -> Page -> Model
 initialModel settings dataStoreCache page =
     { page = page
-    , table = FT.initial
+    , table = FT.initialModel
     , settings = settings
     , dataStore = Result.withDefault emptyDataStore <| Decode.decodeString decodeDataStore dataStoreCache
     , fabModel = initialFabModel

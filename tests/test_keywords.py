@@ -3,9 +3,7 @@ import pytest
 
 @pytest.mark.slow
 @pytest.mark.django_db
-class TestOthers:
-    """Test posting as a user"""
-
+class TestKeywords:
     def test_keyword_responses_archive_all_not_ticked(self, keywords, users):
         users['c_staff'].post('/api/v2/keywords/test/archive_resps/', {'tick_to_archive_all_responses': False})
 

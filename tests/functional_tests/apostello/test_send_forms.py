@@ -27,7 +27,7 @@ def click_send(b, wt):
 
 
 def add_recipient(b, wt):
-    for x in b.find_elements_by_xpath('//*[@id="elmContainer"]/div/div[3]/div/div/div/form/div[2]/div/div[2]/div'):
+    for x in b.find_elements_by_xpath('//*[@id="elmContainer"]/div/div[3]/div/div/div/form/div[2]/div/div[3]/div'):
         if x.text == 'John Calvin':
             recipient = x
             break

@@ -5,7 +5,7 @@ import Date.Format
 import DateTimePicker
 import DateTimePicker.Config
 import Dict
-import FilteringTable.Util exposing (filterRecord)
+import FilteringTable exposing (filterRecord)
 import Forms.Model exposing (..)
 import Html exposing (Html, button, div, i, input, label, text, textarea)
 import Html.Attributes as A
@@ -15,15 +15,15 @@ import Regex
 import RemoteList as RL
 
 
-form : FormStatus -> List Field -> Msg -> Html Msg -> Html Msg
-form formStatus fields submitMsg button_ =
+form : FormStatus -> List FormItem -> Msg -> Html Msg -> Html Msg
+form formStatus items submitMsg button_ =
     Html.form
         [ A.class <| formClass formStatus
         , E.onSubmit submitMsg
         ]
     <|
         renderFormError formStatus
-            ++ List.map (renderField <| formErrors formStatus) fields
+            ++ List.map (renderItem <| formErrors formStatus) items
             ++ [ button_ ]
 
 
@@ -40,6 +40,54 @@ renderFormError status =
 
         _ ->
             []
+
+
+renderItem : FormErrors -> FormItem -> Html Msg
+renderItem errorDict item =
+    case item of
+        FormField field ->
+            renderField errorDict field
+
+        FormHeader header ->
+            Html.h4 [ A.class "ui dividing header" ] [ Html.text header ]
+
+        FieldGroup config fields ->
+            fieldGroupHelp config <|
+                List.map (renderField errorDict) fields
+
+
+fieldGroupHelp : FieldGroupConfig -> List (Html Msg) -> Html Msg
+fieldGroupHelp config fields =
+    fields
+        |> addSideBySide config.sideBySide
+        |> addHeader config.header
+        |> addSegment config.useSegment
+
+
+addSideBySide : Bool -> List (Html Msg) -> Html Msg
+addSideBySide add fields =
+    if add then
+        Html.div [ A.class "equal width fields" ] fields
+    else
+        Html.div [] fields
+
+
+addHeader : Maybe String -> Html Msg -> Html Msg
+addHeader header fields =
+    case header of
+        Nothing ->
+            fields
+
+        Just h ->
+            Html.div [] [ Html.h4 [] [ Html.text h ], fields ]
+
+
+addSegment : Bool -> Html Msg -> Html Msg
+addSegment seg fields =
+    if seg then
+        Html.div [ A.class "ui raised segment" ] [ fields ]
+    else
+        fields
 
 
 renderField : FormErrors -> Field -> Html Msg
@@ -277,12 +325,13 @@ submitButton maybeItem showAN =
 
 
 type alias MultiSelectField a =
-    { items : RL.RemoteList a
+    { items : RL.RemoteList { a | pk : Int }
     , selectedPks : Maybe (List Int)
     , defaultPks : Maybe (List Int)
     , filter : Regex.Regex
     , filterMsg : String -> Msg
-    , itemView : Maybe (List Int) -> a -> Html Msg
+    , itemView : Maybe (List Int) -> { a | pk : Int } -> Html Msg
+    , selectedView : Maybe (List Int) -> { a | pk : Int } -> Html Msg
     }
 
 
@@ -301,6 +350,7 @@ multiSelectField meta props =
     , helpLabel meta
     , div [ A.class "ui raised segment" ]
         [ loadingMessage props.items
+        , selectedItemsView pks props.selectedView props.items
         , div [ A.class "ui left icon large transparent fluid input" ]
             [ input
                 [ A.placeholder "Filter..."
@@ -325,6 +375,20 @@ multiSelectField meta props =
             )
         ]
     ]
+
+
+selectedItemsView : Maybe (List Int) -> (Maybe (List Int) -> { a | pk : Int } -> Html Msg) -> RL.RemoteList { a | pk : Int } -> Html Msg
+selectedItemsView maybePks render rl =
+    case maybePks of
+        Nothing ->
+            div [] []
+
+        Just pks ->
+            rl
+                |> RL.toList
+                |> List.filter (\x -> List.member x.pk pks)
+                |> List.map (render maybePks)
+                |> div []
 
 
 loadingMessage : RL.RemoteList a -> Html Msg

@@ -37,7 +37,7 @@ class TestUserProfiles:
 
     def test_user_profile_form(self, live_server, browser_in, users, driver_wait_time):
         """Test an individual user profile form."""
-        uri = users['staff'].profile.get_absolute_url()
+        uri = '/users/profiles/' + str(users['staff'].pk)
         assert users['staff'].profile.can_archive
         # load page
         browser_in.get(live_server + uri)

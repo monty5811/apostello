@@ -1,7 +1,7 @@
 module Pages.Forms.SendGroup.Update exposing (..)
 
 import Data.RecipientGroup exposing (RecipientGroup, nullGroup)
-import FilteringTable.Util as FT
+import FilteringTable as FT
 import Helpers exposing (calculateSmsCost)
 import Pages.Forms.SendGroup.Messages exposing (SendGroupMsg(SelectGroup, UpdateGroupFilter, UpdateSGContent, UpdateSGDate))
 import Pages.Forms.SendGroup.Model exposing (SendGroupModel)

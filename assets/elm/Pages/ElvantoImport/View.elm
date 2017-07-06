@@ -1,8 +1,7 @@
 module Pages.ElvantoImport.View exposing (view)
 
 import Data.ElvantoGroup exposing (ElvantoGroup)
-import FilteringTable.Model as FTM
-import FilteringTable.View exposing (filteringTable)
+import FilteringTable as FT
 import Helpers exposing (formatDate)
 import Html exposing (Html, a, br, div, td, text, th, thead, tr)
 import Html.Attributes exposing (class, id)
@@ -16,12 +15,12 @@ import Store.Messages exposing (StoreMsg(ToggleElvantoGroupSync))
 -- Main view
 
 
-view : FTM.Model -> RL.RemoteList ElvantoGroup -> Html Msg
+view : FT.Model -> RL.RemoteList ElvantoGroup -> Html Msg
 view tableModel groups =
     div []
         [ div [ class "ui fluid buttons" ] [ fetchButton, pullButton ]
         , br [] []
-        , filteringTable "ui striped compact definition table" tableHead tableModel groupRow groups
+        , FT.filteringTable "ui striped compact definition table" tableHead tableModel groupRow groups
         ]
 
 

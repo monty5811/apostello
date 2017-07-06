@@ -4,7 +4,7 @@ import Data.RecipientGroup exposing (RecipientGroup)
 import Date
 import DateTimePicker
 import DjangoSend exposing (CSRFToken)
-import Forms.Model exposing (Field, FieldMeta, FormStatus)
+import Forms.Model exposing (Field, FieldMeta, FormItem(FieldGroup), FormStatus, defaultFieldGroupConfig)
 import Forms.View as FV
 import Html exposing (Html)
 import Html.Attributes as A
@@ -35,28 +35,43 @@ view csrf dataStore maybeModel status =
                     filterArchived False dataStore.groups
 
                 fields =
-                    [ Field meta.site_name (siteNameField meta.site_name model)
-                    , Field meta.sms_char_limit (smsLimitField meta.sms_char_limit model)
-                    , Field meta.default_number_prefix (defaultPrefixField meta.default_number_prefix model)
-                    , Field meta.disable_all_replies (allRepliesField meta.disable_all_replies model)
-                    , Field meta.disable_email_login_form (emailLoginField meta.disable_email_login_form model)
-                    , Field meta.office_email (officeEmailField meta.office_email model)
-                    , Field meta.auto_add_new_groups (autoNewGroupsField groups meta.auto_add_new_groups model)
-                    , Field meta.sms_expiration_date (smsExpirationDateField meta.sms_expiration_date model)
-                    , Field meta.slack_url (slackField meta.slack_url model)
-                    , Field meta.sync_elvanto (syncElvField meta.sync_elvanto model)
-                    , Field meta.not_approved_msg (notAppField meta.not_approved_msg model)
-                    , Field meta.email_host (emailHostField meta.email_host model)
-                    , Field meta.email_port (emailPortField meta.email_port model)
-                    , Field meta.email_username (emailUserField meta.email_username model)
-                    , Field meta.email_password (emailPassField meta.email_password model)
-                    , Field meta.email_from (emailFromField meta.email_from model)
-                    ]
+                    fieldsHelp groups model
             in
             FV.form status
                 fields
                 (FormMsg <| PostForm <| postCmd csrf model)
                 (FV.submitButton (Just model) False)
+
+
+fieldsHelp : RL.RemoteList RecipientGroup -> SiteConfigFormModel -> List FormItem
+fieldsHelp groups model =
+    [ FieldGroup { defaultFieldGroupConfig | header = Just "Site Settings" }
+        [ Field meta.site_name (siteNameField meta.site_name model)
+        , Field meta.disable_email_login_form (emailLoginField meta.disable_email_login_form model)
+        , Field meta.not_approved_msg (notAppField meta.not_approved_msg model)
+        ]
+    , FieldGroup { defaultFieldGroupConfig | header = Just "SMS Settings" }
+        [ Field meta.sms_char_limit (smsLimitField meta.sms_char_limit model)
+        , Field meta.default_number_prefix (defaultPrefixField meta.default_number_prefix model)
+        , Field meta.disable_all_replies (allRepliesField meta.disable_all_replies model)
+        , Field meta.auto_add_new_groups (autoNewGroupsField groups meta.auto_add_new_groups model)
+        , Field meta.sms_expiration_date (smsExpirationDateField meta.sms_expiration_date model)
+        ]
+    , FieldGroup { defaultFieldGroupConfig | header = Just "Notification Settings" }
+        [ Field meta.office_email (officeEmailField meta.office_email model)
+        , Field meta.slack_url (slackField meta.slack_url model)
+        ]
+    , FieldGroup { defaultFieldGroupConfig | header = Just "Sending Email Settings" }
+        [ Field meta.email_host (emailHostField meta.email_host model)
+        , Field meta.email_port (emailPortField meta.email_port model)
+        , Field meta.email_username (emailUserField meta.email_username model)
+        , Field meta.email_password (emailPassField meta.email_password model)
+        , Field meta.email_from (emailFromField meta.email_from model)
+        ]
+    , FieldGroup { defaultFieldGroupConfig | header = Just "Sync Settings" }
+        [ Field meta.sync_elvanto (syncElvField meta.sync_elvanto model)
+        ]
+    ]
 
 
 siteNameField : FieldMeta -> SiteConfigFormModel -> List (Html Msg)
@@ -123,6 +138,7 @@ autoNewGroupsField groups meta_ model =
             model.groupsFilter
             (FormMsg << SiteConfigFormMsg << UpdateGroupsFilter model)
             (groupView model)
+            (groupLabelView model)
         )
 
 
@@ -134,6 +150,16 @@ smsExpirationDateField meta_ model =
 updateExpDate : SiteConfigFormModel -> DateTimePicker.State -> Maybe Date.Date -> Msg
 updateExpDate model state maybeDate =
     FormMsg <| SiteConfigFormMsg <| UpdateSmsExpiredDate model state maybeDate
+
+
+groupLabelView : SiteConfigFormModel -> Maybe (List Int) -> RecipientGroup -> Html Msg
+groupLabelView model maybePks group =
+    Html.div
+        [ A.class "ui violet basic label"
+        , A.style [ ( "user-select", "none" ) ]
+        , E.onClick <| FormMsg <| SiteConfigFormMsg <| UpdateAutoAddGroupsField model group.pk
+        ]
+        [ Html.text group.name ]
 
 
 groupView : SiteConfigFormModel -> Maybe (List Int) -> RecipientGroup -> Html Msg

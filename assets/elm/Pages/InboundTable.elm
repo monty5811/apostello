@@ -1,8 +1,7 @@
 module Pages.InboundTable exposing (view)
 
 import Data.SmsInbound exposing (SmsInbound)
-import FilteringTable.Model as FTM
-import FilteringTable.View exposing (uiTable)
+import FilteringTable as FT
 import Helpers exposing (formatDate)
 import Html exposing (Html, a, b, i, td, text, th, thead, tr)
 import Html.Attributes as A
@@ -19,7 +18,7 @@ import Store.Messages exposing (StoreMsg(ReprocessSms))
 -- Main view
 
 
-view : FTM.Model -> RL.RemoteList SmsInbound -> Html Msg
+view : FT.Model -> RL.RemoteList SmsInbound -> Html Msg
 view tableModel sms =
     let
         head =
@@ -33,7 +32,7 @@ view tableModel sms =
                     ]
                 ]
     in
-    uiTable head tableModel smsRow sms
+    FT.uiTable head tableModel smsRow sms
 
 
 smsRow : SmsInbound -> Html Msg

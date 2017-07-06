@@ -42,6 +42,7 @@ class RecipientGroup(models.Model):
     def send_message(self, content, sent_by, eta=None):
         """Send message to group."""
         async('apostello.tasks.group_send_message_task', content, self.name, sent_by, eta)
+
     def archive(self):
         """Archive the group."""
         self.is_archived = True
@@ -74,11 +75,6 @@ class RecipientGroup(models.Model):
     def calculate_cost(self):
         """Calculate the cost of sending to this group."""
         return settings.TWILIO_SENDING_COST * self.all_recipients.count()
-
-    @cached_property
-    def get_absolute_url(self):
-        """Url for this group."""
-        return '/group/edit/{}/'.format(self.pk)
 
     def __str__(self):
         """Pretty representation."""
@@ -167,11 +163,6 @@ class Recipient(models.Model):
             raise ValidationError('Sorry, you can only send messages that cost no more than ${0}.'.format(limit))
 
     @cached_property
-    def get_absolute_url(self):
-        """Url for this recipient."""
-        return "/recipient/edit/{}/".format(self.pk)
-
-    @cached_property
     def full_name(self):
         """Recipient's full name."""
         return u"{fn} {ln}".format(fn=self.first_name, ln=self.last_name)
@@ -184,11 +175,13 @@ class Recipient(models.Model):
             msg = SmsInbound.objects.filter(sender_num=str(self.number))
             try:
                 msg = msg[0]  # sms are already sorted in time
-                last_sms = {'content': msg.content, 'time_received': msg.time_received.strftime('%d %b %H:%M')}
+                t = msg.time_received
+                if t is not None:
+                    t = t.strftime('%d %b %H:%M')
+                last_sms = {'content': msg.content, 'time_received': t}
             except IndexError:
                 last_sms = {'content': '', 'time_received': ''}
             cache.set('last_msg__{0}'.format(self.pk), last_sms, 600)
-
         return last_sms
 
     def save(self, *args, **kwargs):
@@ -428,15 +421,6 @@ class Keyword(models.Model):
         self.keyword = self.keyword.lower()
         super(Keyword, self).save(force_insert, force_update, *args, **kwargs)
         async('apostello.tasks.populate_keyword_response_count', pk=self.pk)
-    @cached_property
-    def get_absolute_url(self):
-        """Url for this group."""
-        return '/keyword/edit/{}/'.format(self.keyword)
-
-    @cached_property
-    def get_responses_url(self):
-        """Url for keyword responses list page."""
-        return '/keyword/responses/{}/'.format(self.keyword)
 
     @staticmethod
     def _match(sms):
@@ -698,10 +682,6 @@ class UserProfile(models.Model):
         p.user = dummy_user
         p.pk = 0
         return p
-
-    def get_absolute_url(self):
-        """Url for this user profile."""
-        return '/users/profiles/{}/'.format(self.user.pk)
 
     def __str__(self):
         """Pretty representation."""

@@ -52,6 +52,24 @@ formErrors formStatus =
             noErrors
 
 
+type FormItem
+    = FormField Field
+    | FormHeader String
+    | FieldGroup FieldGroupConfig (List Field)
+
+
+type alias FieldGroupConfig =
+    { header : Maybe String
+    , sideBySide : Bool
+    , useSegment : Bool
+    }
+
+
+defaultFieldGroupConfig : FieldGroupConfig
+defaultFieldGroupConfig =
+    FieldGroupConfig Nothing False True
+
+
 type alias Field =
     { meta : FieldMeta
     , view : List (Html Msg)

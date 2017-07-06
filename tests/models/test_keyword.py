@@ -86,14 +86,8 @@ class TestKeywords():
     def test_no_match(self, keywords):
         assert Keyword.match("nope") == 'No Match'
 
-    def test_get_log_link_keyword(self, keywords):
-        assert Keyword.get_log_link(keywords['test']) == '/keyword/responses/test/'
-
     def test_lookup_colour_test(self, keywords):
         assert Keyword.lookup_colour('test') == '#098f6b'
-
-    def test_get_log_link_str(self, keywords):
-        assert Keyword.get_log_link('test_no_link') == '#'
 
     def test_stop(self):
         assert Keyword.match("Stop it!") == 'stop'

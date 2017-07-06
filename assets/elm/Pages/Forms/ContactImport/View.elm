@@ -1,7 +1,7 @@
 module Pages.Forms.ContactImport.View exposing (view)
 
 import DjangoSend exposing (CSRFToken)
-import Forms.Model exposing (Field, FieldMeta, FormStatus)
+import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus)
 import Forms.View exposing (form, longTextField)
 import Html exposing (Html)
 import Html.Attributes as A
@@ -16,7 +16,7 @@ view : CSRFToken -> FormStatus -> ContactImportModel -> Html Msg
 view csrf status model =
     let
         fields =
-            [ Field meta.csv_data <| longTextField 20 meta.csv_data (Just "") (FormMsg << ContactImportMsg << UpdateText)
+            [ FormField <| Field meta.csv_data <| longTextField 20 meta.csv_data (Just "") (FormMsg << ContactImportMsg << UpdateText)
             ]
 
         button =

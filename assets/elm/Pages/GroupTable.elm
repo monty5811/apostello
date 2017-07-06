@@ -1,8 +1,7 @@
 module Pages.GroupTable exposing (view)
 
 import Data.RecipientGroup exposing (RecipientGroup)
-import FilteringTable.Model as FTM
-import FilteringTable.View exposing (uiTable)
+import FilteringTable as FT
 import Helpers exposing (archiveCell)
 import Html exposing (Html, a, td, text, th, thead, tr)
 import Html.Attributes exposing (class)
@@ -18,9 +17,9 @@ import Store.Messages exposing (StoreMsg(ToggleGroupArchive))
 -- Main view
 
 
-view : FTM.Model -> RL.RemoteList RecipientGroup -> Html Msg
+view : FT.Model -> RL.RemoteList RecipientGroup -> Html Msg
 view tableModel groups =
-    uiTable tableHead tableModel groupRow groups
+    FT.uiTable tableHead tableModel groupRow groups
 
 
 tableHead : Html Msg

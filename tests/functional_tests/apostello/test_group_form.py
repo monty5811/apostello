@@ -108,10 +108,10 @@ class TestGroupForm:
 
     def test_group_membership_buttons(self, live_server, browser_in, recipients, groups, driver_wait_time):
         """Test editing group membership."""
-        non_member_xpath = '//*[@id="elmContainer"]/div[1]/div[3]/div/div/div/div/div[1]/div/div[2]/div/div'
-        member_xpath = '//*[@id="elmContainer"]/div[1]/div[3]/div/div/div/div/div[2]/div/div[2]/div/div'
+        non_member_xpath = '//*[@id="elmContainer"]/div/div[3]/div/div/div/div/div[1]/div/div[2]/div/div'
+        member_xpath = '//*[@id="elmContainer"]/div/div[3]/div/div/div/div/div[2]/div/div[2]/div/div'
         grp = groups['empty_group']
-        browser_in.get(live_server + grp.get_absolute_url)
+        browser_in.get(live_server + '/group/edit/' + str(grp.pk) + '/')
         # check all recipient are displayed
         cards = browser_in.find_elements_by_xpath(non_member_xpath)
         assert len(cards) == models.Recipient.objects.filter(is_archived=False).count()

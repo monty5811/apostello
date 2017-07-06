@@ -32,8 +32,8 @@ commonShell model mainContent fab =
         , div [ class "ui hidden divider" ] []
         , div [ class "ui stackable grid container" ]
             [ div [ class "fourteen wide centered column" ]
-                ([ h3 [] [ text <| title model.page ] ]
-                    ++ Notif.view model
+                (h3 [] [ text <| title model.page ]
+                    :: Notif.view model
                     ++ [ mainContent ]
                 )
             ]

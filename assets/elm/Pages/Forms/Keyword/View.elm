@@ -6,7 +6,7 @@ import Data.User exposing (User)
 import Date
 import DateTimePicker
 import DjangoSend exposing (CSRFToken)
-import Forms.Model exposing (Field, FieldMeta, FormStatus)
+import Forms.Model exposing (Field, FieldMeta, FormItem(FieldGroup, FormField), FormStatus, defaultFieldGroupConfig)
 import Forms.View exposing (..)
 import Html exposing (Html)
 import Html.Attributes as A
@@ -88,17 +88,23 @@ viewHelp csrf now dataStore currentKeyword model status =
             showArchiveNotice keywords currentKeyword model
 
         fields =
-            [ Field meta.keyword (keywordField meta.keyword currentKeyword)
-            , Field meta.description (descField meta.description currentKeyword)
-            , Field meta.disable_all_replies (disableRepliesField meta.disable_all_replies currentKeyword)
-            , Field meta.custom_response (customRespField meta.custom_response currentKeyword)
-            , Field meta.deactivated_response (deactivatedRespField meta.deactivated_response currentKeyword)
-            , Field meta.too_early_response (tooEarlyRespField meta.too_early_response currentKeyword)
-            , Field meta.activate_time (activateTimeField meta.activate_time model currentKeyword)
-            , Field meta.deactivate_time (deactivateTimeField meta.deactivate_time model currentKeyword)
-            , Field meta.linked_groups (linkedGroupsField meta.linked_groups model groups currentKeyword)
-            , Field meta.owners (ownersField meta.owners model users currentKeyword)
-            , Field meta.subscribed_to_digest (digestField meta.subscribed_to_digest model users currentKeyword)
+            [ FormField <| Field meta.keyword (keywordField meta.keyword currentKeyword)
+            , FormField <| Field meta.description (descField meta.description currentKeyword)
+            , FormField <| Field meta.disable_all_replies (disableRepliesField meta.disable_all_replies currentKeyword)
+            , FieldGroup { defaultFieldGroupConfig | header = Just "Replies" }
+                [ Field meta.custom_response (customRespField meta.custom_response currentKeyword)
+                , Field meta.deactivated_response (deactivatedRespField meta.deactivated_response currentKeyword)
+                , Field meta.too_early_response (tooEarlyRespField meta.too_early_response currentKeyword)
+                ]
+            , FieldGroup { defaultFieldGroupConfig | header = Just "Scheduling" }
+                [ Field meta.activate_time (activateTimeField meta.activate_time model currentKeyword)
+                , Field meta.deactivate_time (deactivateTimeField meta.deactivate_time model currentKeyword)
+                ]
+            , FieldGroup { defaultFieldGroupConfig | header = Just "Other Settings" }
+                [ Field meta.linked_groups (linkedGroupsField meta.linked_groups model groups currentKeyword)
+                , Field meta.owners (ownersField meta.owners model users currentKeyword)
+                , Field meta.subscribed_to_digest (digestField meta.subscribed_to_digest model users currentKeyword)
+                ]
             ]
     in
     Html.div []
@@ -203,7 +209,18 @@ linkedGroupsField meta_ model groups maybeKeyword =
             model.linkedGroupsFilter
             (FormMsg << KeywordFormMsg << UpdateKeywordLinkedGroupsFilter)
             groupView
+            groupLabelView
         )
+
+
+groupLabelView : Maybe (List Int) -> RecipientGroup -> Html Msg
+groupLabelView maybePks group =
+    Html.div
+        [ A.class "ui violet basic label"
+        , A.style [ ( "user-select", "none" ) ]
+        , E.onClick <| FormMsg <| KeywordFormMsg <| UpdateSelectedLinkedGroup (Maybe.withDefault [] maybePks) group.pk
+        ]
+        [ Html.text group.name ]
 
 
 groupView : Maybe (List Int) -> RecipientGroup -> Html Msg
@@ -241,6 +258,7 @@ ownersField meta_ model users maybeKeyword =
             model.ownersFilter
             (FormMsg << KeywordFormMsg << UpdateKeywordOwnersFilter)
             (userView UpdateSelectedOwner)
+            (userLabelView UpdateSelectedOwner)
         )
 
 
@@ -255,7 +273,18 @@ digestField meta_ model users maybeKeyword =
             model.subscribersFilter
             (FormMsg << KeywordFormMsg << UpdateKeywordSubscribersFilter)
             (userView UpdateSelectedSubscriber)
+            (userLabelView UpdateSelectedSubscriber)
         )
+
+
+userLabelView : (List Int -> Int -> KeywordFormMsg) -> Maybe (List Int) -> User -> Html Msg
+userLabelView msg selectedPks user =
+    Html.div
+        [ A.class "ui violet basic label"
+        , A.style [ ( "user-select", "none" ) ]
+        , E.onClick <| FormMsg <| KeywordFormMsg <| msg (Maybe.withDefault [] selectedPks) user.pk
+        ]
+        [ Html.text user.email ]
 
 
 userView : (List Int -> Int -> KeywordFormMsg) -> Maybe (List Int) -> User -> Html Msg
