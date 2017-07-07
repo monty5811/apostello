@@ -1,6 +1,6 @@
 module Pages.Curator exposing (view)
 
-import Data.SmsInbound exposing (SmsInbound)
+import Data exposing (SmsInbound)
 import FilteringTable as FT
 import Helpers exposing (formatDate)
 import Html exposing (Html, a, td, text, th, thead, tr)

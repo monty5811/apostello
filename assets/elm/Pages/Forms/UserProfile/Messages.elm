@@ -1,6 +1,6 @@
 module Pages.Forms.UserProfile.Messages exposing (UserProfileFormMsg(..))
 
-import Data.User exposing (UserProfile)
+import Data exposing (UserProfile)
 
 
 type UserProfileFormMsg

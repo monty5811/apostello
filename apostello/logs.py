@@ -1,33 +1,58 @@
 import logging
+from datetime import datetime, timedelta
 
 from django.conf import settings
 from twilio.base.exceptions import TwilioRestException
 
+from site_config.models import SiteConfiguration
+
 from .models import Keyword, Recipient, SmsInbound, SmsOutbound
 from .twilio import twilio_client
-from site_config.models import SiteConfiguration
 
 logger = logging.getLogger('apostello')
 
 
-def has_expired(datetime):
-    config = SiteConfiguration.get_solo()
-    if config.sms_expiration_date is None:
+def has_expired(dt_):
+    d = get_expiry_date()
+    if d is None:
         return False
     else:
-        return datetime.date() < config.sms_expiration_date
+        return dt_.date() < d
+
+
+def get_expiry_date():
+    config = SiteConfiguration.get_solo()
+    exp_date = config.sms_expiration_date
+    try:
+        roll_date = datetime.today() - timedelta(days=config.sms_rolling_expiration_days)
+        roll_date = roll_date.date()
+    except TypeError:
+        # no rolling expiration
+        roll_date = None
+
+    if roll_date is None and exp_date is None:
+        # no expiration set
+        return None
+    elif roll_date is None:
+        # no roll date, use expiration date
+        delete_date = exp_date
+    elif exp_date is None:
+        # no expiration date, use roll date
+        delete_date = roll_date
+    else:
+        # both set, use the most recent date of the tow
+        delete_date = max([exp_date, roll_date])
+
+    return delete_date
 
 
 def cleanup_expired_sms():
     """Remove expired messages."""
-    config = SiteConfiguration.get_solo()
-    if config.sms_expiration_date is None:
-        # no expiration, skip checks
-        return
-    for sms in SmsInbound.objects.filter(time_received__date__lt=config.sms_expiration_date):
-        sms.delete()
-    for sms in SmsOutbound.objects.filter(time_sent__date__lt=config.sms_expiration_date):
-        sms.delete()
+    d = get_expiry_date()
+    if d is not None:
+        SmsInbound.objects.filter(time_received__date__lt=d).delete()
+        SmsOutbound.objects.filter(time_sent__date__lt=d).delete()
+
 
 
 def handle_incoming_sms(msg):

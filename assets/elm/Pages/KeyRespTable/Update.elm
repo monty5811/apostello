@@ -1,6 +1,6 @@
 module Pages.KeyRespTable.Update exposing (update)
 
-import Data.SmsInbound exposing (SmsInbound)
+import Data exposing (SmsInbound)
 import DjangoSend exposing (CSRFToken, post)
 import Helpers exposing (..)
 import Http

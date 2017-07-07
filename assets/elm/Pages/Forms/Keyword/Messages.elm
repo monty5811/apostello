@@ -1,6 +1,6 @@
 module Pages.Forms.Keyword.Messages exposing (..)
 
-import Data.Keyword exposing (Keyword)
+import Data exposing (Keyword)
 import Date
 import DateTimePicker
 

@@ -1,6 +1,6 @@
 module Pages.Forms.Contact.Remote exposing (..)
 
-import Data.Recipient exposing (Recipient)
+import Data exposing (Recipient)
 import DjangoSend exposing (CSRFToken, rawPost)
 import Forms.Helpers exposing (addPk, extractBool, extractField)
 import Http

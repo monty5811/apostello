@@ -1,6 +1,6 @@
 module Pages.Forms.SendAdhoc.Remote exposing (postCmd)
 
-import Data.User exposing (UserProfile)
+import Data exposing (UserProfile)
 import DjangoSend exposing (CSRFToken, rawPost)
 import Encode exposing (encodeMaybeDate)
 import Http

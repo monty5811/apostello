@@ -1,10 +1,6 @@
 module Store.Messages exposing (..)
 
-import Data.ElvantoGroup exposing (ElvantoGroup)
-import Data.Recipient exposing (RecipientSimple)
-import Data.RecipientGroup exposing (RecipientGroup)
-import Data.SmsInbound exposing (SmsInbound)
-import Data.User exposing (UserProfile)
+import Data exposing (ElvantoGroup, RecipientGroup, RecipientSimple, SmsInbound, UserProfile)
 import Http
 import Store.DataTypes exposing (RemoteDataType)
 import Store.Model exposing (RawResponse)

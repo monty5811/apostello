@@ -1,6 +1,6 @@
 module Pages.Forms.Keyword.Remote exposing (postCmd)
 
-import Data.Keyword exposing (Keyword)
+import Data exposing (Keyword)
 import DjangoSend exposing (CSRFToken, rawPost)
 import Encode exposing (encodeDate, encodeMaybeDate)
 import Forms.Helpers exposing (addPk, extractBool, extractDate, extractField, extractMaybeDate, extractPks)

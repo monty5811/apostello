@@ -1,6 +1,6 @@
 module Pages.Wall exposing (view)
 
-import Data.SmsInbound exposing (SmsInbound)
+import Data exposing (SmsInbound)
 import Html exposing (Html, div, p, span, text)
 import Html.Attributes exposing (class, style)
 import Messages exposing (Msg)

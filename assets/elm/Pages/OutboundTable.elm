@@ -1,6 +1,6 @@
 module Pages.OutboundTable exposing (view)
 
-import Data.SmsOutbound exposing (SmsOutbound)
+import Data exposing (SmsOutbound)
 import FilteringTable as FT
 import Helpers exposing (formatDate)
 import Html exposing (Html, a, td, text, th, thead, tr)

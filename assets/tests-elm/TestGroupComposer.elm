@@ -1,7 +1,6 @@
 module TestGroupComposer exposing (suite)
 
-import Data.Recipient exposing (RecipientSimple)
-import Data.RecipientGroup exposing (RecipientGroup)
+import Data exposing (RecipientGroup, RecipientSimple)
 import Expect
 import Pages.GroupComposer.Model exposing (ParenLoc)
 import Pages.GroupComposer.View exposing (..)

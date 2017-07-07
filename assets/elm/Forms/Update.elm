@@ -18,7 +18,7 @@ import Pages.Forms.SendGroup.Update as SG
 import Pages.Forms.SiteConfig.Model exposing (SiteConfigFormModel)
 import Pages.Forms.SiteConfig.Update as SCF
 import Pages.Forms.UserProfile.Update as UPF
-import Pages.Fragments.Notification.Update as Notif
+import Pages.Fragments.Notification as Notif
 import RemoteList as RL
 
 
@@ -31,7 +31,10 @@ update msg model =
         ReceiveFormResp okMsg (Ok resp) ->
             case Decode.decodeString decodeFormResp resp.body of
                 Ok data ->
-                    ( { model | formStatus = Success } |> Notif.addListOfDjangoMessagesNoDestroy data.messages
+                    ( { model
+                        | formStatus = Success
+                        , notifications = Notif.addListOfDjangoMessagesNoDestroy data.messages model.notifications
+                      }
                     , okMsg
                     )
 
@@ -43,19 +46,26 @@ update msg model =
                 Http.BadStatus resp ->
                     case Decode.decodeString decodeFormResp resp.body of
                         Ok data ->
-                            ( { model | formStatus = Failed data.errors } |> Notif.addListOfDjangoMessagesNoDestroy data.messages
+                            ( { model
+                                | formStatus = Failed data.errors
+                                , notifications = Notif.addListOfDjangoMessagesNoDestroy data.messages model.notifications
+                              }
                             , []
                             )
 
                         Err e ->
-                            ( { model | formStatus = Failed <| formDecodeError e }
-                                |> Notif.addListOfDjangoMessagesNoDestroy [ Notif.refreshNotifMessage ]
+                            ( { model
+                                | formStatus = Failed <| formDecodeError e
+                                , notifications = Notif.addListOfDjangoMessagesNoDestroy [ Notif.refreshNotifMessage ] model.notifications
+                              }
                             , []
                             )
 
                 _ ->
-                    ( { model | formStatus = Failed noErrors }
-                        |> Notif.addListOfDjangoMessagesNoDestroy [ Notif.refreshNotifMessage ]
+                    ( { model
+                        | formStatus = Failed noErrors
+                        , notifications = Notif.addListOfDjangoMessagesNoDestroy [ Notif.refreshNotifMessage ] model.notifications
+                      }
                     , []
                     )
 

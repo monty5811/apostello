@@ -1,6 +1,6 @@
 module Pages.Forms.SiteConfig.View exposing (view)
 
-import Data.RecipientGroup exposing (RecipientGroup)
+import Data exposing (RecipientGroup)
 import Date
 import DateTimePicker
 import DjangoSend exposing (CSRFToken)
@@ -55,7 +55,10 @@ fieldsHelp groups model =
         , Field meta.default_number_prefix (defaultPrefixField meta.default_number_prefix model)
         , Field meta.disable_all_replies (allRepliesField meta.disable_all_replies model)
         , Field meta.auto_add_new_groups (autoNewGroupsField groups meta.auto_add_new_groups model)
-        , Field meta.sms_expiration_date (smsExpirationDateField meta.sms_expiration_date model)
+        ]
+    , FieldGroup { defaultFieldGroupConfig | header = Just "SMS Expiration", sideBySide = True }
+        [ Field meta.sms_expiration_date (smsExpirationDateField meta.sms_expiration_date model)
+        , Field meta.sms_rolling_expiration_days (smsRollingExpireField meta.sms_rolling_expiration_days model)
         ]
     , FieldGroup { defaultFieldGroupConfig | header = Just "Notification Settings" }
         [ Field meta.office_email (officeEmailField meta.office_email model)
@@ -86,6 +89,13 @@ smsLimitField meta_ model =
     FV.simpleIntField meta_
         (Just model.sms_char_limit)
         (FormMsg << SiteConfigFormMsg << UpdateSmsCharLimitField model)
+
+
+smsRollingExpireField : FieldMeta -> SiteConfigFormModel -> List (Html Msg)
+smsRollingExpireField meta_ model =
+    FV.simpleIntField meta_
+        model.sms_rolling_expiration_days
+        (FormMsg << SiteConfigFormMsg << UpdateRollingExpiration model)
 
 
 defaultPrefixField : FieldMeta -> SiteConfigFormModel -> List (Html Msg)

@@ -1,7 +1,6 @@
 module Pages.Forms.Group.View exposing (view)
 
-import Data.Recipient exposing (RecipientSimple)
-import Data.RecipientGroup exposing (RecipientGroup)
+import Data exposing (RecipientGroup, RecipientSimple)
 import DjangoSend exposing (CSRFToken)
 import FilteringTable exposing (filterRecord)
 import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus)

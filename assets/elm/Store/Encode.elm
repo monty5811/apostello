@@ -1,13 +1,6 @@
 module Store.Encode exposing (encodeDataStore)
 
-import Data.ElvantoGroup exposing (ElvantoGroup, encodeElvantoGroup)
-import Data.Keyword exposing (Keyword, encodeKeyword)
-import Data.QueuedSms exposing (QueuedSms, encodeQueuedSms)
-import Data.Recipient exposing (Recipient, RecipientSimple, encodeRecipient)
-import Data.RecipientGroup exposing (RecipientGroup, encodeRecipientGroup)
-import Data.SmsInbound exposing (SmsInbound, encodeSmsInbound)
-import Data.SmsOutbound exposing (SmsOutbound, encodeSmsOutbound)
-import Data.User exposing (User, UserProfile, encodeUser, encodeUserProfile)
+import Data exposing (ElvantoGroup, Keyword, QueuedSms, Recipient, RecipientGroup, RecipientSimple, SmsInbound, SmsOutbound, User, UserProfile, encodeElvantoGroup, encodeKeyword, encodeQueuedSms, encodeRecipient, encodeRecipientGroup, encodeSmsInbound, encodeSmsOutbound, encodeUser, encodeUserProfile)
 import Json.Encode as Encode
 import RemoteList as RL
 import Store.Model exposing (DataStore)

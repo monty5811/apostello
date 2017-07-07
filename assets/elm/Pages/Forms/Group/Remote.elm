@@ -1,6 +1,6 @@
 module Pages.Forms.Group.Remote exposing (postCmd)
 
-import Data.RecipientGroup exposing (RecipientGroup)
+import Data exposing (RecipientGroup)
 import DjangoSend exposing (CSRFToken, rawPost)
 import Forms.Helpers exposing (addPk, extractField)
 import Http

@@ -6,7 +6,7 @@ import Messages exposing (Msg)
 import Models exposing (Model)
 import Pages exposing (Page(..))
 import Pages.Fragments.Menu as Menu
-import Pages.Fragments.Notification.View as Notif
+import Pages.Fragments.Notification as Notif
 
 
 view : Model -> Html Msg -> Html Msg -> Html Msg
@@ -33,7 +33,7 @@ commonShell model mainContent fab =
         , div [ class "ui stackable grid container" ]
             [ div [ class "fourteen wide centered column" ]
                 (h3 [] [ text <| title model.page ]
-                    :: Notif.view model
+                    :: Notif.view model.notifications
                     ++ [ mainContent ]
                 )
             ]

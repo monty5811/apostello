@@ -1,9 +1,6 @@
 module Store.Toggle exposing (..)
 
-import Data.ElvantoGroup exposing (ElvantoGroup, decodeElvantoGroup)
-import Data.RecipientGroup exposing (RecipientGroup, decodeRecipientGroup)
-import Data.SmsInbound exposing (SmsInbound, decodeSmsInbound)
-import Data.User exposing (UserProfile, decodeUserProfile, encodeUserProfile)
+import Data exposing (ElvantoGroup, RecipientGroup, SmsInbound, UserProfile, decodeElvantoGroup, decodeRecipientGroup, decodeSmsInbound, decodeUserProfile, encodeUserProfile)
 import DjangoSend exposing (CSRFToken, archivePost, archivePostRaw, post, rawPost)
 import Http
 import Json.Encode as Encode

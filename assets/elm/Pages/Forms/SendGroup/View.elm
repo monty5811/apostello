@@ -1,12 +1,11 @@
 module Pages.Forms.SendGroup.View exposing (view)
 
-import Data.RecipientGroup exposing (RecipientGroup)
+import Data exposing (RecipientGroup)
 import Date
 import DateTimePicker
 import FilteringTable exposing (filterRecord)
 import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus)
-import Forms.View exposing (form)
-import Forms.View.Send exposing (contentField, sendButton, timeField)
+import Forms.View exposing (contentField, form, sendButton, timeField)
 import Helpers exposing (onClick)
 import Html exposing (Html, a, br, div, i, input, label, p, text)
 import Html.Attributes exposing (class, for, placeholder, style, type_)

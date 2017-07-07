@@ -46,7 +46,7 @@ class TestExpiry:
     Test log imports with expiry date.
     """
     @twilio_vcr
-    def test_import_incoming(self):
+    def test_import_incoming_expiry_date(self):
         config = SiteConfiguration.get_solo()
         config.sms_expiration_date = today
         config.save()
@@ -56,7 +56,7 @@ class TestExpiry:
         ).count() == 0
 
     @twilio_vcr
-    def test_import_outgoing(self):
+    def test_import_outgoing_expiry_date(self):
         config = SiteConfiguration.get_solo()
         config.sms_expiration_date = today
         config.save()
@@ -66,7 +66,7 @@ class TestExpiry:
         ).count() == 0
 
     @twilio_vcr
-    def test_cleanup(self):
+    def test_cleanup_expiry_date(self):
         config = SiteConfiguration.get_solo()
         config.sms_expiration_date = None
         config.save()
@@ -81,6 +81,73 @@ class TestExpiry:
         config.save()
         logs.cleanup_expired_sms()
         assert models.SmsInbound.objects.count() + models.SmsOutbound.objects.count() == 0
+
+    @twilio_vcr
+    def test_import_incoming_rolling(self):
+        config = SiteConfiguration.get_solo()
+        config.sms_expiration_date = None
+        config.sms_rolling_expiration_days = 0
+        config.save()
+        logs.check_incoming_log()
+        assert models.SmsInbound.objects.filter(
+            time_received__lt=today
+        ).count() == 0
+
+    @twilio_vcr
+    def test_import_outgoing_rolling(self):
+        config = SiteConfiguration.get_solo()
+        config.sms_expiration_date = None
+        config.sms_rolling_expiration_days = 0
+        config.save()
+        logs.check_outgoing_log()
+        assert models.SmsOutbound.objects.filter(
+            time_sent__lt=today
+        ).count() == 0
+
+    @twilio_vcr
+    def test_cleanup_rolling(self):
+        config = SiteConfiguration.get_solo()
+        config.sms_expiration_date = None
+        config.sms_rolling_expiration_days = None
+        config.save()
+        logs.check_incoming_log()
+        logs.check_outgoing_log()
+        num_sms = models.SmsInbound.objects.count() + models.SmsOutbound.objects.count()
+        logs.cleanup_expired_sms()
+        assert num_sms > 0
+        assert models.SmsInbound.objects.count() + models.SmsOutbound.objects.count() == num_sms
+        config = SiteConfiguration.get_solo()
+        config.sms_rolling_expiration_days = 0
+        config.save()
+        logs.cleanup_expired_sms()
+        assert models.SmsInbound.objects.count() + models.SmsOutbound.objects.count() == 0
+
+    def test_cleanup(self):
+        # setup
+        config = SiteConfiguration.get_solo()
+        config.sms_rolling_expiration_days = None
+        config.sms_expiration_date = today - timedelta(days=100)
+        config.save()
+        sms = models.SmsInbound.objects.create(
+            content='test message',
+            time_received=timezone.now() - timedelta(50),
+            sender_name="John Calvin",
+            sender_num="+447927401749",
+            matched_keyword="test",
+            sid='12345'
+        )
+        sms.save()
+        assert models.SmsInbound.objects.count() == 1  # we have one sms
+        logs.cleanup_expired_sms()
+        assert models.SmsInbound.objects.count() == 1  # cleanup should leave it untouched
+        config.sms_rolling_expiration_days = 50
+        config.save()
+        logs.cleanup_expired_sms()
+        assert models.SmsInbound.objects.count() == 1  # cleanup should leave it untouched
+        config.sms_rolling_expiration_days = 49
+        config.save()
+        logs.cleanup_expired_sms()
+        assert models.SmsInbound.objects.count() == 0  # cleanup should remove sms
 
 
 @pytest.mark.django_db

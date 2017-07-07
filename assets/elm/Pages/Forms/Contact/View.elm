@@ -1,6 +1,6 @@
 module Pages.Forms.Contact.View exposing (view)
 
-import Data.Recipient exposing (Recipient)
+import Data exposing (Recipient)
 import DjangoSend exposing (CSRFToken)
 import Forms.Model exposing (Field, FieldMeta, FormItem(FieldGroup, FormField), FormStatus, defaultFieldGroupConfig)
 import Forms.View exposing (checkboxField, form, simpleTextField, submitButton)

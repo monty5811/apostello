@@ -13,7 +13,7 @@ import Pages.FirstRun.Update as FR
 import Pages.Forms.DefaultResponses.Remote as DRFR
 import Pages.Forms.SiteConfig.Remote as SCFR
 import Pages.Fragments.Fab.Update as Fab
-import Pages.Fragments.Notification.Update as Notif
+import Pages.Fragments.Notification as Notif
 import Pages.GroupComposer.Update as GC
 import Pages.KeyRespTable.Update as KRT
 import Ports exposing (saveDataStore)
@@ -78,8 +78,8 @@ updateHelper msg model =
         FabMsg subMsg ->
             Fab.update subMsg model
 
-        NotificationMsg subMsg ->
-            Notif.update subMsg model
+        RemoveNotification id ->
+            ( { model | notifications = Notif.remove id model.notifications }, [] )
 
         FirstRunMsg subMsg ->
             FR.update subMsg model

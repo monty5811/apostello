@@ -1,13 +1,6 @@
 module TestSerialisation exposing (serialisation)
 
-import Data.ElvantoGroup exposing (ElvantoGroup, decodeElvantoGroup, encodeElvantoGroup)
-import Data.Keyword exposing (Keyword, decodeKeyword, encodeKeyword)
-import Data.QueuedSms exposing (QueuedSms, decodeQueuedSms, encodeQueuedSms)
-import Data.Recipient exposing (Recipient, RecipientSimple, decodeRecipient, decodeRecipientSimple, encodeRecipient, encodeRecipientSimple)
-import Data.RecipientGroup exposing (RecipientGroup, decodeRecipientGroup, encodeRecipientGroup)
-import Data.SmsInbound exposing (SmsInbound, decodeSmsInbound, encodeSmsInbound)
-import Data.SmsOutbound exposing (SmsOutbound, decodeSmsOutbound, encodeSmsOutbound)
-import Data.User exposing (User, UserProfile, decodeUser, decodeUserProfile, encodeUser, encodeUserProfile)
+import Data exposing (ElvantoGroup, Keyword, QueuedSms, Recipient, RecipientGroup, RecipientSimple, SmsInbound, SmsOutbound, User, UserProfile, decodeElvantoGroup, decodeKeyword, decodeQueuedSms, decodeRecipient, decodeRecipientGroup, decodeRecipientSimple, decodeSmsInbound, decodeSmsOutbound, decodeUser, decodeUserProfile, encodeElvantoGroup, encodeKeyword, encodeQueuedSms, encodeRecipient, encodeRecipientGroup, encodeRecipientSimple, encodeSmsInbound, encodeSmsOutbound, encodeUser, encodeUserProfile)
 import Date
 import Expect
 import Fuzz exposing (Fuzzer)

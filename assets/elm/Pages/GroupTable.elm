@@ -1,6 +1,6 @@
 module Pages.GroupTable exposing (view)
 
-import Data.RecipientGroup exposing (RecipientGroup)
+import Data exposing (RecipientGroup)
 import FilteringTable as FT
 import Helpers exposing (archiveCell)
 import Html exposing (Html, a, td, text, th, thead, tr)

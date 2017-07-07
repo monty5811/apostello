@@ -38,6 +38,15 @@ update msg =
         UpdateSmsExpiredDate model state maybeDate ->
             { model | sms_expiration_date = maybeDate, datePickerSmsExpiredState = state }
 
+        UpdateRollingExpiration model maybeNum ->
+            let
+                num =
+                    maybeNum
+                        |> String.toInt
+                        |> Result.toMaybe
+            in
+            { model | sms_rolling_expiration_days = num }
+
         UpdateSlackUrlField model text ->
             { model | slack_url = text }
 

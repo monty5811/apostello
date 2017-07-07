@@ -1,6 +1,6 @@
 module Pages.RecipientTable exposing (view)
 
-import Data.Recipient exposing (Recipient)
+import Data exposing (Recipient)
 import FilteringTable as FT
 import Helpers exposing (archiveCell, formatDate)
 import Html exposing (Html, a, div, td, text, th, thead, tr)

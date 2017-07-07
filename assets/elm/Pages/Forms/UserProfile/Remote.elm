@@ -1,6 +1,6 @@
 module Pages.Forms.UserProfile.Remote exposing (postCmd)
 
-import Data.User exposing (UserProfile)
+import Data exposing (UserProfile)
 import DjangoSend exposing (CSRFToken, rawPost)
 import Forms.Helpers exposing (addPk, extractBool, extractFloat)
 import Http

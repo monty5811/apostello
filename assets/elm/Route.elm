@@ -1,7 +1,6 @@
 module Route exposing (loc2Page, page2loc, route, spaLink)
 
-import Data.User exposing (UserProfile)
-import Formatting as F exposing ((<>))
+import Data exposing (UserProfile)
 import Html exposing (Attribute, Html)
 import Html.Attributes exposing (href)
 import Html.Events exposing (onWithOptions)
@@ -18,43 +17,6 @@ import Pages.Forms.Keyword.Model exposing (initialKeywordFormModel)
 import Pages.Forms.UserProfile.Model exposing (initialUserProfileFormModel)
 import Pages.GroupComposer.Model exposing (initialGroupComposerModel)
 import UrlParser as Url exposing ((</>), (<?>), customParam, int, intParam, s, string, stringParam, top)
-
-
-loc2Page : Navigation.Location -> Settings -> Page
-loc2Page location settings =
-    Url.parsePath route location
-        |> Maybe.withDefault Error404
-        |> checkPagePerms settings
-
-
-spaLink : (List (Attribute Msg) -> List (Html Msg) -> Html Msg) -> List (Attribute Msg) -> List (Html Msg) -> Page -> Html Msg
-spaLink node attrs nodes page =
-    let
-        uri =
-            page2loc page
-    in
-    node (List.append [ href uri, spaLinkClick <| NewUrl uri ] attrs) nodes
-
-
-spaLinkClick : msg -> Attribute msg
-spaLinkClick message =
-    onWithOptions "click" { stopPropagation = True, preventDefault = True } <|
-        Decode.andThen (maybePreventDefault message) <|
-            Decode.map3
-                (\x y z -> not <| x || y || z)
-                (Decode.field "ctrlKey" Decode.bool)
-                (Decode.field "metaKey" Decode.bool)
-                (Decode.field "shiftKey" Decode.bool)
-
-
-maybePreventDefault : msg -> Bool -> Decode.Decoder msg
-maybePreventDefault msg preventDefault =
-    case preventDefault of
-        True ->
-            Decode.succeed msg
-
-        False ->
-            Decode.fail "Normal link"
 
 
 route : Url.Parser (Page -> a) a
@@ -121,6 +83,43 @@ parseListInts str =
                     |> Result.toMaybe
             else
                 Nothing
+
+
+loc2Page : Navigation.Location -> Settings -> Page
+loc2Page location settings =
+    Url.parsePath route location
+        |> Maybe.withDefault Error404
+        |> checkPagePerms settings
+
+
+spaLink : (List (Attribute Msg) -> List (Html Msg) -> Html Msg) -> List (Attribute Msg) -> List (Html Msg) -> Page -> Html Msg
+spaLink node attrs nodes page =
+    let
+        uri =
+            page2loc page
+    in
+    node (List.append [ href uri, spaLinkClick <| NewUrl uri ] attrs) nodes
+
+
+spaLinkClick : msg -> Attribute msg
+spaLinkClick message =
+    onWithOptions "click" { stopPropagation = True, preventDefault = True } <|
+        Decode.andThen (maybePreventDefault message) <|
+            Decode.map3
+                (\x y z -> not <| x || y || z)
+                (Decode.field "ctrlKey" Decode.bool)
+                (Decode.field "metaKey" Decode.bool)
+                (Decode.field "shiftKey" Decode.bool)
+
+
+maybePreventDefault : msg -> Bool -> Decode.Decoder msg
+maybePreventDefault msg preventDefault =
+    case preventDefault of
+        True ->
+            Decode.succeed msg
+
+        False ->
+            Decode.fail "Normal link"
 
 
 page2loc : Page -> String
@@ -192,7 +191,7 @@ page2loc page =
                     "/group/new/"
 
                 Just pk ->
-                    F.print (F.s "/group/edit/" <> F.int <> F.s "/") pk
+                    "/group/edit/" ++ toString pk ++ "/"
 
         ContactForm _ maybePk ->
             case maybePk of
@@ -200,7 +199,7 @@ page2loc page =
                     "/recipient/new/"
 
                 Just pk ->
-                    F.print (F.s "/recipient/edit/" <> F.int <> F.s "/") pk
+                    "/recipient/edit/" ++ toString pk ++ "/"
 
         KeywordForm _ maybeK ->
             case maybeK of
@@ -208,7 +207,7 @@ page2loc page =
                     "/keyword/new/"
 
                 Just k ->
-                    F.print (F.s "/keyword/edit/" <> F.string <> F.s "/") k
+                    "/keyword/edit/" ++ k ++ "/"
 
         SiteConfigForm _ ->
             "/config/site/"
@@ -226,7 +225,7 @@ page2loc page =
             "/help/"
 
         UserProfileForm _ pk ->
-            F.print (F.s "/users/profiles/" <> F.int <> F.s "/") pk
+            "/users/profiles/" ++ toString pk ++ "/"
 
         ContactImport _ ->
             "/recipient/import/"
@@ -284,14 +283,14 @@ contactsParam : Maybe (List Int) -> Maybe String
 contactsParam contacts =
     Maybe.map
         (\x ->
-            F.print (F.s "recipients=[" <> F.string <> F.s "]") (x |> List.map toString |> String.join ",")
+            "recipients=[" ++ (x |> List.map toString |> String.join ",") ++ "]"
         )
         contacts
 
 
 groupParam : Maybe Int -> Maybe String
 groupParam g =
-    Maybe.map (F.print (F.s "recipient_group=" <> F.int)) g
+    Maybe.map (\x -> "recipient_group=" ++ toString x) g
 
 
 

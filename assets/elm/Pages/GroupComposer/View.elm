@@ -1,8 +1,6 @@
 module Pages.GroupComposer.View exposing (parenPairs, parseQueryString, runQuery, view)
 
-import Array.Hamt as Array
-import Data.Recipient exposing (RecipientSimple)
-import Data.RecipientGroup exposing (GroupPk, RecipientGroup, nullGroup)
+import Data exposing (GroupPk, RecipientGroup, RecipientSimple, nullGroup)
 import Html exposing (..)
 import Html.Attributes as A
 import Html.Events as E
@@ -291,9 +289,7 @@ replaceExpr query pLoc =
 
         newExpr =
             query
-                |> Array.fromList
-                |> Array.slice (left + 1) right
-                |> Array.toList
+                |> slice (left + 1) right
                 |> (++) [ Union ]
                 |> applyQuery Set.empty
                 |> G
@@ -301,19 +297,29 @@ replaceExpr query pLoc =
     replaceOp left right newExpr query
 
 
+slice : Int -> Int -> List a -> List a
+slice left right list =
+    list
+        |> List.indexedMap (,)
+        |> List.filterMap (shouldKeepHelp left right)
+
+
+shouldKeepHelp : Int -> Int -> ( Int, a ) -> Maybe a
+shouldKeepHelp left right ( idx, item ) =
+    if (idx >= left) && (idx < right) then
+        Just item
+    else
+        Nothing
+
+
 replaceOp : Int -> Int -> QueryOp -> Query -> Query
 replaceOp left right op query =
     let
-        ar =
-            Array.fromList query
-
         lhs =
-            Array.slice 0 left ar
-                |> Array.toList
+            slice 0 left query
 
         rhs =
-            Array.slice (right + 1) (Array.length ar) ar
-                |> Array.toList
+            slice (right + 1) (List.length query) query
     in
     List.concat [ lhs, [ op ], rhs ]
 

@@ -9,7 +9,7 @@ import Json.Decode as Decode
 import List.Extra as LE
 import Messages exposing (Msg)
 import Models exposing (Model)
-import Pages.Fragments.Notification.Update as Notif
+import Pages.Fragments.Notification as Notif
 
 
 toggleSelectedPk : Int -> List Int -> List Int
@@ -34,10 +34,10 @@ decodeAlwaysTrue =
 handleNotSaved : Model -> ( Model, List (Cmd Msg) )
 handleNotSaved model =
     let
-        ( newModel, cmd ) =
-            Notif.createNotSaved model
+        ( notifications, cmd ) =
+            Notif.createNotSaved model.notifications
     in
-    ( newModel, [ cmd ] )
+    ( { model | notifications = notifications }, [ cmd ] )
 
 
 

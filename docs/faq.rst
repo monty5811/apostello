@@ -42,4 +42,7 @@ You can do this by opening ``<your domain>/admin/sites/site/``, click on the fir
 How can I get rid of old messages?
 ----------------------------------
 
-Open the Site Configuration page (``Tools --> Site Configuration``), scroll down to find the ``SMS Expiration Date`` field. Any messages before this date will be purged from the system. The purge is run daily. You can use this to hide old messages you no longer care about or to make sure you stay within the limits of the Heroku hobby database.
+Open the Site Configuration page (``Tools --> Site Configuration``), scroll down to find the ``SMS Expiration`` section.
+You can set a hard cut off date: any messages before this date will be purged from the system.
+Or you can choose the number of days to hold on to messages: any messages older than this number of days will be purged.
+The purge is run daily. You can use this to hide old messages you no longer care about or to make sure you stay within the limits of the Heroku hobby database.

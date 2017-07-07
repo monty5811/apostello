@@ -1,6 +1,6 @@
 module Pages.Fragments.Fab.View exposing (view)
 
-import Data.Keyword exposing (Keyword)
+import Data exposing (Keyword)
 import Html exposing (..)
 import Html.Attributes exposing (class, href, id)
 import Html.Events exposing (onClick)

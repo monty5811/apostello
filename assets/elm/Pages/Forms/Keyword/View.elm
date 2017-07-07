@@ -1,8 +1,6 @@
 module Pages.Forms.Keyword.View exposing (view)
 
-import Data.Keyword exposing (Keyword)
-import Data.RecipientGroup exposing (RecipientGroup)
-import Data.User exposing (User)
+import Data exposing (Keyword, RecipientGroup, User)
 import Date
 import DateTimePicker
 import DjangoSend exposing (CSRFToken)

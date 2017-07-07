@@ -1,6 +1,6 @@
 module Pages.KeywordTable exposing (view)
 
-import Data.Keyword exposing (Keyword)
+import Data exposing (Keyword)
 import FilteringTable as FT
 import Helpers exposing (archiveCell)
 import Html exposing (Html, a, div, td, text, th, thead, tr)

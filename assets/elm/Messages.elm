@@ -38,13 +38,9 @@ type Msg
     | FirstRunMsg FirstRunMsg
     | FabMsg FabMsg
     | ApiSetupMsg ApiSetupMsg
-    | NotificationMsg NotificationMsg
+    | RemoveNotification Int
     | CurrentTime Time.Time
     | Nope
-
-
-type NotificationMsg
-    = RemoveNotification Int
 
 
 type FabMsg

@@ -5,7 +5,7 @@ import Html exposing (Html)
 import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (decode, required)
 import Messages exposing (Msg)
-import Pages.Fragments.Notification.Model exposing (DjangoMessage, decodeDjangoMessage)
+import Pages.Fragments.Notification exposing (DjangoMessage, decodeDjangoMessage)
 
 
 type FormStatus

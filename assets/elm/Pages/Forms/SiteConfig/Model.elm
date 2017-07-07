@@ -18,6 +18,7 @@ type alias SiteConfigFormModel =
     , auto_add_new_groups : List Int
     , sms_expiration_date : Maybe Date.Date
     , datePickerSmsExpiredState : DateTimePicker.State
+    , sms_rolling_expiration_days : Maybe Int
     , slack_url : String
     , sync_elvanto : Bool
     , not_approved_msg : String
@@ -42,6 +43,7 @@ decodeSiteConfigFormModel =
         |> required "auto_add_new_groups" (Decode.list Decode.int)
         |> required "sms_expiration_date" (Decode.maybe date)
         |> hardcoded DateTimePicker.initialState
+        |> required "sms_rolling_expiration_days" (Decode.maybe Decode.int)
         |> required "slack_url" Decode.string
         |> required "sync_elvanto" Decode.bool
         |> required "not_approved_msg" Decode.string

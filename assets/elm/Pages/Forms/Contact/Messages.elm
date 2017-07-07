@@ -8,7 +8,7 @@ module Pages.Forms.Contact.Messages
             )
         )
 
-import Data.Recipient exposing (Recipient)
+import Data exposing (Recipient)
 
 
 type ContactFormMsg

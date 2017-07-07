@@ -39,6 +39,7 @@ postCmd csrf model =
             , ( "office_email", Encode.string model.office_email )
             , ( "auto_add_new_groups", Encode.list (List.map Encode.int model.auto_add_new_groups) )
             , ( "sms_expiration_date", encodeMaybeDateOnly model.sms_expiration_date )
+            , ( "sms_rolling_expiration_days", encodeMaybe Encode.int model.sms_rolling_expiration_days )
             , ( "slack_url", Encode.string model.slack_url )
             , ( "sync_elvanto", Encode.bool model.sync_elvanto )
             , ( "not_approved_msg", Encode.string model.not_approved_msg )

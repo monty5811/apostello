@@ -51,6 +51,13 @@ class SiteConfiguration(SingletonModel):
         help_text='If this date is set, any messages older than this will be'
         ' removed from the database.'
     )
+    sms_rolling_expiration_days = models.PositiveIntegerField(
+        "Rolling SMS Expiration",
+        null=True,
+        help_text='The number of days a message will be kept by apostello before'
+        ' being deleted.'
+        ' If blank, then messages will be kept forever.'
+    )
     slack_url = models.URLField(
         blank=True, help_text='Post all incoming messages to this slack hook.'
         ' Leave blank to disable.'

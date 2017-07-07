@@ -1,6 +1,6 @@
 module Pages.ElvantoImport.View exposing (view)
 
-import Data.ElvantoGroup exposing (ElvantoGroup)
+import Data exposing (ElvantoGroup)
 import FilteringTable as FT
 import Helpers exposing (formatDate)
 import Html exposing (Html, a, br, div, td, text, th, thead, tr)

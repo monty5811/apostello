@@ -1,6 +1,6 @@
 module Pages.Forms.UserProfile.View exposing (view)
 
-import Data.User exposing (UserProfile)
+import Data exposing (UserProfile)
 import DjangoSend exposing (CSRFToken)
 import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus)
 import Forms.View exposing (..)

@@ -1,6 +1,6 @@
 module Pages.Fragments.Menu exposing (menu)
 
-import Data.User exposing (UserProfile)
+import Data exposing (UserProfile)
 import Html exposing (Html, a, div, i, text)
 import Html.Attributes exposing (class, href)
 import Html.Keyed as Keyed

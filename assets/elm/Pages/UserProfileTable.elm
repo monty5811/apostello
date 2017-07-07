@@ -1,13 +1,15 @@
 module Pages.UserProfileTable exposing (view)
 
-import Data.User exposing (UserProfile)
+import Data exposing (UserProfile)
 import FilteringTable as FT
-import Formatting as F exposing ((<>))
 import Html exposing (Html, a, button, i, td, text, th, thead, tr)
 import Html.Attributes exposing (class, href)
 import Html.Events exposing (onClick)
 import Messages exposing (Msg)
+import Pages as P
+import Pages.Forms.UserProfile.Model exposing (initialUserProfileFormModel)
 import RemoteList as RL
+import Route exposing (spaLink)
 import Store.Messages exposing (StoreMsg(ToggleProfileField))
 
 
@@ -40,10 +42,10 @@ userprofileRow : UserProfile -> Html Msg
 userprofileRow userprofile =
     tr [ class "center aligned" ]
         [ td []
-            [ a
-                [ href (F.print (F.s "/users/profiles/" <> F.int <> F.s "/") userprofile.user.pk)
-                ]
+            [ spaLink a
+                []
                 [ text userprofile.user.email ]
+                (P.UserProfileForm initialUserProfileFormModel userprofile.user.pk)
             ]
         , toggleCell userprofile Approved
         , toggleCell userprofile Keywords

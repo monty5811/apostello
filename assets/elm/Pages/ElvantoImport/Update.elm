@@ -7,7 +7,7 @@ import Json.Decode as Decode
 import Messages exposing (Msg)
 import Models exposing (Model)
 import Pages.ElvantoImport.Messages exposing (ElvantoMsg(..))
-import Pages.Fragments.Notification.Update exposing (createInfo, createSuccess)
+import Pages.Fragments.Notification exposing (createInfo, createSuccess)
 import Urls
 
 
@@ -16,10 +16,10 @@ update msg model =
     case msg of
         PullGroups ->
             let
-                ( newModel, destroyNotifCmd ) =
-                    createInfo model "Groups are being imported, it may take a couple of minutes"
+                ( notifications, destroyNotifCmd ) =
+                    createInfo model.notifications "Groups are being imported, it may take a couple of minutes"
             in
-            ( newModel
+            ( { model | notifications = notifications }
             , [ buttonReq model.settings.csrftoken Urls.api_act_pull_elvanto_groups
               , destroyNotifCmd
               ]
@@ -27,10 +27,10 @@ update msg model =
 
         FetchGroups ->
             let
-                ( newModel, destroyNotifCmd ) =
-                    createSuccess model "Groups are being fetched, it may take a couple of minutes"
+                ( notifications, destroyNotifCmd ) =
+                    createSuccess model.notifications "Groups are being fetched, it may take a couple of minutes"
             in
-            ( newModel
+            ( { model | notifications = notifications }
             , [ buttonReq model.settings.csrftoken Urls.api_act_fetch_elvanto_groups
               , destroyNotifCmd
               ]

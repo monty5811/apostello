@@ -1,7 +1,6 @@
 module Pages.ScheduledSmsTable exposing (view)
 
-import Data.QueuedSms exposing (QueuedSms)
-import Data.RecipientGroup exposing (RecipientGroup)
+import Data exposing (QueuedSms, RecipientGroup)
 import Date
 import FilteringTable as FT
 import Html exposing (Html, a, div, td, text, th, thead, tr)

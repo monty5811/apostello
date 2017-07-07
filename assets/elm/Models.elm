@@ -8,7 +8,7 @@ module Models
         , initialModel
         )
 
-import Data.User exposing (UserProfile, decodeUserProfile)
+import Data exposing (UserProfile, decodeUserProfile)
 import Dict exposing (Dict)
 import DjangoSend exposing (CSRFToken(CSRFToken))
 import FilteringTable as FT
@@ -16,7 +16,7 @@ import Forms.Model exposing (FormStatus(NoAction))
 import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (decode, required)
 import Pages exposing (Page)
-import Pages.Fragments.Notification.Model exposing (DjangoMessage, Notification, NotificationType(..))
+import Pages.Fragments.Notification exposing (DjangoMessage, Notification, NotificationType(..))
 import Store.Decode exposing (decodeDataStore)
 import Store.Model exposing (DataStore, emptyDataStore)
 import Time

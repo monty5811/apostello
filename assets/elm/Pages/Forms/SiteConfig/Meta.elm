@@ -3,7 +3,7 @@ module Pages.Forms.SiteConfig.Meta exposing (meta)
 import Forms.Model exposing (FieldMeta)
 
 
-meta : { site_name : FieldMeta, sms_char_limit : FieldMeta, default_number_prefix : FieldMeta, disable_all_replies : FieldMeta, disable_email_login_form : FieldMeta, office_email : FieldMeta, auto_add_new_groups : FieldMeta, sms_expiration_date : FieldMeta, slack_url : FieldMeta, sync_elvanto : FieldMeta, not_approved_msg : FieldMeta, email_host : FieldMeta, email_port : FieldMeta, email_username : FieldMeta, email_password : FieldMeta, email_from : FieldMeta }
+meta : { site_name : FieldMeta, sms_char_limit : FieldMeta, default_number_prefix : FieldMeta, disable_all_replies : FieldMeta, disable_email_login_form : FieldMeta, office_email : FieldMeta, auto_add_new_groups : FieldMeta, sms_expiration_date : FieldMeta, sms_rolling_expiration_days : FieldMeta, slack_url : FieldMeta, sync_elvanto : FieldMeta, not_approved_msg : FieldMeta, email_host : FieldMeta, email_port : FieldMeta, email_username : FieldMeta, email_password : FieldMeta, email_from : FieldMeta }
 meta =
     { site_name = FieldMeta True "id_site_name" "site_name" "Site name" Nothing
     , sms_char_limit = FieldMeta True "id_sms_char_limit" "sms_char_limit" "Sms char limit" (Just "SMS length limit. The sending forms use this value to limit the size of messages. Check the Twilio pricing docs for pricing information.")
@@ -13,6 +13,7 @@ meta =
     , office_email = FieldMeta False "id_office_email" "office_email" "Office email" (Just "Email address that receives important notifications.")
     , auto_add_new_groups = FieldMeta False "id_auto_add_new_groups" "auto_add_new_groups" "Auto add new groups" (Just "Any brand new people will be added to the groups selected here")
     , sms_expiration_date = FieldMeta False "id_sms_expiration_date" "sms_expiration_date" "SMS Expiration Date" (Just "If this date is set, any messages older than this will be removed from the database.")
+    , sms_rolling_expiration_days = FieldMeta True "id_sms_rolling_expiration_days" "sms_rolling_expiration_days" "Rolling SMS Expiration" (Just "The number of days a message will be kept by apostello before being deleted. If blank, then messages will be kept forever.")
     , slack_url = FieldMeta False "id_slack_url" "slack_url" "Slack url" (Just "Post all incoming messages to this slack hook. Leave blank to disable.")
     , sync_elvanto = FieldMeta False "id_sync_elvanto" "sync_elvanto" "Sync elvanto" (Just "Toggle automatic syncing of Elvanto groups. Syncing will be done every 24 hours.")
     , not_approved_msg = FieldMeta True "id_not_approved_msg" "not_approved_msg" "Not approved msg" (Just "This message will be shown on the \"not approved\" page.")

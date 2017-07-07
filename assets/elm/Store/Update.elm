@@ -1,21 +1,15 @@
 module Store.Update exposing (..)
 
-import Data.ElvantoGroup exposing (ElvantoGroup, decodeElvantoGroup)
-import Data.Keyword exposing (Keyword, decodeKeyword)
-import Data.QueuedSms exposing (QueuedSms, decodeQueuedSms)
-import Data.Recipient exposing (Recipient, RecipientSimple, decodeRecipient)
-import Data.RecipientGroup exposing (RecipientGroup, decodeRecipientGroup)
-import Data.SmsInbound exposing (SmsInbound, decodeSmsInbound)
-import Data.SmsOutbound exposing (SmsOutbound, decodeSmsOutbound)
-import Data.User exposing (User, UserProfile, decodeUser, decodeUserProfile)
+import Data exposing (ElvantoGroup, Keyword, QueuedSms, Recipient, RecipientGroup, RecipientSimple, SmsInbound, SmsOutbound, User, UserProfile, decodeElvantoGroup, decodeKeyword, decodeQueuedSms, decodeRecipient, decodeRecipientGroup, decodeSmsInbound, decodeSmsOutbound, decodeUser, decodeUserProfile)
 import Date
 import Dict
+import Helpers exposing (handleNotSaved)
 import Http
 import Json.Decode as Decode
 import Messages exposing (Msg)
 import Models exposing (Model)
 import Pages.FirstRun.Model exposing (decodeFirstRunResp)
-import Pages.Fragments.Notification.Update as Notif
+import Pages.Fragments.Notification as Notif
 import RemoteList as RL
 import Store.DataTypes exposing (RemoteDataType(..))
 import Store.Decode exposing (decodeDataStore)
@@ -195,20 +189,12 @@ handleLoadingFailed dt err model =
         niceMsg =
             userFacingErrorMessage err
 
-        ( newModel, cmd ) =
-            { model | dataStore = handleFailed dt niceMsg model.dataStore }
-                |> Notif.createLoadingFailed niceMsg
+        ( notifications, destroyNotifCmd ) =
+            Notif.createLoadingFailed niceMsg model.notifications
     in
-    ( newModel, [ cmd ] )
-
-
-handleNotSaved : Model -> ( Model, List (Cmd Msg) )
-handleNotSaved model =
-    let
-        ( newModel, cmd ) =
-            Notif.createNotSaved model
-    in
-    ( newModel, [ cmd ] )
+    ( { model | dataStore = handleFailed dt niceMsg model.dataStore, notifications = notifications }
+    , [ destroyNotifCmd ]
+    )
 
 
 updateNewData : Bool -> RemoteDataType -> RawResponse -> Model -> Model

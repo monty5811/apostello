@@ -14,6 +14,7 @@ type SiteConfigFormMsg
     | UpdateOfficeEmailField SiteConfigFormModel String
     | UpdateAutoAddGroupsField SiteConfigFormModel Int
     | UpdateSmsExpiredDate SiteConfigFormModel DateTimePicker.State (Maybe Date.Date)
+    | UpdateRollingExpiration SiteConfigFormModel String
     | UpdateSlackUrlField SiteConfigFormModel String
     | UpdateSyncElvantoField SiteConfigFormModel
     | UpdateNotApprovedField SiteConfigFormModel String

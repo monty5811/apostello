@@ -9,7 +9,6 @@
     "exposed-modules": [],
     "dependencies": {
         "NoRedInk/elm-decode-pipeline": "3.0.0 <= v < 4.0.0",
-        "Skinney/elm-array-exploration": "2.0.3 <= v < 3.0.0",
         "abadi199/datetimepicker": "3.0.0 <= v < 4.0.0",
         "elm-community/json-extra": "2.1.0 <= v < 3.0.0",
         "elm-community/list-extra": "4.0.0 <= v < 5.0.0",
@@ -19,7 +18,6 @@
         "elm-lang/http": "1.0.0 <= v < 2.0.0",
         "elm-lang/navigation": "2.1.0 <= v < 3.0.0",
         "evancz/url-parser": "2.0.1 <= v < 3.0.0",
-        "krisajenkins/formatting": "4.2.0 <= v < 5.0.0",
         "mgold/elm-date-format": "1.2.0 <= v < 2.0.0",
         "monty5811/remote-list": "1.0.0 <= v < 2.0.0",
         "myrho/elm-round": "1.0.1 <= v < 2.0.0"
