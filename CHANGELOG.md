@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [v2.3.0]
+
+### Added
+
+ - Add (optional) max number of days to keep messages
+ - Add sections to forms to aid user
+
+### Changed
+
+ - Remove notifications on page change to stop them piling up
+
 ## [v2.2.0]
 
 ### Added
