@@ -46,7 +46,7 @@ pull_repo() {
 replace_ip() {
     echo "Detecting IP and writing to nginx config"
     cd $ANSIBLE_DIR
-    IP=`ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
+    IP=`curl ifconfig.co`
     sed -i -e "s/server_name_replace_me/$IP/g" env_vars/example.yml
 }
 
