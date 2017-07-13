@@ -43,13 +43,6 @@ pull_repo() {
     fi
 }
 
-replace_ip() {
-    echo "Detecting IP and writing to nginx config"
-    cd $ANSIBLE_DIR
-    IP=`curl ifconfig.co`
-    sed -i -e "s/server_name_replace_me/$IP/g" env_vars/example.yml
-}
-
 install() {
     echo "Running ansible deploy"
     $APOSTELLO_INSTALL_DIR/venv/bin/ansible-playbook -i 127.0.0.1, production.yml --connection=local
@@ -69,7 +62,7 @@ print_help() {
     echo "## Twilio setup: http://goo.gl/2lt8dX                            ##"
     echo "##                                                               ##"
     echo "## Then run the command:                                         ##"
-    echo "## ./$APOSTELLO_INSTALL_DIR/scripts/ansible_install.sh ##"
+    echo "## ./$APOSTELLO_INSTALL_DIR/scripts/ansible_install.sh           ##"
     echo "##                                                               ##"
     echo "## More info: https://goo.gl/WWFj3h                              ##"
     echo "##                                                               ##"
@@ -78,6 +71,5 @@ print_help() {
 
 presetup
 pull_repo
-replace_ip
 install
 print_help

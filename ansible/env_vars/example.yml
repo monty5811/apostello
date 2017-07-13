@@ -4,7 +4,7 @@ le_email: ""
 # Database settings
 db_password: "this should be changed to a long random string"
 # Nginx settings
-nginx_server_name: "server_name_replace_me"
+nginx_server_name: "_" # replace this with your domain name
 # Application Settings
 django_secret_key: 'this should be a very long string'
 # this is used in the account related emails and should match your server settings
