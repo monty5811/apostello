@@ -45,6 +45,7 @@ pull_repo() {
 
 install() {
     echo "Running ansible deploy"
+    cd $ANSIBLE_DIR
     $APOSTELLO_INSTALL_DIR/venv/bin/ansible-playbook -i 127.0.0.1, production.yml --connection=local
 }
 
