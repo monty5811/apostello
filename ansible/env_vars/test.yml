@@ -30,3 +30,6 @@ opbeat_app_id: ''
 opbeat_secret_token: ''
 opbeat_js_org_id: ''
 opbeat_js_app_id: ''
+# Cloud messaging
+cm_server_key: ''
+cm_sender_id: ''
