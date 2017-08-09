@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [v2.4.0]
+
+### Added
+
+ - Web Push support: get notified of new messages in your browser or on your phone
+
 ## [v2.3.0]
 
 ### Added
