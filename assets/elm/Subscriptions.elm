@@ -7,6 +7,7 @@ import Ports exposing (loadDataStore)
 import Store.Messages exposing (StoreMsg(LoadData, LoadDataStore))
 import Store.Model as Store
 import Time exposing (Time, second)
+import WebPush
 
 
 subscriptions : Model -> Sub M.Msg
@@ -15,6 +16,7 @@ subscriptions model =
         [ reloadData model.page model.dataStore
         , getCurrentTime
         , loadDataStore (M.StoreMsg << LoadDataStore)
+        , Sub.map M.WebPushMsg <| WebPush.subscriptions model.webPush
         ]
 
 

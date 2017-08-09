@@ -108,8 +108,8 @@ class TestGroupForm:
 
     def test_group_membership_buttons(self, live_server, browser_in, recipients, groups, driver_wait_time):
         """Test editing group membership."""
-        non_member_xpath = '//*[@id="elmContainer"]/div/div[3]/div/div/div/div/div[1]/div/div[2]/div/div'
-        member_xpath = '//*[@id="elmContainer"]/div/div[3]/div/div/div/div/div[2]/div/div[2]/div/div'
+        non_member_xpath = '//*[@id="elmContainer"]/div/div[2]/div/div[2]/div/div/div[1]/div/div[2]/div/div'
+        member_xpath = '//*[@id="elmContainer"]/div/div[2]/div/div[2]/div/div/div[2]/div/div[2]/div/div'
         grp = groups['empty_group']
         browser_in.get(live_server + '/group/edit/' + str(grp.pk) + '/')
         # check all recipient are displayed

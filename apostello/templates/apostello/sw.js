@@ -54,3 +54,23 @@ self.addEventListener('activate', function(event) {
     })
   );
 });
+
+self.addEventListener('push', function(event) {
+  console.log(event);
+  var title = 'New apostello message';
+
+  var body = {
+    'body': 'Click to see in apostello',
+    'tag': 'apostello',
+    'icon': ".{% static 'images/favicons/android-chrome-48x48.png' %}",
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(title, body)
+  );
+});
+
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close(); //Close the notification
+  event.waitUntil(clients.openWindow('/incoming/'));
+});

@@ -32,12 +32,7 @@ extractMaybeDate fn field maybeKeyword =
     case field of
         Nothing ->
             -- never edited the field, use existing or default to ""
-            case maybeKeyword of
-                Nothing ->
-                    Nothing
-
-                Just k ->
-                    fn k
+            Maybe.andThen fn maybeKeyword
 
         Just s ->
             Just s

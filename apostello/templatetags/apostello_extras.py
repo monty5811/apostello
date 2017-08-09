@@ -43,7 +43,5 @@ def elm_settings(user):
 
 
 @register.simple_tag
-def elm_messages(request):
-    storage = get_messages(request)
-    data = [{'type_': message.tags, 'text': str(message)} for message in storage]
-    return mark_safe(json.dumps(data))
+def gcm_sender_id():
+    return settings.CM_SENDER_ID

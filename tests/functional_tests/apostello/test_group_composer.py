@@ -16,19 +16,20 @@ class TestGroupComposer:
         assert uri in browser_in.current_url
         sleep(driver_wait_time)
         # check help text is there
-        header = browser_in.find_elements_by_xpath('//*[@id="elmContainer"]/div/div[3]/div/div/div[1]/div/h2')
+        header = browser_in.find_elements_by_xpath('//*[@id="elmContainer"]/div/div[2]/div/div[2]/div[1]/div/h2')
+
         assert len(header) == 1
         # check input box is there
-        input_ = browser_in.find_elements_by_xpath('//*[@id="elmContainer"]/div/div[3]/div/div/div[2]/div/div/input')
+        input_ = browser_in.find_elements_by_xpath('//*[@id="elmContainer"]/div/div[2]/div/div[2]/div[2]/div/div/input')
         assert len(input_) == 1
         # check reload button is there
         reload_ = browser_in.find_elements_by_xpath(
-            '//*[@id="elmContainer"]/div/div[3]/div/div/div[3]/div[1]/div/h4/div/i'
+            '//*[@id="elmContainer"]/div/div[2]/div/div[2]/div[3]/div[1]/div/h4/div/i'
         )
         assert len(reload_) == 1
         # check correct number of groups appear
         groups_ = browser_in.find_elements_by_xpath(
-            '//*[@id="elmContainer"]/div/div[3]/div/div/div[3]/div[1]/div/div/div'
+            '//*[@id="elmContainer"]/div/div[2]/div/div[2]/div[3]/div[1]/div/div/div'
         )
         num_groups = 0
         for k, v in groups.items():

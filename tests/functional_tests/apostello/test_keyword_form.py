@@ -64,7 +64,7 @@ def add_linked_groups(b, wt):
 
 def add_owner(b, wt):
     user = b.find_element_by_xpath(
-        '//*[@id="elmContainer"]/div/div[3]/div/div/form/div[6]/div/div/div[2]/div[2]/div[3]/div[1]'
+        '//*[@id="elmContainer"]/div/div[2]/div/div[2]/form/div[6]/div/div/div[2]/div[2]/div[3]/div[1]'
         )
     user.click()
     return b
@@ -72,7 +72,7 @@ def add_owner(b, wt):
 
 def add_subscriber(b, wt):
     user = b.find_element_by_xpath(
-        '//*[@id="elmContainer"]/div/div[3]/div/div/form/div[6]/div/div/div[3]/div[2]/div[3]/div[1]'
+        '//*[@id="elmContainer"]/div/div[2]/div/div[2]/form/div[6]/div/div/div[3]/div[2]/div[3]/div[1]'
         )
     user.click()
     return b

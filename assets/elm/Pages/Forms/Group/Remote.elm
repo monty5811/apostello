@@ -22,5 +22,5 @@ postCmd csrf model maybeGroup =
             ]
                 |> addPk maybeGroup
     in
-    rawPost csrf Urls.api_recipient_groups body
+    rawPost csrf (Urls.api_recipient_groups Nothing) body
         |> Http.send (FormMsg << ReceiveFormResp [ Nav.newUrl <| page2loc <| P.GroupTable False ])

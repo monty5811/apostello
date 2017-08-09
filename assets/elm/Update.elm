@@ -23,6 +23,7 @@ import Store.Messages exposing (StoreMsg(LoadDataStore))
 import Store.Model as Store
 import Store.Request exposing (maybeFetchData)
 import Store.Update as SU
+import WebPush
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -102,6 +103,13 @@ updateHelper msg model =
 
         CurrentTime t ->
             ( { model | currentTime = t }, [] )
+
+        WebPushMsg subMsg ->
+            let
+                ( wpModel, wpCmd ) =
+                    WebPush.update model.settings.csrftoken subMsg model.webPush
+            in
+            ( { model | webPush = wpModel }, [ Cmd.map WebPushMsg wpCmd ] )
 
 
 maybeSaveDataStore : Msg -> Model -> Model -> List (Cmd Msg) -> List (Cmd Msg)

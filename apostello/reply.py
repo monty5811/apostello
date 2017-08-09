@@ -44,6 +44,7 @@ class InboundSms:
         async('apostello.tasks.sms_to_slack', self.sms_body, str(self.contact), str(self.keyword))
         async('apostello.tasks.blacklist_notify', self.contact.pk, self.sms_body, self.keyword)
         async('apostello.tasks.ask_for_name', self.contact.pk, self.sms_body, self.send_name_sms)
+        async('apostello.tasks.send_cloud_messages')
         # update outgoing log 1 minute from now:
         schedule(
             'apostello.tasks.check_outgoing_log',

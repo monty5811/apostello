@@ -28,26 +28,26 @@ dt2Url dt =
         Contacts maybePk ->
             case maybePk of
                 Just pk ->
-                    ( True, Urls.api_recipients ++ "?pk=" ++ toString pk )
+                    ( True, Urls.api_recipients maybePk )
 
                 Nothing ->
-                    ( False, Urls.api_recipients )
+                    ( False, Urls.api_recipients maybePk )
 
         Groups maybePk ->
             case maybePk of
                 Just pk ->
-                    ( True, Urls.api_recipient_groups ++ "?pk=" ++ toString pk )
+                    ( True, Urls.api_recipient_groups maybePk )
 
                 Nothing ->
-                    ( False, Urls.api_recipient_groups )
+                    ( False, Urls.api_recipient_groups maybePk )
 
         Keywords maybeK ->
             case maybeK of
                 Nothing ->
-                    ( False, Urls.api_keywords )
+                    ( False, Urls.api_keywords maybeK )
 
                 Just k ->
-                    ( True, Urls.api_keywords ++ "?keyword=" ++ k )
+                    ( True, Urls.api_keywords maybeK )
 
         ScheduledSms ->
             ( False, Urls.api_queued_smss )

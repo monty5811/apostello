@@ -198,3 +198,7 @@ OPBEAT_JS_ORG_ID = os.environ.get('OPBEAT_JS_ORG_ID')
 
 # solo caching:
 SOLO_CACHE = 'default'
+
+# cloud messaging server key:
+CM_SERVER_KEY = os.environ.get('CM_SERVER_KEY')
+CM_SENDER_ID = os.environ.get('CM_SENDER_ID', '')

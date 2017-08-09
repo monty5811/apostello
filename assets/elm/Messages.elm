@@ -21,6 +21,7 @@ import Pages.GroupComposer.Messages exposing (GroupComposerMsg)
 import Pages.KeyRespTable.Messages exposing (KeyRespTableMsg)
 import Store.Messages exposing (StoreMsg)
 import Time
+import WebPush
 
 
 -- MESSAGES
@@ -38,6 +39,7 @@ type Msg
     | FirstRunMsg FirstRunMsg
     | FabMsg FabMsg
     | ApiSetupMsg ApiSetupMsg
+    | WebPushMsg WebPush.Msg
     | RemoveNotification Int
     | CurrentTime Time.Time
     | Nope

@@ -2,9 +2,9 @@
 ipdb==0.10.3
 pytest-cov==2.5.1
 pytest-django==3.1.2
-pytest-env==0.6.0
-pytest-html==1.14.2
-pytest==3.1.0
-selenium==3.4.2
+pytest-env==0.6.2
+pytest-html==1.15.1
+pytest==3.2.0
+selenium==3.4.3
 tox==2.7.0
-vcrpy==1.10.5
+vcrpy==1.11.1

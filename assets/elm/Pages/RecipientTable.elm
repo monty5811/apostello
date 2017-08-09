@@ -44,12 +44,7 @@ recipientRow recipient =
                     ""
 
         timeReceived =
-            case recipient.last_sms of
-                Just sms ->
-                    sms.time_received
-
-                Nothing ->
-                    Nothing
+            Maybe.andThen .time_received recipient.last_sms
 
         content =
             case recipient.last_sms of

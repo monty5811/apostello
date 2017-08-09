@@ -1,4 +1,5 @@
 import Cookies from 'js-cookie';
+import { isSubscribed, subscribePush, unsubscribePush } from './notifications';
 
 /* global elmSettings */
 
@@ -41,6 +42,16 @@ function renderElm() {
 
     app.ports.saveDataStore.subscribe(function(data) {
       setDataStoreCache(data, elmSettings.userPerms.user.email);
+    });
+
+    app.ports.pushSubEvent.subscribe(function(event) {
+      if (event === 'check') {
+        isSubscribed(app.ports.acceptPushSub);
+      } else if (event === 'register') {
+        subscribePush(app.ports.acceptPushSub);
+      } else if (event === 'unregister') {
+        unsubscribePush(app.ports.acceptPushSub);
+      }
     });
 
     window.addEventListener('storage', function(event) {

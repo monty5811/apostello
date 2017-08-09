@@ -632,6 +632,18 @@ class SmsOutbound(models.Model):
         ordering = ['-time_sent']
 
 
+class CloudMessageId(models.Model):
+    """Store cloud messaging IDs."""
+    url = models.CharField(max_length=1000)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,)
+
+    def __str__(self):
+        return f'{self.user.email} <{self.url[0:6]}...>'
+
+    class Meta:
+        unique_together = ('url', 'user',)
+
+
 class UserProfile(models.Model):
     """
     Stores permissions related to a User.

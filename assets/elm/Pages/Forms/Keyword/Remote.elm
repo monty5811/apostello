@@ -33,5 +33,5 @@ postCmd csrf now model maybeKeyword =
             ]
                 |> addPk maybeKeyword
     in
-    rawPost csrf Urls.api_keywords body
+    rawPost csrf (Urls.api_keywords Nothing) body
         |> Http.send (FormMsg << ReceiveFormResp [ Nav.newUrl <| page2loc <| P.KeywordTable False ])

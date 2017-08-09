@@ -1,7 +1,7 @@
 module Pages.Fragments.Shell exposing (view)
 
 import Html exposing (Html, div, h3, text)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, style)
 import Messages exposing (Msg)
 import Models exposing (Model)
 import Pages exposing (Page(..))
@@ -28,16 +28,24 @@ view model mainContent fab =
 commonShell : Model -> Html Msg -> Html Msg -> Html Msg
 commonShell model mainContent fab =
     div []
-        [ Menu.menu model.page model.settings model.dataStore
-        , div [ class "ui hidden divider" ] []
-        , div [ class "ui stackable grid container" ]
-            [ div [ class "fourteen wide centered column" ]
-                (h3 [] [ text <| title model.page ]
-                    :: Notif.view model.notifications
-                    ++ [ mainContent ]
-                )
+        [ Menu.menu model.page model.settings model.dataStore model.webPush
+        , div [ class "ui grid container" ]
+            [ div [ class "fourteen wide centered column" ] <|
+                List.concat
+                    [ [ div [ class "ui hidden divider" ] []
+                      , h3 [] [ text <| title model.page ]
+                      ]
+                    , Notif.view model.notifications
+                    , [ mainContent ]
+                    , [ div [ class "ui hidden divider" ] [] ]
+                    ]
             ]
-        , div [ class "ui hidden divider" ] []
+        , div
+            [ class "ui mobile hidden tablet hidden visible bottom fixed borderless inverted violet tiny menu"
+            , style [ ( "z-index", "auto" ) ]
+            ]
+          <|
+            Menu.allUsersMenuItems model.settings
         , fab
         ]
 
@@ -73,7 +81,7 @@ title page =
             ""
 
         GroupComposer _ ->
-            "Compose Group"
+            ""
 
         GroupForm _ (Just _) ->
             "Edit Group"

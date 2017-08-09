@@ -20,6 +20,7 @@ import Pages.Fragments.Notification exposing (DjangoMessage, Notification, Notif
 import Store.Decode exposing (decodeDataStore)
 import Store.Model exposing (DataStore, emptyDataStore)
 import Time
+import WebPush
 
 
 -- Main Model
@@ -34,6 +35,7 @@ type alias Model =
     , notifications : Dict Int Notification
     , currentTime : Time.Time
     , formStatus : FormStatus
+    , webPush : WebPush.Model
     }
 
 
@@ -47,6 +49,7 @@ initialModel settings dataStoreCache page =
     , notifications = Dict.empty
     , currentTime = 0
     , formStatus = NoAction
+    , webPush = WebPush.initial
     }
 
 

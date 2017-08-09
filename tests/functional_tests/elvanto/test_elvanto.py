@@ -44,7 +44,7 @@ class TestElvantoImport:
         # enable a group
         sleep(driver_wait_time)
         group_button = browser_in.find_elements_by_xpath(
-            '//*[@id="elmContainer"]/div/div[3]/div/div/div[2]/table/tbody/tr[1]/td[3]/a'
+            '//*[@id="elmContainer"]/div/div[2]/div/div[2]/div[2]/table/tbody/tr[1]/td[3]/a'
         )[0]
         click_and_wait(group_button, driver_wait_time)
         table = browser_in.find_elements_by_class_name('table')[0]

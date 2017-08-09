@@ -24,5 +24,5 @@ postCmd csrf model maybeContact =
             ]
                 |> addPk maybeContact
     in
-    rawPost csrf Urls.api_recipients body
+    rawPost csrf (Urls.api_recipients Nothing) body
         |> Http.send (FormMsg << ReceiveFormResp [ Nav.newUrl <| page2loc <| P.RecipientTable False ])

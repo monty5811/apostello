@@ -10,6 +10,7 @@ admin.autodiscover()
 
 urlpatterns = [
     url(r'^sw(.*.js)$', v.sw_js, name='sw_js'),
+    url(r'^manifest.json', TemplateView.as_view(template_name='apostello/manifest.json')),
     url(r'not_approved/$', v.NotApprovedView.as_view(), name='not_approved'),
     url(r'^keyword/responses/csv/(?P<keyword>[\d|\w]+)/$', v.keyword_csv, name='keyword_csv'),
 ]
@@ -44,5 +45,5 @@ urlpatterns += [
         name='offline',
     ),
     url(r'^.*/$', v.SimpleView.as_view(template_name="apostello/spa.html", required_perms=[]), name='spa'),
-    url(r'^$', v.SimpleView.as_view(template_name="apostello/spa.html", required_perms=[]), name='spa'),
+    url(r'^$', v.SimpleView.as_view(template_name="apostello/spa.html", required_perms=[]), name='spa_'),
 ]
