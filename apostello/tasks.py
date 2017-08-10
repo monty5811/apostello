@@ -239,7 +239,7 @@ def sms_to_slack(sms_body, person_name, keyword_name):
 def send_cloud_messages():
     """Send messages to all registere cloud messaging IDs."""
     server_key = settings.CM_SERVER_KEY
-    if server_key is None:
+    if not server_key:
         return
     from apostello.models import CloudMessageId
     cmids = CloudMessageId.objects.all()
