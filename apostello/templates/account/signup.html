@@ -1,16 +1,15 @@
 {% extends 'account/base_apsotello.html' %}
 {% load i18n %}
 {% load account %}
-{% load semanticui %}
 {% block content %}
 <h3>{% trans "Sign Up" %}</h3>
 <p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p>
-<form class="ui form signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
+<form id="signup_form" method="post" action="{% url 'account_signup' %}">
   {% csrf_token %}
-  {{ form|semanticui }}
+  {{ form.as_p }}
   {% if redirect_field_value %}
   <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
   {% endif %}
-  <button class="ui black button" type="submit">{% trans "Sign Up" %} &raquo;</button>
+  <button class="button button-dark" type="submit" id="signupButton">{% trans "Sign Up" %} &raquo;</button>
 </form>
 {% endblock %}

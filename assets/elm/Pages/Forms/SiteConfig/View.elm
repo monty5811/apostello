@@ -17,6 +17,7 @@ import Pages.Forms.SiteConfig.Model exposing (SiteConfigFormModel)
 import Pages.Forms.SiteConfig.Remote exposing (postCmd)
 import Pages.Fragments.Loader exposing (loader)
 import RemoteList as RL
+import Rocket exposing ((=>))
 import Store.Model exposing (DataStore, filterArchived)
 
 
@@ -165,8 +166,8 @@ updateExpDate model state maybeDate =
 groupLabelView : SiteConfigFormModel -> Maybe (List Int) -> RecipientGroup -> Html Msg
 groupLabelView model maybePks group =
     Html.div
-        [ A.class "ui violet basic label"
-        , A.style [ ( "user-select", "none" ) ]
+        [ A.class "badge"
+        , A.style [ "user-select" => "none" ]
         , E.onClick <| FormMsg <| SiteConfigFormMsg <| UpdateAutoAddGroupsField model group.pk
         ]
         [ Html.text group.name ]
@@ -190,7 +191,7 @@ groupView model maybeSelectedPks group =
 
 groupViewHelper : List Int -> RecipientGroup -> Html Msg
 groupViewHelper selectedPks group =
-    Html.div [ A.class "content", A.style [ ( "color", "#000" ) ] ]
+    Html.div [ A.style [ "color" => "#000" ] ]
         [ FV.selectedIcon selectedPks group
         , Html.text group.name
         ]

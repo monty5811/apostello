@@ -21,16 +21,16 @@ div {
     border-radius: 5px;
 }
 .column {
-      max-width: 450px;
+  max-width: 450px;
+  padding: 0 2rem;
+  margin: 2rem auto;
 }
 </style>
 </head>
 <body>
-  <div class="ui middle aligned center aligned grid">
-    <div class="left aligned column" style="background-color: #5c569c; padding: 10px">
+    <div class="column" style="background-color: #5c569c; padding: 10px">
       {% block content %}
       {% endblock %}
     </div>
-  </div>
   {% include 'apostello/includes/js.html' %}
 </body>

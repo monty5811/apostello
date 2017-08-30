@@ -1,22 +1,21 @@
-module Pages.Fragments.Fab.Update exposing (update)
+module Pages.Fragments.SidePanel.Update exposing (update)
 
 import DjangoSend exposing (CSRFToken, archivePost)
 import Helpers exposing (decodeAlwaysTrue)
 import Http
 import Messages
     exposing
-        ( FabMsg
+        ( Msg(SidePanelMsg)
+        , SidePanelMsg
             ( ArchiveItem
             , ReceiveArchiveResp
-            , ToggleFabView
             )
-        , Msg(FabMsg)
         )
-import Models exposing (FabModel(..), Model)
+import Models exposing (Model)
 import Navigation
 
 
-update : FabMsg -> Model -> ( Model, List (Cmd Msg) )
+update : SidePanelMsg -> Model -> ( Model, List (Cmd Msg) )
 update msg model =
     case msg of
         ArchiveItem redirectUrl url isArchived ->
@@ -28,21 +27,8 @@ update msg model =
         ReceiveArchiveResp url (Ok _) ->
             ( model, [ Navigation.load url ] )
 
-        ToggleFabView ->
-            ( { model | fabModel = toggleFabView model.fabModel }, [] )
-
-
-toggleFabView : FabModel -> FabModel
-toggleFabView model =
-    case model of
-        MenuHidden ->
-            MenuVisible
-
-        MenuVisible ->
-            MenuHidden
-
 
 archiveItem : CSRFToken -> String -> String -> Bool -> Cmd Msg
 archiveItem csrf redirectUrl url isArchived =
     archivePost csrf url isArchived decodeAlwaysTrue
-        |> Http.send (FabMsg << ReceiveArchiveResp redirectUrl)
+        |> Http.send (SidePanelMsg << ReceiveArchiveResp redirectUrl)

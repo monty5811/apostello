@@ -8,6 +8,10 @@
     {% endblock %}
   </head>
   <body>
+    <div class="spinner" id="elmLoader">
+      <div class="dot1"></div>
+      <div class="dot2"></div>
+    </div>
     <div id="elmContainer"></div>
     <script>
     {% cache 60 elmSettings request.user %}
@@ -17,14 +21,8 @@
     {% include 'apostello/includes/js.html' %}
     {% block morejs %}{% endblock %}
     <noscript>
-      <div class="ui top attached inverted violet menu">
-        <a href="/" class="item">Home</a>
-      </div>
-      <div class="ui hidden divider"></div>
-      <div class="ui stackable grid container">
-        <div class="fourteen wide centered column">
-          <p>apostello cannot function without javascript...</p>
-        </div>
+      <div class="alert alert-warning">
+        <p>apostello cannot function without javascript...</p>
       </div>
     </noscript>
   </body>

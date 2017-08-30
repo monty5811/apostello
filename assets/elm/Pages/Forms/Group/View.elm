@@ -2,7 +2,7 @@ module Pages.Forms.Group.View exposing (view)
 
 import Data exposing (RecipientGroup, RecipientSimple)
 import DjangoSend exposing (CSRFToken)
-import FilteringTable exposing (filterRecord)
+import FilteringTable exposing (filterInput, filterRecord)
 import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus)
 import Forms.View exposing (..)
 import Helpers exposing (onClick)
@@ -19,6 +19,7 @@ import Pages.Forms.Group.Remote exposing (postCmd)
 import Pages.Fragments.Loader exposing (loader)
 import Regex
 import RemoteList as RL
+import Rocket exposing ((=>))
 import Route exposing (spaLink)
 import Store.Messages exposing (StoreMsg(ToggleGroupMembership))
 
@@ -129,7 +130,7 @@ archiveNotice show groups name =
             Html.text ""
 
         True ->
-            Html.div [ A.class "ui message" ]
+            Html.div [ A.class "alert" ]
                 [ Html.p [] [ Html.text "There is already a Group that with that name in the archive" ]
                 , Html.p [] [ Html.text "You can chose a different name." ]
                 , Html.p []
@@ -174,18 +175,23 @@ membershipToggles maybeGroup model =
                 [ Html.br [] []
                 , Html.h3 [] [ Html.text "Group Members" ]
                 , Html.p [] [ Html.text "Click a person to toggle their membership." ]
-                , Html.div [ A.class "ui two column celled grid" ]
-                    [ Html.div [ A.class "ui column" ]
+                , Html.div
+                    [ A.style
+                        [ "display" => "grid"
+                        , "grid-template-columns" => "50% 50%"
+                        ]
+                    ]
+                    [ Html.div []
                         [ Html.h4 [] [ Html.text "Non-Members" ]
                         , Html.div []
-                            [ filter (FormMsg << GroupFormMsg << UpdateNonMemberFilter)
+                            [ filterInput (FormMsg << GroupFormMsg << UpdateNonMemberFilter)
                             , cardContainer "nonmembers" model.nonmembersFilterRegex group.nonmembers group
                             ]
                         ]
-                    , Html.div [ A.class "ui column" ]
+                    , Html.div []
                         [ Html.h4 [] [ Html.text "Members" ]
                         , Html.div []
-                            [ filter (FormMsg << GroupFormMsg << UpdateMemberFilter)
+                            [ filterInput (FormMsg << GroupFormMsg << UpdateMemberFilter)
                             , cardContainer "members" model.membersFilterRegex group.members group
                             ]
                         ]
@@ -193,29 +199,21 @@ membershipToggles maybeGroup model =
                 ]
 
 
-filter : (String -> Msg) -> Html Msg
-filter handleInput =
-    Html.div [ A.class "ui left icon large transparent fluid input" ]
-        [ Html.input [ A.placeholder "Filter...", A.type_ "text", onInput handleInput ] []
-        , Html.i [ A.class "violet filter icon" ] []
-        ]
-
-
 cardContainer : String -> Regex.Regex -> List RecipientSimple -> RecipientGroup -> Html Msg
 cardContainer id_ filterRegex contacts group =
     Html.div []
         [ Html.br [] []
-        , Html.div [ A.class "ui three stackable cards", A.id <| id_ ++ "_list" ]
+        , Html.div [ A.class "list", A.id <| id_ ++ "_list" ]
             (contacts
                 |> List.filter (filterRecord filterRegex)
-                |> List.map (card group)
+                |> List.map (card id_ group)
             )
         ]
 
 
-card : RecipientGroup -> RecipientSimple -> Html Msg
-card group contact =
-    Html.div [ A.class "ui raised card" ]
-        [ Html.div [ A.class "content", onClick (StoreMsg <| ToggleGroupMembership group contact) ]
+card : String -> RecipientGroup -> RecipientSimple -> Html Msg
+card id_ group contact =
+    Html.div [ A.class "item", A.id <| id_ ++ "_item" ]
+        [ Html.div [ onClick (StoreMsg <| ToggleGroupMembership group contact) ]
             [ Html.text contact.full_name ]
         ]

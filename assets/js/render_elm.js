@@ -60,6 +60,9 @@ function renderElm() {
       }
     });
 
+    const loader = document.getElementById('elmLoader');
+    loader.remove();
+
     return app;
   }
   return null;

@@ -5,15 +5,15 @@ import FilteringTable as FT
 import Forms.DatePickers exposing (initDateTimePickers)
 import Forms.Update as F
 import Messages exposing (..)
-import Models exposing (FabModel(..), Model, Settings)
+import Models exposing (MenuModel(MenuHidden, MenuVisible), Model, Settings)
 import Navigation
 import Pages.ApiSetup.Update as ApiSetup
 import Pages.ElvantoImport.Update as ElvImp
 import Pages.FirstRun.Update as FR
 import Pages.Forms.DefaultResponses.Remote as DRFR
 import Pages.Forms.SiteConfig.Remote as SCFR
-import Pages.Fragments.Fab.Update as Fab
 import Pages.Fragments.Notification as Notif
+import Pages.Fragments.SidePanel.Update as SidePanel
 import Pages.GroupComposer.Update as GC
 import Pages.KeyRespTable.Update as KRT
 import Ports exposing (saveDataStore)
@@ -44,10 +44,18 @@ updateHelper msg model =
         Nope ->
             ( model, [] )
 
+        ToggleMenu ->
+            case model.menuState of
+                MenuHidden ->
+                    ( { model | menuState = MenuVisible }, [] )
+
+                MenuVisible ->
+                    ( { model | menuState = MenuHidden }, [] )
+
         NewUrl str ->
             ( { model
-                | fabModel = MenuHidden
-                , notifications = Dict.empty
+                | notifications = Dict.empty
+                , menuState = MenuHidden
               }
             , [ Navigation.newUrl str ]
             )
@@ -76,8 +84,8 @@ updateHelper msg model =
         FormMsg subMsg ->
             F.update subMsg model
 
-        FabMsg subMsg ->
-            Fab.update subMsg model
+        SidePanelMsg subMsg ->
+            SidePanel.update subMsg model
 
         RemoveNotification id ->
             ( { model | notifications = Notif.remove id model.notifications }, [] )

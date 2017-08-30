@@ -16,21 +16,16 @@ class TestGroupComposer:
         assert uri in browser_in.current_url
         sleep(driver_wait_time)
         # check help text is there
-        header = browser_in.find_elements_by_xpath('//*[@id="elmContainer"]/div/div[2]/div/div[2]/div[1]/div/h2')
-
-        assert len(header) == 1
+        header = browser_in.find_elements_by_tag_name('h2')
+        assert any([h.text == 'Group Composer' for h  in header])
         # check input box is there
-        input_ = browser_in.find_elements_by_xpath('//*[@id="elmContainer"]/div/div[2]/div/div[2]/div[2]/div/div/input')
+        input_ = browser_in.find_elements_by_id('queryInputBox')
         assert len(input_) == 1
         # check reload button is there
-        reload_ = browser_in.find_elements_by_xpath(
-            '//*[@id="elmContainer"]/div/div[2]/div/div[2]/div[3]/div[1]/div/h4/div/i'
-        )
+        reload_ = browser_in.find_elements_by_id('refreshButton')
         assert len(reload_) == 1
         # check correct number of groups appear
-        groups_ = browser_in.find_elements_by_xpath(
-            '//*[@id="elmContainer"]/div/div[2]/div/div[2]/div[3]/div[1]/div/div/div'
-        )
+        groups_ = browser_in.find_elements_by_id('groupRow')
         num_groups = 0
         for k, v in groups.items():
             if not v.is_archived:

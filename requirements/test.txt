@@ -4,6 +4,7 @@ pytest-cov==2.5.1
 pytest-django==3.1.2
 pytest-env==0.6.2
 pytest-html==1.15.1
+pytest-sugar==0.9.0
 pytest==3.2.0
 selenium==3.4.3
 tox==2.7.0

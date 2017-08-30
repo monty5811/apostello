@@ -3,7 +3,7 @@ module Helpers exposing (..)
 import Date
 import Date.Format
 import Html exposing (Attribute, Html, a, td, text)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, id)
 import Html.Events exposing (onWithOptions)
 import Json.Decode as Decode
 import List.Extra as LE
@@ -71,8 +71,8 @@ calculateSmsCost smsCostPerMsg msg =
 
 archiveCell : Bool -> Msg -> Html Msg
 archiveCell isArchived msg =
-    td [ class "collapsing" ]
-        [ a [ class "ui tiny grey button", onClick msg ] [ text <| archiveText isArchived ]
+    td []
+        [ a [ class "button button-secondary", onClick msg, id "archiveItemButton" ] [ text <| archiveText isArchived ]
         ]
 
 

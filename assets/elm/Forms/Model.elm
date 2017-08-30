@@ -61,13 +61,12 @@ type FormItem
 type alias FieldGroupConfig =
     { header : Maybe String
     , sideBySide : Bool
-    , useSegment : Bool
     }
 
 
 defaultFieldGroupConfig : FieldGroupConfig
 defaultFieldGroupConfig =
-    FieldGroupConfig Nothing False True
+    FieldGroupConfig Nothing False
 
 
 type alias Field =

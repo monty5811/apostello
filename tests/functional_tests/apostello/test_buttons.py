@@ -14,7 +14,7 @@ from apostello import models
 @pytest.mark.slow
 @pytest.mark.selenium
 class TestButton:
-    """Test the ajax buttons."""
+    """Test the buttons."""
 
     @pytest.mark.parametrize(
         "uri,query_set", [
@@ -37,11 +37,11 @@ class TestButton:
         table = tables[0]
         assert 'Archive' in table.text
         # toggle a permission
-        toggle_buttons = browser_in.find_elements_by_class_name('grey')
+        toggle_buttons = browser_in.find_elements_by_id('archiveItemButton')
         num_buttons = len(toggle_buttons)
         while num_buttons > 0:
             click_and_wait(toggle_buttons[0], driver_wait_time)
-            toggle_buttons = browser_in.find_elements_by_class_name('grey')
+            toggle_buttons = browser_in.find_elements_by_id('archiveItemButton')
             assert num_buttons - 1 == len(toggle_buttons)
             num_buttons = len(toggle_buttons)
 
@@ -65,9 +65,7 @@ class TestButton:
         k.save()
         browser_in.get(live_server + '/keyword/edit/test/')
         sleep(driver_wait_time)
-        wrench = browser_in.find_elements_by_class_name('wrench')[0]
-        click_and_wait(wrench, driver_wait_time)
-        button = browser_in.find_elements_by_class_name('positive')[0]
+        button = browser_in.find_element_by_id('restoreItemButton')
         click_and_wait(button, driver_wait_time)
         assert 'all' in browser_in.current_url
         k.refresh_from_db()
@@ -80,26 +78,26 @@ class TestButton:
         uri = '/incoming/curate_wall/'
         browser_in.get(live_server + uri)
         sleep(driver_wait_time)
-        tables = browser_in.find_elements_by_class_name('table')
+        tables = browser_in.find_elements_by_tag_name('table')
         assert len(tables) == 1
         table = tables[0]
         assert 'Hidden' in table.text
-        hidden_buttons = browser_in.find_elements_by_class_name('red')
+        hidden_buttons = browser_in.find_elements_by_class_name('button-danger')
         num_buttons = len(hidden_buttons)
         while num_buttons > 0:
             click_and_wait(hidden_buttons[0], driver_wait_time)
-            hidden_buttons = browser_in.find_elements_by_class_name('red')
+            hidden_buttons = browser_in.find_elements_by_class_name('button-danger')
             assert num_buttons - 1 == len(hidden_buttons)
             num_buttons = len(hidden_buttons)
 
         sleep(driver_wait_time)
         sms.refresh_from_db()
         assert sms.display_on_wall
-        displaying_buttons = browser_in.find_elements_by_class_name('green')
+        displaying_buttons = browser_in.find_elements_by_class_name('button-success')
         num_buttons = len(displaying_buttons)
         while len(displaying_buttons) > 0:
             click_and_wait(displaying_buttons[0], driver_wait_time)
-            displaying_buttons = browser_in.find_elements_by_class_name('green')
+            displaying_buttons = browser_in.find_elements_by_class_name('button-success')
             assert num_buttons - 1 == len(displaying_buttons)
             num_buttons = len(displaying_buttons)
         sleep(driver_wait_time)
@@ -117,7 +115,7 @@ class TestButton:
         )
         sms.save()
         browser_in.get(live_server + '/incoming/')
-        for button in browser_in.find_elements_by_class_name('blue'):
+        for button in browser_in.find_elements_by_id('reingestButton'):
             button.click()
         sleep(driver_wait_time)
         sms.refresh_from_db()
@@ -127,7 +125,7 @@ class TestButton:
         uri = '/keywords/edit/' + keywords['test'].keyword
         browser_in.get(live_server + uri)
         sleep(driver_wait_time)
-        for button in browser_in.find_elements_by_class_name('positive'):
+        for button in browser_in.find_elements_by_id('unDealWithButton'):
             browser_in.execute_script("return arguments[0].scrollIntoView();", button)
             sleep(driver_wait_time)
             button.click()
@@ -150,7 +148,7 @@ class TestButton:
         assert uri in browser_in.current_url
         sleep(driver_wait_time)
         # archive (should fail and show a popup):
-        toggle_buttons = browser_in.find_elements_by_class_name('grey')
+        toggle_buttons = browser_in.find_elements_by_id('archiveItemButton')
         click_and_wait(toggle_buttons[0], driver_wait_time)
         check_and_close_msg(browser_in, driver_wait_time)
 
@@ -184,11 +182,11 @@ class TestButton:
         assert 'another test message' in browser_in.page_source
         assert 'Calvin' in browser_in.page_source
         # delete tasks
-        cancel_buttons = browser_in.find_elements_by_class_name('grey')
+        cancel_buttons = browser_in.find_elements_by_id('cancelSmsButton')
         num_buttons = len(cancel_buttons)
         while num_buttons > 0:
             click_and_wait(cancel_buttons[0], driver_wait_time)
-            cancel_buttons = browser_in.find_elements_by_class_name('grey')
+            cancel_buttons = browser_in.find_elements_by_id('cancelSmsButton')
             assert num_buttons - 1 == len(cancel_buttons)
             num_buttons = len(cancel_buttons)
         assert 'test message' not in browser_in.page_source

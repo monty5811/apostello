@@ -5,27 +5,30 @@ import Date.Format
 import DateTimePicker
 import DateTimePicker.Config
 import Dict
-import FilteringTable exposing (filterRecord)
+import FilteringTable exposing (filterInput, filterRecord)
 import Forms.Model exposing (..)
 import Html exposing (Html, button, div, i, input, label, text, textarea)
 import Html.Attributes as A
 import Html.Events as E exposing (onInput)
 import Messages exposing (Msg)
+import Pages.Fragments.Loader exposing (loader)
 import Regex
 import RemoteList as RL
+import Rocket exposing ((=>))
 import Round
 
 
 form : FormStatus -> List FormItem -> Msg -> Html Msg -> Html Msg
 form formStatus items submitMsg button_ =
-    Html.form
-        [ A.class <| formClass formStatus
-        , E.onSubmit submitMsg
-        ]
-    <|
-        renderFormError formStatus
-            ++ List.map (renderItem <| formErrors formStatus) items
-            ++ [ button_ ]
+    case formStatus of
+        InProgress ->
+            loader
+
+        _ ->
+            Html.form [ E.onSubmit submitMsg ] <|
+                renderFormError formStatus
+                    ++ List.map (renderItem <| formErrors formStatus) items
+                    ++ [ button_ ]
 
 
 renderFormError : FormStatus -> List (Html Msg)
@@ -50,7 +53,7 @@ renderItem errorDict item =
             renderField errorDict field
 
         FormHeader header ->
-            Html.h4 [ A.class "ui dividing header" ] [ Html.text header ]
+            Html.h4 [ A.class "" ] [ Html.text header ]
 
         FieldGroup config fields ->
             fieldGroupHelp config <|
@@ -62,33 +65,38 @@ fieldGroupHelp config fields =
     fields
         |> addSideBySide config.sideBySide
         |> addHeader config.header
-        |> addSegment config.useSegment
+        |> addSegment
 
 
-addSideBySide : Bool -> List (Html Msg) -> Html Msg
+addSideBySide : Bool -> List (Html Msg) -> List (Html Msg)
 addSideBySide add fields =
     if add then
-        Html.div [ A.class "equal width fields" ] fields
+        [ div
+            [ A.style
+                [ "display" => "grid"
+                , "grid-template-columns" => "repeat(" ++ toString (List.length fields) ++ ", auto)"
+                , "grid-column-gap" => "1rem"
+                ]
+            ]
+            fields
+        ]
     else
-        Html.div [] fields
+        fields
 
 
-addHeader : Maybe String -> Html Msg -> Html Msg
+addHeader : Maybe String -> List (Html Msg) -> List (Html Msg)
 addHeader header fields =
     case header of
         Nothing ->
             fields
 
         Just h ->
-            Html.div [] [ Html.h4 [] [ Html.text h ], fields ]
+            Html.legend [] [ Html.text h ] :: fields
 
 
-addSegment : Bool -> Html Msg -> Html Msg
-addSegment seg fields =
-    if seg then
-        Html.div [ A.class "ui raised segment" ] [ fields ]
-    else
-        fields
+addSegment : List (Html Msg) -> Html Msg
+addSegment fields =
+    Html.fieldset [] fields
 
 
 renderField : FormErrors -> Field -> Html Msg
@@ -101,10 +109,10 @@ renderField errorDict field =
         className =
             case field.meta.required of
                 False ->
-                    "field"
+                    "input-field"
 
                 True ->
-                    "required field"
+                    "required input-field"
     in
     div [ A.class (errorFieldClass className errors) ]
         (List.append
@@ -184,6 +192,7 @@ simpleTextField meta defaultValue inputMsg =
     , input
         [ A.id meta.id
         , A.name meta.name
+        , A.type_ "text"
         , E.onInput inputMsg
         , A.defaultValue <| Maybe.withDefault "" defaultValue
         ]
@@ -267,18 +276,9 @@ checkboxField meta maybeRec getter toggleMsg =
     let
         checked =
             Maybe.map getter maybeRec |> Maybe.withDefault False
-
-        divClass =
-            case checked of
-                True ->
-                    "ui checked checkbox"
-
-                False ->
-                    "ui checkbox"
     in
     [ div
-        [ A.class divClass
-        , E.onClick <| toggleMsg maybeRec
+        [ E.onClick <| toggleMsg maybeRec
         ]
         [ input
             [ A.id meta.id
@@ -287,7 +287,7 @@ checkboxField meta maybeRec getter toggleMsg =
             , A.checked checked
             ]
             []
-        , label [] [ text meta.label ]
+        , label [] [ text <| " " ++ meta.label ]
         , helpLabel meta
         ]
     ]
@@ -300,7 +300,7 @@ helpLabel meta =
             text ""
 
         Just help ->
-            div [ A.class "ui label" ] [ text help ]
+            div [ A.class "help" ] [ text help ]
 
 
 submitButton : Maybe a -> Bool -> Html Msg
@@ -317,12 +317,12 @@ submitButton maybeItem showAN =
         colour =
             case showAN of
                 True ->
-                    "disabled"
+                    "button-lg button-secondary"
 
                 False ->
-                    "primary"
+                    "button-lg button-primary"
     in
-    button [ A.class <| "ui " ++ colour ++ " button" ] [ text txt ]
+    button [ A.class <| "button button-block" ++ colour, A.id "formSubmitButton" ] [ text txt ]
 
 
 type alias MultiSelectField a =
@@ -349,24 +349,17 @@ multiSelectField meta props =
     in
     [ label [ A.for meta.id ] [ text meta.label ]
     , helpLabel meta
-    , div [ A.class "ui raised segment" ]
+    , div [ A.class "segment" ]
         [ loadingMessage props.items
-        , selectedItemsView pks props.selectedView props.items
-        , div [ A.class "ui left icon large transparent fluid input" ]
-            [ input
-                [ A.placeholder "Filter..."
-                , A.type_ "text"
-                , E.onInput props.filterMsg
-                ]
-                []
-            , i [ A.class "violet filter icon" ] []
-            ]
+        , div [] <| selectedItemsView pks props.selectedView props.items
+        , Html.br [] []
+        , filterInput props.filterMsg
         , div
-            [ A.class "ui divided selection list"
+            [ A.class "list"
             , A.style
-                [ ( "min-height", "25vh" )
-                , ( "max-height", "50vh" )
-                , ( "overflow-y", "auto" )
+                [ "min-height" => "25vh"
+                , "max-height" => "50vh"
+                , "overflow-y" => "auto"
                 ]
             ]
             (props.items
@@ -378,18 +371,17 @@ multiSelectField meta props =
     ]
 
 
-selectedItemsView : Maybe (List Int) -> (Maybe (List Int) -> { a | pk : Int } -> Html Msg) -> RL.RemoteList { a | pk : Int } -> Html Msg
+selectedItemsView : Maybe (List Int) -> (Maybe (List Int) -> { a | pk : Int } -> Html Msg) -> RL.RemoteList { a | pk : Int } -> List (Html Msg)
 selectedItemsView maybePks render rl =
     case maybePks of
         Nothing ->
-            div [] []
+            []
 
         Just pks ->
             rl
                 |> RL.toList
                 |> List.filter (\x -> List.member x.pk pks)
                 |> List.map (render maybePks)
-                |> div []
 
 
 loadingMessage : RL.RemoteList a -> Html Msg
@@ -415,12 +407,12 @@ selectedIcon selectedPks item =
             text ""
 
         True ->
-            i [ A.class "check icon", A.style [ ( "color", "#603cba" ) ] ] []
+            i [ A.class "fa fa-check", A.style [ "color" => "var(--state-primary)" ] ] []
 
 
 fieldMessage : String -> Html Msg
 fieldMessage message =
-    div [ A.class "ui error message" ] [ text message ]
+    div [ A.class "alert alert-danger" ] [ text message ]
 
 
 errorFieldClass : String -> List String -> String
@@ -430,23 +422,17 @@ errorFieldClass base errors =
             base
 
         False ->
-            "error " ++ base
+            "input-invalid " ++ base
 
 
 formClass : FormStatus -> String
 formClass status =
     case status of
-        NoAction ->
-            "ui form"
-
         InProgress ->
-            "ui loading form"
+            "loading"
 
-        Success ->
-            "ui success form"
-
-        Failed _ ->
-            "ui error form"
+        _ ->
+            ""
 
 
 
@@ -477,14 +463,14 @@ timeField msg meta datePickerState date =
 -- Send Button
 
 
-sendButtonClass : Maybe Float -> String
-sendButtonClass cost =
+isDisabled : Maybe Float -> Html.Attribute msg
+isDisabled cost =
     case cost of
         Nothing ->
-            "disabled"
+            A.disabled True
 
         Just _ ->
-            "primary"
+            A.disabled False
 
 
 sendButtonText : Maybe Float -> String
@@ -500,5 +486,5 @@ sendButtonText cost =
 sendButton : Maybe Float -> Html Msg
 sendButton cost =
     button
-        [ A.class ("ui " ++ sendButtonClass cost ++ " button"), A.id "send_button" ]
+        [ isDisabled cost, A.id "send_button", A.class "button" ]
         [ text ("Send ($" ++ sendButtonText cost ++ ")") ]

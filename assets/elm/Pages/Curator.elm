@@ -33,7 +33,7 @@ smsRow : SmsInbound -> Html Msg
 smsRow sms =
     tr []
         [ td [] [ text sms.content ]
-        , td [ class "collapsing" ] [ text (formatDate sms.time_received) ]
+        , td [] [ text (formatDate sms.time_received) ]
         , curateToggleCell sms
         ]
 
@@ -52,15 +52,15 @@ curateToggleCell sms =
         colour =
             case sms.display_on_wall of
                 True ->
-                    "green"
+                    "button-success"
 
                 False ->
-                    "red"
+                    "button-danger"
 
         className =
-            "ui tiny " ++ colour ++ " fluid button"
+            "button " ++ colour
     in
-    td [ class "collapsing" ]
+    td []
         [ a
             [ class className
             , onClick (StoreMsg (ToggleWallDisplay sms.display_on_wall sms.pk))

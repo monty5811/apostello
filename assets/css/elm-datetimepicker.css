@@ -1,6 +1,6 @@
 .elm-input-datepickerDatePicker {
     position: relative;
-    min-width: 475px;
+    min-width: 100%;
 }
 
 .elm-input-datepickerDialog {

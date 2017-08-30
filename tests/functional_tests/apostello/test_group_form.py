@@ -16,7 +16,7 @@ def load_page(b, wt, url):
 
 
 def send_form(b, wt):
-    send_button = b.find_elements_by_class_name('primary')[0]
+    send_button = b.find_element_by_id('formSubmitButton')
     click_and_wait(send_button, wt)
     return b
 
@@ -108,23 +108,23 @@ class TestGroupForm:
 
     def test_group_membership_buttons(self, live_server, browser_in, recipients, groups, driver_wait_time):
         """Test editing group membership."""
-        non_member_xpath = '//*[@id="elmContainer"]/div/div[2]/div/div[2]/div/div/div[1]/div/div[2]/div/div'
-        member_xpath = '//*[@id="elmContainer"]/div/div[2]/div/div[2]/div/div/div[2]/div/div[2]/div/div'
+        non_member_id = 'nonmembers_item'
+        member_id = 'members_item'
         grp = groups['empty_group']
         browser_in.get(live_server + '/group/edit/' + str(grp.pk) + '/')
         # check all recipient are displayed
-        cards = browser_in.find_elements_by_xpath(non_member_xpath)
+        cards = browser_in.find_elements_by_id(non_member_id)
         assert len(cards) == models.Recipient.objects.filter(is_archived=False).count()
         # move all recipients into membership
         while len(cards) > 0:
             click_and_wait(cards[0], driver_wait_time)
-            cards = browser_in.find_elements_by_xpath(non_member_xpath)
+            cards = browser_in.find_elements_by_id(non_member_id)
         assert grp.all_recipients.count() == models.Recipient.objects.filter(is_archived=False).count()
         # remove them again:
-        cards = browser_in.find_elements_by_xpath(member_xpath)
+        cards = browser_in.find_elements_by_id(member_id)
         while len(cards) > 0:
             click_and_wait(cards[0], driver_wait_time)
-            cards = browser_in.find_elements_by_xpath(member_xpath)
+            cards = browser_in.find_elements_by_id(member_id)
         sleep(driver_wait_time)
         assert grp.all_recipients.count() == 0
 

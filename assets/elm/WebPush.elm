@@ -15,6 +15,7 @@ import Html.Events as E
 import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
+import Rocket exposing ((=>))
 import Urls
 
 
@@ -68,37 +69,34 @@ update csrftoken msg model =
 addId : CSRFToken -> String -> Cmd Msg
 addId csrftoken endpoint =
     Http.send (\_ -> NoOp) <|
-        post csrftoken Urls.api_act_add_cm_id [ ( "endpoint", Encode.string endpoint ) ] (Decode.succeed ())
+        post csrftoken Urls.api_act_add_cm_id [ "endpoint" => Encode.string endpoint ] (Decode.succeed ())
 
 
 removeId : CSRFToken -> String -> Cmd Msg
 removeId csrftoken endpoint =
     Http.send (\_ -> NoOp) <|
-        post csrftoken Urls.api_act_remove_cm_id [ ( "endpoint", Encode.string endpoint ) ] (Decode.succeed ())
+        post csrftoken Urls.api_act_remove_cm_id [ "endpoint" => Encode.string endpoint ] (Decode.succeed ())
 
 
 view : Model -> List (Html Msg)
 view model =
-    [ Html.div [ A.class "ui divider" ] []
-    , Html.div [ A.class "header" ] [ Html.text <| "Push Status:" ]
-    , Html.div [ A.class "header" ] [ Html.text <| header model ]
-    , Html.div [ A.class "item" ]
-        [ case model of
-            Unknown ->
-                button CheckSubscribed "" "Click to check"
+    [ Html.h4 [] [ Html.text <| "Push Status:" ]
+    , Html.div [] [ Html.text <| header model ]
+    , case model of
+        Unknown ->
+            button CheckSubscribed "button-secondary" "Click to check"
 
-            Subscribed ->
-                button Unregister "blue" "Click to stop"
+        Subscribed ->
+            button Unregister "button-info" "Click to stop"
 
-            NotSubscribed ->
-                button Register "blue" "Click to start"
+        NotSubscribed ->
+            button Register "button-info" "Click to start"
 
-            NoSupport ->
-                Html.text ""
+        NoSupport ->
+            Html.text ""
 
-            Error ->
-                Html.text ""
-        ]
+        Error ->
+            Html.text ""
     ]
 
 
@@ -123,8 +121,8 @@ header m =
 
 button : Msg -> String -> String -> Html Msg
 button msg colour text =
-    Html.div
-        [ A.class <| "ui " ++ colour ++ " button"
+    Html.button
+        [ A.class <| "button " ++ colour
         , E.onClick msg
         ]
         [ Html.text text ]

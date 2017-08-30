@@ -25,8 +25,8 @@ def add_csv_data(b, wt, text):
 
 
 def send_form(b, wt):
-    send_button = b.find_elements_by_class_name('primary')[0]
-    click_and_wait(send_button, wt)
+    button = b.find_element_by_id('formSubmitButton')
+    click_and_wait(button, wt)
     return b
 
 

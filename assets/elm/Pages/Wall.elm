@@ -5,6 +5,7 @@ import Html exposing (Html, div, p, span, text)
 import Html.Attributes exposing (class, style)
 import Messages exposing (Msg)
 import RemoteList as RL
+import Rocket exposing ((=>))
 
 
 -- Main view
@@ -13,32 +14,35 @@ import RemoteList as RL
 view : RL.RemoteList SmsInbound -> Html Msg
 view sms =
     div
-        [ class "ui grid"
+        [ class "text-center"
         , style
-            [ ( "background-color", "#5c569c" )
-            , ( "height", "100vh" )
-            , ( "width", "100vw" )
+            [ "background-color" => "#5c569c"
+            , "height" => "100vh"
+            , "width" => "100vw"
             ]
         ]
-        [ div [ class "twelve wide centered column" ]
-            [ div [ class "ui one cards" ]
-                (sms
-                    |> RL.toList
-                    |> List.filter (\s -> s.display_on_wall)
-                    |> List.map smsCard
-                )
-            ]
+        [ div [ style [ "padding" => "2rem" ] ]
+            (sms
+                |> RL.toList
+                |> List.filter (\s -> s.display_on_wall)
+                |> List.map smsCard
+            )
         ]
 
 
 smsCard : SmsInbound -> Html Msg
 smsCard sms =
-    div [ class "card", style [ ( "backgroundColor", "#ffffff" ), ( "fontSize", "200%" ) ] ]
-        [ div [ class "content" ]
-            [ p []
-                [ span [ style [ ( "color", "#d3d3d3" ) ] ] [ text <| firstWord sms ]
-                , text <| restOfMessage sms
-                ]
+    div
+        [ style
+            [ "backgroundColor" => "#ffffff"
+            , "fontSize" => "200%"
+            , "padding" => ".5rem"
+            , "margin" => ".5rem"
+            ]
+        ]
+        [ p []
+            [ span [ style [ "color" => "#d3d3d3" ] ] [ text <| firstWord sms ]
+            , text <| restOfMessage sms
             ]
         ]
 

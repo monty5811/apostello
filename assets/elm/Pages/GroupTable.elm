@@ -4,7 +4,6 @@ import Data exposing (RecipientGroup)
 import FilteringTable as FT
 import Helpers exposing (archiveCell)
 import Html exposing (Html, a, td, text, th, thead, tr)
-import Html.Attributes exposing (class)
 import Messages exposing (Msg(StoreMsg))
 import Pages exposing (Page(GroupForm))
 import Pages.Forms.Group.Model exposing (initialGroupFormModel)
@@ -39,6 +38,6 @@ groupRow group =
     tr []
         [ td [] [ spaLink a [] [ text group.name ] <| GroupForm initialGroupFormModel <| Just group.pk ]
         , td [] [ text group.description ]
-        , td [ class "collapsing" ] [ text ("$" ++ Round.round 2 group.cost) ]
+        , td [] [ text ("$" ++ Round.round 2 group.cost) ]
         , archiveCell group.is_archived (StoreMsg (ToggleGroupArchive group.is_archived group.pk))
         ]

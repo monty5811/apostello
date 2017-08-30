@@ -3,12 +3,12 @@ module Pages.Forms.SendGroup.View exposing (view)
 import Data exposing (RecipientGroup)
 import Date
 import DateTimePicker
-import FilteringTable exposing (filterRecord)
+import FilteringTable exposing (filterInput, filterRecord)
 import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus)
 import Forms.View exposing (contentField, form, sendButton, timeField)
 import Helpers exposing (onClick)
 import Html exposing (Html, a, br, div, i, input, label, p, text)
-import Html.Attributes exposing (class, for, placeholder, style, type_)
+import Html.Attributes as A exposing (class, for, placeholder, style, type_)
 import Html.Events exposing (onInput)
 import Html.Keyed
 import Messages exposing (FormMsg(PostForm, SendGroupMsg), Msg(FormMsg))
@@ -20,6 +20,7 @@ import Pages.Forms.SendGroup.Meta exposing (meta)
 import Pages.Forms.SendGroup.Model exposing (SendGroupModel)
 import Pages.Forms.SendGroup.Remote exposing (postCmd)
 import RemoteList as RL
+import Rocket exposing ((=>))
 import Route exposing (spaLink)
 
 
@@ -44,9 +45,9 @@ view settings model groups status =
 
 noGroups : Html Msg
 noGroups =
-    div [ class "ui raised segment" ]
+    div [ class "segment" ]
         [ p [] [ text "Looks like you don't have any (non-empty) groups yet." ]
-        , spaLink a [ class "ui violet button" ] [ text "Create a New Group" ] <| GroupForm initialGroupFormModel Nothing
+        , spaLink a [ class "button" ] [ text "Create a New Group" ] <| GroupForm initialGroupFormModel Nothing
         ]
 
 
@@ -74,23 +75,15 @@ updateSGDate state maybeDate =
 groupField : FieldMeta -> SendGroupModel -> RL.RemoteList RecipientGroup -> List (Html Msg)
 groupField meta_ model groups =
     [ label [ for meta_.id ] [ text meta_.label ]
-    , div [ class "ui raised segment" ]
+    , div [ class "segment" ]
         [ loadingMessage groups
-        , div [ class "ui left icon large transparent fluid input" ]
-            [ input
-                [ placeholder "Filter..."
-                , type_ "text"
-                , onInput (FormMsg << SendGroupMsg << UpdateGroupFilter)
-                ]
-                []
-            , i [ class "violet filter icon" ] []
-            ]
+        , filterInput (FormMsg << SendGroupMsg << UpdateGroupFilter)
         , div
-            [ class "ui divided selection list"
+            [ class "list"
             , style
-                [ ( "min-height", "25vh" )
-                , ( "max-height", "50vh" )
-                , ( "overflow-y", "auto" )
+                [ "min-height" => "25vh"
+                , "max-height" => "50vh"
+                , "overflow-y" => "auto"
                 ]
             ]
             (groups
@@ -98,8 +91,8 @@ groupField meta_ model groups =
                 |> List.filter (filterRecord model.groupFilter)
                 |> List.map (groupItem model.selectedPk)
             )
-        , div [ class "ui secondary bottom attached segment" ] [ p [] [ text "Note that empty groups are not shown here." ] ]
         ]
+    , div [ class "help" ] [ p [] [ text "Note that empty groups are not shown here." ] ]
     ]
 
 
@@ -113,13 +106,13 @@ loadingMessage rl =
             text ""
 
         RL.RespFailed err _ ->
-            div [ class "ui secondary segment" ] [ text err ]
+            div [ class "alert" ] [ text err ]
 
         RL.WaitingForFirstResp _ ->
-            div [ class "ui secondary segment" ] [ text "We are fetching your groups now..." ]
+            div [ class "alert" ] [ text "We are fetching your groups now..." ]
 
         RL.WaitingForPage _ ->
-            div [ class "ui secondary segment" ] [ text "We are fetching your groups now..." ]
+            div [ class "alert" ] [ text "We are fetching your groups now..." ]
 
         RL.WaitingOnRefresh _ ->
             text ""
@@ -128,15 +121,15 @@ loadingMessage rl =
 groupItem : Maybe Int -> RecipientGroup -> Html Msg
 groupItem selectedPk group =
     Html.Keyed.node "div"
-        [ class "item", onClick <| FormMsg <| SendGroupMsg <| SelectGroup group.pk ]
+        [ class "item", onClick <| FormMsg <| SendGroupMsg <| SelectGroup group.pk, A.id "groupItem" ]
         [ ( toString group.pk, groupItemHelper selectedPk group ) ]
 
 
 groupItemHelper : Maybe Int -> RecipientGroup -> Html Msg
 groupItemHelper selectedPk group =
-    div [ style [ ( "color", "#000" ) ] ]
-        [ div [ class "right floated content" ] [ text <| "($" ++ toString group.cost ++ ")" ]
-        , div [ class "content" ]
+    div [ style [ "color" => "#000" ] ]
+        [ Html.span [ class "float-right" ] [ text <| "($" ++ toString group.cost ++ ")" ]
+        , Html.span []
             [ selectedIcon selectedPk group
             , text <| group.name ++ " - " ++ group.description
             ]
@@ -153,8 +146,8 @@ selectedIcon selectedPk group =
             case pk == group.pk of
                 True ->
                     i
-                        [ class "check icon"
-                        , style [ ( "color", "#603cba" ) ]
+                        [ class "fa fa-check"
+                        , style [ "color" => "var(--color-purple)" ]
                         ]
                         []
 

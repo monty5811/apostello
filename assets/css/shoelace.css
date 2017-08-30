@@ -1,0 +1,15 @@
+@import '../node_modules/shoelace-css/source/css/normalize';
+@import '../node_modules/shoelace-css/source/css/content';
+@import '../node_modules/shoelace-css/source/css/alerts';
+@import '../node_modules/shoelace-css/source/css/badges';
+@import '../node_modules/shoelace-css/source/css/buttons';
+/* @import '../node_modules/shoelace-css/source/css/dropdowns'; */
+@import '../node_modules/shoelace-css/source/css/forms';
+/* @import '../node_modules/shoelace-css/source/grid.css'; */
+@import '../node_modules/shoelace-css/source/css/loaders';
+@import '../node_modules/shoelace-css/source/css/progress-bars';
+/* @import '../node_modules/shoelace-css/source/css/switches'; */
+@import '../node_modules/shoelace-css/source/css/tables';
+/* @import '../node_modules/shoelace-css/source/css/tabs'; */
+@import '../node_modules/shoelace-css/source/css/utilities';
+@import '../node_modules/shoelace-css/source/css/variables.css';

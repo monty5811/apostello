@@ -11,6 +11,7 @@ import Pages exposing (Page(ContactForm, GroupForm))
 import Pages.Forms.Contact.Model exposing (initialContactFormModel)
 import Pages.Forms.Group.Model exposing (initialGroupFormModel)
 import RemoteList as RL
+import Rocket exposing ((=>))
 import Route exposing (spaLink)
 import Store.Messages exposing (StoreMsg(CancelSms))
 import Time
@@ -53,21 +54,21 @@ onlyFuture t sms =
 smsRow : QueuedSms -> Html Msg
 smsRow sms =
     let
-        className =
+        style =
             case sms.failed of
                 True ->
-                    "negative"
+                    [ "background" => "var(--color-red)" ]
 
                 False ->
-                    ""
+                    []
     in
-    tr [ A.class className ]
+    tr [ A.style style ]
         [ td [] [ text sms.sent_by ]
         , td [] [ spaLink a [] [ text sms.recipient.full_name ] <| ContactForm initialContactFormModel <| Just sms.recipient.pk ]
         , td [] [ groupLink sms.recipient_group ]
         , td [] [ text sms.content ]
         , td [] [ text sms.time_to_send_formatted ]
-        , td [ A.class "collapsing" ] [ cancelButton sms ]
+        , td [] [ cancelButton sms ]
         ]
 
 
@@ -83,4 +84,9 @@ groupLink group =
 
 cancelButton : QueuedSms -> Html Msg
 cancelButton sms =
-    a [ A.class "ui tiny grey button", onClick (StoreMsg (CancelSms sms.pk)) ] [ text "Cancel" ]
+    a
+        [ A.class "button button-danger"
+        , onClick (StoreMsg (CancelSms sms.pk))
+        , A.id "cancelSmsButton"
+        ]
+        [ text "Cancel" ]

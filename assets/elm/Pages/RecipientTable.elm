@@ -9,6 +9,7 @@ import Messages exposing (Msg(StoreMsg))
 import Pages exposing (Page(ContactForm))
 import Pages.Forms.Contact.Model exposing (initialContactFormModel)
 import RemoteList as RL
+import Rocket exposing ((=>))
 import Route exposing (spaLink)
 import Store.Messages exposing (StoreMsg(ToggleRecipientArchive))
 
@@ -35,13 +36,13 @@ view tableModel recipients =
 recipientRow : Recipient -> Html Msg
 recipientRow recipient =
     let
-        className =
+        style =
             case recipient.is_blocking of
                 True ->
-                    "warning"
+                    [ "background" => "var(--color-red)" ]
 
                 False ->
-                    ""
+                    []
 
         timeReceived =
             Maybe.andThen .time_received recipient.last_sms
@@ -54,7 +55,7 @@ recipientRow recipient =
                 Nothing ->
                     ""
     in
-    tr [ A.class className ]
+    tr [ A.style style ]
         [ td []
             [ spaLink a [] [ text recipient.full_name ] <| ContactForm initialContactFormModel <| Just recipient.pk
             , doNotReplyIndicator recipient.do_not_reply
@@ -69,7 +70,7 @@ doNotReplyIndicator : Bool -> Html Msg
 doNotReplyIndicator reply =
     case reply of
         True ->
-            div [ A.class "ui horizontal red label" ] [ text "No Reply" ]
+            div [ A.class "badge badge-danger" ] [ text "No Reply" ]
 
         False ->
             text ""

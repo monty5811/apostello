@@ -3,6 +3,7 @@ module DjangoSend exposing (CSRFToken(CSRFToken), archivePost, archivePostRaw, p
 import Http exposing (Request, expectJson, header, request)
 import Json.Decode as Decode
 import Json.Encode as Encode
+import Rocket exposing ((=>))
 
 
 type CSRFToken
@@ -27,12 +28,12 @@ post (CSRFToken csrftoken) url body decoder =
 
 archivePost : CSRFToken -> String -> Bool -> Decode.Decoder a -> Request a
 archivePost csrftoken url isArchived =
-    post csrftoken url [ ( "archived", Encode.bool isArchived ) ]
+    post csrftoken url [ "archived" => Encode.bool isArchived ]
 
 
 archivePostRaw : CSRFToken -> String -> Bool -> Request { body : String, code : Int }
 archivePostRaw csrftoken url isArchived =
-    rawPost csrftoken url [ ( "archived", Encode.bool isArchived ) ]
+    rawPost csrftoken url [ "archived" => Encode.bool isArchived ]
 
 
 encodeBody : List ( String, Encode.Value ) -> Http.Body

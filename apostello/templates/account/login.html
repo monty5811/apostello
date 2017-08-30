@@ -1,6 +1,5 @@
 {% extends 'account/base_apsotello.html' %}
 {% load i18n %}
-{% load semanticui %}
 {% load account socialaccount %}
 {% load staticfiles %}
 {% block content %}
@@ -14,13 +13,13 @@
 {% if DISPLAY_GOOGLE_LOGIN %}
 <p>or</p>
 {% endif %}
-<form class="ui {% if not form.is_valid %}error{% endif %} form login" method="POST" action="{% url 'account_login' %}">
+<form method="POST" action="{% url 'account_login' %}">
   {% csrf_token %}
-  {{ form|semanticui }}
+  {{ form.as_p }}
   {% if redirect_field_value %}
   <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
   {% endif %}
-  <button class="ui button black" type="submit" id="login_button">{% trans "Sign In" %}</button>
+  <button type="submit" id="login_button" class="button button-dark">{% trans "Sign In" %}</button>
   <br><br>
   <p><a href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a></p>
 <p>{% blocktrans %}If you have not yet created an account, please

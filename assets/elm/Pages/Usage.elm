@@ -1,48 +1,46 @@
 module Pages.Usage exposing (view)
 
 import Html exposing (Html, div, embed, figure, h3, text)
-import Html.Attributes exposing (class, src, type_)
+import Html.Attributes as A
 import Messages exposing (Msg)
+import Rocket exposing ((=>))
 
 
 view : Html Msg
 view =
-    div []
-        [ div [ class "ui hidden divder" ] []
-        , div [ class "ui stackable centered relaxed padded grid" ]
-            [ div [ class "four wide column" ]
-                [ h3 [ class "ui header" ] [ text "Contacts" ]
-                , figure [] [ embed [ type_ "image/svg+xml", src "/graphs/contacts/" ] [] ]
-                ]
-            , div [ class "four wide column" ]
-                [ h3 [ class "ui header" ] [ text "Groups" ]
-                , figure []
-                    [ embed [ type_ "image/svg+xml", src "/graphs/groups/" ] [] ]
-                ]
-            , div [ class "four wide column" ]
-                [ h3 [ class "ui header" ] [ text "Keywords" ]
-                , figure []
-                    [ embed [ type_ "image/svg+xml", src "/graphs/keywords/" ] [] ]
-                ]
-            , div [ class "twelve wide column" ]
-                [ h3 [ class "ui header" ] [ text "Recent Message History" ]
-                , figure []
-                    [ embed [ type_ "image/svg+xml", src "/graphs/recent/" ] [] ]
-                ]
-            , div [ class "four wide column" ]
-                [ h3 [ class "ui header" ] [ text "Messages" ]
-                , figure []
-                    [ embed [ type_ "image/svg+xml", src "/graphs/sms/totals/" ] [] ]
-                ]
-            , div [ class "eight wide column" ]
-                [ h3 [ class "ui header" ] [ text "Inbound" ]
-                , figure [] [ embed [ type_ "image/svg+xml", src "/graphs/sms/in/bycontact/" ] [] ]
-                ]
-            , div [ class "eight wide column" ]
-                [ h3 [ class "ui header" ] [ text "Outbound" ]
-                , figure []
-                    [ embed [ type_ "image/svg+xml", src "/graphs/sms/out/bycontact/" ] [] ]
-                ]
+    div
+        [ A.style [ "margin" => "2rem" ] ]
+        [ row
+            [ fig "Contacts" "/graphs/contacts/" "3 / 6"
+            , fig "Groups" "/graphs/groups/" "7 / 10"
+            , fig "Keywords" "/graphs/keywords/" "11 / 14"
             ]
-        , div [ class "ui hidden divder" ] []
+        , row
+            [ fig "Recent Message History" "/graphs/recent/" "1 / 12"
+            , fig "Messages" "/graphs/sms/totals/" "13 / 16"
+            ]
+        , row
+            [ fig "Inbound" "/graphs/sms/in/bycontact/" "1 / 8"
+            , fig "Outbound" "/graphs/sms/out/bycontact/" "9 / 16"
+            ]
+        ]
+
+
+row : List (Html Msg) -> Html Msg
+row l =
+    div
+        [ A.style
+            [ "display" => "grid"
+            , "min-height" => "40vh"
+            , "grid-template-columns" => "repeat(16, auto)"
+            ]
+        ]
+        l
+
+
+fig : String -> String -> String -> Html Msg
+fig header src col =
+    div [ A.style [ "grid-column" => col ] ]
+        [ h3 [] [ text header ]
+        , figure [] [ embed [ A.type_ "image/svg+xml", A.src src ] [] ]
         ]

@@ -10,9 +10,9 @@
 
 <p>{% blocktrans with confirmation.email_address.email as email %}Please confirm that <a href="mailto:{{ email }}">{{ email }}</a> is an e-mail address for user {{ user_display }}.{% endblocktrans %}</p>
 
-<form class="ui form" method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+<form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
 {% csrf_token %}
-    <button class="ui black button" type="submit">{% trans 'Confirm' %}</button>
+    <button type="button" class="button-dark" id="confirmButton" type="submit">{% trans 'Confirm' %}</button>
 </form>
 
 {% else %}

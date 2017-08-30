@@ -19,6 +19,7 @@ import Pages.Forms.Keyword.Model exposing (KeywordFormModel, initialKeywordFormM
 import Pages.Forms.Keyword.Remote exposing (postCmd)
 import Pages.Fragments.Loader exposing (loader)
 import RemoteList as RL
+import Rocket exposing ((=>))
 import Route exposing (spaLink)
 import Store.Model exposing (DataStore, filterArchived)
 import Time
@@ -214,8 +215,8 @@ linkedGroupsField meta_ model groups maybeKeyword =
 groupLabelView : Maybe (List Int) -> RecipientGroup -> Html Msg
 groupLabelView maybePks group =
     Html.div
-        [ A.class "ui violet basic label"
-        , A.style [ ( "user-select", "none" ) ]
+        [ A.class "badge"
+        , A.style [ "user-select" => "none" ]
         , E.onClick <| FormMsg <| KeywordFormMsg <| UpdateSelectedLinkedGroup (Maybe.withDefault [] maybePks) group.pk
         ]
         [ Html.text group.name ]
@@ -233,13 +234,16 @@ groupView maybeSelectedPks group =
                     pks
     in
     Html.Keyed.node "div"
-        [ A.class "item", E.onClick <| FormMsg <| KeywordFormMsg <| UpdateSelectedLinkedGroup selectedPks group.pk ]
-        [ ( toString group.pk, groupViewHelper selectedPks group ) ]
+        [ A.class "item"
+        , A.style [ "user-select" => "none" ]
+        , E.onClick <| FormMsg <| KeywordFormMsg <| UpdateSelectedLinkedGroup selectedPks group.pk
+        ]
+        [ toString group.pk => groupViewHelper selectedPks group ]
 
 
 groupViewHelper : List Int -> RecipientGroup -> Html Msg
 groupViewHelper selectedPks group =
-    Html.div [ A.class "content", A.style [ ( "color", "#000" ) ] ]
+    Html.div [ A.style [ "color" => "#000" ] ]
         [ selectedIcon selectedPks group
         , Html.text group.name
         ]
@@ -278,15 +282,15 @@ digestField meta_ model users maybeKeyword =
 userLabelView : (List Int -> Int -> KeywordFormMsg) -> Maybe (List Int) -> User -> Html Msg
 userLabelView msg selectedPks user =
     Html.div
-        [ A.class "ui violet basic label"
-        , A.style [ ( "user-select", "none" ) ]
+        [ A.class "badge"
+        , A.style [ "user-select" => "none" ]
         , E.onClick <| FormMsg <| KeywordFormMsg <| msg (Maybe.withDefault [] selectedPks) user.pk
         ]
         [ Html.text user.email ]
 
 
 userView : (List Int -> Int -> KeywordFormMsg) -> Maybe (List Int) -> User -> Html Msg
-userView msg maybeSelectedPks owner =
+userView toMsg maybeSelectedPks owner =
     let
         selectedPks =
             case maybeSelectedPks of
@@ -295,15 +299,33 @@ userView msg maybeSelectedPks owner =
 
                 Just pks ->
                     pks
+
+        msg =
+            toMsg selectedPks owner.pk
+
+        id =
+            case msg of
+                UpdateSelectedOwner _ _ ->
+                    "UpdateSelectedOwner"
+
+                UpdateSelectedSubscriber _ _ ->
+                    "UpdateSelectedSubscriber"
+
+                _ ->
+                    "_err"
     in
     Html.Keyed.node "div"
-        [ A.class "item", E.onClick <| FormMsg <| KeywordFormMsg <| msg selectedPks owner.pk ]
-        [ ( toString owner.pk, userViewHelper selectedPks owner ) ]
+        [ A.class "item"
+        , A.style [ "user-select" => "none" ]
+        , E.onClick <| FormMsg <| KeywordFormMsg <| msg
+        , A.id <| "user" ++ id
+        ]
+        [ toString owner.pk => userViewHelper selectedPks owner ]
 
 
 userViewHelper : List Int -> User -> Html Msg
 userViewHelper selectedPks owner =
-    Html.div [ A.class "content", A.style [ ( "color", "#000" ) ] ]
+    Html.div [ A.style [ "color" => "#000" ] ]
         [ selectedIcon selectedPks owner
         , Html.text owner.email
         ]
@@ -347,7 +369,7 @@ archiveNotice show keywords name =
             Html.text ""
 
         True ->
-            Html.div [ A.class "ui message" ]
+            Html.div [ A.class "alert" ]
                 [ Html.p [] [ Html.text "There is already a Keyword that with that name in the archive" ]
                 , Html.p [] [ Html.text "You can chose a different name." ]
                 , Html.p []

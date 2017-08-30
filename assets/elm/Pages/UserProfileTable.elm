@@ -18,13 +18,13 @@ import Store.Messages exposing (StoreMsg(ToggleProfileField))
 
 view : FT.Model -> RL.RemoteList UserProfile -> Html Msg
 view tableModel profiles =
-    FT.filteringTable "ui collapsing celled very basic table" tableHead tableModel userprofileRow profiles
+    FT.filteringTable "table-bordered" tableHead tableModel userprofileRow profiles
 
 
 tableHead : Html Msg
 tableHead =
-    thead []
-        [ tr [ class "left aligned" ]
+    thead [ class "text-left" ]
+        [ tr []
             [ th [] [ text "User" ]
             , th [] [ text "Approved" ]
             , th [] [ text "Keywords" ]
@@ -40,7 +40,7 @@ tableHead =
 
 userprofileRow : UserProfile -> Html Msg
 userprofileRow userprofile =
-    tr [ class "center aligned" ]
+    tr [ class "text-center" ]
         [ td []
             [ spaLink a
                 []
@@ -67,26 +67,28 @@ toggleCell userprofile field =
         buttonType =
             case fieldVal of
                 True ->
-                    "positive"
+                    "button-success"
 
                 False ->
-                    "negative"
+                    "button-danger"
 
         className =
-            "ui tiny " ++ buttonType ++ " icon button"
+            "button button-sm " ++ buttonType
 
         iconType =
             case fieldVal of
                 True ->
-                    "checkmark icon"
+                    " ✔ "
 
                 False ->
-                    "minus circle icon"
+                    " ✖ "
     in
     td []
-        [ button [ class className, onClick (Messages.StoreMsg (ToggleProfileField (toggleField field userprofile))) ]
-            [ i [ class iconType ] []
+        [ button
+            [ class className
+            , onClick (Messages.StoreMsg (ToggleProfileField (toggleField field userprofile)))
             ]
+            [ text iconType ]
         ]
 
 

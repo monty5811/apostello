@@ -18,7 +18,7 @@ import Store.Messages exposing (StoreMsg(ToggleKeywordArchive))
 
 view : FT.Model -> RL.RemoteList Keyword -> Html Msg
 view tableModel keywords =
-    FT.filteringTable "ui striped definition table" tableHead tableModel keywordRow keywords
+    FT.filteringTable "table-striped" tableHead tableModel keywordRow keywords
 
 
 tableHead : Html Msg
@@ -40,11 +40,11 @@ keywordRow : Keyword -> Html Msg
 keywordRow keyword =
     tr []
         [ td [] [ spaLink a [] [ text keyword.keyword ] <| KeyRespTable False keyword.is_archived keyword.keyword ]
-        , td [ class "center aligned" ] [ spaLink a [] [ text keyword.num_replies ] <| KeyRespTable False keyword.is_archived keyword.keyword ]
+        , td [ class "text-center" ] [ spaLink a [] [ text keyword.num_replies ] <| KeyRespTable False keyword.is_archived keyword.keyword ]
         , td [] [ text keyword.description ]
         , td [] [ text keyword.current_response ]
         , keywordStatusCell keyword.is_live
-        , td [] [ spaLink a [ class "ui tiny primary button" ] [ text "Edit" ] (KeywordForm initialKeywordFormModel <| Just keyword.keyword) ]
+        , td [] [ spaLink a [ class "button" ] [ text "Edit" ] (KeywordForm initialKeywordFormModel <| Just keyword.keyword) ]
         , archiveCell keyword.is_archived (StoreMsg (ToggleKeywordArchive keyword.is_archived keyword.keyword))
         ]
 
@@ -53,7 +53,7 @@ keywordStatusCell : Bool -> Html Msg
 keywordStatusCell isLive =
     case isLive of
         True ->
-            td [] [ div [ class "ui green label" ] [ text "Active" ] ]
+            td [] [ div [ class "badge badge-success" ] [ text "Active" ] ]
 
         False ->
-            td [] [ div [ class "ui orange label" ] [ text "Inactive" ] ]
+            td [] [ div [ class "badge badge-warning" ] [ text "Inactive" ] ]

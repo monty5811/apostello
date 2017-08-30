@@ -18,7 +18,7 @@ class TestUserProfiles:
 
         # check table is there
         def _test1():
-            tables = browser_in.find_elements_by_class_name('table')
+            tables = browser_in.find_elements_by_class_name('table-bordered')
             assert len(tables) == 1
             table = tables[0]
             assert 'Approved' in table.text
@@ -44,10 +44,10 @@ class TestUserProfiles:
         assert uri in browser_in.current_url
         sleep(driver_wait_time)
         # toggle
-        toggle_button = browser_in.find_elements_by_class_name('checkbox')[-1]
+        toggle_button = browser_in.find_element_by_id('id_can_archive')
         toggle_button.click()
         # submit
-        save_button = browser_in.find_elements_by_class_name('primary')[0]
+        save_button = browser_in.find_element_by_id('formSubmitButton')
         save_button.click()
 
         def _test():

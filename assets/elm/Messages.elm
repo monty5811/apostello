@@ -37,18 +37,18 @@ type Msg
     | GroupComposerMsg GroupComposerMsg
     | KeyRespTableMsg KeyRespTableMsg
     | FirstRunMsg FirstRunMsg
-    | FabMsg FabMsg
+    | SidePanelMsg SidePanelMsg
     | ApiSetupMsg ApiSetupMsg
     | WebPushMsg WebPush.Msg
     | RemoveNotification Int
     | CurrentTime Time.Time
     | Nope
+    | ToggleMenu
 
 
-type FabMsg
+type SidePanelMsg
     = ArchiveItem String String Bool
     | ReceiveArchiveResp String (Result Http.Error Bool)
-    | ToggleFabView
 
 
 type TableMsg

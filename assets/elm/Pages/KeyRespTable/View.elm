@@ -4,13 +4,14 @@ import Data exposing (SmsInbound)
 import FilteringTable as FT
 import Helpers exposing (archiveCell, formatDate)
 import Html exposing (Html, a, br, button, div, i, input, label, td, text, th, thead, tr)
-import Html.Attributes exposing (attribute, checked, class, id, name, style, type_)
+import Html.Attributes as A
 import Html.Events exposing (onClick, onSubmit)
 import Messages exposing (Msg(KeyRespTableMsg, StoreMsg))
 import Pages exposing (Page(ContactForm), initSendAdhoc)
 import Pages.Forms.Contact.Model exposing (initialContactFormModel)
 import Pages.KeyRespTable.Messages exposing (KeyRespTableMsg(..))
 import RemoteList as RL
+import Rocket exposing ((=>))
 import Route exposing (spaLink)
 import Store.Messages exposing (StoreMsg(ToggleInboundSmsArchive, ToggleInboundSmsDealtWith))
 
@@ -48,21 +49,20 @@ archiveAllForm viewingArchive ticked k =
 
         False ->
             Html.form [ onSubmit (KeyRespTableMsg <| ArchiveAllButtonClick k) ]
-                [ div [ class "field" ]
-                    [ div [ class "ui checkbox" ]
+                [ div [ A.class "input-field" ]
+                    [ Html.label []
                         [ input
-                            [ id "id_tick_to_archive_all_responses"
-                            , name "tick_to_archive_all_responses"
-                            , attribute "required" ""
-                            , type_ "checkbox"
-                            , checked ticked
+                            [ A.id "id_tick_to_archive_all_responses"
+                            , A.name "tick_to_archive_all_responses"
+                            , A.attribute "required" ""
+                            , A.type_ "checkbox"
+                            , A.checked ticked
                             , onClick (KeyRespTableMsg ArchiveAllCheckBoxClick)
                             ]
                             []
-                        , label [] [ text "Tick to archive all responses" ]
+                        , text " Tick to archive all responses"
                         ]
                     ]
-                , br [] []
                 , archiveAllButton ticked
                 ]
 
@@ -71,28 +71,19 @@ archiveAllButton : Bool -> Html Msg
 archiveAllButton ticked =
     case ticked of
         True ->
-            button [ class "ui red button" ] [ text "Archive all!" ]
+            button [ A.class "button button-danger", A.id "archiveAllSmsButton" ] [ text "Archive all!" ]
 
         False ->
-            button [ class "ui disabled button" ] [ text "Archive all!" ]
+            button [ A.class "button button-danger", A.disabled True ] [ text "Archive all!" ]
 
 
 smsRow : SmsInbound -> Html Msg
 smsRow sms =
-    let
-        className =
-            case sms.dealt_with of
-                True ->
-                    ""
-
-                False ->
-                    "warning"
-    in
-    tr [ class className ]
+    tr []
         [ recipientCell sms
-        , td [ class "collapsing" ] [ text (formatDate sms.time_received) ]
+        , td [] [ text (formatDate sms.time_received) ]
         , td [] [ text sms.content ]
-        , td [ class "collapsing" ] [ dealtWithButton sms ]
+        , td [] [ dealtWithButton sms ]
         , archiveCell sms.is_archived (StoreMsg (ToggleInboundSmsArchive sms.is_archived sms.pk))
         ]
 
@@ -107,8 +98,8 @@ recipientCell sms =
             ContactForm initialContactFormModel <| sms.sender_pk
     in
     td []
-        [ spaLink a [] [ i [ class "violet reply link icon" ] [] ] replyPage
-        , spaLink a [ style [ ( "color", "#212121" ) ] ] [ text sms.sender_name ] contactPage
+        [ spaLink a [] [ i [ A.class "fa fa-reply" ] [] ] replyPage
+        , spaLink a [ A.style [ "color" => "var(--color-black)" ] ] [ text sms.sender_name ] contactPage
         ]
 
 
@@ -117,14 +108,16 @@ dealtWithButton sms =
     case sms.dealt_with of
         True ->
             button
-                [ class "ui tiny positive icon button"
+                [ A.class "button button-success"
                 , onClick (StoreMsg (ToggleInboundSmsDealtWith sms.dealt_with sms.pk))
+                , A.id "unDealWithButton"
                 ]
-                [ i [ class "checkmark icon" ] [], text "Dealt With" ]
+                [ i [ A.class "fa fa-check" ] [], text " Dealt With" ]
 
         False ->
             button
-                [ class "ui tiny orange icon button"
+                [ A.class "button button-warning"
                 , onClick (StoreMsg (ToggleInboundSmsDealtWith sms.dealt_with sms.pk))
+                , A.id "dealWithButton"
                 ]
-                [ i [ class "attention icon" ] [], text "Requires Action" ]
+                [ i [ A.class "fa fa-exclamation" ] [], text " Requires Action" ]

@@ -1,4 +1,3 @@
-apostello-form==0.0.2
 dj-database-url==0.4.2
 django-allauth==0.32.0
 django-extensions==1.8.1

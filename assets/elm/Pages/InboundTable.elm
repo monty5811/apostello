@@ -11,6 +11,7 @@ import Pages exposing (Page(ContactForm, KeywordForm), initSendAdhoc)
 import Pages.Forms.Contact.Model exposing (initialContactFormModel)
 import Pages.Forms.Keyword.Model exposing (initialKeywordFormModel)
 import RemoteList as RL
+import Rocket exposing ((=>))
 import Route exposing (spaLink)
 import Store.Messages exposing (StoreMsg(ReprocessSms))
 
@@ -37,11 +38,11 @@ view tableModel sms =
 
 smsRow : SmsInbound -> Html Msg
 smsRow sms =
-    tr [ A.style [ ( "backgroundColor", sms.matched_colour ) ] ]
+    tr [ A.style [ "backgroundColor" => sms.matched_colour ] ]
         [ recipientCell sms
         , keywordCell sms
         , td [] [ text sms.content ]
-        , td [ A.class "collapsing" ] [ text (formatDate sms.time_received) ]
+        , td [] [ text (formatDate sms.time_received) ]
         , reprocessCell sms
         ]
 
@@ -56,8 +57,8 @@ recipientCell sms =
             ContactForm initialContactFormModel <| sms.sender_pk
     in
     td []
-        [ spaLink a [] [ i [ A.class "violet reply link icon" ] [] ] replyPage
-        , spaLink a [ A.style [ ( "color", "#212121" ) ] ] [ text sms.sender_name ] contactPage
+        [ spaLink a [] [ i [ A.class "fa fa-reply", A.style [ "color" => "var(--state-primary)" ] ] [] ] replyPage
+        , spaLink a [ A.style [ "color" => "#212121" ] ] [ text sms.sender_name ] contactPage
         ]
 
 
@@ -83,6 +84,11 @@ keywordCell sms =
 
 reprocessCell : SmsInbound -> Html Msg
 reprocessCell sms =
-    td [ A.class "collapsing" ]
-        [ a [ A.class "ui tiny blue button", E.onClick (StoreMsg (ReprocessSms sms.pk)) ] [ text "Reprocess" ]
+    td []
+        [ a
+            [ A.class "button button-info"
+            , A.id "reingestButton"
+            , E.onClick (StoreMsg (ReprocessSms sms.pk))
+            ]
+            [ text "Reprocess" ]
         ]

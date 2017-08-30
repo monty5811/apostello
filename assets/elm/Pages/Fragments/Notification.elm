@@ -51,7 +51,7 @@ tView ( id, notification ) =
                     "error"
 
         className =
-            "ui floating " ++ messageType ++ " message"
+            "alert alert-" ++ messageType
 
         text =
             notification.text
@@ -61,7 +61,7 @@ tView ( id, notification ) =
     in
     Html.div [ class className ] <|
         [ Html.i
-            [ class "close icon"
+            [ class "fa fa-close float-right"
             , onClick <| RemoveNotification id
             ]
             []

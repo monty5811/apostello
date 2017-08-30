@@ -16,7 +16,7 @@ def load_page(b, wt, url):
 
 
 def send_form(b, wt):
-    send_button = b.find_elements_by_class_name('primary')[0]
+    send_button = b.find_element_by_id('formSubmitButton')
     click_and_wait(send_button, wt)
     return b
 
@@ -63,17 +63,17 @@ def add_linked_groups(b, wt):
 
 
 def add_owner(b, wt):
-    user = b.find_element_by_xpath(
-        '//*[@id="elmContainer"]/div/div[2]/div/div[2]/form/div[6]/div/div/div[2]/div[2]/div[3]/div[1]'
-        )
+    user = b.find_elements_by_id(
+        'userUpdateSelectedOwner'
+        )[0]
     user.click()
     return b
 
 
 def add_subscriber(b, wt):
-    user = b.find_element_by_xpath(
-        '//*[@id="elmContainer"]/div/div[2]/div/div[2]/form/div[6]/div/div/div[3]/div[2]/div[3]/div[1]'
-        )
+    user = b.find_elements_by_id(
+        'userUpdateSelectedSubscriber'
+        )[0]
     user.click()
     return b
 

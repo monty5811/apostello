@@ -20,7 +20,7 @@ view csrf status model =
             ]
 
         button =
-            Html.button [ A.class <| "ui primary button" ] [ Html.text "Import" ]
+            Html.button [ A.class <| "button", A.id "formSubmitButton" ] [ Html.text "Import" ]
     in
     Html.div []
         [ Html.p []

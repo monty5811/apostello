@@ -6,6 +6,7 @@ import Json.Decode as Decode
 import Json.Decode.Extra exposing (date)
 import Json.Decode.Pipeline exposing (decode, optional, required)
 import Json.Encode as Encode
+import Rocket exposing ((=>))
 
 
 -- Inbound SMS
@@ -45,17 +46,17 @@ decodeSmsInbound =
 encodeSmsInbound : SmsInbound -> Encode.Value
 encodeSmsInbound sms =
     Encode.object
-        [ ( "sid", Encode.string sms.sid )
-        , ( "pk", Encode.int sms.pk )
-        , ( "sender_name", Encode.string sms.sender_name )
-        , ( "content", Encode.string sms.content )
-        , ( "time_received", encodeMaybeDate sms.time_received )
-        , ( "dealt_with", Encode.bool sms.dealt_with )
-        , ( "is_archived", Encode.bool sms.is_archived )
-        , ( "display_on_wall", Encode.bool sms.display_on_wall )
-        , ( "matched_keyword", Encode.string sms.matched_keyword )
-        , ( "matched_colour", Encode.string sms.matched_colour )
-        , ( "sender_pk", encodeMaybe Encode.int sms.sender_pk )
+        [ "sid" => Encode.string sms.sid
+        , "pk" => Encode.int sms.pk
+        , "sender_name" => Encode.string sms.sender_name
+        , "content" => Encode.string sms.content
+        , "time_received" => encodeMaybeDate sms.time_received
+        , "dealt_with" => Encode.bool sms.dealt_with
+        , "is_archived" => Encode.bool sms.is_archived
+        , "display_on_wall" => Encode.bool sms.display_on_wall
+        , "matched_keyword" => Encode.string sms.matched_keyword
+        , "matched_colour" => Encode.string sms.matched_colour
+        , "sender_pk" => encodeMaybe Encode.int sms.sender_pk
         ]
 
 
@@ -85,11 +86,11 @@ decodeSmsOutbound =
 encodeSmsOutbound : SmsOutbound -> Encode.Value
 encodeSmsOutbound sms =
     Encode.object
-        [ ( "content", Encode.string sms.content )
-        , ( "pk", Encode.int sms.pk )
-        , ( "time_sent", encodeMaybeDate sms.time_sent )
-        , ( "sent_by", Encode.string sms.sent_by )
-        , ( "recipient", encodeMaybe encodeRecipientSimple sms.recipient )
+        [ "content" => Encode.string sms.content
+        , "pk" => Encode.int sms.pk
+        , "time_sent" => encodeMaybeDate sms.time_sent
+        , "sent_by" => Encode.string sms.sent_by
+        , "recipient" => encodeMaybe encodeRecipientSimple sms.recipient
         ]
 
 
@@ -127,15 +128,15 @@ decodeRecipient =
 encodeRecipient : Recipient -> Encode.Value
 encodeRecipient contact =
     Encode.object
-        [ ( "first_name", Encode.string contact.first_name )
-        , ( "last_name", Encode.string contact.last_name )
-        , ( "number", encodeMaybe Encode.string contact.number )
-        , ( "pk", Encode.int contact.pk )
-        , ( "full_name", Encode.string contact.full_name )
-        , ( "is_archived", Encode.bool contact.is_archived )
-        , ( "is_blocking", Encode.bool contact.is_blocking )
-        , ( "do_not_reply", Encode.bool contact.do_not_reply )
-        , ( "last_sms", encodeMaybe encodeSmsInbound contact.last_sms )
+        [ "first_name" => Encode.string contact.first_name
+        , "last_name" => Encode.string contact.last_name
+        , "number" => encodeMaybe Encode.string contact.number
+        , "pk" => Encode.int contact.pk
+        , "full_name" => Encode.string contact.full_name
+        , "is_archived" => Encode.bool contact.is_archived
+        , "is_blocking" => Encode.bool contact.is_blocking
+        , "do_not_reply" => Encode.bool contact.do_not_reply
+        , "last_sms" => encodeMaybe encodeSmsInbound contact.last_sms
         ]
 
 
@@ -155,8 +156,8 @@ decodeRecipientSimple =
 encodeRecipientSimple : RecipientSimple -> Encode.Value
 encodeRecipientSimple contact =
     Encode.object
-        [ ( "full_name", Encode.string contact.full_name )
-        , ( "pk", Encode.int contact.pk )
+        [ "full_name" => Encode.string contact.full_name
+        , "pk" => Encode.int contact.pk
         ]
 
 
@@ -199,13 +200,13 @@ decodeRecipientGroup =
 encodeRecipientGroup : RecipientGroup -> Encode.Value
 encodeRecipientGroup group =
     Encode.object
-        [ ( "name", Encode.string group.name )
-        , ( "pk", Encode.int group.pk )
-        , ( "description", Encode.string group.description )
-        , ( "members", Encode.list (List.map encodeRecipientSimple group.members) )
-        , ( "nonmembers", Encode.list (List.map encodeRecipientSimple group.nonmembers) )
-        , ( "cost", Encode.float group.cost )
-        , ( "is_archived", Encode.bool group.is_archived )
+        [ "name" => Encode.string group.name
+        , "pk" => Encode.int group.pk
+        , "description" => Encode.string group.description
+        , "members" => Encode.list (List.map encodeRecipientSimple group.members)
+        , "nonmembers" => Encode.list (List.map encodeRecipientSimple group.nonmembers)
+        , "cost" => Encode.float group.cost
+        , "is_archived" => Encode.bool group.is_archived
         ]
 
 
@@ -259,23 +260,23 @@ decodeKeyword =
 encodeKeyword : Keyword -> Encode.Value
 encodeKeyword keyword =
     Encode.object
-        [ ( "keyword", Encode.string keyword.keyword )
-        , ( "pk", Encode.int keyword.pk )
-        , ( "description", Encode.string keyword.description )
-        , ( "current_response", Encode.string keyword.current_response )
-        , ( "is_live", Encode.bool keyword.is_live )
-        , ( "num_replies", Encode.string keyword.num_replies )
-        , ( "num_archived_replies", Encode.string keyword.num_archived_replies )
-        , ( "is_archived", Encode.bool keyword.is_archived )
-        , ( "disable_all_replies", Encode.bool keyword.disable_all_replies )
-        , ( "custom_response", Encode.string keyword.custom_response )
-        , ( "deactivated_response", Encode.string keyword.deactivated_response )
-        , ( "too_early_response", Encode.string keyword.too_early_response )
-        , ( "activate_time", encodeDate keyword.activate_time )
-        , ( "deactivate_time", encodeMaybeDate keyword.deactivate_time )
-        , ( "linked_groups", Encode.list (List.map Encode.int keyword.linked_groups) )
-        , ( "owners", Encode.list (List.map Encode.int keyword.owners) )
-        , ( "subscribed_to_digest", Encode.list (List.map Encode.int keyword.subscribed_to_digest) )
+        [ "keyword" => Encode.string keyword.keyword
+        , "pk" => Encode.int keyword.pk
+        , "description" => Encode.string keyword.description
+        , "current_response" => Encode.string keyword.current_response
+        , "is_live" => Encode.bool keyword.is_live
+        , "num_replies" => Encode.string keyword.num_replies
+        , "num_archived_replies" => Encode.string keyword.num_archived_replies
+        , "is_archived" => Encode.bool keyword.is_archived
+        , "disable_all_replies" => Encode.bool keyword.disable_all_replies
+        , "custom_response" => Encode.string keyword.custom_response
+        , "deactivated_response" => Encode.string keyword.deactivated_response
+        , "too_early_response" => Encode.string keyword.too_early_response
+        , "activate_time" => encodeDate keyword.activate_time
+        , "deactivate_time" => encodeMaybeDate keyword.deactivate_time
+        , "linked_groups" => Encode.list (List.map Encode.int keyword.linked_groups)
+        , "owners" => Encode.list (List.map Encode.int keyword.owners)
+        , "subscribed_to_digest" => Encode.list (List.map Encode.int keyword.subscribed_to_digest)
         ]
 
 
@@ -313,15 +314,15 @@ decodeQueuedSms =
 encodeQueuedSms : QueuedSms -> Encode.Value
 encodeQueuedSms sms =
     Encode.object
-        [ ( "pk", Encode.int sms.pk )
-        , ( "time_to_send", encodeMaybeDate sms.time_to_send )
-        , ( "time_to_send_formatted", Encode.string sms.time_to_send_formatted )
-        , ( "sent", Encode.bool sms.sent )
-        , ( "failed", Encode.bool sms.failed )
-        , ( "content", Encode.string sms.content )
-        , ( "recipient", encodeRecipient sms.recipient )
-        , ( "recipient_group", encodeMaybe encodeRecipientGroup sms.recipient_group )
-        , ( "sent_by", Encode.string sms.sent_by )
+        [ "pk" => Encode.int sms.pk
+        , "time_to_send" => encodeMaybeDate sms.time_to_send
+        , "time_to_send_formatted" => Encode.string sms.time_to_send_formatted
+        , "sent" => Encode.bool sms.sent
+        , "failed" => Encode.bool sms.failed
+        , "content" => Encode.string sms.content
+        , "recipient" => encodeRecipient sms.recipient
+        , "recipient_group" => encodeMaybe encodeRecipientGroup sms.recipient_group
+        , "sent_by" => Encode.string sms.sent_by
         ]
 
 
@@ -349,10 +350,10 @@ decodeElvantoGroup =
 encodeElvantoGroup : ElvantoGroup -> Encode.Value
 encodeElvantoGroup group =
     Encode.object
-        [ ( "name", Encode.string group.name )
-        , ( "pk", Encode.int group.pk )
-        , ( "sync", Encode.bool group.sync )
-        , ( "last_synced", encodeMaybeDate group.last_synced )
+        [ "name" => Encode.string group.name
+        , "pk" => Encode.int group.pk
+        , "sync" => Encode.bool group.sync
+        , "last_synced" => encodeMaybeDate group.last_synced
         ]
 
 
@@ -398,19 +399,19 @@ decodeUserProfile =
 encodeUserProfile : UserProfile -> Encode.Value
 encodeUserProfile record =
     Encode.object
-        [ ( "pk", Encode.int record.pk )
-        , ( "user", encodeUser record.user )
-        , ( "approved", Encode.bool record.approved )
-        , ( "message_cost_limit", Encode.float record.message_cost_limit )
-        , ( "can_see_groups", Encode.bool record.can_see_groups )
-        , ( "can_see_contact_names", Encode.bool record.can_see_contact_names )
-        , ( "can_see_keywords", Encode.bool record.can_see_keywords )
-        , ( "can_see_outgoing", Encode.bool record.can_see_outgoing )
-        , ( "can_see_incoming", Encode.bool record.can_see_incoming )
-        , ( "can_send_sms", Encode.bool record.can_send_sms )
-        , ( "can_see_contact_nums", Encode.bool record.can_see_contact_nums )
-        , ( "can_import", Encode.bool record.can_import )
-        , ( "can_archive", Encode.bool record.can_archive )
+        [ "pk" => Encode.int record.pk
+        , "user" => encodeUser record.user
+        , "approved" => Encode.bool record.approved
+        , "message_cost_limit" => Encode.float record.message_cost_limit
+        , "can_see_groups" => Encode.bool record.can_see_groups
+        , "can_see_contact_names" => Encode.bool record.can_see_contact_names
+        , "can_see_keywords" => Encode.bool record.can_see_keywords
+        , "can_see_outgoing" => Encode.bool record.can_see_outgoing
+        , "can_see_incoming" => Encode.bool record.can_see_incoming
+        , "can_send_sms" => Encode.bool record.can_send_sms
+        , "can_see_contact_nums" => Encode.bool record.can_see_contact_nums
+        , "can_import" => Encode.bool record.can_import
+        , "can_archive" => Encode.bool record.can_archive
         ]
 
 
@@ -436,9 +437,9 @@ decodeUser =
 encodeUser : User -> Encode.Value
 encodeUser user =
     Encode.object
-        [ ( "pk", Encode.int user.pk )
-        , ( "email", Encode.string user.email )
-        , ( "username", Encode.string user.username )
-        , ( "is_staff", Encode.bool user.is_staff )
-        , ( "is_social", Encode.bool user.is_social )
+        [ "pk" => Encode.int user.pk
+        , "email" => Encode.string user.email
+        , "username" => Encode.string user.username
+        , "is_staff" => Encode.bool user.is_staff
+        , "is_social" => Encode.bool user.is_social
         ]

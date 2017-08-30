@@ -1,11 +1,10 @@
-module Pages.Fragments.Fab.View exposing (view)
+module Pages.Fragments.SidePanel.View exposing (view)
 
 import Data exposing (Keyword)
 import Html exposing (..)
-import Html.Attributes exposing (class, href, id)
+import Html.Attributes as A exposing (class, href, id)
 import Html.Events exposing (onClick)
 import Messages exposing (..)
-import Models exposing (FabModel(..))
 import Pages exposing (Page(..))
 import Pages.Forms.Contact.Model exposing (initialContactFormModel)
 import Pages.Forms.Group.Model exposing (initialGroupFormModel)
@@ -16,47 +15,9 @@ import Store.Model exposing (DataStore)
 import Urls as U
 
 
-view : DataStore -> Page -> FabModel -> Bool -> Html Msg
-view ds page model canArchive =
-    div []
-        [ fabDimView model
-        , div [ class "fabContainer" ]
-            [ fabDropdownView ds page model canArchive
-            , br [] []
-            , br [] []
-            , fabButtonView
-            ]
-        ]
-
-
-fabDropdownView : DataStore -> Page -> FabModel -> Bool -> Html Msg
-fabDropdownView ds page model canArchive =
-    case model of
-        MenuHidden ->
-            div [] []
-
-        MenuVisible ->
-            div [ class "fabDropdown" ]
-                [ div [ class "ui fab large very relaxed inverted list" ]
-                    (fabLinks ds page canArchive)
-                ]
-
-
-fabDimView : FabModel -> Html Msg
-fabDimView model =
-    case model of
-        MenuHidden ->
-            div [] []
-
-        MenuVisible ->
-            div [ class "fabDim", onClick (FabMsg ToggleFabView) ] []
-
-
-fabButtonView : Html Msg
-fabButtonView =
-    div [ class "faButton", id "fab", onClick (FabMsg ToggleFabView) ]
-        [ div [ class "fabb ui circular violet icon button" ] [ i [ class "large wrench icon" ] [] ]
-        ]
+view : DataStore -> Page -> Bool -> Html Msg
+view ds page canArchive =
+    Html.nav [ id "nav" ] (fabLinks ds page canArchive)
 
 
 fabLinks : DataStore -> Page -> Bool -> List (Html Msg)
@@ -117,7 +78,7 @@ fabLinks ds page canArchive =
             [ incomingWall ]
 
         UserProfileTable ->
-            [ fabLink "/admin/auth/user/" Table "Admin: Users" ]
+            [ fabLink "/admin/auth/user/" "Admin: Users" ]
 
         ScheduledSmsTable ->
             defaultLinks
@@ -244,26 +205,14 @@ fabLinks ds page canArchive =
             defaultLinks
 
 
-fabLink : String -> Icon -> String -> Html Msg
-fabLink uri icon linkText =
-    a [ class "hvr-backward item", href uri ]
-        [ i [ class ("large " ++ (icon |> iconString) ++ " icon") ] []
-        , div [ class "content" ]
-            [ div [ class "header" ] [ text linkText ]
-            ]
-        ]
+fabLink : String -> String -> Html Msg
+fabLink uri linkText =
+    a [ href uri ] [ text linkText ]
 
 
-fabSpaLink : Page -> Icon -> String -> Html Msg
-fabSpaLink page icon linkText =
-    spaLink a
-        [ class "hvr-backward item" ]
-        [ i [ class ("large " ++ (icon |> iconString) ++ " icon") ] []
-        , div [ class "content" ]
-            [ div [ class "header" ] [ text linkText ]
-            ]
-        ]
-        page
+fabSpaLink : Page -> String -> Html Msg
+fabSpaLink page linkText =
+    spaLink a [] [ text linkText ] page
 
 
 
@@ -280,58 +229,35 @@ archiveButton page url maybeIsArchived canArchive =
         True ->
             case maybeIsArchived of
                 Nothing ->
-                    div [ class "ui fluid grey button" ] [ text "Loading..." ]
+                    div [ class "button button-secondary" ] [ text "Loading..." ]
 
                 Just isArchived ->
                     let
                         clickAction =
-                            FabMsg <| ArchiveItem (page2loc page) url isArchived
+                            SidePanelMsg <| ArchiveItem (page2loc page) url isArchived
                     in
                     case isArchived of
                         True ->
-                            div
-                                [ class "ui fluid positive button"
+                            Html.button
+                                [ class "button-success"
+                                , A.type_ "button"
                                 , onClick clickAction
+                                , A.id "restoreItemButton"
                                 ]
                                 [ text "Restore" ]
 
                         False ->
-                            div
-                                [ class "ui fluid negative button"
+                            Html.button
+                                [ class "button-danger"
+                                , A.type_ "button"
                                 , onClick clickAction
+                                , A.id "archiveItemButton"
                                 ]
                                 [ text "Remove" ]
 
 
 
 -- Links
-
-
-type Icon
-    = Table
-    | Inbox
-    | Plus
-    | Download
-    | Edit
-
-
-iconString : Icon -> String
-iconString icon =
-    case icon of
-        Table ->
-            "table"
-
-        Inbox ->
-            "inbox"
-
-        Plus ->
-            "plus"
-
-        Download ->
-            "download"
-
-        Edit ->
-            "edit"
 
 
 defaultLinks : List (Html Msg)
@@ -344,104 +270,104 @@ defaultLinks =
 
 newKeywordSpa : Html Msg
 newKeywordSpa =
-    fabSpaLink (KeywordForm initialKeywordFormModel Nothing) Plus "New Keyword"
+    fabSpaLink (KeywordForm initialKeywordFormModel Nothing) "New Keyword"
 
 
 keywords : Html Msg
 keywords =
-    fabSpaLink (KeywordTable False) Table " Keywords"
+    fabSpaLink (KeywordTable False) "Keywords"
 
 
 keywordArchive : Html Msg
 keywordArchive =
-    fabSpaLink (KeywordTable True) Table "Archived Keywords"
+    fabSpaLink (KeywordTable True) "Archived Keywords"
 
 
 keywordCsv : String -> Html Msg
 keywordCsv k =
-    fabLink ("/keyword/responses/csv/" ++ k ++ "/") Download "Export responses"
+    fabLink ("/keyword/responses/csv/" ++ k ++ "/") "Export responses"
 
 
 keywordEdit : String -> Html Msg
 keywordEdit k =
-    fabSpaLink (KeywordForm initialKeywordFormModel <| Just k) Edit "Edit"
+    fabSpaLink (KeywordForm initialKeywordFormModel <| Just k) "Edit"
 
 
 keywordResponsesSpa : Maybe Keyword -> Html Msg
 keywordResponsesSpa maybeK =
     case maybeK of
         Nothing ->
-            fabLink "#" Inbox "..."
+            fabLink "#" "..."
 
         Just k ->
-            fabSpaLink (KeyRespTable False False k.keyword) Inbox ("Replies (" ++ k.num_replies ++ ")")
+            fabSpaLink (KeyRespTable False False k.keyword) ("Replies (" ++ k.num_replies ++ ")")
 
 
 keywordArchiveResponsesSpa : Maybe Keyword -> Html Msg
 keywordArchiveResponsesSpa k =
     case k of
         Nothing ->
-            fabLink "#" Inbox "..."
+            fabLink "#" "..."
 
         Just keyword ->
-            fabSpaLink (KeyRespTable False True keyword.keyword) Inbox ("Archived Replies (" ++ keyword.num_archived_replies ++ ")")
+            fabSpaLink (KeyRespTable False True keyword.keyword) ("Archived Replies (" ++ keyword.num_archived_replies ++ ")")
 
 
 keywordResponses : Maybe Keyword -> Html Msg
 keywordResponses maybeK =
     case maybeK of
         Nothing ->
-            fabLink "#" Inbox "..."
+            fabLink "#" "..."
 
         Just k ->
-            fabSpaLink (KeyRespTable False False k.keyword) Inbox ("Replies (" ++ k.num_replies ++ ")")
+            fabSpaLink (KeyRespTable False False k.keyword) ("Replies (" ++ k.num_replies ++ ")")
 
 
 keywordArchiveResponses : Maybe Keyword -> Html Msg
 keywordArchiveResponses k =
     case k of
         Nothing ->
-            fabLink "#" Inbox "..."
+            fabLink "#" "..."
 
         Just keyword ->
-            fabSpaLink (KeyRespTable False True keyword.keyword) Inbox ("Archived Replies (" ++ keyword.num_archived_replies ++ ")")
+            fabSpaLink (KeyRespTable False True keyword.keyword) ("Archived Replies (" ++ keyword.num_archived_replies ++ ")")
 
 
 newContactSpa : Html Msg
 newContactSpa =
-    fabSpaLink (ContactForm initialContactFormModel Nothing) Plus "New Contact"
+    fabSpaLink (ContactForm initialContactFormModel Nothing) "New Contact"
 
 
 contactsSpa : Html Msg
 contactsSpa =
-    fabSpaLink (RecipientTable False) Table " Contacts"
+    fabSpaLink (RecipientTable False) " Contacts"
 
 
 contactArchiveSpa : Html Msg
 contactArchiveSpa =
-    fabSpaLink (RecipientTable True) Table "Archived Contacts"
+    fabSpaLink (RecipientTable True) "Archived Contacts"
 
 
 groupsArchiveSpa : Html Msg
 groupsArchiveSpa =
-    fabSpaLink (GroupTable True) Table "Archived Groups"
+    fabSpaLink (GroupTable True) "Archived Groups"
 
 
 groupsSpa : Html Msg
 groupsSpa =
-    fabSpaLink (GroupTable False) Table "Groups"
+    fabSpaLink (GroupTable False) "Groups"
 
 
 newGroupSpa : Html Msg
 newGroupSpa =
-    fabSpaLink (GroupForm initialGroupFormModel Nothing) Plus "New Group"
+    fabSpaLink (GroupForm initialGroupFormModel Nothing) "New Group"
 
 
 incomingWall : Html Msg
 incomingWall =
-    fabSpaLink Wall Inbox "Live Updates"
+    fabSpaLink Wall "Live Updates"
 
 
 wallCurator : Html Msg
 wallCurator =
-    fabSpaLink Curator Table "Live Curator"
+    fabSpaLink Curator "Live Curator"

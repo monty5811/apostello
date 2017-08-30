@@ -75,7 +75,7 @@ viewHelp settings maybeTable currentContact contacts_ model status =
             showArchiveNotice contacts currentContact model
 
         fields =
-            [ FieldGroup { defaultFieldGroupConfig | sideBySide = True, useSegment = False }
+            [ FieldGroup { defaultFieldGroupConfig | sideBySide = True, header = Just "Name" }
                 [ Field meta.first_name <| firstNameField meta.first_name currentContact
                 , Field meta.last_name <| lastNameField meta.last_name currentContact
                 ]
@@ -169,7 +169,7 @@ archiveNotice show contacts num =
             text ""
 
         True ->
-            div [ A.class "ui message" ]
+            div [ A.class "alert" ]
                 [ p [] [ text "There is already a Contact that with that number in the archive" ]
                 , p []
                     [ text "Or you can restore the contact here: "

@@ -26,7 +26,7 @@ class TestElvantoImport:
         assert uri in browser_in.current_url
         # check table is there
         sleep(driver_wait_time)
-        tables = browser_in.find_elements_by_class_name('table')
+        tables = browser_in.find_elements_by_xpath('//table')
         assert len(tables) == 1
         table = tables[0]
         assert 'Geneva' in table.text
@@ -43,11 +43,9 @@ class TestElvantoImport:
         assert uri in browser_in.current_url
         # enable a group
         sleep(driver_wait_time)
-        group_button = browser_in.find_elements_by_xpath(
-            '//*[@id="elmContainer"]/div/div[2]/div/div[2]/div[2]/table/tbody/tr[1]/td[3]/a'
-        )[0]
+        group_button = browser_in.find_element_by_id('elvantoGroupButton')
         click_and_wait(group_button, driver_wait_time)
-        table = browser_in.find_elements_by_class_name('table')[0]
+        table = browser_in.find_elements_by_xpath('//table')[0]
         assert 'Syncing' in table.text
         # pull groups
         browser_in.get(live_server + uri)
@@ -62,6 +60,6 @@ class TestElvantoImport:
         "Test fetch group button." ""
         # fetch groups
         browser_in.get(live_server + uri)
-        fetch_button = browser_in.find_elements_by_id('fetch_button')[0]
+        fetch_button = browser_in.find_element_by_id('fetch_button')
         click_and_wait(fetch_button, driver_wait_time)
         check_and_close_msg(browser_in, driver_wait_time)

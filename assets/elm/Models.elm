@@ -1,7 +1,7 @@
 module Models
     exposing
-        ( FabModel(..)
-        , Flags
+        ( Flags
+        , MenuModel(..)
         , Model
         , Settings
         , decodeFlags
@@ -31,11 +31,11 @@ type alias Model =
     , table : FT.Model
     , settings : Settings
     , dataStore : DataStore
-    , fabModel : FabModel
     , notifications : Dict Int Notification
     , currentTime : Time.Time
     , formStatus : FormStatus
     , webPush : WebPush.Model
+    , menuState : MenuModel
     }
 
 
@@ -45,11 +45,11 @@ initialModel settings dataStoreCache page =
     , table = FT.initialModel
     , settings = settings
     , dataStore = Result.withDefault emptyDataStore <| Decode.decodeString decodeDataStore dataStoreCache
-    , fabModel = initialFabModel
     , notifications = Dict.empty
     , currentTime = 0
     , formStatus = NoAction
     , webPush = WebPush.initial
+    , menuState = MenuHidden
     }
 
 
@@ -98,14 +98,9 @@ decodeFlags =
 
 
 
--- FAB model
+-- Menu model
 
 
-type FabModel
+type MenuModel
     = MenuHidden
     | MenuVisible
-
-
-initialFabModel : FabModel
-initialFabModel =
-    MenuHidden

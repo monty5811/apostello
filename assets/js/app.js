@@ -5,7 +5,7 @@ function handleDOMContentLoaded() {
   try {
     const elmApp = renderElm();
   } catch (e) {
-    console.err(e);
+    console.error(e);
     const node = document.getElementById('elmContainer');
     const style =
       'width:100vw;height:100vh;background:#5a589b;color:#fff;font-size:xx-large;';

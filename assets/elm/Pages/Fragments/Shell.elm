@@ -1,12 +1,14 @@
 module Pages.Fragments.Shell exposing (view)
 
 import Html exposing (Html, div, h3, text)
-import Html.Attributes exposing (class, style)
-import Messages exposing (Msg)
-import Models exposing (Model)
+import Html.Attributes exposing (class, id, style)
+import Html.Events as E
+import Messages exposing (Msg(ToggleMenu))
+import Models exposing (MenuModel(MenuHidden, MenuVisible), Model)
 import Pages exposing (Page(..))
 import Pages.Fragments.Menu as Menu
 import Pages.Fragments.Notification as Notif
+import Route exposing (spaLink)
 
 
 view : Model -> Html Msg -> Html Msg -> Html Msg
@@ -27,27 +29,34 @@ view model mainContent fab =
 
 commonShell : Model -> Html Msg -> Html Msg -> Html Msg
 commonShell model mainContent fab =
-    div []
-        [ Menu.menu model.page model.settings model.dataStore model.webPush
-        , div [ class "ui grid container" ]
-            [ div [ class "fourteen wide centered column" ] <|
-                List.concat
-                    [ [ div [ class "ui hidden divider" ] []
-                      , h3 [] [ text <| title model.page ]
-                      ]
-                    , Notif.view model.notifications
-                    , [ mainContent ]
-                    , [ div [ class "ui hidden divider" ] [] ]
+    case model.menuState of
+        MenuVisible ->
+            div [ id "menuWrapper" ] <|
+                Html.a
+                    [ class "button button-lg"
+                    , id "close"
+                    , E.onClick ToggleMenu
                     ]
-            ]
-        , div
-            [ class "ui mobile hidden tablet hidden visible bottom fixed borderless inverted violet tiny menu"
-            , style [ ( "z-index", "auto" ) ]
-            ]
-          <|
-            Menu.allUsersMenuItems model.settings
-        , fab
-        ]
+                    [ text "Close" ]
+                    :: Menu.menu model.page model.settings model.dataStore model.webPush
+
+        MenuHidden ->
+            div []
+                [ Html.header [ id "head", class "text-center" ]
+                    [ Html.h2 [] [ text "apostello" ]
+                    , spaLink Html.a [ class "button" ] [ text "Home" ] Home
+                    , Html.a [ class "button", E.onClick ToggleMenu ] [ text "Menu" ]
+                    ]
+                , Html.main_ [ id "wrap" ]
+                    [ fab
+                    , div [ id "content" ] <|
+                        List.concat
+                            [ [ h3 [] [ text <| title model.page ] ]
+                            , Notif.view model.notifications
+                            , [ mainContent ]
+                            ]
+                    ]
+                ]
 
 
 title : Page -> String
@@ -150,7 +159,7 @@ title page =
             ""
 
         UserProfileForm _ _ ->
-            "Edit Profile"
+            ""
 
         Help ->
             "Help"

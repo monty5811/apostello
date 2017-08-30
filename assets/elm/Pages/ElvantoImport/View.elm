@@ -4,11 +4,12 @@ import Data exposing (ElvantoGroup)
 import FilteringTable as FT
 import Helpers exposing (formatDate)
 import Html exposing (Html, a, br, div, td, text, th, thead, tr)
-import Html.Attributes exposing (class, id)
+import Html.Attributes as A
 import Html.Events exposing (onClick)
 import Messages exposing (Msg)
 import Pages.ElvantoImport.Messages exposing (ElvantoMsg(..))
 import RemoteList as RL
+import Rocket exposing ((=>))
 import Store.Messages exposing (StoreMsg(ToggleElvantoGroupSync))
 
 
@@ -18,9 +19,9 @@ import Store.Messages exposing (StoreMsg(ToggleElvantoGroupSync))
 view : FT.Model -> RL.RemoteList ElvantoGroup -> Html Msg
 view tableModel groups =
     div []
-        [ div [ class "ui fluid buttons" ] [ fetchButton, pullButton ]
+        [ div [] [ fetchButton, pullButton ]
         , br [] []
-        , FT.filteringTable "ui striped compact definition table" tableHead tableModel groupRow groups
+        , FT.filteringTable "table-striped" tableHead tableModel groupRow groups
         ]
 
 
@@ -37,12 +38,24 @@ tableHead =
 
 fetchButton : Html Msg
 fetchButton =
-    a [ class "ui green button", onClick (Messages.ElvantoMsg FetchGroups), id "fetch_button" ] [ text "Fetch Groups" ]
+    a
+        [ A.class "button button-success"
+        , onClick (Messages.ElvantoMsg FetchGroups)
+        , A.id "fetch_button"
+        , A.style [ "width" => "50%" ]
+        ]
+        [ text "Fetch Groups" ]
 
 
 pullButton : Html Msg
 pullButton =
-    a [ class "ui blue button", onClick (Messages.ElvantoMsg PullGroups), id "pull_button" ] [ text "Pull Groups" ]
+    a
+        [ A.class "button button-info"
+        , onClick (Messages.ElvantoMsg PullGroups)
+        , A.id "pull_button"
+        , A.style [ "width" => "50%" ]
+        ]
+        [ text "Pull Groups" ]
 
 
 groupRow : ElvantoGroup -> Html Msg
@@ -66,14 +79,19 @@ toggleSyncButton group =
 
 syncingButton : ElvantoGroup -> Html Msg
 syncingButton group =
-    button_ "ui tiny green button" "Syncing" group
+    button_ "button button-success" "Syncing" group
 
 
 notSyncingButton : ElvantoGroup -> Html Msg
 notSyncingButton group =
-    button_ "ui tiny grey button" "Disabled" group
+    button_ "button button-secondary" "Disabled" group
 
 
 button_ : String -> String -> ElvantoGroup -> Html Msg
 button_ styling label group =
-    a [ class styling, onClick (Messages.StoreMsg (ToggleElvantoGroupSync group)) ] [ text label ]
+    a
+        [ A.class styling
+        , A.id "elvantoGroupButton"
+        , onClick (Messages.StoreMsg (ToggleElvantoGroupSync group))
+        ]
+        [ text label ]

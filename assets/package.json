@@ -7,36 +7,35 @@
     "elm": "0.18.0",
     "js-cookie": "^2.1.4",
     "opbeat-js": "3.1.4",
-    "semantic-ui": "^2.2.13"
+    "shoelace-css": "^1.0.0-beta20"
   },
   "devDependencies": {
+    "bluebird": "^3.5.0",
+    "chalk": "^2.1.0",
+    "cssnano": "^3.10.0",
     "elm-format": "exp",
     "elm-test": "^0.18.8",
     "elm-webpack-loader": "^4.3.1",
-    "gulp": "3.9.1",
-    "gulp-cssnano": "2.1.2",
-    "gulp-plumber": "1.1.0",
-    "gulp-rename": "1.2.2",
-    "gulp-sass": "3.1.0",
-    "node-sass": "^4.5.3",
-    "prettier": "^1.5.3",
-    "webpack": "^3.5.1",
-    "wrench": "1.5.9"
+    "postcss": "^6.0.10",
+    "postcss-cssnext": "^3.0.2",
+    "postcss-import": "^10.0.0",
+    "prettier": "^1.6.0",
+    "webpack": "^3.5.5"
   },
   "scripts": {
+    "build": "npm run css && npm run js",
+    "css": "node build-css.js --build",
+    "js": "webpack --config webpack.production.config.js --color --progress",
     "format-elm": "elm-format --yes elm tests-elm",
     "format-js": "prettier --single-quote --trailing-comma es5 --write \"js/**/*.js\"",
     "format": "npm run format-elm && npm run format-js",
     "elm": "elm-make --yes",
     "elm-test": "elm-test tests-elm/",
     "preelm": "npm run elm-test",
-    "prebuild": "npm run elm",
-    "preprodjs": "npm run elm",
-    "build": "gulp",
+    "prejs": "npm run elm",
     "prewatchjs": "npm run elm",
     "watchjs": "WATCH=true webpack --config webpack.base.config.js --color --watch",
-    "watchelm": "find . -name '*.elm' | entr -c elm make elm/Main.elm --warn --output /tmp/tmp.js",
-    "prodjs": "webpack --config webpack.production.config.js --color --progress"
+    "watchelm": "find . -name '*.elm' | entr -c elm make elm/Main.elm --warn --output /tmp/tmp.js"
   },
   "author": "",
   "license": "ISC"

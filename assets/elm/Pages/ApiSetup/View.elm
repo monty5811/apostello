@@ -12,7 +12,7 @@ view maybeApiKey =
     case maybeApiKey of
         Nothing ->
             Html.div []
-                [ Html.button [ A.class "ui primary button", E.onClick <| ApiSetupMsg Get ] [ Html.text "Show Key" ]
+                [ Html.button [ A.class "button", E.onClick <| ApiSetupMsg Get, A.id "showKeyButton" ] [ Html.text "Show Key" ]
                 ]
 
         Just apiKey ->
@@ -21,17 +21,10 @@ view maybeApiKey =
                     [ Html.text "For more details and help, please read the "
                     , Html.a [ A.href "https://apostello.readthedocs.io/en/latest/api.html" ] [ Html.text "docs" ]
                     , Html.text "."
-                    , Html.div [ A.class "ui segments" ]
-                        [ Html.div [ A.class "ui segment" ]
-                            [ Html.p [] [ Html.text "API Token" ]
-                            , Html.div [ A.class "ui secondary segement" ]
-                                [ Html.pre [] [ Html.text apiKey ]
-                                ]
-                            ]
-                        ]
-                    , Html.div [ A.class "ui buttons" ]
-                        [ Html.button [ A.class "ui green button", E.onClick <| ApiSetupMsg Generate ] [ Html.text "(Re)Generate Token" ]
-                        , Html.button [ A.class "ui red button", E.onClick <| ApiSetupMsg Delete ] [ Html.text "Delete Token" ]
-                        ]
                     ]
+                , Html.br [] []
+                , Html.p [] [ Html.text "API Token" ]
+                , Html.pre [] [ Html.text apiKey ]
+                , Html.button [ A.class "button button-success", E.onClick <| ApiSetupMsg Generate, A.id "genKeyButton" ] [ Html.text "(Re)Generate Token" ]
+                , Html.button [ A.class "button button-danger", E.onClick <| ApiSetupMsg Delete, A.id "delKeyButton" ] [ Html.text "Delete Token" ]
                 ]

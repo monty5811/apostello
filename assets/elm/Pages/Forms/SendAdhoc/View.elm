@@ -3,7 +3,7 @@ module Pages.Forms.SendAdhoc.View exposing (view)
 import Data exposing (Recipient)
 import Date
 import DateTimePicker
-import FilteringTable exposing (filterRecord)
+import FilteringTable exposing (filterInput, filterRecord)
 import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus)
 import Forms.View exposing (contentField, form, sendButton, timeField)
 import Helpers exposing (onClick)
@@ -20,6 +20,7 @@ import Pages.Forms.SendAdhoc.Meta exposing (meta)
 import Pages.Forms.SendAdhoc.Model exposing (SendAdhocModel)
 import Pages.Forms.SendAdhoc.Remote exposing (postCmd)
 import RemoteList as RL
+import Rocket exposing ((=>))
 import Route exposing (spaLink)
 
 
@@ -44,9 +45,9 @@ view settings model contacts status =
 
 noContacts : Html Msg
 noContacts =
-    div [ A.class "ui raised segment" ]
+    div [ A.class "segment" ]
         [ p [] [ text "Looks like you don't have any contacts yet." ]
-        , spaLink a [ A.class "ui violet button" ] [ text "Add a New Contact" ] <| ContactForm initialContactFormModel Nothing
+        , spaLink a [ A.class "button" ] [ text "Add a New Contact" ] <| ContactForm initialContactFormModel Nothing
         ]
 
 
@@ -85,13 +86,13 @@ loadingMessage rl =
             text ""
 
         RL.RespFailed err _ ->
-            div [ A.class "ui secondary segment" ] [ text err ]
+            div [ A.class "alert" ] [ text err ]
 
         RL.WaitingForFirstResp _ ->
-            div [ A.class "ui secondary segment" ] [ text "We are fetching your contacts now..." ]
+            div [ A.class "alert" ] [ text "We are fetching your contacts now..." ]
 
         RL.WaitingForPage _ ->
-            div [ A.class "ui secondary segment" ] [ text "We are fetching your contacts now..." ]
+            div [ A.class "alert" ] [ text "We are fetching your contacts now..." ]
 
         RL.WaitingOnRefresh _ ->
             text ""
@@ -100,24 +101,16 @@ loadingMessage rl =
 contactsField : FieldMeta -> SendAdhocModel -> RL.RemoteList Recipient -> List (Html Msg)
 contactsField meta_ model contacts =
     [ label [ A.for meta_.id ] [ text meta_.label ]
-    , div [ A.class "ui raised segment" ]
+    , div [ A.class "segment" ]
         [ loadingMessage contacts
         , selectedContacts model.selectedContacts contacts
-        , div [ A.class "ui left icon large transparent fluid input" ]
-            [ input
-                [ A.placeholder "Filter..."
-                , A.type_ "text"
-                , E.onInput (FormMsg << SendAdhocMsg << UpdateAdhocFilter)
-                ]
-                []
-            , i [ A.class "violet filter icon" ] []
-            ]
+        , filterInput (FormMsg << SendAdhocMsg << UpdateAdhocFilter)
         , div
-            [ A.class "ui divided selection list"
+            [ A.class "list"
             , A.style
-                [ ( "min-height", "25vh" )
-                , ( "max-height", "50vh" )
-                , ( "overflow-y", "auto" )
+                [ "min-height" => "25vh"
+                , "max-height" => "50vh"
+                , "overflow-y" => "auto"
                 ]
             ]
             (contacts
@@ -138,14 +131,14 @@ selectedContacts selectedPks contacts_ =
                 |> List.filter (\c -> List.member c.pk selectedPks)
                 |> List.map contactLabel
     in
-    Html.div [] selected
+    Html.div [ A.style [ "margin-bottom" => "1rem" ] ] selected
 
 
 contactLabel : Recipient -> Html Msg
 contactLabel contact =
     Html.div
-        [ A.class "ui violet basic label"
-        , A.style [ ( "user-select", "none" ) ]
+        [ A.class "badge"
+        , A.style [ "user-select" => "none" ]
         , onClick <| FormMsg <| SendAdhocMsg <| ToggleSelectedContact contact.pk
         ]
         [ Html.text contact.full_name ]
@@ -156,13 +149,14 @@ contactItem selectedPks contact =
     Html.Keyed.node "div"
         [ A.class "item"
         , onClick <| FormMsg <| SendAdhocMsg <| ToggleSelectedContact contact.pk
+        , A.id "contactItem"
         ]
         [ ( toString contact.pk, contactItemHelper selectedPks contact ) ]
 
 
 contactItemHelper : List Int -> Recipient -> Html Msg
 contactItemHelper selectedPks contact =
-    div [ A.class "content", A.style [ ( "color", "#000" ) ] ]
+    div [ A.style [ "color" => "#000" ] ]
         [ selectedIcon selectedPks contact
         , text contact.full_name
         ]
@@ -175,4 +169,4 @@ selectedIcon selectedPks contact =
             text ""
 
         True ->
-            i [ A.class "check icon", A.style [ ( "color", "#603cba" ) ] ] []
+            i [ A.class "fa fa-check", A.style [ "color" => "var(--color-purple)" ] ] []

@@ -20,8 +20,8 @@ import Pages.Forms.SendAdhoc.View as SA
 import Pages.Forms.SendGroup.View as SG
 import Pages.Forms.SiteConfig.View as SCF
 import Pages.Forms.UserProfile.View as UPF
-import Pages.Fragments.Fab.View as F
 import Pages.Fragments.Shell as Shell
+import Pages.Fragments.SidePanel.View as SPV
 import Pages.GroupComposer.View as GC
 import Pages.GroupTable as GT
 import Pages.Help as Help
@@ -42,10 +42,9 @@ import Store.Model exposing (filterArchived)
 view : Model -> Html Msg
 view model =
     let
-        fab =
-            F.view model.dataStore
+        sidePanel =
+            SPV.view model.dataStore
                 model.page
-                model.fabModel
                 (model.settings.userPerms.can_archive || model.settings.userPerms.user.is_staff)
 
         shell =
@@ -54,7 +53,7 @@ view model =
         mainContent =
             content model
     in
-    shell mainContent fab
+    shell mainContent sidePanel
 
 
 content : Model -> Html Msg

@@ -4,65 +4,66 @@
   <head>
     {% include 'apostello/includes/head.html' %}
     {% block morehead %}
+    <style>
+      body{
+        max-width: 60rem;
+        padding: 0 2rem;
+        margin: 2rem auto;
+      }
+    </style>
     {% endblock %}
   </head>
-  <body data-js-view-name="{{ js_path }}">
-    <div class="ui hidden divider"></div>
-    <div class="ui stackable centered grid container">
-      <div class="twelve wide column">
-        <img src="{% static 'images/favicons/apostello-logo.svg' %}" height="150">
-        <h2>apostello initial setup</h2>
+  <body>
+    <div class="twelve wide column">
+      <img src="{% static 'images/favicons/apostello-logo.svg' %}" style="height: 150px;">
+      <h1>apostello initial setup</h1>
 
-        <p>Welcome! This page should help you verify your installation and configuration of apostello.
-        You can see all your configured settings, send a test email and set up an admin user account.</p>
+      <p>Welcome! This page should help you verify your installation and configuration of apostello.
+      You can see all your configured settings, send a test email and set up an admin user account.</p>
 
-        <p><b>Note:</b> once a user has been created, this page will no longer be accessible for security reasons.</p>
-        <div class="ui raised segment">
-          <h3>Twilio Incoming Setup</h3>
+      <p><b>Note:</b> once a user has been created, this page will no longer be accessible for security reasons.</p>
+      <div class="segment">
+        <h4>Twilio Incoming Setup</h4>
 
-          <p>Twilio sends any incoming messages to the URL below, this URL should be your domain name, followed by "/sms/", and the method should be "POST".</p>
+        <p>Twilio sends any incoming messages to the URL below, this URL should be your domain name, followed by "/sms/", and the method should be "POST".</p>
 
-          <p>If you do not see these values below, then you need to update your settings in Twilio.</p>
+        <p>If you do not see these values below, then you need to update your settings in Twilio.</p>
 
-          <table class="ui definition table">
+        <table>
+          <tbody>
+            <tr>
+              <td>SMS Url</td>
+              <td>{{ number.sms_url }}</td>
+            </tr>
+            <tr>
+              <td>SMS Method</td>
+              <td>{{ number.sms_method }}</td>
+            </tr>
             <tbody>
-              <tr>
-                <td>SMS Url</td>
-                <td>{{ number.sms_url }}</td>
-              </tr>
-              <tr>
-                <td>SMS Method</td>
-                <td>{{ number.sms_method }}</td>
-              </tr>
-              <tbody>
-          </table>
-        </div>
-        <div class="ui raised segment">
-          <h3>Configuration Variables</h3>
-          <table class="ui small striped table">
-            <thead>
-              <tr>
-                <th>Environment Variable</th>
-                <th>Description</th>
-                <th>Current Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for row in variables %}
-              <tr>
-                <td>{{ row.env_var_name }}</td>
-                <td>{{ row.info }}</td>
-                <td>{{ row.val|linebreaks }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        </br>
-        <div id="elmContainer"></div>
+        </table>
       </div>
-    </div>
-    <div class="ui hidden divider"></div>
+      <div class="segment">
+        <h4>Configuration Variables</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>Environment Variable</th>
+              <th>Description</th>
+              <th>Current Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in variables %}
+            <tr>
+              <td>{{ row.env_var_name }}</td>
+              <td>{{ row.info }}</td>
+              <td>{{ row.val|linebreaks }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div id="elmContainer"></div>
     </div>
     <script>
       var elmSettings = {% elm_settings request.user %};
@@ -74,10 +75,6 @@
             async
             ></script>
     {% endif %}
-    <script src="https://code.jquery.com/jquery-3.1.0.js"
-          integrity="sha256-slogkvB1K3VOkzAI8QITxV3VzpOnkeNVsKvtkYLMjfk="
-     crossorigin="anonymous"></script>
     <script src="{% static 'js/app.js' %}"></script>
-    {% csrf_token %}
   </body>
 </html>

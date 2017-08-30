@@ -30,7 +30,7 @@ class TestSignup:
         password_box1.send_keys('top_secret')
         password_box2 = browser.find_elements_by_name('password2')[0]
         password_box2.send_keys('top_secret')
-        login_button = browser.find_elements_by_xpath('html/body/div/div/form/button')[0]
+        login_button = browser.find_element_by_id('signupButton')
         click_and_wait(login_button, driver_wait_time)
 
         def _test():
@@ -45,7 +45,7 @@ class TestSignup:
             if x.startswith('http'):
                 confirm_url = x
         browser.get(confirm_url)
-        confirm_button = browser.find_element_by_class_name('button')
+        confirm_button = browser.find_element_by_id('confirmButton')
         confirm_button.click()
         user = User.objects.get(email='testsignupemail@example.com')
         assert not user.is_staff

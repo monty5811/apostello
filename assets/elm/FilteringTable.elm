@@ -1,6 +1,7 @@
 module FilteringTable
     exposing
         ( Model
+        , filterInput
         , filterRecord
         , filteringTable
         , initialModel
@@ -13,10 +14,11 @@ import Html exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
 import List.Extra as LE
-import Messages exposing (Msg(Nope, TableMsg), TableMsg(GoToPage, UpdateFilter))
+import Messages exposing (Msg(TableMsg), TableMsg(GoToPage, UpdateFilter))
 import Pages.Fragments.Loader exposing (loader)
 import Regex
 import RemoteList as RL
+import Rocket exposing ((=>))
 
 
 -- Model
@@ -72,12 +74,12 @@ textToRegex t =
 
 emptyView : Html Msg
 emptyView =
-    Html.div [ A.class "ui message" ] [ Html.text "No data to display" ]
+    Html.div [ A.class "alert alert-info" ] [ Html.text "No data to display" ]
 
 
 uiTable : Html Msg -> Model -> (a -> Html Msg) -> RL.RemoteList a -> Html Msg
 uiTable tableHead tableModel rowConstructor data =
-    filteringTable "ui table" tableHead tableModel rowConstructor data
+    filteringTable "" tableHead tableModel rowConstructor data
 
 
 filteringTable : String -> Html Msg -> Model -> (a -> Html Msg) -> RL.RemoteList a -> Html Msg
@@ -112,21 +114,24 @@ filteringTable tableClass tableHead model rowConstructor data =
 
         _ ->
             Html.div []
-                [ Html.div [ A.class "ui left icon large transparent fluid input" ]
-                    [ Html.i [ A.class "violet filter icon" ] []
-                    , Html.input
-                        [ A.type_ "text"
-                        , A.placeholder "Filter..."
-                        , E.onInput (TableMsg << UpdateFilter)
-                        ]
-                        []
-                    ]
+                [ filterInput (TableMsg << UpdateFilter)
                 , Html.table [ A.class tableClass ]
                     [ tableHead
                     , Html.tbody [] (getPage curPage pages |> List.map rowConstructor)
                     ]
                 , pageControls curPage numPages
                 ]
+
+
+filterInput : (String -> msg) -> Html msg
+filterInput msg =
+    Html.input
+        [ A.type_ "text"
+        , A.placeholder "Filter..."
+        , A.style [ "margin-bottom" => "1rem" ]
+        , E.onInput msg
+        ]
+        []
 
 
 paginate : List a -> List (List a)
@@ -147,7 +152,7 @@ pageControls page numPages =
             Html.text ""
 
         False ->
-            Html.div [ A.class "ui stackable pagination small menu" ] <|
+            Html.div [] <|
                 buttons page numPages
 
 
@@ -188,7 +193,7 @@ leftButtons curPage =
     if curPage == 2 then
         [ Html.text "" ]
     else
-        [ Html.div [ A.class "disabled item" ] [ Html.text "..." ]
+        [ Html.div [ A.class "button", A.disabled True ] [ Html.text "..." ]
         , pageButton (curPage - 1) curPage
         ]
 
@@ -199,36 +204,36 @@ rightButtons curPage numPages =
         [ Html.text "" ]
     else
         [ pageButton (curPage + 1) curPage
-        , Html.div [ A.class "disabled item" ] [ Html.text "..." ]
+        , Html.div [ A.class "button", A.disabled True ] [ Html.text "..." ]
         ]
 
 
 prevButton : Int -> Html Msg
 prevButton curPage =
     let
-        ( class, click ) =
+        attrs =
             case curPage == 1 of
                 True ->
-                    ( "icon disabled item", Nope )
+                    [ A.class "button button-white", A.disabled True ]
 
                 False ->
-                    ( "icon item", TableMsg <| GoToPage <| curPage - 1 )
+                    [ A.class "button button-white", A.disabled False, E.onClick <| TableMsg <| GoToPage <| curPage - 1 ]
     in
-    Html.a [ A.class class, E.onClick click ] [ Html.i [ A.class "left chevron icon" ] [] ]
+    Html.button attrs [ Html.i [ A.class "fa fa-chevron-left" ] [] ]
 
 
 nextButton : Int -> Int -> Html Msg
 nextButton curPage numPages =
     let
-        ( class, click ) =
+        attrs =
             case curPage == numPages of
                 True ->
-                    ( "icon disabled item", Nope )
+                    [ A.class "button button-white", A.disabled True ]
 
                 False ->
-                    ( "icon item", TableMsg <| GoToPage <| curPage + 1 )
+                    [ A.class "button button-white", E.onClick <| TableMsg <| GoToPage <| curPage + 1 ]
     in
-    Html.a [ A.class class, E.onClick click ] [ Html.i [ A.class "right chevron icon" ] [] ]
+    Html.button attrs [ Html.i [ A.class "fa fa-chevron-right" ] [] ]
 
 
 pageButton : Int -> Int -> Html Msg
@@ -237,10 +242,10 @@ pageButton goToPage curPage =
         class =
             case curPage == goToPage of
                 True ->
-                    "active item"
+                    "button"
 
                 False ->
-                    "item"
+                    "button button-white"
     in
     Html.a [ A.class class, E.onClick <| TableMsg <| GoToPage goToPage ] [ Html.text (toString goToPage) ]
 

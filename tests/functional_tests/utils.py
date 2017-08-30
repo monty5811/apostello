@@ -9,10 +9,10 @@ def click_and_wait(elem, t):
 
 def check_and_close_msg(b, wait_time):
     """Check for presence of message and close."""
-    alert = b.find_elements_by_class_name('close')
+    alert = b.find_elements_by_class_name('fa-close')
     assert len(alert) == 1
     click_and_wait(alert[0], wait_time)
-    alert = b.find_elements_by_class_name('close')
+    alert = b.find_elements_by_class_name('fa-close')
     assert len(alert) == 0
 
 

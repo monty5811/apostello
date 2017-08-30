@@ -9,6 +9,7 @@ import Messages exposing (Msg)
 import Pages exposing (Page(ContactForm))
 import Pages.Forms.Contact.Model exposing (initialContactFormModel)
 import RemoteList as RL
+import Rocket exposing ((=>))
 import Route exposing (spaLink)
 
 
@@ -46,9 +47,9 @@ smsRow sms =
             ContactForm initialContactFormModel <| Just recipient.pk
     in
     tr []
-        [ td [ A.class "collapsing" ]
-            [ spaLink a [ A.style [ ( "color", "#212121" ) ] ] [ text recipient.full_name ] contactPage
+        [ td []
+            [ spaLink a [ A.style [ "color" => "var(--color-black)" ] ] [ text recipient.full_name ] contactPage
             ]
         , td [] [ text sms.content ]
-        , td [ A.class "collapsing" ] [ text (formatDate sms.time_sent) ]
+        , td [] [ text (formatDate sms.time_sent) ]
         ]

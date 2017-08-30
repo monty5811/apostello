@@ -28,7 +28,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_docs',
-    'semanticuiform',
     'django_extensions',
     'solo',
     'django_redis',

@@ -27,7 +27,7 @@ def click_send(b, wt):
 
 
 def add_recipient(b, wt):
-    for x in b.find_elements_by_xpath('//*[@id="elmContainer"]/div/div[2]/div/div[2]/div/form/div[2]/div/div[3]/div'):
+    for x in b.find_elements_by_id('contactItem'):
         if x.text == 'John Calvin':
             recipient = x
             break
@@ -36,9 +36,7 @@ def add_recipient(b, wt):
 
 
 def add_group(b, wt):
-    group = b.find_elements_by_xpath(
-        '//*[@id="elmContainer"]/div/div[2]/div/div[2]/div/form/div[2]/div/div[2]/div[1]/div/div[2]'
-    )[-1]
+    group = b.find_elements_by_id('groupItem')[-1]
     click_and_wait(group, wt)
     return b
 
@@ -76,7 +74,7 @@ class TestSendAdhoc:
         b = load_page(browser_in, driver_wait_time, live_server + ADHOC_URI)
         send_button = b.find_element_by_id('send_button')
         assert send_button.text == 'Send ($0.00)'
-        assert send_button.get_attribute('class') == 'ui disabled button'
+        assert send_button.get_attribute('disabled') == 'true'
 
     @twilio_vcr
     def test_good_form(self, live_server, browser_in, users, driver_wait_time, recipients):
@@ -140,7 +138,7 @@ class TestSendAdhoc:
         # load the incoming log
         b = load_page(browser_in, driver_wait_time, live_server + LOG_URI)
         # check reply buttons are present
-        reply_buttons = b.find_elements_by_class_name('reply')
+        reply_buttons = b.find_elements_by_class_name('fa-reply')
         assert len(reply_buttons) == len(smsin)
         # test button works
         click_and_wait(reply_buttons[0], driver_wait_time)
@@ -171,7 +169,7 @@ class TestSendGroup:
         b = load_page(browser_in, driver_wait_time, live_server + GROUP_URI)
         send_button = b.find_element_by_id('send_button')
         assert send_button.text == 'Send ($0.00)'
-        assert send_button.get_attribute('class') == 'ui disabled button'
+        assert send_button.get_attribute('disabled') == 'true'
 
     @twilio_vcr
     def test_good_form(self, live_server, browser_in, users, driver_wait_time, groups):
