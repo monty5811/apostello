@@ -32,5 +32,5 @@ init flagsVal location =
                     Debug.crash <| "Try reloading the page\n" ++ msg
     in
     loc2Page location flags.settings
-        |> initialModel flags.settings (Maybe.withDefault "" flags.dataStoreCache)
+        |> initialModel flags.settings
         |> update (UrlChange location)

@@ -3,29 +3,17 @@ import { isSubscribed, subscribePush, unsubscribePush } from './notifications';
 
 /* global elmSettings */
 
-const lsKey = 'elm-apostello-datastore-v1';
+const lsKey = 'elm-apostello-datastore-v2';
 
-function getDataStoreCache(userEmail) {
-  const item = localStorage.getItem(lsKey);
-  if (item === null) {
-    return null;
-  }
-  const cache = JSON.parse(item);
-  const cachedEmail = cache.userEmail;
-  const cacheExpires = cache.expires;
-  if (cachedEmail === userEmail && cacheExpires > Date.now()) {
-    return JSON.stringify(cache.data);
-  }
-  return null;
-}
-
-function setDataStoreCache(newValue, userEmail) {
+function setDataStoreCache(newValue) {
   const cacheItem = {
     expires: Date.now() + 600 * 1000,
-    userEmail: userEmail,
     data: newValue,
   };
   localStorage.setItem(lsKey, JSON.stringify(cacheItem));
+  // remove again as we don't need to keep it around
+  // and the set value is passed to the event handler in the other tabs
+  localStorage.removeItem(lsKey);
 }
 
 function renderElm() {
@@ -37,11 +25,10 @@ function renderElm() {
     const Elm = require('../elm/Main.elm');
     const app = Elm.Main.embed(node, {
       settings: elmSettings,
-      dataStoreCache: getDataStoreCache(elmSettings.userPerms.user.email),
     });
 
     app.ports.saveDataStore.subscribe(function(data) {
-      setDataStoreCache(data, elmSettings.userPerms.user.email);
+      setDataStoreCache(data);
     });
 
     app.ports.pushSubEvent.subscribe(function(event) {

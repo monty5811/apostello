@@ -17,7 +17,6 @@ import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (decode, required)
 import Pages exposing (Page)
 import Pages.Fragments.Notification exposing (DjangoMessage, Notification, NotificationType(..))
-import Store.Decode exposing (decodeDataStore)
 import Store.Model exposing (DataStore, emptyDataStore)
 import Time
 import WebPush
@@ -39,12 +38,12 @@ type alias Model =
     }
 
 
-initialModel : Settings -> String -> Page -> Model
-initialModel settings dataStoreCache page =
+initialModel : Settings -> Page -> Model
+initialModel settings page =
     { page = page
     , table = FT.initialModel
     , settings = settings
-    , dataStore = Result.withDefault emptyDataStore <| Decode.decodeString decodeDataStore dataStoreCache
+    , dataStore = emptyDataStore
     , notifications = Dict.empty
     , currentTime = 0
     , formStatus = NoAction
@@ -86,7 +85,6 @@ decodeSettings =
 
 type alias Flags =
     { settings : Settings
-    , dataStoreCache : Maybe String
     }
 
 
@@ -94,7 +92,6 @@ decodeFlags : Decode.Decoder Flags
 decodeFlags =
     decode Flags
         |> required "settings" decodeSettings
-        |> required "dataStoreCache" (Decode.maybe Decode.string)
 
 
 

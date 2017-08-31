@@ -3,7 +3,6 @@ module Pages.Fragments.Menu exposing (allUsersMenuItems, menu)
 import Data exposing (UserProfile)
 import Html exposing (Html, a, div, i, text)
 import Html.Attributes as A exposing (class, href, id)
-import Html.Keyed as Keyed
 import Messages exposing (Msg(WebPushMsg))
 import Models exposing (Settings)
 import Pages exposing (Page(..), initSendAdhoc, initSendGroup)

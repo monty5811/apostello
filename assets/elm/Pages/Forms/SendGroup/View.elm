@@ -9,7 +9,6 @@ import Forms.View exposing (contentField, form, sendButton, timeField)
 import Helpers exposing (onClick)
 import Html exposing (Html, a, br, div, i, input, label, p, text)
 import Html.Attributes as A exposing (class, for, placeholder, style, type_)
-import Html.Events exposing (onInput)
 import Html.Keyed
 import Messages exposing (FormMsg(PostForm, SendGroupMsg), Msg(FormMsg))
 import Models exposing (Model, Settings)

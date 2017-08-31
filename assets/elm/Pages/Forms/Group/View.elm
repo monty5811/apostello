@@ -8,7 +8,6 @@ import Forms.View exposing (..)
 import Helpers exposing (onClick)
 import Html exposing (Html)
 import Html.Attributes as A
-import Html.Events exposing (onInput)
 import Messages exposing (FormMsg(GroupFormMsg, PostForm), Msg(FormMsg, Nope, StoreMsg))
 import Pages exposing (Page(GroupForm))
 import Pages.Error404 as E404
