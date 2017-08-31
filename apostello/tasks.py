@@ -106,7 +106,6 @@ def log_msg_in(p, t, from_pk):
         sender_name=str(from_),
         sender_num=p['From'],
         matched_keyword=str(matched_keyword),
-        matched_link=Keyword.get_log_link(matched_keyword),
         matched_colour=Keyword.lookup_colour(p['Body'].strip())
     )
     # check log is consistent:

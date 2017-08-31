@@ -125,7 +125,6 @@
         "sender_num": "+447902537509",
         "matched_keyword": "test",
         "matched_colour": "#098f6b",
-        "matched_link": "/keyword/responses/1/",
         "display_on_wall": true
     }
 }, {
@@ -141,7 +140,6 @@
         "sender_num": "+447902537509",
         "matched_keyword": "test",
         "matched_colour": "#098f6b",
-        "matched_link": "/keyword/responses/1/",
         "display_on_wall": false
     }
 }, {
@@ -157,7 +155,6 @@
         "sender_num": "+447902537509",
         "matched_keyword": "No Match",
         "matched_colour": "#B6B6B6",
-        "matched_link": "#",
         "display_on_wall": false
     }
 }, {
@@ -173,7 +170,6 @@
         "sender_num": "+447902546589",
         "matched_keyword": "connect",
         "matched_colour": "#b640a0",
-        "matched_link": "/keyword/responses/2/",
         "display_on_wall": true
     }
 }, {

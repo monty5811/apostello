@@ -394,6 +394,8 @@ class Keyword(models.Model):
 
     def can_user_access(self, user):
         """Check if user is allowed to access this keyword."""
+        if not self.is_locked:
+            return True
         if user in self.owners.all():
             return True
         elif user.is_staff:
@@ -466,17 +468,6 @@ class Keyword(models.Model):
         else:
             return "#" + hashlib.md5(str(keyword).encode('utf-8')).hexdigest()[:6]
 
-    @staticmethod
-    def get_log_link(k):
-        """Retreive link to keyword log.
-
-        Static method as it may also be called with a "No Match" string.
-        """
-        try:
-            return k.get_responses_url
-        except AttributeError:
-            return '#'
-
     def __str__(self):
         """Pretty representation."""
         return self.keyword
@@ -499,7 +490,6 @@ class SmsInbound(models.Model):
     sender_num = models.CharField("Sent from", max_length=200)
     matched_keyword = models.CharField(max_length=12, db_index=True)
     matched_colour = models.CharField(max_length=7)
-    matched_link = models.CharField(max_length=200)
     display_on_wall = models.BooleanField(
         "Display on Wall?", default=False, help_text='If True, SMS will be shown on all live walls.'
     )
@@ -528,7 +518,6 @@ class SmsInbound(models.Model):
         matched_keyword = Keyword.match(self.content.strip())
         self.matched_keyword = str(matched_keyword)
         self.matched_colour = Keyword.lookup_colour(self.content.strip())
-        self.matched_link = Keyword.get_log_link(matched_keyword)
         self.is_archived = False
         self.dealt_with = False
         self.save()

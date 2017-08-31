@@ -74,7 +74,6 @@ def handle_incoming_sms(msg):
         matched_keyword = Keyword.match(msg.body)
         sms.matched_keyword = str(matched_keyword)
         sms.matched_colour = Keyword.lookup_colour(msg.body)
-        sms.matched_link = Keyword.get_log_link(matched_keyword)
         sms.save()
 
 

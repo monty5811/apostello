@@ -54,6 +54,7 @@ class SiteConfiguration(SingletonModel):
     sms_rolling_expiration_days = models.PositiveIntegerField(
         "Rolling SMS Expiration",
         null=True,
+        blank=True,
         help_text='The number of days a message will be kept by apostello before'
         ' being deleted.'
         ' If blank, then messages will be kept forever.'

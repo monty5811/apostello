@@ -111,7 +111,6 @@ class TestButton:
             content='test',
             matched_keyword='',
             matched_colour='',
-            matched_link='',
         )
         sms.save()
         browser_in.get(live_server + '/incoming/')
