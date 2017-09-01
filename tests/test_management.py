@@ -3,6 +3,9 @@ from django.core.management import call_command
 from django_q.models import Schedule
 from tests.conftest import twilio_vcr
 
+from apostello.management.commands.write_urls_to_elm import generate_module as generate_urls
+from apostello.management.commands import write_form_meta_to_elm as form_meta
+
 
 @pytest.mark.django_db
 class TestManagementCommands():
@@ -26,3 +29,19 @@ class TestManagementCommands():
         assert Schedule.objects.all().count() == 6
         call_command('setup_periodic_tasks')
         assert Schedule.objects.all().count() == 6
+
+    def test_write_elm_urls(self):
+        """Test Elm Urls are up to date."""
+        with open('assets/elm/Urls.elm', 'r') as f:
+            current_urls = f.read()
+
+        new_urls = generate_urls()
+        assert new_urls == current_urls
+
+    def test_write_elm_form_meta(self):
+        """Test Elm Forms are up to date."""
+        for n, f in form_meta.FORMS.items():
+            new_meta, fname = form_meta.generate_module(n, f)
+            with open(fname, 'r') as f_:
+                current_meta = f_.read()
+            assert new_meta == current_meta

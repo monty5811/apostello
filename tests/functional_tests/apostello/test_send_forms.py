@@ -1,5 +1,6 @@
 from time import sleep
 
+from flaky import flaky
 import pytest
 from selenium.common.exceptions import ElementNotVisibleException
 from selenium.webdriver.common.keys import Keys
@@ -66,6 +67,7 @@ def add_scheduled_time(b, wt):
     return b
 
 
+@flaky(max_runs=5)
 @pytest.mark.slow
 @pytest.mark.selenium
 class TestSendAdhoc:
@@ -161,6 +163,7 @@ class TestSendAdhoc:
         assert 'DO NOT REPLY' == content_box.get_attribute('value')
 
 
+@flaky(max_runs=5)
 @pytest.mark.slow
 @pytest.mark.selenium
 class TestSendGroup:

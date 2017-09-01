@@ -22,7 +22,7 @@ FORMS = {
 
 
 def esc(text):
-    return text.replace('"', '\\"')
+    return text.replace('"', '\\"').replace('\n', '\\n')
 
 
 def field_text(field_name, field):
@@ -40,29 +40,36 @@ def field_text(field_name, field):
     else:
         req = "False"
 
-    txt =  f'{field_name} = FieldMeta {req} "id_{field_name}"  "{field_name}"  "{esc(label)}" {help_text}'
+    txt =  f'{field_name} = FieldMeta {req} "id_{field_name}" "{field_name}" "{esc(label)}" {help_text}'
     return txt
 
 
-
-def write_form(name, form_):
+def generate_module(name, form_):
     form = form_()
-    elm = f'module Pages.Forms.{name}.Meta exposing (meta)\n'
-    elm += 'import Forms.Model exposing (FieldMeta)\n'
-    elm += 'meta : {'
-    elm += ','.join([f'{name} : FieldMeta' for name in form.base_fields])
-    elm += '}\n'
-    elm += 'meta = \n{\n'
-    fields_text = '\n    ,'.join(
+    elm = f'module Pages.Forms.{name}.Meta exposing (meta)\n\n'
+    elm += 'import Forms.Model exposing (FieldMeta)\n\n\n'
+    elm += 'meta : { '
+    elm += ', '.join([f'{name} : FieldMeta' for name in form.base_fields])
+    elm += ' }\n'
+    elm += 'meta =\n    { '
+    fields_text = '\n    , '.join(
         [field_text(field_name, field) for field_name, field in form.base_fields.items()]
     )
-    elm += f'{fields_text}\n}}'
+    elm += f'{fields_text}\n    }}\n'
     dir_name = f'assets/elm/Pages/Forms/{name}'
     fname = os.path.join(dir_name, 'Meta.elm')
+
+    return elm, fname
+
+
+def write_form(elm, fname):
+    dir_name = os.path.dirname(fname)
     if not os.path.exists(dir_name):
         os.mkdir(dir_name)
+
     with open(fname, 'w') as f:
         f.write(elm)
+
     subprocess.run(f'elm-format --yes {fname}'.split())
 
 
@@ -74,4 +81,5 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """Handle the command."""
         for n, f in FORMS.items():
-            write_form(n, f)
+            module, fname = generate_module(n, f)
+            write_form(module, fname)

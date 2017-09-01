@@ -37,24 +37,40 @@ def extract_types(url, optional):
         if m in TYPES:
             t = TYPES[m]
             if optional:
-                t = f'(Maybe {t})'
+                t = f'Maybe {t}'
             types.append(t)
             args_.append(m)
 
     return types, args_
 
 
+def indent(n):
+    return '    ' * n
+
+
+def case_template(a, convert_b):
+    t = f'''"
+        ++ (case {a} of
+                Just b ->
+                    {convert_b} ++ "/"
+
+                Nothing ->
+                    ""
+           )'''
+    return t
+
+
 def argTypeConv(a, t, optional):
     if optional:
         if t == 'String':
-            s = f'(case {a} of\nJust b -> b ++ "/" \nNothing->"")'
+            s = case_template(a, "b")
         else:
-            s = f'(case {a} of\nJust b ->toString b ++ "/"\nNothing -> "")'
+            s = case_template(a, "toString b")
     else:
         if t == 'String':
-            s = f'{a} ++ "/'
+            s = f'" ++ {a} ++ "/'
         else:
-            s = f'toString {a} ++ "/'
+            s = f'" ++ toString {a} ++ "/'
 
     return s
 
@@ -65,7 +81,7 @@ def extract_body(url, types, args_, optional):
 
     for t, a in zip(types, args_):
         arg_w_brackets = '<' + a + '>/'
-        url = url.replace(arg_w_brackets, f'" ++ {argTypeConv(a, t, optional)}')
+        url = url.replace(arg_w_brackets, argTypeConv(a, t, optional))
 
     if not url.endswith(')'):
         url = url + '"'
@@ -108,7 +124,7 @@ def convert_to_elm(u):
     body = extract_body(url, types, args_, optional)
 
     typeDef = f'{name} : {" -> ".join(types + ["String"])}'
-    funcDef = f'{name} {"  ".join(args_)} = '
+    funcDef = " ".join([name] + args_ + ["="])
     funcBody = f'    {body}'
     return '\n'.join([typeDef, funcDef, funcBody])
 
@@ -140,6 +156,18 @@ def extract_urls(urlpatterns):
     return url_data
 
 
+def generate_module():
+    url_data = extract_urls(urlpatterns)
+
+    funcs = [convert_to_elm(u) for u in url_data]
+    funcs = [f for f in funcs if f is not None]
+    funcs = sorted(list(set(funcs)))
+
+    module = 'module Urls exposing (..)\n\n\n' + '\n\n\n'.join(funcs) + '\n'
+
+    return module
+
+
 class Command(BaseCommand):
     """Parse urls and write to Elm file."""
     args = ''
@@ -147,13 +175,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Handle the command."""
-        url_data = extract_urls(urlpatterns)
-
-        funcs = [convert_to_elm(u) for u in url_data]
-        funcs = [f for f in funcs if f is not None]
-        funcs = sorted(list(set(funcs)))
-
-        module = 'module Urls exposing (..)\n\n' + '\n\n'.join(funcs)
+        module = generate_module()
 
         with open('assets/elm/Urls.elm', 'w') as f:
             f.write(module)
