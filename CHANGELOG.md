@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [v.2.5.1]
+
+### Fixed
+
+ - Fix broken service worker
+
 ## [v2.5.0]
 
 ### Changed
