@@ -23,6 +23,8 @@ def load_page(b, wt, url):
 
 def click_send(b, wt):
     send_button = b.find_element_by_id('send_button')
+    if not send_button.is_enabled():
+        sleep(wt * 3)
     click_and_wait(send_button, wt)
     return b
 
@@ -67,6 +69,18 @@ def add_scheduled_time(b, wt):
     return b
 
 
+def add_content_and_recipient(b, wt):
+    b = add_content(b, wt)
+    b = add_recipient(b, wt)
+    return b
+
+
+def add_content_and_group(b, wt):
+    b = add_content(b, wt)
+    b = add_group(b, wt)
+    return b
+
+
 @flaky(max_runs=5)
 @pytest.mark.slow
 @pytest.mark.selenium
@@ -82,8 +96,7 @@ class TestSendAdhoc:
     def test_good_form(self, live_server, browser_in, users, driver_wait_time, recipients):
         """Test good form submission."""
         b = load_page(browser_in, driver_wait_time, live_server + ADHOC_URI)
-        b = add_recipient(b, driver_wait_time)
-        b = add_content(b, driver_wait_time)
+        b = add_content_and_recipient(b, driver_wait_time)
         b = click_send(b, driver_wait_time)
 
         assert 'Please check the logs for verification' in b.page_source
@@ -95,8 +108,7 @@ class TestSendAdhoc:
         b = load_page(browser_in, driver_wait_time, live_server + ADHOC_URI)
         # add scheduled time
         b = add_scheduled_time(b, driver_wait_time)
-        b = add_recipient(b, driver_wait_time)
-        b = add_content(b, driver_wait_time)
+        b = add_content_and_recipient(b, driver_wait_time)
         b = click_send(b, driver_wait_time)
 
         def _test():
@@ -111,8 +123,7 @@ class TestSendAdhoc:
         user_profile.save()
 
         b = load_page(browser_in, driver_wait_time, live_server + ADHOC_URI)
-        b = add_recipient(b, driver_wait_time)
-        b = add_content(b, driver_wait_time)
+        b = add_content_and_recipient(b, driver_wait_time)
         b = click_send(b, driver_wait_time)
 
         assert 'cost no more than' in b.page_source
@@ -125,8 +136,7 @@ class TestSendAdhoc:
         s.sms_char_limit = 2
         s.save()
         b = load_page(browser_in, driver_wait_time, live_server + ADHOC_URI)
-        b = add_recipient(b, driver_wait_time)
-        b = add_content(b, driver_wait_time)
+        b = add_content_and_recipient(b, driver_wait_time)
         b = click_send(b, driver_wait_time)
 
         assert 'You have exceeded' in b.page_source
@@ -178,8 +188,7 @@ class TestSendGroup:
     def test_good_form(self, live_server, browser_in, users, driver_wait_time, groups):
         """Test good form submission."""
         b = load_page(browser_in, driver_wait_time, live_server + GROUP_URI)
-        b = add_group(b, driver_wait_time)
-        b = add_content(b, driver_wait_time)
+        b = add_content_and_group(b, driver_wait_time)
         b = click_send(b, driver_wait_time)
 
         assert 'Please check the logs for verification' in b.page_source
@@ -189,8 +198,7 @@ class TestSendGroup:
     def test_scheduled_message(self, live_server, browser_in, users, driver_wait_time, groups):
         """Test good form submission with a scheduled time."""
         b = load_page(browser_in, driver_wait_time, live_server + GROUP_URI)
-        b = add_group(b, driver_wait_time)
-        b = add_content(b, driver_wait_time)
+        b = add_content_and_group(b, driver_wait_time)
         b = add_scheduled_time(b, driver_wait_time)
         b = click_send(b, driver_wait_time)
 
@@ -203,8 +211,7 @@ class TestSendGroup:
         user_profile.save()
 
         b = load_page(browser_in, driver_wait_time, live_server + GROUP_URI)
-        b = add_group(b, driver_wait_time)
-        b = add_content(b, driver_wait_time)
+        b = add_content_and_group(b, driver_wait_time)
         b = click_send(b, driver_wait_time)
 
         assert 'cost no more than' in b.page_source
