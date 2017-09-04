@@ -5,11 +5,6 @@ const urlsToCache = [
   OFFLINE_URL,
   "{% static 'js/app.js' %}",
   "{% static 'css/apostello.min.css' %}",
-  "{% static 'css/themes/default/assets/fonts/icons.ttf' %}",
-  "{% static 'css/themes/default/assets/fonts/icons.eot' %}",
-  "{% static 'css/themes/default/assets/fonts/icons.svg' %}",
-  "{% static 'css/themes/default/assets/fonts/icons.woff' %}",
-  "{% static 'css/themes/default/assets/fonts/icons.woff2' %}",
 ];
 
 self.addEventListener('install', (event) => {
