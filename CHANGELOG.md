@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [v2.5.0]
+
+### Changed
+
+ - Visual refresh (and much smaller CSS assets now required)
+
+### Fixed
+
+ - Rolling SMS expiration setting is no longer "required"
+ - Bug when checking if a user could access a keyword
+
 ## [v2.4.1]
 
 ### Added
@@ -39,7 +50,7 @@ All notable changes to this project will be documented in this file.
  - Edit forms eagerly load current item instead of paging through all results
 
 ### Fixed
- 
+
  - Edit forms show a 404 if an item does not exist
  - Don't redirect a user to the scheduled queue if they can't view it
  - Don't try to link to "No Match" keyword
@@ -103,7 +114,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- Sort tables properly 
+- Sort tables properly
 
 ## [v1.16.0]
 
