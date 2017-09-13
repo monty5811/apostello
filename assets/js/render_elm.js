@@ -48,7 +48,9 @@ function renderElm() {
     });
 
     const loader = document.getElementById('elmLoader');
-    loader.remove();
+    if (loader !== null) {
+      loader.remove();
+    }
 
     return app;
   }
