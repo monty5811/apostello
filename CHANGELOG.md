@@ -3,13 +3,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [v.2.5.2]
+## [v2.5.3]
+
+### Fixed
+
+ - Fix csrftoken missing on first run setup
+
+## [v2.5.2]
 
 ### Fixed
 
  - Fix bug in first run page
 
-## [v.2.5.1]
+## [v2.5.1]
 
 ### Fixed
 

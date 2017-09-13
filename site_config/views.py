@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.http import JsonResponse
 from django.shortcuts import redirect
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import TemplateView, View
 from rest_framework.parsers import JSONParser
 from twilio.base.exceptions import TwilioException
@@ -16,6 +18,7 @@ from apostello.twilio import twilio_client
 EnvVarSetting = namedtuple('EnvVarSetting', ['env_var_name', 'info', 'val'])
 
 
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 class FirstRunView(TemplateView):
     """View to make initial run experience easier."""
     template_name = 'apostello/first_run.html'
