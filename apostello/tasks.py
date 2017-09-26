@@ -243,10 +243,10 @@ def send_cloud_messages():
     from apostello.models import CloudMessageId
     cmids = CloudMessageId.objects.all()
     for cmid in cmids:
-        if not (cmid.user.profile.is_staff or cmid.user.profile.can_see_incoming):
+        if not (cmid.user.is_staff or cmid.user.profile.can_see_incoming):
             # only send messages to people with permission
             continue
-        headers={
+        headers = {
             'Content-Length': '0',
             'TTL': '60',
         }
@@ -255,7 +255,7 @@ def send_cloud_messages():
         try:
             r = requests.post(
                 cmid.url,
-                headers = headers,
+                headers=headers,
             )
             if r.status_code == 401:
                 cmid.delete()
@@ -283,10 +283,12 @@ def pull_elvanto_groups(force=False):
         from elvanto.models import ElvantoGroup
         ElvantoGroup.pull_all_groups()
 
+
 # Onebody import
 def pull_onebody_csv():
     from onebody.importer import import_onebody_csv
     import_onebody_csv()
+
 
 #
 def add_new_contact_to_groups(contact_pk):
