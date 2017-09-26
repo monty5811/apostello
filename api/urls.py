@@ -162,7 +162,10 @@ urlpatterns = [
         v.ArchiveObj.as_view(
             model_class=m.SmsInbound,
             serializer_class=s.SmsInboundSerializer,
-            permission_classes=(IsAuthenticated, p.CanSeeIncoming, ),
+            permission_classes=(
+                IsAuthenticated,
+                p.CanSeeIncoming,
+            ),
         ),
         name='act_archive_sms',
     ),

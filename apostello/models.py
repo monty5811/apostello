@@ -42,7 +42,6 @@ class RecipientGroup(models.Model):
     def send_message(self, content, sent_by, eta=None):
         """Send message to group."""
         async('apostello.tasks.group_send_message_task', content, self.name, sent_by, eta)
-
     def archive(self):
         """Archive the group."""
         self.is_archived = True
@@ -423,7 +422,6 @@ class Keyword(models.Model):
         self.keyword = self.keyword.lower()
         super(Keyword, self).save(force_insert, force_update, *args, **kwargs)
         async('apostello.tasks.populate_keyword_response_count', pk=self.pk)
-
     @staticmethod
     def _match(sms):
         """Match keyword or raises exception."""
@@ -624,13 +622,19 @@ class SmsOutbound(models.Model):
 class CloudMessageId(models.Model):
     """Store cloud messaging IDs."""
     url = models.CharField(max_length=1000)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
 
     def __str__(self):
         return f'{self.user.email} <{self.url[0:6]}...>'
 
     class Meta:
-        unique_together = ('url', 'user',)
+        unique_together = (
+            'url',
+            'user',
+        )
 
 
 class UserProfile(models.Model):

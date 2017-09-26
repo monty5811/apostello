@@ -44,6 +44,7 @@ def test_csv_import_ok(live_server, browser_in, recipients, users, driver_wait_t
 
     assert_with_timeout(_test, 10 * driver_wait_time)
 
+
 @pytest.mark.slow
 @pytest.mark.sel
 def test_csv_import_bad(live_server, browser_in, recipients, users, driver_wait_time):

@@ -61,9 +61,7 @@ def groups():
     for grp in RecipientGroup.objects.filter(is_archived=False):
         treemap.add(str(grp), [grp.recipient_set.all().count()])
 
-    return treemap.render(
-        show_legend=False,
-    )
+    return treemap.render(show_legend=False, )
 
 
 def keywords():
@@ -96,9 +94,7 @@ def incoming_by_contact():
             SmsInbound.objects.filter(sender_num=str(con.number)).count(),
         )
 
-    return treemap.render(
-        show_legend=False,
-    )
+    return treemap.render(show_legend=False, )
 
 
 def outgoing_by_contact():
@@ -110,9 +106,7 @@ def outgoing_by_contact():
     for con in Recipient.objects.filter(is_archived=False):
         treemap.add(str(con), SmsOutbound.objects.filter(recipient=con).count())
 
-    return treemap.render(
-        show_legend=False,
-    )
+    return treemap.render(show_legend=False, )
 
 
 def sms_totals():

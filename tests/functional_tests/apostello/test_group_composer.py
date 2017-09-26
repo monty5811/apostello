@@ -17,7 +17,7 @@ class TestGroupComposer:
         sleep(driver_wait_time)
         # check help text is there
         header = browser_in.find_elements_by_tag_name('h2')
-        assert any([h.text == 'Group Composer' for h  in header])
+        assert any([h.text == 'Group Composer' for h in header])
         # check input box is there
         input_ = browser_in.find_elements_by_id('queryInputBox')
         assert len(input_) == 1

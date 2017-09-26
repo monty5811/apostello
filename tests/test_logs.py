@@ -45,15 +45,14 @@ class TestExpiry:
     """
     Test log imports with expiry date.
     """
+
     @twilio_vcr
     def test_import_incoming_expiry_date(self):
         config = SiteConfiguration.get_solo()
         config.sms_expiration_date = today
         config.save()
         logs.check_incoming_log()
-        assert models.SmsInbound.objects.filter(
-            time_received__lt=today
-        ).count() == 0
+        assert models.SmsInbound.objects.filter(time_received__lt=today).count() == 0
 
     @twilio_vcr
     def test_import_outgoing_expiry_date(self):
@@ -61,9 +60,7 @@ class TestExpiry:
         config.sms_expiration_date = today
         config.save()
         logs.check_outgoing_log()
-        assert models.SmsOutbound.objects.filter(
-            time_sent__lt=today
-        ).count() == 0
+        assert models.SmsOutbound.objects.filter(time_sent__lt=today).count() == 0
 
     @twilio_vcr
     def test_cleanup_expiry_date(self):
@@ -89,9 +86,7 @@ class TestExpiry:
         config.sms_rolling_expiration_days = 0
         config.save()
         logs.check_incoming_log()
-        assert models.SmsInbound.objects.filter(
-            time_received__lt=today
-        ).count() == 0
+        assert models.SmsInbound.objects.filter(time_received__lt=today).count() == 0
 
     @twilio_vcr
     def test_import_outgoing_rolling(self):
@@ -100,9 +95,7 @@ class TestExpiry:
         config.sms_rolling_expiration_days = 0
         config.save()
         logs.check_outgoing_log()
-        assert models.SmsOutbound.objects.filter(
-            time_sent__lt=today
-        ).count() == 0
+        assert models.SmsOutbound.objects.filter(time_sent__lt=today).count() == 0
 
     @twilio_vcr
     def test_cleanup_rolling(self):

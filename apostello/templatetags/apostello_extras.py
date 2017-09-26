@@ -34,10 +34,8 @@ def elm_settings(user):
         config.default_number_prefix,
         'noAccessMessage':
         config.not_approved_msg,
-        'blockedKeywords': [
-            x.keyword for x in Keyword.objects.all().prefetch_related('owners')
-            if not x.can_user_access(user)
-        ],
+        'blockedKeywords':
+        [x.keyword for x in Keyword.objects.all().prefetch_related('owners') if not x.can_user_access(user)],
     }
     return mark_safe(json.dumps(elm))
 

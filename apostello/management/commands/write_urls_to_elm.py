@@ -8,19 +8,13 @@ from apostello.urls import urlpatterns
 
 arg_re = re.compile(r'<\w*>')
 
-IGNORED_URLS = (
-    '/accounts/confirm-',
-    '/accounts/password/reset/',
-    '/admin',
-    '/__debug__',
-    '/sw',
-    '/.*'
-)
+IGNORED_URLS = ('/accounts/confirm-', '/accounts/password/reset/', '/admin', '/__debug__', '/sw', '/.*')
 
 TYPES = {
     'pk': 'Int',
     'keyword': 'String',
 }
+
 
 def safe_name(name):
     name = name.replace('-', '_')
@@ -57,6 +51,7 @@ def case_template(a, convert_b):
                 Nothing ->
                     ""
            )'''
+
     return t
 
 
@@ -91,8 +86,8 @@ def extract_body(url, types, args_, optional):
 
 def clean_url(url):
     url = url.replace('(?:(?P', '')
-    url = url.replace('\\w+)','')
-    url = url.replace('\\d+)','')
+    url = url.replace('\\w+)', '')
+    url = url.replace('\\d+)', '')
     url = url.replace('[\\d|\\w]+)', '')
     url = url.replace('(?P', '')
     url = url.replace('^', '')

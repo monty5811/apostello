@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-import subprocess
 from os import scandir
+
+from yapf.yapflib.yapf_api import FormatFile
 
 IGNORE_DIRS = ['migrations', 'node_modules', 'venv', '__pycache__', '.git', '.tox']
 
@@ -8,7 +9,7 @@ IGNORE_DIRS = ['migrations', 'node_modules', 'venv', '__pycache__', '.git', '.to
 def yapf_file(f):
     """Run yapf on file."""
     print(f.path)
-    subprocess.call("yapf -i {} --style scripts/.style.yapf".format(f.path), shell=True)
+    FormatFile(f.path, in_place=True, style_config='scripts/.style.yapf')
 
 
 def yapf_or_recr(f):

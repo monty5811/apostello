@@ -6,21 +6,66 @@ from selenium import webdriver
 
 DEMO_URL = "https://apostello-testing.herokuapp.com"
 PAGES = [
-    ('/accounts/signup/', 'Signup', ),
-    ('/accounts/login/', 'Login', ),
-    ('/accounts/logout/', 'Logout', ),
-    ('/send/adhoc/', 'SendtoIndividuals', ),
-    ('/send/group/', 'SendtoGroup', ),
-    ('/recipient/all/', 'Recipients', ),
-    ('/recipient/edit/1/', 'RecipientEdit', ),
-    ('/keyword/all/', 'Keywords', ),
-    ('/keyword/edit/test/', 'KeywordEdit', ),
-    ('/keyword/responses/test/', 'KeywordResponses', ),
-    ('/incoming/', 'IncomingLog', ),
-    ('/incoming/wall/', 'IncomingWall', ),
-    ('/outgoing/', 'OutgoingLog', ),
-    ('/elvanto/import/', 'ElvantoSync', ),
-    ('/', 'Home', ),
+    (
+        '/accounts/signup/',
+        'Signup',
+    ),
+    (
+        '/accounts/login/',
+        'Login',
+    ),
+    (
+        '/accounts/logout/',
+        'Logout',
+    ),
+    (
+        '/send/adhoc/',
+        'SendtoIndividuals',
+    ),
+    (
+        '/send/group/',
+        'SendtoGroup',
+    ),
+    (
+        '/recipient/all/',
+        'Recipients',
+    ),
+    (
+        '/recipient/edit/1/',
+        'RecipientEdit',
+    ),
+    (
+        '/keyword/all/',
+        'Keywords',
+    ),
+    (
+        '/keyword/edit/test/',
+        'KeywordEdit',
+    ),
+    (
+        '/keyword/responses/test/',
+        'KeywordResponses',
+    ),
+    (
+        '/incoming/',
+        'IncomingLog',
+    ),
+    (
+        '/incoming/wall/',
+        'IncomingWall',
+    ),
+    (
+        '/outgoing/',
+        'OutgoingLog',
+    ),
+    (
+        '/elvanto/import/',
+        'ElvantoSync',
+    ),
+    (
+        '/',
+        'Home',
+    ),
 ]
 
 

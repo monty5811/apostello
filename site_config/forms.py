@@ -6,7 +6,7 @@ from site_config.models import DefaultResponses, SiteConfiguration
 class SiteConfigurationForm(forms.ModelForm):
     """Site configuration model form."""
     sms_expiration_date = forms.DateField(
-        input_formats=('%Y-%m-%d',),
+        input_formats=('%Y-%m-%d', ),
         required=False,
         label='SMS Expiration Date',
         help_text='If this date is set, any messages older than this will be'

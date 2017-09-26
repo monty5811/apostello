@@ -54,7 +54,6 @@ def cleanup_expired_sms():
         SmsOutbound.objects.filter(time_sent__date__lt=d).delete()
 
 
-
 def handle_incoming_sms(msg):
     """Add incoming sms to log."""
     if has_expired(msg.date_created):

@@ -38,7 +38,7 @@ def import_onebody_csv():
 
     csv_url = resp.headers['Location']
 
-    sleep(WAIT_TIME) # wait for csv to be generated
+    sleep(WAIT_TIME)  # wait for csv to be generated
     tries = 0
     max_tries = 10
     while tries <= max_tries:

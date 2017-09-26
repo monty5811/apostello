@@ -342,7 +342,6 @@ class CloudMessageView(APIView):
 
 
 class AddCloudMessageId(CloudMessageView):
-
     def _post(self, endpoint, user):
         if endpoint is None:
             return {}
@@ -352,8 +351,8 @@ class AddCloudMessageId(CloudMessageView):
         )
         return {}
 
-class RemoveCloudMessageId(CloudMessageView):
 
+class RemoveCloudMessageId(CloudMessageView):
     def _post(self, endpoint, user):
         if endpoint is None:
             return {}

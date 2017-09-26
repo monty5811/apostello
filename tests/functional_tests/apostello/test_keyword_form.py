@@ -63,17 +63,13 @@ def add_linked_groups(b, wt):
 
 
 def add_owner(b, wt):
-    user = b.find_elements_by_id(
-        'userUpdateSelectedOwner'
-        )[0]
+    user = b.find_elements_by_id('userUpdateSelectedOwner')[0]
     user.click()
     return b
 
 
 def add_subscriber(b, wt):
-    user = b.find_elements_by_id(
-        'userUpdateSelectedSubscriber'
-        )[0]
+    user = b.find_elements_by_id('userUpdateSelectedSubscriber')[0]
     user.click()
     return b
 
