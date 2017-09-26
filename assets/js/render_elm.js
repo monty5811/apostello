@@ -42,7 +42,7 @@ function renderElm() {
     });
 
     window.addEventListener('storage', function(event) {
-      if (event.key === lsKey) {
+      if (event.key === lsKey && event.newValue !== null) {
         app.ports.loadDataStore.send(event.newValue);
       }
     });
