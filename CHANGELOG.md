@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [v2.5.4]
+
+ - Fix bug that prevented sending of cloud notifications
+ - Misc other bug fixes
+
 ## [v2.5.3]
 
 ### Fixed
