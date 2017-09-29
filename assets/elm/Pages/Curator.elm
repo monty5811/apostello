@@ -26,16 +26,19 @@ view tableModel sms =
                     ]
                 ]
     in
-    FT.uiTable head tableModel smsRow sms
+    FT.defaultTable head tableModel smsRow sms
 
 
-smsRow : SmsInbound -> Html Msg
+smsRow : SmsInbound -> ( String, Html Msg )
 smsRow sms =
-    tr []
+    ( toString sms.pk
+    , tr
+        []
         [ td [] [ text sms.content ]
         , td [] [ text (formatDate sms.time_received) ]
         , curateToggleCell sms
         ]
+    )
 
 
 curateToggleCell : SmsInbound -> Html Msg

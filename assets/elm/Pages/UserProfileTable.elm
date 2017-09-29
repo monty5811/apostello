@@ -18,7 +18,7 @@ import Store.Messages exposing (StoreMsg(ToggleProfileField))
 
 view : FT.Model -> RL.RemoteList UserProfile -> Html Msg
 view tableModel profiles =
-    FT.filteringTable "table-bordered" tableHead tableModel userprofileRow profiles
+    FT.table "table-bordered" tableHead tableModel userprofileRow profiles
 
 
 tableHead : Html Msg
@@ -38,9 +38,10 @@ tableHead =
         ]
 
 
-userprofileRow : UserProfile -> Html Msg
+userprofileRow : UserProfile -> ( String, Html Msg )
 userprofileRow userprofile =
-    tr [ class "text-center" ]
+    ( toString userprofile.pk
+    , tr [ class "text-center" ]
         [ td []
             [ spaLink a
                 []
@@ -56,6 +57,7 @@ userprofileRow userprofile =
         , toggleCell userprofile Outgoing
         , toggleCell userprofile Archiving
         ]
+    )
 
 
 toggleCell : UserProfile -> Field -> Html Msg

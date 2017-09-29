@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 
  - Fix bug that prevented sending of cloud notifications
  - Misc other bug fixes
+ - Misc usability tweaks
 
 ## [v2.5.3]
 

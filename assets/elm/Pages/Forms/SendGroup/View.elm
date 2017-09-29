@@ -29,8 +29,7 @@ import Route exposing (spaLink)
 view : Settings -> SendGroupModel -> RL.RemoteList RecipientGroup -> FormStatus -> Html Msg
 view settings model groups status =
     div []
-        [ br [] []
-        , case groups of
+        [ case groups of
             RL.FinalPageReceived groups_ ->
                 if List.length groups_ == 0 then
                     noGroups

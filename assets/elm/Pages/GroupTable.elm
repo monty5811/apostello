@@ -4,6 +4,7 @@ import Data exposing (RecipientGroup)
 import FilteringTable as FT
 import Helpers exposing (archiveCell)
 import Html exposing (Html, a, td, text, th, thead, tr)
+import Html.Attributes as A
 import Messages exposing (Msg(StoreMsg))
 import Pages exposing (Page(GroupForm))
 import Pages.Forms.Group.Model exposing (initialGroupFormModel)
@@ -18,7 +19,7 @@ import Store.Messages exposing (StoreMsg(ToggleGroupArchive))
 
 view : FT.Model -> RL.RemoteList RecipientGroup -> Html Msg
 view tableModel groups =
-    FT.uiTable tableHead tableModel groupRow groups
+    FT.defaultTable tableHead tableModel groupRow groups
 
 
 tableHead : Html Msg
@@ -26,18 +27,20 @@ tableHead =
     thead []
         [ tr []
             [ th [] [ text "Name" ]
-            , th [] [ text "Description" ]
+            , th [ A.class "hide-sm-down" ] [ text "Description" ]
             , th [] [ text "Cost" ]
-            , th [] []
+            , th [ A.class "hide-sm-down" ] []
             ]
         ]
 
 
-groupRow : RecipientGroup -> Html Msg
+groupRow : RecipientGroup -> ( String, Html Msg )
 groupRow group =
-    tr []
+    ( toString group.pk
+    , tr []
         [ td [] [ spaLink a [] [ text group.name ] <| GroupForm initialGroupFormModel <| Just group.pk ]
-        , td [] [ text group.description ]
+        , td [ A.class "hide-sm-down" ] [ text group.description ]
         , td [] [ text ("$" ++ Round.round 2 group.cost) ]
         , archiveCell group.is_archived (StoreMsg (ToggleGroupArchive group.is_archived group.pk))
         ]
+    )

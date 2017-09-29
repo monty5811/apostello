@@ -18,7 +18,7 @@ import Route exposing (spaLink)
 
 view : FT.Model -> RL.RemoteList SmsOutbound -> Html Msg
 view tableModel sms =
-    FT.uiTable tableHead tableModel smsRow sms
+    FT.defaultTable tableHead tableModel smsRow sms
 
 
 tableHead : Html Msg
@@ -32,7 +32,7 @@ tableHead =
         ]
 
 
-smsRow : SmsOutbound -> Html Msg
+smsRow : SmsOutbound -> ( String, Html Msg )
 smsRow sms =
     let
         recipient =
@@ -46,10 +46,12 @@ smsRow sms =
         contactPage =
             ContactForm initialContactFormModel <| Just recipient.pk
     in
-    tr []
+    ( toString sms.pk
+    , tr []
         [ td []
             [ spaLink a [ A.style [ "color" => "var(--color-black)" ] ] [ text recipient.full_name ] contactPage
             ]
         , td [] [ text sms.content ]
         , td [] [ text (formatDate sms.time_sent) ]
         ]
+    )

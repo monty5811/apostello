@@ -22,7 +22,7 @@ import Store.Messages exposing (StoreMsg(ToggleInboundSmsArchive, ToggleInboundS
 view : Bool -> FT.Model -> RL.RemoteList SmsInbound -> Bool -> String -> Html Msg
 view viewingArchive tableModel sms ticked keyword =
     div []
-        [ FT.uiTable tableHead tableModel smsRow sms
+        [ FT.defaultTable tableHead tableModel smsRow sms
         , br [] []
         , archiveAllForm viewingArchive ticked keyword
         ]
@@ -36,7 +36,7 @@ tableHead =
             , th [] [ text "Time Received" ]
             , th [] [ text "Message" ]
             , th [] [ text "Requires Action?" ]
-            , th [] []
+            , th [ A.class "hide-sm-down" ] []
             ]
         ]
 
@@ -77,15 +77,17 @@ archiveAllButton ticked =
             button [ A.class "button button-danger", A.disabled True ] [ text "Archive all!" ]
 
 
-smsRow : SmsInbound -> Html Msg
+smsRow : SmsInbound -> ( String, Html Msg )
 smsRow sms =
-    tr []
+    ( toString sms.pk
+    , tr []
         [ recipientCell sms
         , td [] [ text (formatDate sms.time_received) ]
         , td [] [ text sms.content ]
         , td [] [ dealtWithButton sms ]
         , archiveCell sms.is_archived (StoreMsg (ToggleInboundSmsArchive sms.is_archived sms.pk))
         ]
+    )
 
 
 recipientCell : SmsInbound -> Html Msg

@@ -21,7 +21,7 @@ view tableModel groups =
     div []
         [ div [] [ fetchButton, pullButton ]
         , br [] []
-        , FT.filteringTable "table-striped" tableHead tableModel groupRow groups
+        , FT.table "table-striped" tableHead tableModel groupRow groups
         ]
 
 
@@ -58,13 +58,15 @@ pullButton =
         [ text "Pull Groups" ]
 
 
-groupRow : ElvantoGroup -> Html Msg
+groupRow : ElvantoGroup -> ( String, Html Msg )
 groupRow group =
-    tr []
+    ( toString group.pk
+    , tr []
         [ td [] [ text group.name ]
         , td [] [ text (formatDate group.last_synced) ]
         , td [] [ toggleSyncButton group ]
         ]
+    )
 
 
 toggleSyncButton : ElvantoGroup -> Html Msg

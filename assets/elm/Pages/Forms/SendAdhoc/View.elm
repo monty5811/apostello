@@ -29,8 +29,7 @@ import Route exposing (spaLink)
 view : Settings -> SendAdhocModel -> RL.RemoteList Recipient -> FormStatus -> Html Msg
 view settings model contacts status =
     div []
-        [ br [] []
-        , case contacts of
+        [ case contacts of
             RL.FinalPageReceived contacts_ ->
                 if List.length contacts_ == 0 then
                     noContacts

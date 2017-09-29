@@ -26,14 +26,14 @@ view tableModel recipients =
                     [ th [] [ text "Name" ]
                     , th [] [ text "Last Message" ]
                     , th [] [ text "Received" ]
-                    , th [] []
+                    , th [ A.class "hide-sm-down" ] []
                     ]
                 ]
     in
-    FT.uiTable head tableModel recipientRow recipients
+    FT.defaultTable head tableModel recipientRow recipients
 
 
-recipientRow : Recipient -> Html Msg
+recipientRow : Recipient -> ( String, Html Msg )
 recipientRow recipient =
     let
         style =
@@ -55,7 +55,8 @@ recipientRow recipient =
                 Nothing ->
                     ""
     in
-    tr [ A.style style ]
+    ( toString recipient.pk
+    , tr [ A.style style ]
         [ td []
             [ spaLink a [] [ text recipient.full_name ] <| ContactForm initialContactFormModel <| Just recipient.pk
             , doNotReplyIndicator recipient.do_not_reply
@@ -64,6 +65,7 @@ recipientRow recipient =
         , td [] [ text <| formatDate timeReceived ]
         , archiveCell recipient.is_archived (StoreMsg (ToggleRecipientArchive recipient.is_archived recipient.pk))
         ]
+    )
 
 
 doNotReplyIndicator : Bool -> Html Msg

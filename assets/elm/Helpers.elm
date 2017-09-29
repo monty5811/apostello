@@ -71,7 +71,7 @@ calculateSmsCost smsCostPerMsg msg =
 
 archiveCell : Bool -> Msg -> Html Msg
 archiveCell isArchived msg =
-    td []
+    td [ class "hide-sm-down" ]
         [ a [ class "button button-secondary", onClick msg, id "archiveItemButton" ] [ text <| archiveText isArchived ]
         ]
 

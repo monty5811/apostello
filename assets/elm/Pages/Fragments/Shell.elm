@@ -3,6 +3,7 @@ module Pages.Fragments.Shell exposing (view)
 import Html exposing (Html, div, h3, text)
 import Html.Attributes exposing (class, id, style)
 import Html.Events as E
+import Html.Keyed
 import Messages exposing (Msg(ToggleMenu))
 import Models exposing (MenuModel(MenuHidden, MenuVisible), Model)
 import Pages exposing (Page(..))
@@ -29,34 +30,45 @@ view model mainContent fab =
 
 commonShell : Model -> Html Msg -> Html Msg -> Html Msg
 commonShell model mainContent fab =
-    case model.menuState of
-        MenuVisible ->
-            div [ id "menuWrapper" ] <|
-                Html.a
-                    [ class "button button-lg"
-                    , id "close"
-                    , E.onClick ToggleMenu
+    Html.div
+        []
+        [ Html.header [ id "head", class "text-center" ]
+            [ case model.page of
+                Home ->
+                    Html.h2 [] [ text "apostello" ]
+
+                _ ->
+                    spaLink Html.a [] [ Html.h2 [] [ text "apostello" ] ] Home
+            , Html.a [ class "button", E.onClick ToggleMenu ] [ text "Menu" ]
+            ]
+        , Html.main_ [ id "wrap" ]
+            [ fab
+            , div [ id "content" ] <|
+                List.concat
+                    [ [ h3 [] [ text <| title model.page ] ]
+                    , Notif.view model.notifications
+                    , [ mainContent ]
                     ]
-                    [ text "Close" ]
-                    :: Menu.menu model.page model.settings model.dataStore model.webPush
+            ]
+        , div [ id "menuWrapper", class <| menuClass model.menuState ] <|
+            Html.a
+                [ class "button button-lg"
+                , id "close"
+                , E.onClick ToggleMenu
+                ]
+                [ text "Close" ]
+                :: Menu.menu model.page model.settings model.dataStore model.webPush
+        ]
+
+
+menuClass : MenuModel -> String
+menuClass menuState =
+    case menuState of
+        MenuVisible ->
+            "menuVisible"
 
         MenuHidden ->
-            div []
-                [ Html.header [ id "head", class "text-center" ]
-                    [ Html.h2 [] [ text "apostello" ]
-                    , spaLink Html.a [ class "button" ] [ text "Home" ] Home
-                    , Html.a [ class "button", E.onClick ToggleMenu ] [ text "Menu" ]
-                    ]
-                , Html.main_ [ id "wrap" ]
-                    [ fab
-                    , div [ id "content" ] <|
-                        List.concat
-                            [ [ h3 [] [ text <| title model.page ] ]
-                            , Notif.view model.notifications
-                            , [ mainContent ]
-                            ]
-                    ]
-                ]
+            "menuHidden"
 
 
 title : Page -> String

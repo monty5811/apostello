@@ -24,7 +24,7 @@ view : FT.Model -> Time.Time -> RL.RemoteList QueuedSms -> Html Msg
 view tableModel currentTime sms =
     sms
         |> RL.filter (onlyFuture currentTime)
-        |> FT.uiTable tableHead tableModel smsRow
+        |> FT.defaultTable tableHead tableModel smsRow
 
 
 tableHead : Html Msg
@@ -51,7 +51,7 @@ onlyFuture t sms =
             False
 
 
-smsRow : QueuedSms -> Html Msg
+smsRow : QueuedSms -> ( String, Html Msg )
 smsRow sms =
     let
         style =
@@ -62,7 +62,8 @@ smsRow sms =
                 False ->
                     []
     in
-    tr [ A.style style ]
+    ( toString sms.pk
+    , tr [ A.style style ]
         [ td [] [ text sms.sent_by ]
         , td [] [ spaLink a [] [ text sms.recipient.full_name ] <| ContactForm initialContactFormModel <| Just sms.recipient.pk ]
         , td [] [ groupLink sms.recipient_group ]
@@ -70,6 +71,7 @@ smsRow sms =
         , td [] [ text sms.time_to_send_formatted ]
         , td [] [ cancelButton sms ]
         ]
+    )
 
 
 groupLink : Maybe RecipientGroup -> Html Msg

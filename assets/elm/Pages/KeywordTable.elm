@@ -18,7 +18,7 @@ import Store.Messages exposing (StoreMsg(ToggleKeywordArchive))
 
 view : FT.Model -> RL.RemoteList Keyword -> Html Msg
 view tableModel keywords =
-    FT.filteringTable "table-striped" tableHead tableModel keywordRow keywords
+    FT.table "table-striped" tableHead tableModel keywordRow keywords
 
 
 tableHead : Html Msg
@@ -27,26 +27,28 @@ tableHead =
         [ tr []
             [ th [] []
             , th [] [ text "Matches" ]
-            , th [] [ text "Description" ]
-            , th [] [ text "Auto Reply" ]
+            , th [ class "hide-sm-down" ] [ text "Description" ]
+            , th [ class "hide-sm-down" ] [ text "Auto Reply" ]
             , th [] [ text "Status" ]
             , th [] []
-            , th [] []
+            , th [ class "hide-sm-down" ] []
             ]
         ]
 
 
-keywordRow : Keyword -> Html Msg
+keywordRow : Keyword -> ( String, Html Msg )
 keywordRow keyword =
-    tr []
+    ( toString keyword.pk
+    , tr []
         [ td [] [ spaLink a [] [ text keyword.keyword ] <| KeyRespTable False keyword.is_archived keyword.keyword ]
         , td [ class "text-center" ] [ spaLink a [] [ text keyword.num_replies ] <| KeyRespTable False keyword.is_archived keyword.keyword ]
-        , td [] [ text keyword.description ]
-        , td [] [ text keyword.current_response ]
+        , td [ class "hide-sm-down" ] [ text keyword.description ]
+        , td [ class "hide-sm-down" ] [ text keyword.current_response ]
         , keywordStatusCell keyword.is_live
         , td [] [ spaLink a [ class "button" ] [ text "Edit" ] (KeywordForm initialKeywordFormModel <| Just keyword.keyword) ]
         , archiveCell keyword.is_archived (StoreMsg (ToggleKeywordArchive keyword.is_archived keyword.keyword))
         ]
+    )
 
 
 keywordStatusCell : Bool -> Html Msg

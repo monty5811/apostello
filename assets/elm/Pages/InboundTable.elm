@@ -33,18 +33,20 @@ view tableModel sms =
                     ]
                 ]
     in
-    FT.uiTable head tableModel smsRow sms
+    FT.defaultTable head tableModel smsRow sms
 
 
-smsRow : SmsInbound -> Html Msg
+smsRow : SmsInbound -> ( String, Html Msg )
 smsRow sms =
-    tr [ A.style [ "backgroundColor" => sms.matched_colour ] ]
+    ( toString sms.pk
+    , tr [ A.style [ "backgroundColor" => sms.matched_colour ] ]
         [ recipientCell sms
         , keywordCell sms
         , td [] [ text sms.content ]
         , td [] [ text (formatDate sms.time_received) ]
         , reprocessCell sms
         ]
+    )
 
 
 recipientCell : SmsInbound -> Html Msg

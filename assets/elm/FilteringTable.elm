@@ -1,18 +1,19 @@
 module FilteringTable
     exposing
         ( Model
+        , defaultTable
         , filterInput
         , filterRecord
-        , filteringTable
         , initialModel
+        , table
         , textToRegex
-        , uiTable
         , update
         )
 
 import Html exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
+import Html.Keyed
 import List.Extra as LE
 import Messages exposing (Msg(TableMsg), TableMsg(GoToPage, UpdateFilter))
 import Pages.Fragments.Loader exposing (loader)
@@ -77,13 +78,13 @@ emptyView =
     Html.div [ A.class "alert alert-info" ] [ Html.text "No data to display" ]
 
 
-uiTable : Html Msg -> Model -> (a -> Html Msg) -> RL.RemoteList a -> Html Msg
-uiTable tableHead tableModel rowConstructor data =
-    filteringTable "" tableHead tableModel rowConstructor data
+defaultTable : Html Msg -> Model -> (a -> ( String, Html Msg )) -> RL.RemoteList a -> Html Msg
+defaultTable tableHead tableModel rowConstructor data =
+    table "" tableHead tableModel rowConstructor data
 
 
-filteringTable : String -> Html Msg -> Model -> (a -> Html Msg) -> RL.RemoteList a -> Html Msg
-filteringTable tableClass tableHead model rowConstructor data =
+table : String -> Html Msg -> Model -> (a -> ( String, Html Msg )) -> RL.RemoteList a -> Html Msg
+table tableClass tableHead model rowConstructor data =
     let
         items =
             RL.toList data
@@ -113,11 +114,11 @@ filteringTable tableClass tableHead model rowConstructor data =
                     emptyView
 
         _ ->
-            Html.div []
+            Html.div [ A.class "xOverflow" ]
                 [ filterInput (TableMsg << UpdateFilter)
                 , Html.table [ A.class tableClass ]
                     [ tableHead
-                    , Html.tbody [] (getPage curPage pages |> List.map rowConstructor)
+                    , Html.Keyed.node "tbody" [] (getPage curPage pages |> List.map rowConstructor)
                     ]
                 , pageControls curPage numPages
                 ]

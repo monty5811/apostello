@@ -25,6 +25,7 @@
   "scripts": {
     "build": "npm run css && npm run js",
     "css": "node build-css.js --build",
+    "watchcss": "find . -name '*.css' | entr -c node build-css.js --build",
     "js": "webpack --config webpack.production.config.js --color --progress",
     "format-elm": "elm-format --yes elm tests-elm",
     "format-js": "prettier --single-quote --trailing-comma es5 --write \"js/**/*.js\"",
