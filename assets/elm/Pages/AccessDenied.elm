@@ -2,13 +2,12 @@ module Pages.AccessDenied exposing (view)
 
 import Html exposing (..)
 import Html.Attributes exposing (class)
-import Messages exposing (..)
 
 
 -- Main view
 
 
-view : Html Msg
+view : Html msg
 view =
     div [ class "alert alert-danger" ]
         [ p [] [ text "Uh, oh, you don't have access to this page." ]

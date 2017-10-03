@@ -1,18 +1,18 @@
 module Update exposing (update)
 
-import Dict
 import FilteringTable as FT
 import Forms.DatePickers exposing (initDateTimePickers)
 import Forms.Update as F
 import Messages exposing (..)
 import Models exposing (MenuModel(MenuHidden, MenuVisible), Model, Settings)
 import Navigation
+import Notification as Notif
+import PageVisibility
 import Pages.ApiSetup.Update as ApiSetup
 import Pages.ElvantoImport.Update as ElvImp
 import Pages.FirstRun.Update as FR
 import Pages.Forms.DefaultResponses.Remote as DRFR
 import Pages.Forms.SiteConfig.Remote as SCFR
-import Pages.Fragments.Notification as Notif
 import Pages.Fragments.SidePanel.Update as SidePanel
 import Pages.GroupComposer.Update as GC
 import Pages.KeyRespTable.Update as KRT
@@ -54,7 +54,7 @@ updateHelper msg model =
 
         NewUrl str ->
             ( { model
-                | notifications = Dict.empty
+                | notifications = Notif.empty
                 , menuState = MenuHidden
               }
             , [ Navigation.newUrl str ]
@@ -87,8 +87,8 @@ updateHelper msg model =
         SidePanelMsg subMsg ->
             SidePanel.update subMsg model
 
-        RemoveNotification id ->
-            ( { model | notifications = Notif.remove id model.notifications }, [] )
+        NotificationMsg subMsg ->
+            ( { model | notifications = Notif.update subMsg model.notifications }, [] )
 
         FirstRunMsg subMsg ->
             FR.update subMsg model
@@ -111,6 +111,19 @@ updateHelper msg model =
 
         CurrentTime t ->
             ( { model | currentTime = t }, [] )
+
+        VisibilityChange state ->
+            let
+                tmp =
+                    ( { model | pageVisibility = state }, [] )
+            in
+            case state of
+                PageVisibility.Hidden ->
+                    tmp
+
+                PageVisibility.Visible ->
+                    -- fetch data when page becomes visible again
+                    maybeFetchData tmp
 
         WebPushMsg subMsg ->
             let

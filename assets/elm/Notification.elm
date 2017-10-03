@@ -1,40 +1,52 @@
-module Pages.Fragments.Notification
+module Notification
     exposing
         ( DjangoMessage
+        , Msg
         , Notification
-        , NotificationType
-        , addListOfDjangoMessagesNoDestroy
+        , Notifications
+        , addListOfDjangoMessages
+        , addRefreshNotif
         , createInfo
         , createLoadingFailed
         , createNotSaved
         , createSuccess
         , decodeDjangoMessage
-        , refreshNotifMessage
+        , empty
         , remove
+        , update
         , view
         )
 
-import Dict
 import Html exposing (Html)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (decode, required)
-import Messages exposing (Msg(RemoveNotification))
-import Process
-import Task
-import Time
+
+
+type Msg
+    = Remove Notification
+
+
+update : Msg -> Notifications -> Notifications
+update msg notifs =
+    case msg of
+        Remove n ->
+            remove n notifs
+
+
+empty : Notifications
+empty =
+    []
 
 
 view : Notifications -> List (Html Msg)
 view notifications =
-    notifications
-        |> Dict.toList
-        |> List.map tView
+    List.map tView notifications
 
 
-tView : ( Int, Notification ) -> Html Msg
-tView ( id, notification ) =
+tView : Notification -> Html Msg
+tView notification =
     let
         messageType =
             case notification.type_ of
@@ -62,7 +74,7 @@ tView ( id, notification ) =
     Html.div [ class className ] <|
         [ Html.i
             [ class "fa fa-close float-right"
-            , onClick <| RemoveNotification id
+            , onClick <| Remove notification
             ]
             []
         ]
@@ -80,7 +92,7 @@ type alias Notification =
 
 
 type alias Notifications =
-    Dict.Dict Int Notification
+    List Notification
 
 
 type NotificationType
@@ -107,36 +119,22 @@ decodeDjangoMessage =
 -- Update
 
 
-delayAction : Time.Time -> msg -> Cmd msg
-delayAction t msg =
-    Process.sleep t
-        |> Task.andThen (always <| Task.succeed msg)
-        |> Task.perform identity
+remove : Notification -> Notifications -> Notifications
+remove notification notifications =
+    List.filter (removeHelp notification) notifications
 
 
-remove : Int -> Notifications -> Notifications
-remove id notifications =
-    Dict.remove id notifications
+removeHelp : Notification -> Notification -> Bool
+removeHelp notifToRemove curNotif =
+    not (notifToRemove == curNotif)
 
 
-create : Notifications -> String -> NotificationType -> ( Notifications, Cmd Msg )
+create : Notifications -> String -> NotificationType -> Notifications
 create notifications text type_ =
-    let
-        maxId =
-            notifications
-                |> Dict.keys
-                |> List.maximum
-                |> Maybe.withDefault 0
-
-        newNotifications =
-            Dict.insert (maxId + 1) (Notification type_ text) notifications
-    in
-    ( newNotifications
-    , delayAction (20 * Time.second) <| RemoveNotification (maxId + 1)
-    )
+    Notification type_ text :: notifications
 
 
-createFromDjangoMessage : DjangoMessage -> Notifications -> ( Notifications, Cmd Msg )
+createFromDjangoMessage : DjangoMessage -> Notifications -> Notifications
 createFromDjangoMessage dm notifications =
     let
         type_ =
@@ -159,15 +157,9 @@ createFromDjangoMessage dm notifications =
     create notifications dm.text type_
 
 
-createFromDjangoMessageNoDestroy : DjangoMessage -> Notifications -> Notifications
-createFromDjangoMessageNoDestroy message notifications =
-    createFromDjangoMessage message notifications
-        |> Tuple.first
-
-
-addListOfDjangoMessagesNoDestroy : List DjangoMessage -> Notifications -> Notifications
-addListOfDjangoMessagesNoDestroy msgs notifications =
-    List.foldl createFromDjangoMessageNoDestroy notifications msgs
+addListOfDjangoMessages : List DjangoMessage -> Notifications -> Notifications
+addListOfDjangoMessages msgs notifications =
+    List.foldl createFromDjangoMessage notifications msgs
 
 
 refreshNotifMessage : DjangoMessage
@@ -175,26 +167,31 @@ refreshNotifMessage =
     DjangoMessage "error" "Something went wrong there, try refreshing the page and going again."
 
 
-createWarning : Notifications -> String -> ( Notifications, Cmd Msg )
+addRefreshNotif : Notifications -> Notifications
+addRefreshNotif notifications =
+    addListOfDjangoMessages [ refreshNotifMessage ] notifications
+
+
+createWarning : Notifications -> String -> Notifications
 createWarning notifications text =
     create notifications text WarningNotification
 
 
-createInfo : Notifications -> String -> ( Notifications, Cmd Msg )
+createInfo : Notifications -> String -> Notifications
 createInfo notifications text =
     create notifications text InfoNotification
 
 
-createSuccess : Notifications -> String -> ( Notifications, Cmd Msg )
+createSuccess : Notifications -> String -> Notifications
 createSuccess notifications text =
     create notifications text SuccessNotification
 
 
-createNotSaved : Notifications -> ( Notifications, Cmd Msg )
+createNotSaved : Notifications -> Notifications
 createNotSaved notifications =
     createWarning notifications "Something went wrong, there :-( Your changes may not have been saved"
 
 
-createLoadingFailed : String -> Notifications -> ( Notifications, Cmd Msg )
+createLoadingFailed : String -> Notifications -> Notifications
 createLoadingFailed msg notifications =
     createWarning notifications msg

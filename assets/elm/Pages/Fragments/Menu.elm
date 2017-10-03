@@ -2,7 +2,7 @@ module Pages.Fragments.Menu exposing (allUsersMenuItems, menu)
 
 import Data exposing (UserProfile)
 import Html exposing (Html, a, div, i, text)
-import Html.Attributes as A exposing (class, href, id)
+import Html.Attributes as A exposing (class, href)
 import Messages exposing (Msg(WebPushMsg))
 import Models exposing (Settings)
 import Pages exposing (Page(..), initSendAdhoc, initSendGroup)
@@ -10,13 +10,12 @@ import Pages.Forms.ContactImport.Model exposing (initialContactImportModel)
 import Pages.GroupComposer.Model exposing (initialGroupComposerModel)
 import Rocket exposing ((=>))
 import Route exposing (spaLink)
-import Store.Model as Store
 import Urls
 import WebPush
 
 
-menu : Page -> Settings -> Store.DataStore -> WebPush.Model -> List (Html Msg)
-menu page settings dataStore wp =
+menu : Settings -> WebPush.Model -> List (Html Msg)
+menu settings wp =
     allUsersMenuItems settings wp
 
 
@@ -66,23 +65,9 @@ allUsersMenuItems settings wp =
         , lockedItem False Urls.account_change_password "Change Password" (not userPerms.user.is_social)
         , item Urls.account_logout "Logout" True
         ]
+    , Html.div [ A.id "webpush", A.style [ "margin-left" => "2rem" ] ] <| pushMenu isStaff userPerms wp
+    , Html.div [ A.class "text-right", A.style [ "margin-right" => "2rem" ] ] [ text settings.twilioFromNumber ]
     ]
-        ++ [ Html.div [ A.id "webpush", A.style [ "margin-left" => "2rem" ] ] <| pushMenu isStaff userPerms wp ]
-        ++ [ Html.div [ A.class "text-right", A.style [ "margin-right" => "2rem" ] ] [ text settings.twilioFromNumber ] ]
-
-
-loadingIndicator : Page -> Store.DataStore -> Html Msg
-loadingIndicator page dataStore =
-    let
-        spinnerClass =
-            if Store.allFinished page dataStore then
-                ""
-            else if Store.anyFailed page dataStore then
-                "red spinner icon"
-            else
-                "green spinner icon"
-    in
-    div [ class "right aligned item" ] [ i [ class spinnerClass ] [] ]
 
 
 pushMenu : Bool -> UserProfile -> WebPush.Model -> List (Html Msg)

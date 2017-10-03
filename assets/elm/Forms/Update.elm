@@ -6,6 +6,7 @@ import Http
 import Json.Decode as Decode
 import Messages exposing (FormMsg(..), Msg)
 import Models exposing (Model, Settings)
+import Notification as Notif
 import Pages as P
 import Pages.Forms.Contact.Update as CF
 import Pages.Forms.ContactImport.Update as CI
@@ -18,7 +19,6 @@ import Pages.Forms.SendGroup.Update as SG
 import Pages.Forms.SiteConfig.Model exposing (SiteConfigFormModel)
 import Pages.Forms.SiteConfig.Update as SCF
 import Pages.Forms.UserProfile.Update as UPF
-import Pages.Fragments.Notification as Notif
 import RemoteList as RL
 
 
@@ -33,7 +33,7 @@ update msg model =
                 Ok data ->
                     ( { model
                         | formStatus = Success
-                        , notifications = Notif.addListOfDjangoMessagesNoDestroy data.messages model.notifications
+                        , notifications = Notif.addListOfDjangoMessages data.messages model.notifications
                       }
                     , okMsg
                     )
@@ -48,7 +48,7 @@ update msg model =
                         Ok data ->
                             ( { model
                                 | formStatus = Failed data.errors
-                                , notifications = Notif.addListOfDjangoMessagesNoDestroy data.messages model.notifications
+                                , notifications = Notif.addListOfDjangoMessages data.messages model.notifications
                               }
                             , []
                             )
@@ -56,7 +56,7 @@ update msg model =
                         Err e ->
                             ( { model
                                 | formStatus = Failed <| formDecodeError e
-                                , notifications = Notif.addListOfDjangoMessagesNoDestroy [ Notif.refreshNotifMessage ] model.notifications
+                                , notifications = Notif.addRefreshNotif model.notifications
                               }
                             , []
                             )
@@ -64,7 +64,7 @@ update msg model =
                 _ ->
                     ( { model
                         | formStatus = Failed noErrors
-                        , notifications = Notif.addListOfDjangoMessagesNoDestroy [ Notif.refreshNotifMessage ] model.notifications
+                        , notifications = Notif.addRefreshNotif model.notifications
                       }
                     , []
                     )

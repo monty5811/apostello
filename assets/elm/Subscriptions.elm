@@ -2,6 +2,7 @@ module Subscriptions exposing (subscriptions)
 
 import Messages as M
 import Models exposing (Model)
+import PageVisibility
 import Pages exposing (Page(Curator, SendAdhoc, SendGroup, Wall))
 import Ports exposing (loadDataStore)
 import Store.Messages exposing (StoreMsg(LoadData, LoadDataStore))
@@ -13,10 +14,11 @@ import WebPush
 subscriptions : Model -> Sub M.Msg
 subscriptions model =
     Sub.batch
-        [ reloadData model.page model.dataStore
+        [ reloadData model.pageVisibility model.page model.dataStore
         , getCurrentTime
         , loadDataStore (M.StoreMsg << LoadDataStore)
         , Sub.map M.WebPushMsg <| WebPush.subscriptions model.webPush
+        , PageVisibility.visibilityChanges M.VisibilityChange
         ]
 
 
@@ -25,8 +27,8 @@ getCurrentTime =
     Time.every (60 * second) (\t -> M.CurrentTime t)
 
 
-reloadData : Page -> Store.DataStore -> Sub M.Msg
-reloadData page dataStore =
+reloadData : PageVisibility.Visibility -> Page -> Store.DataStore -> Sub M.Msg
+reloadData pageVisibility page dataStore =
     let
         allFinished =
             Store.allFinished page dataStore
@@ -54,9 +56,12 @@ reloadData page dataStore =
                         _ ->
                             60 * second
             in
-            if allFinished then
-                Time.every interval (\_ -> M.StoreMsg LoadData)
-            else if anyFailed then
-                Time.every interval (\_ -> M.StoreMsg LoadData)
-            else
-                Sub.none
+            case pageVisibility of
+                PageVisibility.Visible ->
+                    if allFinished || anyFailed then
+                        Time.every interval (\_ -> M.StoreMsg LoadData)
+                    else
+                        Sub.none
+
+                PageVisibility.Hidden ->
+                    Sub.none

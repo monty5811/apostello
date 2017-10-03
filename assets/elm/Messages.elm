@@ -2,6 +2,8 @@ module Messages exposing (..)
 
 import Http
 import Navigation
+import Notification as Notif
+import PageVisibility
 import Pages.ApiSetup.Messages exposing (ApiSetupMsg)
 import Pages.ElvantoImport.Messages exposing (ElvantoMsg)
 import Pages.FirstRun.Messages exposing (FirstRunMsg)
@@ -40,10 +42,11 @@ type Msg
     | SidePanelMsg SidePanelMsg
     | ApiSetupMsg ApiSetupMsg
     | WebPushMsg WebPush.Msg
-    | RemoveNotification Int
+    | NotificationMsg Notif.Msg
     | CurrentTime Time.Time
     | Nope
     | ToggleMenu
+    | VisibilityChange PageVisibility.Visibility
 
 
 type SidePanelMsg

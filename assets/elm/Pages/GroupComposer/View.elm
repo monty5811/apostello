@@ -178,7 +178,7 @@ groupLink people =
 -- Help
 
 
-helpView : Html Msg
+helpView : Html msg
 helpView =
     div []
         [ h2 [] [ text "Group Composer" ]

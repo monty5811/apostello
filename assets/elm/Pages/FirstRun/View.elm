@@ -1,6 +1,6 @@
 module Pages.FirstRun.View exposing (view)
 
-import Html exposing (Html, br, button, div, h3, input, label, p, pre, text)
+import Html exposing (Html, button, div, h3, input, label, p, pre, text)
 import Html.Attributes as A
 import Html.Events exposing (onInput, onSubmit)
 import Messages exposing (Msg(FirstRunMsg))

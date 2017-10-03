@@ -39,7 +39,7 @@ update csrftoken msg model =
                 event =
                     Decode.decodeValue decodeEvent eventValue
             in
-            case Debug.log "event" event of
+            case event of
                 Err err ->
                     Error ! []
 
@@ -161,7 +161,7 @@ type SubUpdate
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     acceptPushSub UpdateRecieved
 
 

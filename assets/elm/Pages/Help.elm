@@ -2,10 +2,9 @@ module Pages.Help exposing (view)
 
 import Html exposing (Html, code, div, h3, p, text)
 import Html.Attributes exposing (id)
-import Messages exposing (Msg)
 
 
-view : Html Msg
+view : Html msg
 view =
     div
         []

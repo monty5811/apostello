@@ -8,8 +8,8 @@ import Http
 import Json.Decode as Decode
 import Messages exposing (Msg)
 import Models exposing (Model)
+import Notification as Notif
 import Pages.FirstRun.Model exposing (decodeFirstRunResp)
-import Pages.Fragments.Notification as Notif
 import RemoteList as RL
 import Store.DataTypes exposing (RemoteDataType(..))
 import Store.Decode exposing (decodeDataStore)
@@ -188,12 +188,12 @@ handleLoadingFailed dt err model =
     let
         niceMsg =
             userFacingErrorMessage err
-
-        ( notifications, destroyNotifCmd ) =
-            Notif.createLoadingFailed niceMsg model.notifications
     in
-    ( { model | dataStore = handleFailed dt niceMsg model.dataStore, notifications = notifications }
-    , [ destroyNotifCmd ]
+    ( { model
+        | dataStore = handleFailed dt niceMsg model.dataStore
+        , notifications = Notif.createLoadingFailed niceMsg model.notifications
+      }
+    , []
     )
 
 

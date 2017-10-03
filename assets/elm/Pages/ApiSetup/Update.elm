@@ -6,9 +6,9 @@ import Json.Decode as Decode
 import Json.Encode as Encode
 import Messages exposing (Msg(ApiSetupMsg))
 import Models exposing (Model)
+import Notification as Notif
 import Pages as P
 import Pages.ApiSetup.Messages exposing (ApiSetupMsg(..))
-import Pages.Fragments.Notification as Notif
 import Urls
 
 
@@ -35,9 +35,7 @@ update msg model =
         ReceiveApiKey (Err _) ->
             case model.page of
                 P.ApiSetup _ ->
-                    ( { model
-                        | notifications = Notif.addListOfDjangoMessagesNoDestroy [ Notif.refreshNotifMessage ] model.notifications
-                      }
+                    ( { model | notifications = Notif.addRefreshNotif model.notifications }
                     , []
                     )
 

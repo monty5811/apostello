@@ -7,7 +7,7 @@ import FilteringTable exposing (filterInput, filterRecord)
 import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus)
 import Forms.View exposing (contentField, form, sendButton, timeField)
 import Helpers exposing (onClick)
-import Html exposing (Html, a, br, div, i, input, label, p, text)
+import Html exposing (Html, a, div, i, label, p, text)
 import Html.Attributes as A
 import Html.Keyed
 import Messages exposing (FormMsg(PostForm, SendAdhocMsg), Msg(FormMsg))

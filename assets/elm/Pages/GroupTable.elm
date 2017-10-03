@@ -22,7 +22,7 @@ view tableModel groups =
     FT.defaultTable tableHead tableModel groupRow groups
 
 
-tableHead : Html Msg
+tableHead : Html msg
 tableHead =
     thead []
         [ tr []

@@ -2,11 +2,10 @@ module Pages.Usage exposing (view)
 
 import Html exposing (Html, div, embed, figure, h3, text)
 import Html.Attributes as A
-import Messages exposing (Msg)
 import Rocket exposing ((=>))
 
 
-view : Html Msg
+view : Html msg
 view =
     div
         [ A.style [ "margin" => "2rem" ] ]
@@ -26,7 +25,7 @@ view =
         ]
 
 
-row : List (Html Msg) -> Html Msg
+row : List (Html msg) -> Html msg
 row l =
     div
         [ A.style
@@ -38,7 +37,7 @@ row l =
         l
 
 
-fig : String -> String -> String -> Html Msg
+fig : String -> String -> String -> Html msg
 fig header src col =
     div [ A.style [ "grid-column" => col ] ]
         [ h3 [] [ text header ]

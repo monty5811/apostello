@@ -9,14 +9,14 @@ module Models
         )
 
 import Data exposing (UserProfile, decodeUserProfile)
-import Dict exposing (Dict)
 import DjangoSend exposing (CSRFToken(CSRFToken))
 import FilteringTable as FT
 import Forms.Model exposing (FormStatus(NoAction))
 import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (decode, required)
+import Notification as Notif
+import PageVisibility
 import Pages exposing (Page)
-import Pages.Fragments.Notification exposing (DjangoMessage, Notification, NotificationType(..))
 import Store.Model exposing (DataStore, emptyDataStore)
 import Time
 import WebPush
@@ -30,11 +30,12 @@ type alias Model =
     , table : FT.Model
     , settings : Settings
     , dataStore : DataStore
-    , notifications : Dict Int Notification
+    , notifications : Notif.Notifications
     , currentTime : Time.Time
     , formStatus : FormStatus
     , webPush : WebPush.Model
     , menuState : MenuModel
+    , pageVisibility : PageVisibility.Visibility
     }
 
 
@@ -44,11 +45,12 @@ initialModel settings page =
     , table = FT.initialModel
     , settings = settings
     , dataStore = emptyDataStore
-    , notifications = Dict.empty
+    , notifications = Notif.empty
     , currentTime = 0
     , formStatus = NoAction
     , webPush = WebPush.initial
     , menuState = MenuHidden
+    , pageVisibility = PageVisibility.Visible -- default to visible, perhaps, should do something more sophisticated on init
     }
 
 

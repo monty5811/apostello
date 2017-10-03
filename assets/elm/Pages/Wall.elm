@@ -3,7 +3,6 @@ module Pages.Wall exposing (view)
 import Data exposing (SmsInbound)
 import Html exposing (Html, div, p, span, text)
 import Html.Attributes exposing (class, style)
-import Messages exposing (Msg)
 import RemoteList as RL
 import Rocket exposing ((=>))
 
@@ -11,7 +10,7 @@ import Rocket exposing ((=>))
 -- Main view
 
 
-view : RL.RemoteList SmsInbound -> Html Msg
+view : RL.RemoteList SmsInbound -> Html msg
 view sms =
     div
         [ class "text-center"
@@ -30,7 +29,7 @@ view sms =
         ]
 
 
-smsCard : SmsInbound -> Html Msg
+smsCard : SmsInbound -> Html msg
 smsCard sms =
     div
         [ style

@@ -3,7 +3,7 @@ module Pages.KeyRespTable.View exposing (view)
 import Data exposing (SmsInbound)
 import FilteringTable as FT
 import Helpers exposing (archiveCell, formatDate)
-import Html exposing (Html, a, br, button, div, i, input, label, td, text, th, thead, tr)
+import Html exposing (Html, a, br, button, div, i, input, td, text, th, thead, tr)
 import Html.Attributes as A
 import Html.Events exposing (onClick, onSubmit)
 import Messages exposing (Msg(KeyRespTableMsg, StoreMsg))

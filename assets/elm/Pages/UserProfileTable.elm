@@ -2,8 +2,8 @@ module Pages.UserProfileTable exposing (view)
 
 import Data exposing (UserProfile)
 import FilteringTable as FT
-import Html exposing (Html, a, button, i, td, text, th, thead, tr)
-import Html.Attributes exposing (class, href)
+import Html exposing (Html, a, button, td, text, th, thead, tr)
+import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Messages exposing (Msg)
 import Pages as P
@@ -21,7 +21,7 @@ view tableModel profiles =
     FT.table "table-bordered" tableHead tableModel userprofileRow profiles
 
 
-tableHead : Html Msg
+tableHead : Html msg
 tableHead =
     thead [ class "text-left" ]
         [ tr []

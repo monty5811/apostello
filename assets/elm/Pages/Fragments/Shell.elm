@@ -1,14 +1,13 @@
 module Pages.Fragments.Shell exposing (view)
 
 import Html exposing (Html, div, h3, text)
-import Html.Attributes exposing (class, id, style)
+import Html.Attributes exposing (class, id)
 import Html.Events as E
-import Html.Keyed
-import Messages exposing (Msg(ToggleMenu))
+import Messages exposing (Msg(NotificationMsg, ToggleMenu))
 import Models exposing (MenuModel(MenuHidden, MenuVisible), Model)
+import Notification as Notif
 import Pages exposing (Page(..))
 import Pages.Fragments.Menu as Menu
-import Pages.Fragments.Notification as Notif
 import Route exposing (spaLink)
 
 
@@ -46,7 +45,7 @@ commonShell model mainContent fab =
             , div [ id "content" ] <|
                 List.concat
                     [ [ h3 [] [ text <| title model.page ] ]
-                    , Notif.view model.notifications
+                    , List.map (Html.map NotificationMsg) (Notif.view model.notifications)
                     , [ mainContent ]
                     ]
             ]
@@ -57,7 +56,7 @@ commonShell model mainContent fab =
                 , E.onClick ToggleMenu
                 ]
                 [ text "Close" ]
-                :: Menu.menu model.page model.settings model.dataStore model.webPush
+                :: Menu.menu model.settings model.webPush
         ]
 
 
