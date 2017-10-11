@@ -9,13 +9,12 @@ import Messages exposing (Msg(NewUrl))
 import Models exposing (Settings)
 import Navigation
 import Pages exposing (Page(..), initSendAdhoc, initSendGroup)
-import Pages.FirstRun.Model exposing (initialFirstRunModel)
-import Pages.Forms.Contact.Model exposing (initialContactFormModel)
-import Pages.Forms.ContactImport.Model exposing (initialContactImportModel)
-import Pages.Forms.Group.Model exposing (initialGroupFormModel)
-import Pages.Forms.Keyword.Model exposing (initialKeywordFormModel)
-import Pages.Forms.UserProfile.Model exposing (initialUserProfileFormModel)
-import Pages.GroupComposer.Model exposing (initialGroupComposerModel)
+import Pages.FirstRun as FR
+import Pages.Forms.Contact as CF
+import Pages.Forms.Group as GF
+import Pages.Forms.Keyword as KF
+import Pages.Forms.UserProfile as UP
+import Pages.GroupComposer as GC
 import UrlParser as Url exposing ((</>), (<?>), customParam, int, intParam, s, string, stringParam, top)
 
 
@@ -29,7 +28,7 @@ route =
         , Url.map Curator (s "incoming" </> s "curate_wall")
         , Url.map (GroupTable False) (s "group" </> s "all")
         , Url.map (GroupTable True) (s "group" </> s "archive")
-        , Url.map (GroupComposer initialGroupComposerModel) (s "group" </> s "composer")
+        , Url.map (GroupComposer GC.initialModel) (s "group" </> s "composer")
         , Url.map (RecipientTable False) (s "recipient" </> s "all")
         , Url.map (RecipientTable True) (s "recipient" </> s "archive")
         , Url.map (KeywordTable False) (s "keyword" </> s "all")
@@ -40,18 +39,18 @@ route =
         , Url.map ScheduledSmsTable (s "scheduled" </> s "sms")
         , Url.map UserProfileTable (s "users" </> s "profiles")
         , Url.map ElvantoImport (s "elvanto" </> s "import")
-        , Url.map (FirstRun initialFirstRunModel) (s "config" </> s "first_run")
-        , Url.map (GroupForm initialGroupFormModel << Just) (s "group" </> s "edit" </> int)
-        , Url.map (GroupForm initialGroupFormModel Nothing) (s "group" </> s "new")
-        , Url.map (ContactForm initialContactFormModel << Just) (s "recipient" </> s "edit" </> int)
-        , Url.map (ContactForm initialContactFormModel Nothing) (s "recipient" </> s "new")
-        , Url.map (KeywordForm initialKeywordFormModel Nothing) (s "keyword" </> s "new")
-        , Url.map (KeywordForm initialKeywordFormModel << Just) (s "keyword" </> s "edit" </> string)
+        , Url.map (FirstRun FR.initialModel) (s "config" </> s "first_run")
+        , Url.map (GroupForm GF.initialModel << Just) (s "group" </> s "edit" </> int)
+        , Url.map (GroupForm GF.initialModel Nothing) (s "group" </> s "new")
+        , Url.map (ContactForm CF.initialModel << Just) (s "recipient" </> s "edit" </> int)
+        , Url.map (ContactForm CF.initialModel Nothing) (s "recipient" </> s "new")
+        , Url.map (KeywordForm KF.initialModel Nothing) (s "keyword" </> s "new")
+        , Url.map (KeywordForm KF.initialModel << Just) (s "keyword" </> s "edit" </> string)
         , Url.map (SiteConfigForm Nothing) (s "config" </> s "site")
         , Url.map (DefaultResponsesForm Nothing) (s "config" </> s "responses")
         , Url.map (CreateAllGroup "") (s "group" </> s "create_all")
-        , Url.map (UserProfileForm initialUserProfileFormModel) (s "users" </> s "profiles" </> int)
-        , Url.map (ContactImport initialContactImportModel) (s "recipient" </> s "import")
+        , Url.map (UserProfileForm UP.initialModel) (s "users" </> s "profiles" </> int)
+        , Url.map (ContactImport "") (s "recipient" </> s "import")
         , Url.map (ApiSetup Nothing) (s "api-setup")
         , Url.map Help (s "help")
 

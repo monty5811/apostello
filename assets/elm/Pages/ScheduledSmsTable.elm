@@ -1,33 +1,38 @@
 module Pages.ScheduledSmsTable exposing (view)
 
-import Data exposing (QueuedSms, RecipientGroup)
+import Data exposing (QueuedSms, Recipient, RecipientGroup)
 import Date
 import FilteringTable as FT
 import Html exposing (Html, a, div, td, text, th, thead, tr)
 import Html.Attributes as A
 import Html.Events exposing (onClick)
-import Messages exposing (Msg(StoreMsg))
-import Pages exposing (Page(ContactForm, GroupForm))
-import Pages.Forms.Contact.Model exposing (initialContactFormModel)
-import Pages.Forms.Group.Model exposing (initialGroupFormModel)
 import RemoteList as RL
 import Rocket exposing ((=>))
-import Route exposing (spaLink)
-import Store.Messages exposing (StoreMsg(CancelSms))
 import Time
 
 
 -- Main view
 
 
-view : FT.Model -> Time.Time -> RL.RemoteList QueuedSms -> Html Msg
-view tableModel currentTime sms =
-    sms
-        |> RL.filter (onlyFuture currentTime)
-        |> FT.defaultTable tableHead tableModel smsRow
+type alias Props msg =
+    { currentTime : Time.Time
+    , tableModel : FT.Model
+    , tableMsg : FT.Msg -> msg
+    , sms : RL.RemoteList QueuedSms
+    , cancelSms : Int -> msg
+    , groupLink : RecipientGroup -> Html msg
+    , contactLink : Recipient -> Html msg
+    }
 
 
-tableHead : Html Msg
+view : Props msg -> Html msg
+view props =
+    props.sms
+        |> RL.filter (onlyFuture props.currentTime)
+        |> FT.defaultTable { top = props.tableMsg } tableHead props.tableModel (smsRow props)
+
+
+tableHead : Html msg
 tableHead =
     thead []
         [ tr []
@@ -51,8 +56,8 @@ onlyFuture t sms =
             False
 
 
-smsRow : QueuedSms -> ( String, Html Msg )
-smsRow sms =
+smsRow : Props msg -> QueuedSms -> ( String, Html msg )
+smsRow props sms =
     let
         style =
             case sms.failed of
@@ -65,30 +70,30 @@ smsRow sms =
     ( toString sms.pk
     , tr [ A.style style ]
         [ td [] [ text sms.sent_by ]
-        , td [] [ spaLink a [] [ text sms.recipient.full_name ] <| ContactForm initialContactFormModel <| Just sms.recipient.pk ]
-        , td [] [ groupLink sms.recipient_group ]
+        , td [] [ props.contactLink sms.recipient ]
+        , td [] [ groupLink props sms.recipient_group ]
         , td [] [ text sms.content ]
         , td [] [ text sms.time_to_send_formatted ]
-        , td [] [ cancelButton sms ]
+        , td [] [ cancelButton props sms ]
         ]
     )
 
 
-groupLink : Maybe RecipientGroup -> Html Msg
-groupLink group =
+groupLink : Props msg -> Maybe RecipientGroup -> Html msg
+groupLink props group =
     case group of
         Nothing ->
             div [] []
 
         Just g ->
-            spaLink a [] [ text g.name ] <| GroupForm initialGroupFormModel <| Just g.pk
+            props.groupLink g
 
 
-cancelButton : QueuedSms -> Html Msg
-cancelButton sms =
+cancelButton : Props msg -> QueuedSms -> Html msg
+cancelButton props sms =
     a
         [ A.class "button button-danger"
-        , onClick (StoreMsg (CancelSms sms.pk))
+        , onClick (props.cancelSms sms.pk)
         , A.id "cancelSmsButton"
         ]
         [ text "Cancel" ]

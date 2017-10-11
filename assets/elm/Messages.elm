@@ -1,26 +1,25 @@
 module Messages exposing (..)
 
+import FilteringTable as FT
 import Http
 import Navigation
 import Notification as Notif
 import PageVisibility
-import Pages.ApiSetup.Messages exposing (ApiSetupMsg)
-import Pages.ElvantoImport.Messages exposing (ElvantoMsg)
-import Pages.FirstRun.Messages exposing (FirstRunMsg)
-import Pages.Forms.Contact.Messages exposing (ContactFormMsg)
-import Pages.Forms.ContactImport.Messages exposing (ContactImportMsg)
-import Pages.Forms.CreateAllGroup.Messages exposing (CreateAllGroupMsg)
-import Pages.Forms.DefaultResponses.Messages exposing (DefaultResponsesFormMsg)
-import Pages.Forms.DefaultResponses.Model exposing (DefaultResponsesFormModel)
-import Pages.Forms.Group.Messages exposing (GroupFormMsg)
-import Pages.Forms.Keyword.Messages exposing (KeywordFormMsg)
-import Pages.Forms.SendAdhoc.Messages exposing (SendAdhocMsg)
-import Pages.Forms.SendGroup.Messages exposing (SendGroupMsg)
-import Pages.Forms.SiteConfig.Messages exposing (SiteConfigFormMsg)
-import Pages.Forms.SiteConfig.Model exposing (SiteConfigFormModel)
-import Pages.Forms.UserProfile.Messages exposing (UserProfileFormMsg)
-import Pages.GroupComposer.Messages exposing (GroupComposerMsg)
-import Pages.KeyRespTable.Messages exposing (KeyRespTableMsg)
+import Pages.ApiSetup as AS
+import Pages.ElvantoImport as EI
+import Pages.FirstRun as FR
+import Pages.Forms.Contact as CF
+import Pages.Forms.ContactImport as CI
+import Pages.Forms.CreateAllGroup as CAG
+import Pages.Forms.DefaultResponses as DRF
+import Pages.Forms.Group as GF
+import Pages.Forms.Keyword as KF
+import Pages.Forms.SendAdhoc as SAF
+import Pages.Forms.SendGroup as SGF
+import Pages.Forms.SiteConfig as SCF
+import Pages.Forms.UserProfile as UP
+import Pages.GroupComposer as GC
+import Pages.KeyRespTable as KRT
 import Store.Messages exposing (StoreMsg)
 import Time
 import WebPush
@@ -34,13 +33,13 @@ type Msg
     | UrlChange Navigation.Location
     | NewUrl String
     | FormMsg FormMsg
-    | TableMsg TableMsg
-    | ElvantoMsg ElvantoMsg
-    | GroupComposerMsg GroupComposerMsg
-    | KeyRespTableMsg KeyRespTableMsg
-    | FirstRunMsg FirstRunMsg
+    | TableMsg FT.Msg
+    | ElvantoMsg EI.Msg
+    | GroupComposerMsg GC.Msg
+    | KeyRespTableMsg KRT.Msg
+    | FirstRunMsg FR.Msg
     | SidePanelMsg SidePanelMsg
-    | ApiSetupMsg ApiSetupMsg
+    | ApiSetupMsg AS.Msg
     | WebPushMsg WebPush.Msg
     | NotificationMsg Notif.Msg
     | CurrentTime Time.Time
@@ -54,23 +53,27 @@ type SidePanelMsg
     | ReceiveArchiveResp String (Result Http.Error Bool)
 
 
-type TableMsg
-    = UpdateFilter String
-    | GoToPage Int
-
-
 type FormMsg
-    = PostForm (Cmd Msg)
+    = PostKeywordForm
+    | PostContactForm
+    | PostContactImportForm
+    | PostCreateAllGroupForm
+    | PostDefaultRespForm
+    | PostGroupForm
+    | PostSendAdhocForm
+    | PostSendGroupForm
+    | PostSiteConfigForm
+    | PostUserProfileForm
     | ReceiveFormResp (List (Cmd Msg)) (Result Http.Error { body : String, code : Int })
-    | GroupFormMsg GroupFormMsg
-    | ContactFormMsg ContactFormMsg
-    | KeywordFormMsg KeywordFormMsg
-    | UserProfileFormMsg UserProfileFormMsg
-    | SiteConfigFormMsg SiteConfigFormMsg
-    | DefaultResponsesFormMsg DefaultResponsesFormMsg
-    | CreateAllGroupMsg CreateAllGroupMsg
-    | ContactImportMsg ContactImportMsg
-    | ReceiveSiteConfigFormModel (Result Http.Error SiteConfigFormModel)
-    | ReceiveDefaultResponsesFormModel (Result Http.Error DefaultResponsesFormModel)
-    | SendAdhocMsg SendAdhocMsg
-    | SendGroupMsg SendGroupMsg
+    | GroupFormMsg GF.Msg
+    | ContactFormMsg CF.Msg
+    | KeywordFormMsg KF.Msg
+    | UserProfileFormMsg UP.Msg
+    | SiteConfigFormMsg SCF.Msg
+    | DefaultResponsesFormMsg DRF.Msg
+    | CreateAllGroupMsg CAG.Msg
+    | ContactImportMsg CI.Msg
+    | ReceiveSiteConfigFormModel (Result Http.Error SCF.Model)
+    | ReceiveDefaultResponsesFormModel (Result Http.Error DRF.Model)
+    | SendAdhocMsg SAF.Msg
+    | SendGroupMsg SGF.Msg

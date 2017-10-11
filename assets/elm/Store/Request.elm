@@ -2,36 +2,35 @@ module Store.Request exposing (..)
 
 import Http
 import Json.Decode as Decode
-import Messages exposing (Msg(StoreMsg))
-import Models exposing (Model)
+import Pages exposing (Page)
 import Regex
 import Store.DataTypes exposing (RemoteDataType, dt2Url, dt_from_page)
 import Store.Messages exposing (StoreMsg(ReceiveRawResp))
-import Store.Model exposing (RawResponse, setLoadDataStatus)
+import Store.Model exposing (DataStore, RawResponse, setLoadDataStatus)
 
 
-maybeFetchData : ( Model, List (Cmd Msg) ) -> ( Model, List (Cmd Msg) )
-maybeFetchData ( model, cmds ) =
+maybeFetchData : Page -> DataStore -> ( DataStore, List (Cmd StoreMsg) )
+maybeFetchData page dataStore =
     let
         dataTypes =
-            dt_from_page model.page
+            dt_from_page page
 
         newDs =
             dataTypes
-                |> List.foldl setLoadDataStatus model.dataStore
+                |> List.foldl setLoadDataStatus dataStore
 
         fetchCmds =
             dataTypes
                 |> List.map (\dt -> ( dt, dt2Url dt ))
                 |> List.map fetchData
     in
-    ( { model | dataStore = newDs }, List.concat [ fetchCmds, cmds ] )
+    ( newDs, fetchCmds )
 
 
-fetchData : ( RemoteDataType, ( Bool, String ) ) -> Cmd Msg
+fetchData : ( RemoteDataType, ( Bool, String ) ) -> Cmd StoreMsg
 fetchData ( dt, ( ignorePageInfo, url ) ) =
     makeRequest url
-        |> Http.send (StoreMsg << ReceiveRawResp dt ignorePageInfo)
+        |> Http.send (ReceiveRawResp dt ignorePageInfo)
 
 
 dataFromResp : Decode.Decoder a -> RawResponse -> List a

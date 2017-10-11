@@ -1,6 +1,5 @@
 module Store.Optimistic exposing (..)
 
-import Data exposing (ElvantoGroup, RecipientSimple, SmsInbound)
 import RemoteList as RL
 import Store.Model exposing (DataStore)
 
@@ -15,7 +14,7 @@ toggleDealtWith ds pk =
     { ds | inboundSms = RL.map (switchDealtWith pk) ds.inboundSms }
 
 
-switchDealtWith : Int -> SmsInbound -> SmsInbound
+switchDealtWith : Int -> { a | dealt_with : Bool, pk : Int } -> { a | dealt_with : Bool, pk : Int }
 switchDealtWith pk sms =
     if pk == sms.pk then
         { sms | dealt_with = not sms.dealt_with }
@@ -28,7 +27,7 @@ archiveGroup ds pk =
     { ds | groups = RL.map (archiveRecordWithPk pk) ds.groups }
 
 
-updateGroupMembers : List RecipientSimple -> RecipientSimple -> List RecipientSimple
+updateGroupMembers : List { a | pk : Int } -> { a | pk : Int } -> List { a | pk : Int }
 updateGroupMembers existingList contact =
     case memberInList existingList contact of
         True ->
@@ -39,18 +38,18 @@ updateGroupMembers existingList contact =
             contact :: existingList
 
 
-memberInList : List RecipientSimple -> RecipientSimple -> Bool
+memberInList : List { a | pk : Int } -> { a | pk : Int } -> Bool
 memberInList existingList contact =
     List.map (\x -> x.pk) existingList
         |> List.member contact.pk
 
 
-toggleElvantoGroup : ElvantoGroup -> DataStore -> DataStore
+toggleElvantoGroup : { a | pk : Int } -> DataStore -> DataStore
 toggleElvantoGroup group ds =
     { ds | elvantoGroups = RL.map (toggleGroupSync group.pk) ds.elvantoGroups }
 
 
-toggleGroupSync : Int -> ElvantoGroup -> ElvantoGroup
+toggleGroupSync : Int -> { a | sync : Bool, pk : Int } -> { a | sync : Bool, pk : Int }
 toggleGroupSync pk group =
     if pk == group.pk then
         { group | sync = not group.sync }
@@ -96,3 +95,18 @@ toggleIsArchivedPk pk rec =
 
         False ->
             rec
+
+
+optArchiveMatchingSms : String -> DataStore -> DataStore
+optArchiveMatchingSms k ds =
+    { ds | inboundSms = RL.map (archiveMatches k) ds.inboundSms }
+
+
+archiveMatches : String -> { a | matched_keyword : String, is_archived : Bool } -> { a | matched_keyword : String, is_archived : Bool }
+archiveMatches k sms =
+    case sms.matched_keyword == k of
+        True ->
+            { sms | is_archived = True }
+
+        False ->
+            sms

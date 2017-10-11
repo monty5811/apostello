@@ -6,11 +6,11 @@ import Dict
 import Helpers exposing (handleNotSaved)
 import Http
 import Json.Decode as Decode
-import Messages exposing (Msg)
+import Json.Decode.Pipeline exposing (decode, optional, required)
 import Models exposing (Model)
 import Notification as Notif
-import Pages.FirstRun.Model exposing (decodeFirstRunResp)
 import RemoteList as RL
+import Rocket exposing ((=>))
 import Store.DataTypes exposing (RemoteDataType(..))
 import Store.Decode exposing (decodeDataStore)
 import Store.Messages exposing (StoreMsg(..))
@@ -20,12 +20,16 @@ import Store.Request exposing (dataFromResp, fetchData, increasePageSize, maybeF
 import Store.Toggle as T
 
 
-update : StoreMsg -> Model -> ( Model, List (Cmd Msg) )
+update : StoreMsg -> Model -> ( Model, List (Cmd StoreMsg) )
 update msg model =
     case msg of
         -- apostello list data
         LoadData ->
-            ( model, [] ) |> maybeFetchData
+            let
+                ( ds, cmds ) =
+                    maybeFetchData model.page model.dataStore
+            in
+            { model | dataStore = ds } => cmds
 
         LoadDataStore str ->
             let
@@ -183,7 +187,7 @@ update msg model =
             handleNotSaved model
 
 
-handleLoadingFailed : RemoteDataType -> Http.Error -> Model -> ( Model, List (Cmd Msg) )
+handleLoadingFailed : RemoteDataType -> Http.Error -> Model -> ( Model, List (Cmd StoreMsg) )
 handleLoadingFailed dt err model =
     let
         niceMsg =
@@ -393,6 +397,19 @@ compareTR item =
             toFloat 1
 
 
+type alias ErrResp =
+    { status : String
+    , error : String
+    }
+
+
+decodeErrResp : Decode.Decoder ErrResp
+decodeErrResp =
+    decode ErrResp
+        |> required "status" Decode.string
+        |> optional "error" Decode.string ""
+
+
 userFacingErrorMessage : Http.Error -> String
 userFacingErrorMessage err =
     case err of
@@ -404,7 +421,7 @@ userFacingErrorMessage err =
 
         Http.BadStatus r ->
             r.body
-                |> Decode.decodeString decodeFirstRunResp
+                |> Decode.decodeString decodeErrResp
                 |> Result.withDefault { status = "", error = "Something went wrong there. Sorry. (" ++ r.body ++ ")" }
                 |> .error
 

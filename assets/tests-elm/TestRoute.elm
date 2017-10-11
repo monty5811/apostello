@@ -6,13 +6,12 @@ import List.Extra exposing (uncons)
 import Models exposing (Model)
 import Navigation
 import Pages exposing (Page(..), initSendAdhoc, initSendGroup)
-import Pages.FirstRun.Model exposing (initialFirstRunModel)
-import Pages.Forms.Contact.Model exposing (initialContactFormModel)
-import Pages.Forms.ContactImport.Model exposing (initialContactImportModel)
-import Pages.Forms.Group.Model exposing (initialGroupFormModel)
-import Pages.Forms.Keyword.Model exposing (initialKeywordFormModel)
-import Pages.Forms.UserProfile.Model exposing (initialUserProfileFormModel)
-import Pages.GroupComposer.Model exposing (initialGroupComposerModel)
+import Pages.FirstRun as FR
+import Pages.Forms.Contact as CF
+import Pages.Forms.Group as GF
+import Pages.Forms.Keyword as KF
+import Pages.Forms.UserProfile as UPF
+import Pages.GroupComposer as GC
 import Route exposing (page2loc, route)
 import Test exposing (Test, describe, fuzz, test)
 import UrlParser as Url
@@ -44,7 +43,7 @@ pages =
     , InboundTable
     , GroupTable True
     , GroupTable False
-    , GroupComposer initialGroupComposerModel
+    , GroupComposer GC.initialModel
     , RecipientTable True
     , RecipientTable False
     , KeywordTable True
@@ -56,7 +55,7 @@ pages =
     , ScheduledSmsTable
     , KeyRespTable False True "test"
     , KeyRespTable False False "test"
-    , FirstRun initialFirstRunModel
+    , FirstRun FR.initialModel
     , initSendAdhoc Nothing Nothing
     , initSendAdhoc (Just "test") Nothing
     , initSendAdhoc Nothing (Just [ 1 ])
@@ -66,19 +65,19 @@ pages =
     , initSendGroup Nothing (Just 1)
     , initSendGroup (Just "test") (Just 1)
     , SiteConfigForm Nothing
-    , GroupForm initialGroupFormModel Nothing
-    , GroupForm initialGroupFormModel <| Just 1
+    , GroupForm GF.initialModel Nothing
+    , GroupForm GF.initialModel <| Just 1
     , Help
     , Usage
     , CreateAllGroup ""
-    , ContactForm initialContactFormModel Nothing
-    , ContactForm initialContactFormModel <| Just 1
-    , KeywordForm initialKeywordFormModel Nothing
-    , KeywordForm initialKeywordFormModel <| Just "test"
-    , ContactImport initialContactImportModel
+    , ContactForm CF.initialModel Nothing
+    , ContactForm CF.initialModel <| Just 1
+    , KeywordForm KF.initialModel Nothing
+    , KeywordForm KF.initialModel <| Just "test"
+    , ContactImport ""
     , ApiSetup Nothing
     , DefaultResponsesForm Nothing
-    , UserProfileForm initialUserProfileFormModel 1
+    , UserProfileForm UPF.initialModel 1
     ]
 
 

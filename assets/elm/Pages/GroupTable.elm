@@ -3,23 +3,27 @@ module Pages.GroupTable exposing (view)
 import Data exposing (RecipientGroup)
 import FilteringTable as FT
 import Helpers exposing (archiveCell)
-import Html exposing (Html, a, td, text, th, thead, tr)
+import Html exposing (Html, td, text, th, thead, tr)
 import Html.Attributes as A
-import Messages exposing (Msg(StoreMsg))
-import Pages exposing (Page(GroupForm))
-import Pages.Forms.Group.Model exposing (initialGroupFormModel)
 import RemoteList as RL
 import Round
-import Route exposing (spaLink)
-import Store.Messages exposing (StoreMsg(ToggleGroupArchive))
 
 
 -- Main view
 
 
-view : FT.Model -> RL.RemoteList RecipientGroup -> Html Msg
-view tableModel groups =
-    FT.defaultTable tableHead tableModel groupRow groups
+type alias Props msg =
+    { tableMsg : FT.Msg -> msg
+    , tableModel : FT.Model
+    , groups : RL.RemoteList RecipientGroup
+    , toggleArchiveGroup : Bool -> Int -> msg
+    , groupFormLink : RecipientGroup -> Html msg
+    }
+
+
+view : Props msg -> Html msg
+view props =
+    FT.defaultTable { top = props.tableMsg } tableHead props.tableModel (groupRow props) props.groups
 
 
 tableHead : Html msg
@@ -34,13 +38,13 @@ tableHead =
         ]
 
 
-groupRow : RecipientGroup -> ( String, Html Msg )
-groupRow group =
+groupRow : Props msg -> RecipientGroup -> ( String, Html msg )
+groupRow props group =
     ( toString group.pk
     , tr []
-        [ td [] [ spaLink a [] [ text group.name ] <| GroupForm initialGroupFormModel <| Just group.pk ]
+        [ td [] [ props.groupFormLink group ]
         , td [ A.class "hide-sm-down" ] [ text group.description ]
         , td [] [ text ("$" ++ Round.round 2 group.cost) ]
-        , archiveCell group.is_archived (StoreMsg (ToggleGroupArchive group.is_archived group.pk))
+        , archiveCell group.is_archived (props.toggleArchiveGroup group.is_archived group.pk)
         ]
     )

@@ -46,7 +46,7 @@ def field_text(field_name, field):
 
 def generate_module(name, form_):
     form = form_()
-    elm = f'module Pages.Forms.{name}.Meta exposing (meta)\n\n'
+    elm = f'module Pages.Forms.Meta.{name} exposing (meta)\n\n'
     elm += 'import Forms.Model exposing (FieldMeta)\n\n\n'
     elm += 'meta : { '
     elm += ', '.join([f'{name} : FieldMeta' for name in form.base_fields])
@@ -56,8 +56,8 @@ def generate_module(name, form_):
         [field_text(field_name, field) for field_name, field in form.base_fields.items()]
     )
     elm += f'{fields_text}\n    }}\n'
-    dir_name = f'assets/elm/Pages/Forms/{name}'
-    fname = os.path.join(dir_name, 'Meta.elm')
+    dir_name = 'assets/elm/Pages/Forms/Meta'
+    fname = os.path.join(dir_name, f'{name}.elm')
 
     return elm, fname
 

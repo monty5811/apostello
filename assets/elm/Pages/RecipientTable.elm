@@ -3,22 +3,23 @@ module Pages.RecipientTable exposing (view)
 import Data exposing (Recipient)
 import FilteringTable as FT
 import Helpers exposing (archiveCell, formatDate)
-import Html exposing (Html, a, div, td, text, th, thead, tr)
+import Html exposing (Html, div, td, text, th, thead, tr)
 import Html.Attributes as A
-import Messages exposing (Msg(StoreMsg))
-import Pages exposing (Page(ContactForm))
-import Pages.Forms.Contact.Model exposing (initialContactFormModel)
 import RemoteList as RL
 import Rocket exposing ((=>))
-import Route exposing (spaLink)
-import Store.Messages exposing (StoreMsg(ToggleRecipientArchive))
 
 
--- Main view
+type alias Props msg =
+    { tableMsg : FT.Msg -> msg
+    , tableModel : FT.Model
+    , recipients : RL.RemoteList Recipient
+    , toggleRecipientArchive : Bool -> Int -> msg
+    , contactLink : Recipient -> Html msg
+    }
 
 
-view : FT.Model -> RL.RemoteList Recipient -> Html Msg
-view tableModel recipients =
+view : Props msg -> Html msg
+view props =
     let
         head =
             thead []
@@ -30,11 +31,11 @@ view tableModel recipients =
                     ]
                 ]
     in
-    FT.defaultTable head tableModel recipientRow recipients
+    FT.defaultTable { top = props.tableMsg } head props.tableModel (recipientRow props) props.recipients
 
 
-recipientRow : Recipient -> ( String, Html Msg )
-recipientRow recipient =
+recipientRow : Props msg -> Recipient -> ( String, Html msg )
+recipientRow props recipient =
     let
         style =
             case recipient.is_blocking of
@@ -58,17 +59,17 @@ recipientRow recipient =
     ( toString recipient.pk
     , tr [ A.style style ]
         [ td []
-            [ spaLink a [] [ text recipient.full_name ] <| ContactForm initialContactFormModel <| Just recipient.pk
+            [ props.contactLink recipient
             , doNotReplyIndicator recipient.do_not_reply
             ]
         , td [] [ text content ]
         , td [] [ text <| formatDate timeReceived ]
-        , archiveCell recipient.is_archived (StoreMsg (ToggleRecipientArchive recipient.is_archived recipient.pk))
+        , archiveCell recipient.is_archived (props.toggleRecipientArchive recipient.is_archived recipient.pk)
         ]
     )
 
 
-doNotReplyIndicator : Bool -> Html Msg
+doNotReplyIndicator : Bool -> Html msg
 doNotReplyIndicator reply =
     case reply of
         True ->

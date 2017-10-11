@@ -1,13 +1,12 @@
 module Pages.Fragments.Menu exposing (allUsersMenuItems, menu)
 
 import Data exposing (UserProfile)
-import Html exposing (Html, a, div, i, text)
+import Html exposing (Html, a, text)
 import Html.Attributes as A exposing (class, href)
 import Messages exposing (Msg(WebPushMsg))
 import Models exposing (Settings)
 import Pages exposing (Page(..), initSendAdhoc, initSendGroup)
-import Pages.Forms.ContactImport.Model exposing (initialContactImportModel)
-import Pages.GroupComposer.Model exposing (initialGroupComposerModel)
+import Pages.GroupComposer as GC
 import Rocket exposing ((=>))
 import Route exposing (spaLink)
 import Urls
@@ -47,7 +46,7 @@ allUsersMenuItems settings wp =
         , itemSpa (RecipientTable False) "Contacts" userPerms.can_see_contact_names
         , itemSpa (GroupTable False) "Groups" userPerms.can_see_groups
         , itemSpa (CreateAllGroup "") "Create \"all\" group" isStaff
-        , itemSpa (GroupComposer initialGroupComposerModel) "Compose group" userPerms.can_see_groups
+        , itemSpa (GroupComposer GC.initialModel) "Compose group" userPerms.can_see_groups
         ]
     , Html.ul [ A.id "menu" ]
         [ header "Settings" [ isStaff ]
@@ -55,7 +54,7 @@ allUsersMenuItems settings wp =
         , itemSpa (DefaultResponsesForm Nothing) "Default Responses" isStaff
         , itemSpa UserProfileTable "User Permissions" isStaff
         , header "Import" [ isStaff, userPerms.can_import ]
-        , itemSpa (ContactImport initialContactImportModel) "CSV" userPerms.can_import
+        , itemSpa (ContactImport "") "CSV" userPerms.can_import
         , itemSpa ElvantoImport "Elvanto" userPerms.can_import
         , header "Misc" [ isStaff ]
         , itemSpa Usage "Usage Dashboard" isStaff

@@ -1,10 +1,12 @@
 from time import sleep
 
 import pytest
-from tests.functional_tests.utils import assert_with_timeout
 from django.contrib.auth.models import User
+from flaky import flaky
+from tests.functional_tests.utils import assert_with_timeout
 
 
+@flaky(max_runs=5)
 @pytest.mark.django_db
 @pytest.mark.slow
 @pytest.mark.selenium

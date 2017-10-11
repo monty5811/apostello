@@ -4,39 +4,38 @@ import Data exposing (ElvantoGroup, RecipientGroup, SmsInbound, UserProfile, dec
 import DjangoSend exposing (CSRFToken, archivePost, archivePostRaw, post, rawPost)
 import Http
 import Json.Encode as Encode
-import Messages exposing (Msg(StoreMsg))
 import Rocket exposing ((=>))
 import Store.Messages exposing (StoreMsg(..))
 import Urls
 
 
-smsDealtWith : CSRFToken -> Bool -> Int -> Cmd Msg
+smsDealtWith : CSRFToken -> Bool -> Int -> Cmd StoreMsg
 smsDealtWith csrf isDealtWith pk =
     let
         body =
             [ "dealt_with" => Encode.bool isDealtWith ]
     in
     post csrf (Urls.api_toggle_deal_with_sms pk) body decodeSmsInbound
-        |> Http.send (StoreMsg << ReceiveToggleInboundSmsDealtWith)
+        |> Http.send ReceiveToggleInboundSmsDealtWith
 
 
-smsArchive : CSRFToken -> Bool -> Int -> Cmd Msg
+smsArchive : CSRFToken -> Bool -> Int -> Cmd StoreMsg
 smsArchive csrf isArchived pk =
     archivePost csrf (Urls.api_act_archive_sms pk) isArchived decodeSmsInbound
-        |> Http.send (StoreMsg << ReceiveToggleInboundSmsArchive)
+        |> Http.send ReceiveToggleInboundSmsArchive
 
 
-reprocessSms : CSRFToken -> Int -> Cmd Msg
+reprocessSms : CSRFToken -> Int -> Cmd StoreMsg
 reprocessSms csrf pk =
     let
         body =
             [ "reingest" => Encode.bool True ]
     in
     post csrf (Urls.api_act_reingest_sms pk) body decodeSmsInbound
-        |> Http.send (StoreMsg << ReceiveReprocessSms)
+        |> Http.send ReceiveReprocessSms
 
 
-profileField : CSRFToken -> UserProfile -> Cmd Msg
+profileField : CSRFToken -> UserProfile -> Cmd StoreMsg
 profileField csrf profile =
     let
         url =
@@ -46,28 +45,28 @@ profileField csrf profile =
             [ "user_profile" => encodeUserProfile profile ]
     in
     post csrf url body decodeUserProfile
-        |> Http.send (StoreMsg << ReceiveToggleProfileField)
+        |> Http.send ReceiveToggleProfileField
 
 
-recipientArchive : CSRFToken -> Bool -> Int -> Cmd Msg
+recipientArchive : CSRFToken -> Bool -> Int -> Cmd StoreMsg
 recipientArchive csrf isArchived pk =
     archivePostRaw csrf (Urls.api_act_archive_recipient pk) isArchived
-        |> Http.send (StoreMsg << ReceiveLazy)
+        |> Http.send ReceiveLazy
 
 
-recipientGroupArchive : CSRFToken -> Bool -> Int -> Cmd Msg
+recipientGroupArchive : CSRFToken -> Bool -> Int -> Cmd StoreMsg
 recipientGroupArchive csrf isArchived pk =
     archivePostRaw csrf (Urls.api_act_archive_group pk) isArchived
-        |> Http.send (StoreMsg << ReceiveLazy)
+        |> Http.send ReceiveLazy
 
 
-archiveKeyword : CSRFToken -> Bool -> String -> Cmd Msg
+archiveKeyword : CSRFToken -> Bool -> String -> Cmd StoreMsg
 archiveKeyword csrf isArchived k =
     archivePostRaw csrf (Urls.api_act_archive_keyword k) isArchived
-        |> Http.send (StoreMsg << ReceiveLazy)
+        |> Http.send ReceiveLazy
 
 
-wallDisplay : CSRFToken -> Bool -> Int -> Cmd Msg
+wallDisplay : CSRFToken -> Bool -> Int -> Cmd StoreMsg
 wallDisplay csrf isDisplayed pk =
     let
         url =
@@ -77,10 +76,10 @@ wallDisplay csrf isDisplayed pk =
             [ "display_on_wall" => Encode.bool isDisplayed ]
     in
     post csrf url body decodeSmsInbound
-        |> Http.send (StoreMsg << ReceiveToggleWallDisplay)
+        |> Http.send ReceiveToggleWallDisplay
 
 
-cancelSms : CSRFToken -> Int -> Cmd Msg
+cancelSms : CSRFToken -> Int -> Cmd StoreMsg
 cancelSms csrf pk =
     let
         url =
@@ -90,10 +89,10 @@ cancelSms csrf pk =
             [ "cancel_sms" => Encode.bool True ]
     in
     rawPost csrf url body
-        |> Http.send (StoreMsg << ReceiveLazy)
+        |> Http.send ReceiveLazy
 
 
-groupMembership : CSRFToken -> Int -> Int -> Bool -> Cmd Msg
+groupMembership : CSRFToken -> Int -> Int -> Bool -> Cmd StoreMsg
 groupMembership csrf groupPk contactPk isMember =
     let
         body =
@@ -105,10 +104,10 @@ groupMembership csrf groupPk contactPk isMember =
             Urls.api_act_update_group_members groupPk
     in
     post csrf url body decodeRecipientGroup
-        |> Http.send (StoreMsg << ReceiveToggleGroupMembership)
+        |> Http.send ReceiveToggleGroupMembership
 
 
-elvantoGroupSync : CSRFToken -> ElvantoGroup -> Cmd Msg
+elvantoGroupSync : CSRFToken -> ElvantoGroup -> Cmd StoreMsg
 elvantoGroupSync csrf group =
     let
         url =
@@ -118,4 +117,4 @@ elvantoGroupSync csrf group =
             [ "sync" => Encode.bool group.sync ]
     in
     post csrf url body decodeElvantoGroup
-        |> Http.send (Messages.StoreMsg << ReceiveToggleElvantoGroupSync)
+        |> Http.send ReceiveToggleElvantoGroupSync

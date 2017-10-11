@@ -7,8 +7,6 @@ import Html.Attributes exposing (class, id)
 import Html.Events exposing (onWithOptions)
 import Json.Decode as Decode
 import List.Extra as LE
-import Messages exposing (Msg)
-import Models exposing (Model)
 import Notification as Notif
 
 
@@ -31,7 +29,7 @@ decodeAlwaysTrue =
 -- update model after http errors:
 
 
-handleNotSaved : Model -> ( Model, List (Cmd Msg) )
+handleNotSaved : { a | notifications : Notif.Notifications } -> ( { a | notifications : Notif.Notifications }, List (Cmd msg) )
 handleNotSaved model =
     ( { model | notifications = Notif.createNotSaved model.notifications }, [] )
 
@@ -65,7 +63,7 @@ calculateSmsCost smsCostPerMsg msg =
         |> (*) smsCostPerMsg
 
 
-archiveCell : Bool -> Msg -> Html Msg
+archiveCell : Bool -> msg -> Html msg
 archiveCell isArchived msg =
     td [ class "hide-sm-down" ]
         [ a [ class "button button-secondary", onClick msg, id "archiveItemButton" ] [ text <| archiveText isArchived ]

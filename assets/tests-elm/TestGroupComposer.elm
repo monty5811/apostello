@@ -2,8 +2,7 @@ module TestGroupComposer exposing (suite)
 
 import Data exposing (RecipientGroup, RecipientSimple)
 import Expect
-import Pages.GroupComposer.Model exposing (ParenLoc)
-import Pages.GroupComposer.View exposing (..)
+import Pages.GroupComposer exposing (..)
 import Set exposing (Set)
 import Test exposing (..)
 

@@ -3,25 +3,24 @@ module Pages.OutboundTable exposing (view)
 import Data exposing (SmsOutbound)
 import FilteringTable as FT
 import Helpers exposing (formatDate)
-import Html exposing (Html, a, td, text, th, thead, tr)
-import Html.Attributes as A
-import Messages exposing (Msg)
-import Pages exposing (Page(ContactForm))
-import Pages.Forms.Contact.Model exposing (initialContactFormModel)
+import Html exposing (Html, td, text, th, thead, tr)
 import RemoteList as RL
-import Rocket exposing ((=>))
-import Route exposing (spaLink)
 
 
--- Main view
+type alias Props msg =
+    { tableMsg : FT.Msg -> msg
+    , tableModel : FT.Model
+    , sms : RL.RemoteList SmsOutbound
+    , contactLink : { full_name : String, pk : Int } -> Html msg
+    }
 
 
-view : FT.Model -> RL.RemoteList SmsOutbound -> Html Msg
-view tableModel sms =
-    FT.defaultTable tableHead tableModel smsRow sms
+view : Props msg -> Html msg
+view props =
+    FT.defaultTable { top = props.tableMsg } tableHead props.tableModel (smsRow props) props.sms
 
 
-tableHead : Html Msg
+tableHead : Html msg
 tableHead =
     thead []
         [ tr []
@@ -32,8 +31,8 @@ tableHead =
         ]
 
 
-smsRow : SmsOutbound -> ( String, Html Msg )
-smsRow sms =
+smsRow : Props msg -> SmsOutbound -> ( String, Html msg )
+smsRow props sms =
     let
         recipient =
             case sms.recipient of
@@ -42,15 +41,10 @@ smsRow sms =
 
                 Nothing ->
                     { full_name = "", pk = 0 }
-
-        contactPage =
-            ContactForm initialContactFormModel <| Just recipient.pk
     in
     ( toString sms.pk
     , tr []
-        [ td []
-            [ spaLink a [ A.style [ "color" => "var(--color-black)" ] ] [ text recipient.full_name ] contactPage
-            ]
+        [ td [] [ props.contactLink recipient ]
         , td [] [ text sms.content ]
         , td [] [ text (formatDate sms.time_sent) ]
         ]

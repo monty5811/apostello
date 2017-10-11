@@ -10,7 +10,6 @@ import Forms.Model exposing (..)
 import Html exposing (Html, button, div, i, input, label, text, textarea)
 import Html.Attributes as A
 import Html.Events as E exposing (onInput)
-import Messages exposing (Msg)
 import Pages.Fragments.Loader exposing (loader)
 import Regex
 import RemoteList as RL
@@ -18,7 +17,7 @@ import Rocket exposing ((=>))
 import Round
 
 
-form : FormStatus -> List FormItem -> Msg -> Html Msg -> Html Msg
+form : FormStatus -> List (FormItem msg) -> msg -> Html msg -> Html msg
 form formStatus items submitMsg button_ =
     case formStatus of
         InProgress ->
@@ -31,7 +30,7 @@ form formStatus items submitMsg button_ =
                     ++ [ button_ ]
 
 
-renderFormError : FormStatus -> List (Html Msg)
+renderFormError : FormStatus -> List (Html msg)
 renderFormError status =
     case status of
         Failed errors ->
@@ -46,7 +45,7 @@ renderFormError status =
             []
 
 
-renderItem : FormErrors -> FormItem -> Html Msg
+renderItem : FormErrors -> FormItem msg -> Html msg
 renderItem errorDict item =
     case item of
         FormField field ->
@@ -60,7 +59,7 @@ renderItem errorDict item =
                 List.map (renderField errorDict) fields
 
 
-fieldGroupHelp : FieldGroupConfig -> List (Html Msg) -> Html Msg
+fieldGroupHelp : FieldGroupConfig -> List (Html msg) -> Html msg
 fieldGroupHelp config fields =
     fields
         |> addSideBySide config.sideBySide
@@ -68,7 +67,7 @@ fieldGroupHelp config fields =
         |> addSegment
 
 
-addSideBySide : Bool -> List (Html Msg) -> List (Html Msg)
+addSideBySide : Bool -> List (Html msg) -> List (Html msg)
 addSideBySide add fields =
     if add then
         [ div
@@ -84,7 +83,7 @@ addSideBySide add fields =
         fields
 
 
-addHeader : Maybe String -> List (Html Msg) -> List (Html Msg)
+addHeader : Maybe String -> List (Html msg) -> List (Html msg)
 addHeader header fields =
     case header of
         Nothing ->
@@ -94,12 +93,12 @@ addHeader header fields =
             Html.legend [] [ Html.text h ] :: fields
 
 
-addSegment : List (Html Msg) -> Html Msg
+addSegment : List (Html msg) -> Html msg
 addSegment fields =
     Html.fieldset [] fields
 
 
-renderField : FormErrors -> Field -> Html Msg
+renderField : FormErrors -> Field msg -> Html msg
 renderField errorDict field =
     let
         errors =
@@ -121,7 +120,7 @@ renderField errorDict field =
         )
 
 
-dateTimeField : (DateTimePicker.State -> Maybe Date.Date -> Msg) -> FieldMeta -> DateTimePicker.State -> Maybe Date.Date -> List (Html Msg)
+dateTimeField : (DateTimePicker.State -> Maybe Date.Date -> msg) -> FieldMeta -> DateTimePicker.State -> Maybe Date.Date -> List (Html msg)
 dateTimeField msg meta datePickerState date =
     let
         config =
@@ -154,7 +153,7 @@ dateTimeField msg meta datePickerState date =
     ]
 
 
-dateField : (DateTimePicker.State -> Maybe Date.Date -> Msg) -> FieldMeta -> DateTimePicker.State -> Maybe Date.Date -> List (Html Msg)
+dateField : (DateTimePicker.State -> Maybe Date.Date -> msg) -> FieldMeta -> DateTimePicker.State -> Maybe Date.Date -> List (Html msg)
 dateField msg meta datePickerState date =
     let
         config =
@@ -186,7 +185,7 @@ dateField msg meta datePickerState date =
     ]
 
 
-simpleTextField : FieldMeta -> Maybe String -> (String -> Msg) -> List (Html Msg)
+simpleTextField : FieldMeta -> Maybe String -> (String -> msg) -> List (Html msg)
 simpleTextField meta defaultValue inputMsg =
     [ label [ A.for meta.id ] [ text meta.label ]
     , input
@@ -201,7 +200,7 @@ simpleTextField meta defaultValue inputMsg =
     ]
 
 
-longTextField : Int -> FieldMeta -> Maybe String -> (String -> Msg) -> List (Html Msg)
+longTextField : Int -> FieldMeta -> Maybe String -> (String -> msg) -> List (Html msg)
 longTextField rows meta defaultValue inputMsg =
     [ label [ A.for meta.id ] [ text meta.label ]
     , textarea
@@ -216,7 +215,7 @@ longTextField rows meta defaultValue inputMsg =
     ]
 
 
-simpleIntField : FieldMeta -> Maybe Int -> (String -> Msg) -> List (Html Msg)
+simpleIntField : FieldMeta -> Maybe Int -> (String -> msg) -> List (Html msg)
 simpleIntField meta defaultValue inputMsg =
     [ label [ A.for meta.id ] [ text meta.label ]
     , input
@@ -233,7 +232,7 @@ simpleIntField meta defaultValue inputMsg =
     ]
 
 
-addDefaultInt : Maybe Int -> List (Html.Attribute Msg) -> List (Html.Attribute Msg)
+addDefaultInt : Maybe Int -> List (Html.Attribute msg) -> List (Html.Attribute msg)
 addDefaultInt defaultValue attrs =
     case defaultValue of
         Nothing ->
@@ -243,7 +242,7 @@ addDefaultInt defaultValue attrs =
             (A.defaultValue <| toString num) :: attrs
 
 
-simpleFloatField : FieldMeta -> Maybe Float -> (String -> Msg) -> List (Html Msg)
+simpleFloatField : FieldMeta -> Maybe Float -> (String -> msg) -> List (Html msg)
 simpleFloatField meta defaultValue inputMsg =
     [ label [ A.for meta.id ] [ text meta.label ]
     , input
@@ -261,7 +260,7 @@ simpleFloatField meta defaultValue inputMsg =
     ]
 
 
-addDefaultFloat : Maybe Float -> List (Html.Attribute Msg) -> List (Html.Attribute Msg)
+addDefaultFloat : Maybe Float -> List (Html.Attribute msg) -> List (Html.Attribute msg)
 addDefaultFloat defaultValue attrs =
     case defaultValue of
         Nothing ->
@@ -271,7 +270,7 @@ addDefaultFloat defaultValue attrs =
             (A.defaultValue <| toString num) :: attrs
 
 
-checkboxField : FieldMeta -> Maybe a -> (a -> Bool) -> (Maybe a -> Msg) -> List (Html Msg)
+checkboxField : FieldMeta -> Maybe a -> (a -> Bool) -> (Maybe a -> msg) -> List (Html msg)
 checkboxField meta maybeRec getter toggleMsg =
     let
         checked =
@@ -293,7 +292,7 @@ checkboxField meta maybeRec getter toggleMsg =
     ]
 
 
-helpLabel : FieldMeta -> Html Msg
+helpLabel : FieldMeta -> Html msg
 helpLabel meta =
     case meta.help of
         Nothing ->
@@ -303,7 +302,7 @@ helpLabel meta =
             div [ A.class "help" ] [ text help ]
 
 
-submitButton : Maybe a -> Bool -> Html Msg
+submitButton : Maybe a -> Bool -> Html msg
 submitButton maybeItem showAN =
     let
         txt =
@@ -325,18 +324,18 @@ submitButton maybeItem showAN =
     button [ A.class <| "button button-block" ++ colour, A.id "formSubmitButton" ] [ text txt ]
 
 
-type alias MultiSelectField a =
+type alias MultiSelectField msg a =
     { items : RL.RemoteList { a | pk : Int }
     , selectedPks : Maybe (List Int)
     , defaultPks : Maybe (List Int)
     , filter : Regex.Regex
-    , filterMsg : String -> Msg
-    , itemView : Maybe (List Int) -> { a | pk : Int } -> Html Msg
-    , selectedView : Maybe (List Int) -> { a | pk : Int } -> Html Msg
+    , filterMsg : String -> msg
+    , itemView : Maybe (List Int) -> { a | pk : Int } -> Html msg
+    , selectedView : Maybe (List Int) -> { a | pk : Int } -> Html msg
     }
 
 
-multiSelectField : FieldMeta -> MultiSelectField a -> List (Html Msg)
+multiSelectField : FieldMeta -> MultiSelectField msg a -> List (Html msg)
 multiSelectField meta props =
     let
         pks =
@@ -371,7 +370,7 @@ multiSelectField meta props =
     ]
 
 
-selectedItemsView : Maybe (List Int) -> (Maybe (List Int) -> { a | pk : Int } -> Html Msg) -> RL.RemoteList { a | pk : Int } -> List (Html Msg)
+selectedItemsView : Maybe (List Int) -> (Maybe (List Int) -> { a | pk : Int } -> Html msg) -> RL.RemoteList { a | pk : Int } -> List (Html msg)
 selectedItemsView maybePks render rl =
     case maybePks of
         Nothing ->
@@ -384,7 +383,7 @@ selectedItemsView maybePks render rl =
                 |> List.map (render maybePks)
 
 
-loadingMessage : RL.RemoteList a -> Html Msg
+loadingMessage : RL.RemoteList a -> Html msg
 loadingMessage rl =
     case rl of
         RL.FinalPageReceived _ ->
@@ -400,7 +399,7 @@ loadingMessage rl =
             text "Fetching some data..."
 
 
-selectedIcon : List Int -> { a | pk : Int } -> Html Msg
+selectedIcon : List Int -> { a | pk : Int } -> Html msg
 selectedIcon selectedPks item =
     case List.member item.pk selectedPks of
         False ->
@@ -410,7 +409,7 @@ selectedIcon selectedPks item =
             i [ A.class "fa fa-check", A.style [ "color" => "var(--state-primary)" ] ] []
 
 
-fieldMessage : String -> Html Msg
+fieldMessage : String -> Html msg
 fieldMessage message =
     div [ A.class "alert alert-danger" ] [ text message ]
 
@@ -439,7 +438,7 @@ formClass status =
 -- Sending SMS Forms
 
 
-contentField : FieldMeta -> Int -> (String -> Msg) -> String -> List (Html Msg)
+contentField : FieldMeta -> Int -> (String -> msg) -> String -> List (Html msg)
 contentField meta smsCharLimit msg content =
     [ label [ A.for meta.id ] [ text meta.label ]
     , textarea
@@ -454,7 +453,7 @@ contentField meta smsCharLimit msg content =
     ]
 
 
-timeField : (DateTimePicker.State -> Maybe Date.Date -> Msg) -> FieldMeta -> DateTimePicker.State -> Maybe Date.Date -> List (Html Msg)
+timeField : (DateTimePicker.State -> Maybe Date.Date -> msg) -> FieldMeta -> DateTimePicker.State -> Maybe Date.Date -> List (Html msg)
 timeField msg meta datePickerState date =
     dateTimeField msg meta datePickerState date
 
@@ -483,7 +482,7 @@ sendButtonText cost =
             Round.round 2 c
 
 
-sendButton : Maybe Float -> Html Msg
+sendButton : Maybe Float -> Html msg
 sendButton cost =
     button
         [ isDisabled cost, A.id "send_button", A.class "button" ]

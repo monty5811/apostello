@@ -6,16 +6,22 @@ import Helpers exposing (formatDate)
 import Html exposing (Html, a, td, text, th, thead, tr)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
-import Messages exposing (Msg(StoreMsg))
 import RemoteList as RL
-import Store.Messages exposing (StoreMsg(ToggleWallDisplay))
 
 
 -- Main view
 
 
-view : FT.Model -> RL.RemoteList SmsInbound -> Html Msg
-view tableModel sms =
+type alias Props msg =
+    { tableMsg : FT.Msg -> msg
+    , tableModel : FT.Model
+    , sms : RL.RemoteList SmsInbound
+    , toggleWallDisplay : Bool -> Int -> msg
+    }
+
+
+view : Props msg -> Html msg
+view { tableMsg, tableModel, sms, toggleWallDisplay } =
     let
         head =
             thead []
@@ -26,23 +32,23 @@ view tableModel sms =
                     ]
                 ]
     in
-    FT.defaultTable head tableModel smsRow sms
+    FT.defaultTable { top = tableMsg } head tableModel (smsRow toggleWallDisplay) sms
 
 
-smsRow : SmsInbound -> ( String, Html Msg )
-smsRow sms =
+smsRow : (Bool -> Int -> msg) -> SmsInbound -> ( String, Html msg )
+smsRow toggleWallDisplay sms =
     ( toString sms.pk
     , tr
         []
         [ td [] [ text sms.content ]
         , td [] [ text (formatDate sms.time_received) ]
-        , curateToggleCell sms
+        , curateToggleCell toggleWallDisplay sms
         ]
     )
 
 
-curateToggleCell : SmsInbound -> Html Msg
-curateToggleCell sms =
+curateToggleCell : (Bool -> Int -> msg) -> SmsInbound -> Html msg
+curateToggleCell toggleWallDisplay sms =
     let
         text_ =
             case sms.display_on_wall of
@@ -66,7 +72,7 @@ curateToggleCell sms =
     td []
         [ a
             [ class className
-            , onClick (StoreMsg (ToggleWallDisplay sms.display_on_wall sms.pk))
+            , onClick (toggleWallDisplay sms.display_on_wall sms.pk)
             ]
             [ text text_ ]
         ]

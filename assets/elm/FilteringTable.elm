@@ -1,6 +1,7 @@
 module FilteringTable
     exposing
         ( Model
+        , Msg
         , defaultTable
         , filterInput
         , filterRecord
@@ -15,7 +16,6 @@ import Html.Attributes as A
 import Html.Events as E
 import Html.Keyed
 import List.Extra as LE
-import Messages exposing (Msg(TableMsg), TableMsg(GoToPage, UpdateFilter))
 import Pages.Fragments.Loader exposing (loader)
 import Regex
 import RemoteList as RL
@@ -42,7 +42,12 @@ initialModel =
 -- Update
 
 
-update : TableMsg -> Model -> Model
+type Msg
+    = UpdateFilter String
+    | GoToPage Int
+
+
+update : Msg -> Model -> Model
 update msg model =
     case msg of
         UpdateFilter filterText ->
@@ -73,18 +78,23 @@ textToRegex t =
 -- View
 
 
-emptyView : Html Msg
+emptyView : Html msg
 emptyView =
     Html.div [ A.class "alert alert-info" ] [ Html.text "No data to display" ]
 
 
-defaultTable : Html Msg -> Model -> (a -> ( String, Html Msg )) -> RL.RemoteList a -> Html Msg
-defaultTable tableHead tableModel rowConstructor data =
-    table "" tableHead tableModel rowConstructor data
+defaultTable : Messages msg -> Html msg -> Model -> (a -> ( String, Html msg )) -> RL.RemoteList a -> Html msg
+defaultTable msgs tableHead tableModel rowConstructor data =
+    table msgs "" tableHead tableModel rowConstructor data
 
 
-table : String -> Html Msg -> Model -> (a -> ( String, Html Msg )) -> RL.RemoteList a -> Html Msg
-table tableClass tableHead model rowConstructor data =
+type alias Messages msg =
+    { top : Msg -> msg
+    }
+
+
+table : Messages msg -> String -> Html msg -> Model -> (a -> ( String, Html msg )) -> RL.RemoteList a -> Html msg
+table msgs tableClass tableHead model rowConstructor data =
     let
         items =
             RL.toList data
@@ -115,12 +125,12 @@ table tableClass tableHead model rowConstructor data =
 
         _ ->
             Html.div [ A.class "xOverflow" ]
-                [ filterInput (TableMsg << UpdateFilter)
+                [ filterInput (msgs.top << UpdateFilter)
                 , Html.table [ A.class tableClass ]
                     [ tableHead
                     , Html.Keyed.node "tbody" [] (getPage curPage pages |> List.map rowConstructor)
                     ]
-                , pageControls curPage numPages
+                , pageControls msgs curPage numPages
                 ]
 
 
@@ -146,71 +156,71 @@ getPage page rows =
         |> Maybe.withDefault []
 
 
-pageControls : Int -> Int -> Html Msg
-pageControls page numPages =
+pageControls : Messages msg -> Int -> Int -> Html msg
+pageControls msgs page numPages =
     case numPages < 2 of
         True ->
             Html.text ""
 
         False ->
             Html.div [] <|
-                buttons page numPages
+                buttons msgs page numPages
 
 
-buttons : Int -> Int -> List (Html Msg)
-buttons curPage numPages =
+buttons : Messages msg -> Int -> Int -> List (Html msg)
+buttons msgs curPage numPages =
     let
         middleButtons =
             if curPage == 1 then
                 List.concat
-                    [ [ pageButton 1 curPage ]
-                    , rightButtons curPage numPages
-                    , [ pageButton numPages curPage ]
+                    [ [ pageButton msgs 1 curPage ]
+                    , rightButtons msgs curPage numPages
+                    , [ pageButton msgs numPages curPage ]
                     ]
             else if curPage == numPages then
                 List.concat
-                    [ [ pageButton 1 curPage ]
-                    , leftButtons curPage
-                    , [ pageButton numPages curPage ]
+                    [ [ pageButton msgs 1 curPage ]
+                    , leftButtons msgs curPage
+                    , [ pageButton msgs numPages curPage ]
                     ]
             else
                 List.concat
-                    [ [ pageButton 1 curPage ]
-                    , leftButtons curPage
-                    , [ pageButton curPage curPage ]
-                    , rightButtons curPage numPages
-                    , [ pageButton numPages curPage ]
+                    [ [ pageButton msgs 1 curPage ]
+                    , leftButtons msgs curPage
+                    , [ pageButton msgs curPage curPage ]
+                    , rightButtons msgs curPage numPages
+                    , [ pageButton msgs numPages curPage ]
                     ]
     in
     List.concat
-        [ [ prevButton curPage ]
+        [ [ prevButton msgs curPage ]
         , middleButtons
-        , [ nextButton curPage numPages ]
+        , [ nextButton msgs curPage numPages ]
         ]
 
 
-leftButtons : Int -> List (Html Msg)
-leftButtons curPage =
+leftButtons : Messages msg -> Int -> List (Html msg)
+leftButtons msgs curPage =
     if curPage == 2 then
         [ Html.text "" ]
     else
         [ Html.div [ A.class "button", A.disabled True ] [ Html.text "..." ]
-        , pageButton (curPage - 1) curPage
+        , pageButton msgs (curPage - 1) curPage
         ]
 
 
-rightButtons : Int -> Int -> List (Html Msg)
-rightButtons curPage numPages =
+rightButtons : Messages msg -> Int -> Int -> List (Html msg)
+rightButtons msgs curPage numPages =
     if curPage == numPages - 1 then
         [ Html.text "" ]
     else
-        [ pageButton (curPage + 1) curPage
+        [ pageButton msgs (curPage + 1) curPage
         , Html.div [ A.class "button", A.disabled True ] [ Html.text "..." ]
         ]
 
 
-prevButton : Int -> Html Msg
-prevButton curPage =
+prevButton : Messages msg -> Int -> Html msg
+prevButton msgs curPage =
     let
         attrs =
             case curPage == 1 of
@@ -218,13 +228,13 @@ prevButton curPage =
                     [ A.class "button button-white", A.disabled True ]
 
                 False ->
-                    [ A.class "button button-white", A.disabled False, E.onClick <| TableMsg <| GoToPage <| curPage - 1 ]
+                    [ A.class "button button-white", A.disabled False, E.onClick <| msgs.top <| GoToPage <| curPage - 1 ]
     in
     Html.button attrs [ Html.i [ A.class "fa fa-chevron-left" ] [] ]
 
 
-nextButton : Int -> Int -> Html Msg
-nextButton curPage numPages =
+nextButton : Messages msg -> Int -> Int -> Html msg
+nextButton msgs curPage numPages =
     let
         attrs =
             case curPage == numPages of
@@ -232,13 +242,13 @@ nextButton curPage numPages =
                     [ A.class "button button-white", A.disabled True ]
 
                 False ->
-                    [ A.class "button button-white", E.onClick <| TableMsg <| GoToPage <| curPage + 1 ]
+                    [ A.class "button button-white", E.onClick <| msgs.top <| GoToPage <| curPage + 1 ]
     in
     Html.button attrs [ Html.i [ A.class "fa fa-chevron-right" ] [] ]
 
 
-pageButton : Int -> Int -> Html Msg
-pageButton goToPage curPage =
+pageButton : Messages msg -> Int -> Int -> Html msg
+pageButton msgs goToPage curPage =
     let
         class =
             case curPage == goToPage of
@@ -248,7 +258,7 @@ pageButton goToPage curPage =
                 False ->
                     "button button-white"
     in
-    Html.a [ A.class class, E.onClick <| TableMsg <| GoToPage goToPage ] [ Html.text (toString goToPage) ]
+    Html.a [ A.class class, E.onClick <| msgs.top <| GoToPage goToPage ] [ Html.text (toString goToPage) ]
 
 
 clampPage : Int -> Int -> Int

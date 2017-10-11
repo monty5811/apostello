@@ -3,25 +3,27 @@ module Pages.KeywordTable exposing (view)
 import Data exposing (Keyword)
 import FilteringTable as FT
 import Helpers exposing (archiveCell)
-import Html exposing (Html, a, div, td, text, th, thead, tr)
+import Html exposing (Html, div, td, text, th, thead, tr)
 import Html.Attributes exposing (class)
-import Messages exposing (Msg(StoreMsg))
-import Pages exposing (Page(KeyRespTable, KeywordForm))
-import Pages.Forms.Keyword.Model exposing (initialKeywordFormModel)
 import RemoteList as RL
-import Route exposing (spaLink)
-import Store.Messages exposing (StoreMsg(ToggleKeywordArchive))
 
 
--- Main view
+type alias Props msg =
+    { tableMsg : FT.Msg -> msg
+    , tableModel : FT.Model
+    , keywords : RL.RemoteList Keyword
+    , keywordLink : Keyword -> Html msg
+    , keywordRespLink : (Keyword -> String) -> Keyword -> Html msg
+    , toggleKeywordArchive : Bool -> String -> msg
+    }
 
 
-view : FT.Model -> RL.RemoteList Keyword -> Html Msg
-view tableModel keywords =
-    FT.table "table-striped" tableHead tableModel keywordRow keywords
+view : Props msg -> Html msg
+view props =
+    FT.table { top = props.tableMsg } "table-striped" tableHead props.tableModel (keywordRow props) props.keywords
 
 
-tableHead : Html Msg
+tableHead : Html msg
 tableHead =
     thead []
         [ tr []
@@ -36,22 +38,22 @@ tableHead =
         ]
 
 
-keywordRow : Keyword -> ( String, Html Msg )
-keywordRow keyword =
+keywordRow : Props msg -> Keyword -> ( String, Html msg )
+keywordRow props keyword =
     ( toString keyword.pk
     , tr []
-        [ td [] [ spaLink a [] [ text keyword.keyword ] <| KeyRespTable False keyword.is_archived keyword.keyword ]
-        , td [ class "text-center" ] [ spaLink a [] [ text keyword.num_replies ] <| KeyRespTable False keyword.is_archived keyword.keyword ]
+        [ td [] [ props.keywordRespLink .keyword keyword ]
+        , td [ class "text-center" ] [ props.keywordRespLink .num_replies keyword ]
         , td [ class "hide-sm-down" ] [ text keyword.description ]
         , td [ class "hide-sm-down" ] [ text keyword.current_response ]
         , keywordStatusCell keyword.is_live
-        , td [] [ spaLink a [ class "button" ] [ text "Edit" ] (KeywordForm initialKeywordFormModel <| Just keyword.keyword) ]
-        , archiveCell keyword.is_archived (StoreMsg (ToggleKeywordArchive keyword.is_archived keyword.keyword))
+        , td [] [ props.keywordLink keyword ]
+        , archiveCell keyword.is_archived (props.toggleKeywordArchive keyword.is_archived keyword.keyword)
         ]
     )
 
 
-keywordStatusCell : Bool -> Html Msg
+keywordStatusCell : Bool -> Html msg
 keywordStatusCell isLive =
     case isLive of
         True ->

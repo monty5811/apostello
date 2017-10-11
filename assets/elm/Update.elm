@@ -1,28 +1,32 @@
 module Update exposing (update)
 
 import FilteringTable as FT
-import Forms.DatePickers exposing (initDateTimePickers)
 import Forms.Update as F
+import Http
 import Messages exposing (..)
 import Models exposing (MenuModel(MenuHidden, MenuVisible), Model, Settings)
 import Navigation
 import Notification as Notif
 import PageVisibility
-import Pages.ApiSetup.Update as ApiSetup
-import Pages.ElvantoImport.Update as ElvImp
-import Pages.FirstRun.Update as FR
-import Pages.Forms.DefaultResponses.Remote as DRFR
-import Pages.Forms.SiteConfig.Remote as SCFR
-import Pages.Fragments.SidePanel.Update as SidePanel
-import Pages.GroupComposer.Update as GC
-import Pages.KeyRespTable.Update as KRT
+import Pages as P
+import Pages.ApiSetup as ApiSetup
+import Pages.ElvantoImport as ElvImp
+import Pages.FirstRun as FR
+import Pages.Forms.DefaultResponses as DRF
+import Pages.Forms.SiteConfig as SCF
+import Pages.Fragments.SidePanel as SidePanel
+import Pages.GroupComposer as GC
+import Pages.KeyRespTable as KRT
 import Ports exposing (saveDataStore)
+import Rocket exposing ((=>))
 import Route exposing (loc2Page)
 import Store.Encode exposing (encodeDataStore)
 import Store.Messages exposing (StoreMsg(LoadDataStore))
 import Store.Model as Store
+import Store.Optimistic
 import Store.Request exposing (maybeFetchData)
 import Store.Update as SU
+import Urls
 import WebPush
 
 
@@ -64,22 +68,32 @@ updateHelper msg model =
             let
                 page =
                     loc2Page location model.settings
+
+                ( newDs, storeCmds ) =
+                    maybeFetchData page <| Store.resetStatus model.dataStore
+
+                newModel =
+                    { model | dataStore = newDs, page = page, table = FT.initialModel }
+
+                datePickerCmds =
+                    F.initDateTimePickers model.page
             in
-            ( { model
-                | page = page
-                , dataStore = Store.resetStatus model.dataStore
-                , table = FT.initialModel
-              }
-            , []
+            ( newModel
+            , List.concat
+                [ List.map (Cmd.map StoreMsg) storeCmds
+                , List.map (Cmd.map FormMsg) datePickerCmds
+                ]
             )
-                |> initDateTimePickers
-                |> maybeFetchData
-                |> SCFR.maybeFetchConfig
-                |> DRFR.maybeFetchResps
+                |> maybeFetchConfig
+                |> maybeFetchResps
 
         -- Load data
         StoreMsg subMsg ->
-            SU.update subMsg model
+            let
+                ( newModel, storeCmds ) =
+                    SU.update subMsg model
+            in
+            newModel => List.map (Cmd.map StoreMsg) storeCmds
 
         FormMsg subMsg ->
             F.update subMsg model
@@ -91,19 +105,73 @@ updateHelper msg model =
             ( { model | notifications = Notif.update subMsg model.notifications }, [] )
 
         FirstRunMsg subMsg ->
-            FR.update subMsg model
+            case model.page of
+                P.FirstRun frModel ->
+                    let
+                        ( newFrModel, frCmds ) =
+                            FR.update model.settings.csrftoken subMsg frModel
+                    in
+                    { model | page = P.FirstRun newFrModel }
+                        => List.map (Cmd.map FirstRunMsg) frCmds
+
+                _ ->
+                    model => []
 
         ElvantoMsg subMsg ->
-            ElvImp.update subMsg model
+            case model.page of
+                P.ElvantoImport ->
+                    ElvImp.update { topLevelMsg = ElvantoMsg, csrftoken = model.settings.csrftoken } subMsg model
+
+                _ ->
+                    model => []
 
         GroupComposerMsg subMsg ->
-            ( GC.update subMsg model, [] )
+            case model.page of
+                P.GroupComposer _ ->
+                    ( { model | page = P.GroupComposer <| GC.update subMsg }, [] )
+
+                _ ->
+                    ( model, [] )
 
         KeyRespTableMsg subMsg ->
-            KRT.update subMsg model
+            case model.page of
+                P.KeyRespTable keyRespModel isArchive k ->
+                    let
+                        ( newKRModel, newIsArchive, newK, newStore, krtCmds ) =
+                            KRT.update subMsg
+                                { csrftoken = model.settings.csrftoken
+                                , keyRespModel = keyRespModel
+                                , isArchive = isArchive
+                                , keyword = k
+                                , store = model.dataStore
+                                , optArchiveMatchingSms = Store.Optimistic.optArchiveMatchingSms
+                                }
+                    in
+                    { model
+                        | page = P.KeyRespTable newKRModel newIsArchive newK
+                        , dataStore = newStore
+                    }
+                        => List.map (Cmd.map KeyRespTableMsg) krtCmds
+
+                _ ->
+                    model => []
 
         ApiSetupMsg subMsg ->
-            ApiSetup.update subMsg model
+            case model.page of
+                P.ApiSetup maybeKey ->
+                    let
+                        ( newKey, notifications, apiCmds ) =
+                            ApiSetup.update subMsg
+                                { key = maybeKey
+                                , notifications = model.notifications
+                                , csrftoken = model.settings.csrftoken
+                                }
+                    in
+                    { model | page = P.ApiSetup newKey, notifications = notifications }
+                        => List.map (Cmd.map ApiSetupMsg) apiCmds
+
+                _ ->
+                    model => []
 
         -- Filtering Table
         TableMsg subMsg ->
@@ -113,17 +181,21 @@ updateHelper msg model =
             ( { model | currentTime = t }, [] )
 
         VisibilityChange state ->
-            let
-                tmp =
-                    ( { model | pageVisibility = state }, [] )
-            in
             case state of
                 PageVisibility.Hidden ->
-                    tmp
+                    { model | pageVisibility = state } => []
 
                 PageVisibility.Visible ->
                     -- fetch data when page becomes visible again
-                    maybeFetchData tmp
+                    let
+                        ( newDataStore, storeCmds ) =
+                            maybeFetchData model.page model.dataStore
+                    in
+                    { model
+                        | dataStore = newDataStore
+                        , pageVisibility = state
+                    }
+                        => List.map (Cmd.map StoreMsg) storeCmds
 
         WebPushMsg subMsg ->
             let
@@ -157,3 +229,31 @@ addSaveDataStoreCmd oldModel newModel cmds =
         False ->
             (saveDataStore <| encodeDataStore newModel.dataStore)
                 :: cmds
+
+
+maybeFetchResps : ( Model, List (Cmd Msg) ) -> ( Model, List (Cmd Msg) )
+maybeFetchResps ( model, cmds ) =
+    let
+        req =
+            Http.get Urls.api_default_responses DRF.decodeModel
+    in
+    case model.page of
+        P.DefaultResponsesForm _ ->
+            ( model, cmds ++ [ Http.send (FormMsg << ReceiveDefaultResponsesFormModel) req ] )
+
+        _ ->
+            ( model, cmds )
+
+
+maybeFetchConfig : ( Model, List (Cmd Msg) ) -> ( Model, List (Cmd Msg) )
+maybeFetchConfig ( model, cmds ) =
+    let
+        req =
+            Http.get Urls.api_site_config SCF.decodeModel
+    in
+    case model.page of
+        P.SiteConfigForm _ ->
+            ( model, cmds ++ [ Http.send (FormMsg << ReceiveSiteConfigFormModel) req ] )
+
+        _ ->
+            ( model, cmds )

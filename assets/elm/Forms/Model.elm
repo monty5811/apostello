@@ -4,7 +4,6 @@ import Dict
 import Html exposing (Html)
 import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (decode, required)
-import Messages exposing (Msg)
 import Notification exposing (DjangoMessage, decodeDjangoMessage)
 
 
@@ -52,10 +51,10 @@ formErrors formStatus =
             noErrors
 
 
-type FormItem
-    = FormField Field
+type FormItem msg
+    = FormField (Field msg)
     | FormHeader String
-    | FieldGroup FieldGroupConfig (List Field)
+    | FieldGroup FieldGroupConfig (List (Field msg))
 
 
 type alias FieldGroupConfig =
@@ -69,9 +68,9 @@ defaultFieldGroupConfig =
     FieldGroupConfig Nothing False
 
 
-type alias Field =
+type alias Field msg =
     { meta : FieldMeta
-    , view : List (Html Msg)
+    , view : List (Html msg)
     }
 
 

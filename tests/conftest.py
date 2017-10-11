@@ -333,7 +333,7 @@ def create_browser(request, driver_wait_time, tries=0):
     try:
         driver = webdriver.Firefox()
         driver.implicitly_wait(driver_wait_time)
-        driver.set_window_size(800, 1200)
+        driver.set_window_size(1200, 1200)
 
         request.node._driver = driver
         return driver

@@ -1,47 +1,46 @@
 module Pages exposing (Page(..), initSendAdhoc, initSendGroup)
 
-import Pages.FirstRun.Model exposing (FirstRunModel)
-import Pages.Forms.Contact.Model exposing (ContactFormModel)
-import Pages.Forms.ContactImport.Model exposing (ContactImportModel)
-import Pages.Forms.DefaultResponses.Model exposing (DefaultResponsesFormModel)
-import Pages.Forms.Group.Model exposing (GroupFormModel)
-import Pages.Forms.Keyword.Model exposing (KeywordFormModel)
-import Pages.Forms.SendAdhoc.Model exposing (SendAdhocModel, initialSendAdhocModel)
-import Pages.Forms.SendGroup.Model exposing (SendGroupModel, initialSendGroupModel)
-import Pages.Forms.SiteConfig.Model exposing (SiteConfigFormModel)
-import Pages.Forms.UserProfile.Model exposing (UserProfileFormModel)
-import Pages.GroupComposer.Model exposing (GroupComposerModel)
+import Pages.FirstRun as FR
+import Pages.Forms.Contact as CF
+import Pages.Forms.DefaultResponses as DRF
+import Pages.Forms.Group as GF
+import Pages.Forms.Keyword as KF
+import Pages.Forms.SendAdhoc as SAF
+import Pages.Forms.SendGroup as SGF
+import Pages.Forms.SiteConfig as SCF
+import Pages.Forms.UserProfile as UP
+import Pages.GroupComposer as GC
 
 
 type Page
     = Home
     | AccessDenied
-    | ContactForm ContactFormModel (Maybe Int)
+    | ContactForm CF.Model (Maybe Int)
     | CreateAllGroup String
     | Curator
     | ElvantoImport
     | Error404
-    | FirstRun FirstRunModel
-    | GroupComposer GroupComposerModel
-    | GroupForm GroupFormModel (Maybe Int)
+    | FirstRun FR.Model
+    | GroupComposer GC.Model
+    | GroupForm GF.Model (Maybe Int)
     | GroupTable IsArchive
     | InboundTable
-    | KeyRespTable KeyRespTableModel IsArchive String
-    | KeywordForm KeywordFormModel (Maybe String)
+    | KeyRespTable Bool IsArchive String
+    | KeywordForm KF.Model (Maybe String)
     | KeywordTable IsArchive
     | OutboundTable
     | RecipientTable IsArchive
     | ScheduledSmsTable
-    | SendAdhoc SendAdhocModel
-    | SendGroup SendGroupModel
+    | SendAdhoc SAF.Model
+    | SendGroup SGF.Model
     | UserProfileTable
     | Wall
-    | SiteConfigForm (Maybe SiteConfigFormModel)
-    | DefaultResponsesForm (Maybe DefaultResponsesFormModel)
+    | SiteConfigForm (Maybe SCF.Model)
+    | DefaultResponsesForm (Maybe DRF.Model)
     | Usage
-    | UserProfileForm UserProfileFormModel Int
+    | UserProfileForm UP.Model Int
     | Help
-    | ContactImport ContactImportModel
+    | ContactImport String
     | ApiSetup (Maybe String)
 
 
@@ -49,15 +48,11 @@ type alias IsArchive =
     Bool
 
 
-type alias KeyRespTableModel =
-    Bool
-
-
 initSendAdhoc : Maybe String -> Maybe (List Int) -> Page
 initSendAdhoc content pks =
-    SendAdhoc <| initialSendAdhocModel content pks
+    SendAdhoc <| SAF.initialModel content pks
 
 
 initSendGroup : Maybe String -> Maybe Int -> Page
 initSendGroup content pk =
-    SendGroup <| initialSendGroupModel content pk
+    SendGroup <| SGF.initialModel content pk

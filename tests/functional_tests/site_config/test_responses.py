@@ -1,5 +1,5 @@
-from flaky import flaky
 import pytest
+from flaky import flaky
 from tests.functional_tests.utils import assert_with_timeout
 
 
