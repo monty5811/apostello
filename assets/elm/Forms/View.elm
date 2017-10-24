@@ -7,7 +7,7 @@ import DateTimePicker.Config
 import Dict
 import FilteringTable exposing (filterInput, filterRecord)
 import Forms.Model exposing (..)
-import Html exposing (Html, button, div, i, input, label, text, textarea)
+import Html exposing (Html, button, div, i, input, label, textarea)
 import Html.Attributes as A
 import Html.Events as E exposing (onInput)
 import Pages.Fragments.Loader exposing (loader)
@@ -129,7 +129,7 @@ dateTimeField msg meta datePickerState date =
         i18nConfig =
             DateTimePicker.Config.defaultDateTimeI18n
     in
-    [ label [ A.for meta.id ] [ text meta.label ]
+    [ label [ A.for meta.id ] [ Html.text meta.label ]
     , DateTimePicker.dateTimePickerWithConfig
         { config
             | timePickerType = DateTimePicker.Config.Digital
@@ -162,7 +162,7 @@ dateField msg meta datePickerState date =
         i18nConfig =
             DateTimePicker.Config.defaultDateI18n
     in
-    [ label [ A.for meta.id ] [ text meta.label ]
+    [ label [ A.for meta.id ] [ Html.text meta.label ]
     , DateTimePicker.datePickerWithConfig
         { config
             | autoClose = True
@@ -187,7 +187,7 @@ dateField msg meta datePickerState date =
 
 simpleTextField : FieldMeta -> Maybe String -> (String -> msg) -> List (Html msg)
 simpleTextField meta defaultValue inputMsg =
-    [ label [ A.for meta.id ] [ text meta.label ]
+    [ label [ A.for meta.id ] [ Html.text meta.label ]
     , input
         [ A.id meta.id
         , A.name meta.name
@@ -202,8 +202,8 @@ simpleTextField meta defaultValue inputMsg =
 
 longTextField : Int -> FieldMeta -> Maybe String -> (String -> msg) -> List (Html msg)
 longTextField rows meta defaultValue inputMsg =
-    [ label [ A.for meta.id ] [ text meta.label ]
-    , textarea
+    [ label [ A.for meta.id ] [ Html.text meta.label ]
+    , Html.textarea
         [ A.id meta.id
         , A.name meta.name
         , E.onInput inputMsg
@@ -217,7 +217,7 @@ longTextField rows meta defaultValue inputMsg =
 
 simpleIntField : FieldMeta -> Maybe Int -> (String -> msg) -> List (Html msg)
 simpleIntField meta defaultValue inputMsg =
-    [ label [ A.for meta.id ] [ text meta.label ]
+    [ label [ A.for meta.id ] [ Html.text meta.label ]
     , input
         (addDefaultInt defaultValue
             [ A.id meta.id
@@ -244,7 +244,7 @@ addDefaultInt defaultValue attrs =
 
 simpleFloatField : FieldMeta -> Maybe Float -> (String -> msg) -> List (Html msg)
 simpleFloatField meta defaultValue inputMsg =
-    [ label [ A.for meta.id ] [ text meta.label ]
+    [ label [ A.for meta.id ] [ Html.text meta.label ]
     , input
         (addDefaultFloat defaultValue
             [ A.id meta.id
@@ -279,14 +279,16 @@ checkboxField meta maybeRec getter toggleMsg =
     [ div
         [ E.onClick <| toggleMsg maybeRec
         ]
-        [ input
-            [ A.id meta.id
-            , A.name meta.name
-            , A.type_ "checkbox"
-            , A.checked checked
+        [ label []
+            [ input
+                [ A.id meta.id
+                , A.name meta.name
+                , A.type_ "checkbox"
+                , A.checked checked
+                ]
+                []
+            , Html.text <| " " ++ meta.label
             ]
-            []
-        , label [] [ text <| " " ++ meta.label ]
         , helpLabel meta
         ]
     ]
@@ -296,10 +298,10 @@ helpLabel : FieldMeta -> Html msg
 helpLabel meta =
     case meta.help of
         Nothing ->
-            text ""
+            Html.text ""
 
         Just help ->
-            div [ A.class "help" ] [ text help ]
+            Html.p [ A.class "input-hint" ] [ Html.text help ]
 
 
 submitButton : Maybe a -> Bool -> Html msg
@@ -321,7 +323,7 @@ submitButton maybeItem showAN =
                 False ->
                     "button-lg button-primary"
     in
-    button [ A.class <| "button button-block" ++ colour, A.id "formSubmitButton" ] [ text txt ]
+    button [ A.class <| "button button-block" ++ colour, A.id "formSubmitButton" ] [ Html.text txt ]
 
 
 type alias MultiSelectField msg a =
@@ -346,7 +348,7 @@ multiSelectField meta props =
                 Just pks_ ->
                     Just pks_
     in
-    [ label [ A.for meta.id ] [ text meta.label ]
+    [ label [ A.for meta.id ] [ Html.text meta.label ]
     , helpLabel meta
     , div [ A.class "segment" ]
         [ loadingMessage props.items
@@ -387,23 +389,23 @@ loadingMessage : RL.RemoteList a -> Html msg
 loadingMessage rl =
     case rl of
         RL.FinalPageReceived _ ->
-            text ""
+            Html.text ""
 
         RL.WaitingOnRefresh _ ->
-            text ""
+            Html.text ""
 
         RL.RespFailed _ _ ->
-            text "Uh oh, something went wrong there. Maybe try reloading the page?"
+            Html.text "Uh oh, something went wrong there. Maybe try reloading the page?"
 
         _ ->
-            text "Fetching some data..."
+            Html.text "Fetching some data..."
 
 
 selectedIcon : List Int -> { a | pk : Int } -> Html msg
 selectedIcon selectedPks item =
     case List.member item.pk selectedPks of
         False ->
-            text ""
+            Html.text ""
 
         True ->
             i [ A.class "fa fa-check", A.style [ "color" => "var(--state-primary)" ] ] []
@@ -411,7 +413,7 @@ selectedIcon selectedPks item =
 
 fieldMessage : String -> Html msg
 fieldMessage message =
-    div [ A.class "alert alert-danger" ] [ text message ]
+    div [ A.class "alert alert-danger" ] [ Html.text message ]
 
 
 errorFieldClass : String -> List String -> String
@@ -440,8 +442,8 @@ formClass status =
 
 contentField : FieldMeta -> Int -> (String -> msg) -> String -> List (Html msg)
 contentField meta smsCharLimit msg content =
-    [ label [ A.for meta.id ] [ text meta.label ]
-    , textarea
+    [ label [ A.for meta.id ] [ Html.text meta.label ]
+    , Html.textarea
         [ A.id meta.id
         , A.name meta.name
         , A.rows (smsCharLimit |> toFloat |> (/) 160 |> ceiling)
@@ -486,4 +488,4 @@ sendButton : Maybe Float -> Html msg
 sendButton cost =
     button
         [ isDisabled cost, A.id "send_button", A.class "button" ]
-        [ text ("Send ($" ++ sendButtonText cost ++ ")") ]
+        [ Html.text ("Send ($" ++ sendButtonText cost ++ ")") ]

@@ -7,7 +7,7 @@
     "elm": "0.18.0",
     "js-cookie": "^2.1.4",
     "opbeat-js": "3.1.4",
-    "shoelace-css": "^1.0.0-beta20"
+    "shoelace-css": "1.0.0-beta24"
   },
   "devDependencies": {
     "bluebird": "^3.5.0",

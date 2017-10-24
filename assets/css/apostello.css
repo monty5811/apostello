@@ -152,19 +152,6 @@ label {
     margin: 1rem;
 }
 
-.help {
-    margin: 0rem 1rem;
-    line-height: 1;
-    vertical-align: baseline;
-    margin: 0 .14285714em;
-    background-color: #e8e8e8;
-    padding: .5833em .833em;
-    color: rgba(0,0,0,.6);
-    text-transform: none;
-    font-weight: 500;
-    border: 0 solid transparent;
-}
-
 .required label:after {
     color: #e32;
     content: " *";

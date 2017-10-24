@@ -169,7 +169,7 @@ groupField props meta_ model groups =
                 |> List.map (groupItem props model.selectedPk)
             )
         ]
-    , div [ class "help" ] [ p [] [ text "Note that empty groups are not shown here." ] ]
+    , Html.p [ class "input-hint" ] [ p [] [ text "Note that empty groups are not shown here." ] ]
     ]
 
 
