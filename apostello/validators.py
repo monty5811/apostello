@@ -15,7 +15,9 @@ def validate_lower(value):
 
 def not_twilio_num(value):
     """Ensure value does not match the sending number."""
-    if str(value) == str(settings.TWILIO_FROM_NUM):
+    from site_config.models import SiteConfiguration
+    twilio_num = str(SiteConfiguration.get_solo().twilio_from_num)
+    if str(value) == twilio_num:
         raise ValidationError("You cannot add the number from which we send messages. Inception!")
 
 

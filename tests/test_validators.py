@@ -24,7 +24,7 @@ class TestNoTwilioNum():
 
     def test_upper_chars(self):
         with pytest.raises(ValidationError):
-            not_twilio_num(settings.TWILIO_FROM_NUM)
+            not_twilio_num(SiteConfiguration.get_twilio_settings()['from_num'])
 
 
 class TestNoReserved:

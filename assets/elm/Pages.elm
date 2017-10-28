@@ -1,5 +1,6 @@
 module Pages exposing (Page(..), initSendAdhoc, initSendGroup)
 
+import Pages.Debug as DG
 import Pages.FirstRun as FR
 import Pages.Forms.Contact as CF
 import Pages.Forms.DefaultResponses as DRF
@@ -21,6 +22,7 @@ type Page
     | ElvantoImport
     | Error404
     | FirstRun FR.Model
+    | Debug DG.Model
     | GroupComposer GC.Model
     | GroupForm GF.Model (Maybe Int)
     | GroupTable IsArchive

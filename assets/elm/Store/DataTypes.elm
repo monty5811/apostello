@@ -104,6 +104,9 @@ dt_from_page p =
         FirstRun _ ->
             []
 
+        Debug _ ->
+            []
+
         AccessDenied ->
             []
 

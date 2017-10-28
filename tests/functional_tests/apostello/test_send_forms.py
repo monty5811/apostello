@@ -1,13 +1,14 @@
 from time import sleep
 
-from flaky import flaky
 import pytest
+from flaky import flaky
 from selenium.common.exceptions import ElementNotVisibleException
 from selenium.webdriver.common.keys import Keys
-from tests.conftest import twilio_vcr
+from tests.conftest import MAX_RUNS, twilio_vcr
 from tests.functional_tests.utils import assert_with_timeout, click_and_wait
 
 from apostello.models import SmsOutbound
+from site_config.models import SiteConfiguration
 
 ADHOC_URI = '/send/adhoc/'
 GROUP_URI = '/send/group/'
@@ -81,10 +82,12 @@ def add_content_and_group(b, wt):
     return b
 
 
-@flaky(max_runs=5)
+@flaky(max_runs=MAX_RUNS)
 @pytest.mark.slow
+@pytest.mark.django_db
 @pytest.mark.selenium
-class TestSendAdhoc:
+@pytest.mark.usefixtures('setup_twilio')
+class TestSendAdhoc():
     def test_empty_form(self, live_server, browser_in, users, driver_wait_time):
         """Test submitting an empty form."""
         b = load_page(browser_in, driver_wait_time, live_server + ADHOC_URI)
@@ -173,9 +176,11 @@ class TestSendAdhoc:
         assert 'DO NOT REPLY' == content_box.get_attribute('value')
 
 
-@flaky(max_runs=5)
+@flaky(max_runs=MAX_RUNS)
 @pytest.mark.slow
+@pytest.mark.django_db
 @pytest.mark.selenium
+@pytest.mark.usefixtures('setup_twilio')
 class TestSendGroup:
     def test_empty_form(self, live_server, browser_in, users, driver_wait_time, groups):
         """Test submitting an empty form."""

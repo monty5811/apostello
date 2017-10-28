@@ -1,10 +1,15 @@
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.core.cache.utils import make_template_fragment_key
 from django.db import models
+from phonenumber_field.modelfields import PhoneNumberField
 from solo.models import SingletonModel
 
-from apostello.validators import (less_than_sms_char_limit, validate_starts_with_plus)
+from apostello.validators import (less_than_sms_char_limit,
+                                  validate_starts_with_plus)
+
+
+class ConfigurationError(Exception):
+    pass
 
 
 class SiteConfiguration(SingletonModel):
@@ -79,31 +84,62 @@ class SiteConfiguration(SingletonModel):
     # email sending settings
     email_host = models.URLField(
         blank=True,
-        help_text='Email host.'
-        ' This will override values in settings.py',
+        null=True,
+        help_text='Email host.',
     )
     email_port = models.PositiveIntegerField(
         blank=True,
         null=True,
-        help_text='Email host port.'
-        ' This will override values in settings.py',
+        help_text='Email host port.',
     )
     email_username = models.CharField(
+        null=True,
         blank=True,
         max_length=255,
-        help_text='Email user name.'
-        ' This will override values in settings.py',
+        help_text='Email user name.',
     )
     email_password = models.CharField(
+        null=True,
         blank=True,
         max_length=255,
-        help_text='Email password.'
-        ' This will override values in settings.py',
+        help_text='Email password.',
     )
     email_from = models.EmailField(
+        null=True,
         blank=True,
-        help_text='Email will be sent from this address.'
-        ' This will override values in settings.py',
+        help_text='Email will be sent from this address.',
+    )
+    # sms sending settings
+    twilio_account_sid = models.CharField(
+        'Twilio Account SID',
+        null=True,
+        blank=True,
+        max_length=34,
+        help_text='Your Twilio Account SID.'
+        ' See https://support.twilio.com/hc/en-us/articles/223136607-What-is-an-Application-SID-'
+    )
+    twilio_auth_token = models.CharField(
+        'Twilio Auth Token',
+        null=True,
+        blank=True,
+        max_length=32,
+        help_text='Your Twilio Auth Token.'
+        ' See https://support.twilio.com/hc/en-us/articles/223136027-Auth-Tokens-and-how-to-change-them'
+    )
+    twilio_from_num = PhoneNumberField(
+        'Twilio Phone Number',
+        null=True,
+        blank=True,
+        help_text='Your Twilio Number. This is the number we will send messages from.'
+    )
+    twilio_sending_cost = models.DecimalField(
+        'Twilio Sending Cost',
+        null=True,
+        blank=True,
+        decimal_places=4,
+        max_digits=5,
+        help_text='The cost of sending an SMS.'
+        ' You can find this here: https://www.twilio.com/sms/pricing'
     )
 
     def __str__(self):
@@ -112,9 +148,45 @@ class SiteConfiguration(SingletonModel):
 
     def save(self, *args, **kwargs):
         super(SiteConfiguration, self).save(*args, **kwargs)
-        for u in User.objects.all():
-            key = make_template_fragment_key('elmSettings', [u])
-            cache.delete(key)
+        cache.delete('twilio_settings')
+
+    def is_twilio_setup(self):
+        vals = [
+            self.twilio_account_sid,
+            self.twilio_auth_token,
+            self.twilio_from_num,
+            self.twilio_sending_cost
+        ]
+        return all([x is not None for x in vals])
+
+    def is_email_setup(self):
+        vals = [
+            self.email_from,
+            self.email_username,
+            self.email_password,
+            self.email_port,
+            self.email_host,
+        ]
+        return all([x is not None for x in vals])
+
+    @staticmethod
+    def get_twilio_settings():
+        config = SiteConfiguration.get_solo()
+        if not config.is_twilio_setup():
+            raise ConfigurationError('Twilio Not Setup Yet.')
+
+        cached = cache.get('twilio_settings')
+        if cached is None:
+            s = {
+                'auth_token': config.twilio_auth_token,
+                'sid': config.twilio_account_sid,
+                'from_num': str(config.twilio_from_num),
+                'sending_cost': float(config.twilio_sending_cost),
+            }
+            cache.set('twilio_settings', s, 3600)
+            return s
+        else:
+            return cached
 
     class Meta:
         verbose_name = "Site Configuration"

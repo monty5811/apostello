@@ -219,6 +219,20 @@ class QueuedSmsSerializer(BaseModelSerializer):
 
 class SiteConfigurationSerializer(BaseModelSerializer):
     auto_add_new_groups = RecipientGroupSerializer(many=True, read_only=True)
+    twilio_from_num = serializers.SerializerMethodField()
+    twilio_sending_cost = serializers.SerializerMethodField()
+
+    def get_twilio_from_num(self, obj):
+        if obj.twilio_from_num is not None:
+            return str(obj.twilio_from_num)
+        else:
+            return None
+
+    def get_twilio_sending_cost(self, obj):
+        if obj.twilio_sending_cost is not None:
+            return float(obj.twilio_sending_cost)
+        else:
+            return None
 
     class Meta:
         model = SiteConfiguration
@@ -240,6 +254,10 @@ class SiteConfigurationSerializer(BaseModelSerializer):
             'email_from',
             'sms_expiration_date',
             'sms_rolling_expiration_days',
+            'twilio_sending_cost',
+            'twilio_account_sid',
+            'twilio_from_num',
+            'twilio_auth_token',
         )
 
 

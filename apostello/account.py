@@ -12,4 +12,4 @@ class ApostelloAccountAdapter(DefaultAccountAdapter):
         """Override to use SiteConfiguration, then fall back to settings."""
         from site_config.models import SiteConfiguration
         s = SiteConfiguration.get_solo()
-        return s.email_from or settings.EMAIL_FROM
+        return s.email_from

@@ -9,6 +9,7 @@ def handle_form(view, request):
     except KeyError:
         form = view.form_class(request.data)
     if form.is_valid():
+        form.full_clean()
         form.save()
         msg = {
             'type_': 'info',

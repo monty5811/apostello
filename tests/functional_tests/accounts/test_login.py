@@ -24,14 +24,18 @@ class TestLogin:
         password_box = browser.find_elements_by_name('password')[0]
         password_box.send_keys('top_secret')
         login_button = browser.find_element_by_id('login_button')
-        click_and_wait(login_button, 5 * driver_wait_time)
+        login_button.click()
+
         # check we have been redirected
-        assert 'accounts' not in browser.current_url
+        def _test():
+            assert 'accounts' not in browser.current_url
+
+        assert_with_timeout(_test, 5 * driver_wait_time)
 
         # log out again
         browser.get(live_server + '/accounts/logout/')
         logout_confirm = browser.find_element_by_id('logout_button')
-        click_and_wait(logout_confirm, driver_wait_time)
+        logout_confirm.click()
 
         def _test():
             assert 'accounts/login' in browser.current_url

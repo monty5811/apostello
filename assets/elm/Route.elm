@@ -9,6 +9,7 @@ import Messages exposing (Msg(NewUrl))
 import Models exposing (Settings)
 import Navigation
 import Pages exposing (Page(..), initSendAdhoc, initSendGroup)
+import Pages.Debug as DG
 import Pages.FirstRun as FR
 import Pages.Forms.Contact as CF
 import Pages.Forms.Group as GF
@@ -40,6 +41,7 @@ route =
         , Url.map UserProfileTable (s "users" </> s "profiles")
         , Url.map ElvantoImport (s "elvanto" </> s "import")
         , Url.map (FirstRun FR.initialModel) (s "config" </> s "first_run")
+        , Url.map (Debug DG.initialModel) (s "config" </> s "debug")
         , Url.map (GroupForm GF.initialModel << Just) (s "group" </> s "edit" </> int)
         , Url.map (GroupForm GF.initialModel Nothing) (s "group" </> s "new")
         , Url.map (ContactForm CF.initialModel << Just) (s "recipient" </> s "edit" </> int)
@@ -213,6 +215,9 @@ page2loc page =
 
         DefaultResponsesForm _ ->
             "/config/responses/"
+
+        Debug _ ->
+            "/config/debug/"
 
         CreateAllGroup _ ->
             "/group/create_all/"
@@ -415,6 +420,9 @@ checkPerm blockedKeywords userPerms page =
                     userPerms.can_import
 
                 ApiSetup _ ->
+                    userPerms.user.is_staff
+
+                Debug _ ->
                     userPerms.user.is_staff
     in
     case permBool of

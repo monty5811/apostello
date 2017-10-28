@@ -84,7 +84,7 @@ Running Tests
 Frontend
 ~~~~~~~~
 
-A significant portion of the frontend uses `Elm <https://elm-lang.org>`_.
+Most of the frontend is written in `Elm <https://elm-lang.org>`_.
 
 Setup:
 

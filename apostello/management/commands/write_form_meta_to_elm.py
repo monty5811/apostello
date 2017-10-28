@@ -40,7 +40,7 @@ def field_text(field_name, field):
     else:
         req = "False"
 
-    txt =  f'{field_name} = FieldMeta {req} "id_{field_name}" "{field_name}" "{esc(label)}" {help_text}'
+    txt = f'{field_name} = FieldMeta {req} "id_{field_name}" "{field_name}" "{esc(label)}" {help_text}'
     return txt
 
 
@@ -52,9 +52,7 @@ def generate_module(name, form_):
     elm += ', '.join([f'{name} : FieldMeta' for name in form.base_fields])
     elm += ' }\n'
     elm += 'meta =\n    { '
-    fields_text = '\n    , '.join(
-        [field_text(field_name, field) for field_name, field in form.base_fields.items()]
-    )
+    fields_text = '\n    , '.join([field_text(field_name, field) for field_name, field in form.base_fields.items()])
     elm += f'{fields_text}\n    }}\n'
     dir_name = 'assets/elm/Pages/Forms/Meta'
     fname = os.path.join(dir_name, f'{name}.elm')

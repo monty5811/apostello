@@ -8,7 +8,7 @@ Setup
 ~~~~~
 
 In order to access the API, you must generate an API key.
-Open your instance of apostello and navigate to ``/api-setup/``, or click ``Tools -> API Setup``, then generate an API key. Only staff users can access this page.
+Open your instance of apostello and navigate to ``/api-setup/``, or click ``Menu -> API Setup``, then generate an API key. Only staff users can access this page.
 
 You can also regenerate or remove your API keys on this page.
 

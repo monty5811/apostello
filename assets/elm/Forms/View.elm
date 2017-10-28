@@ -59,28 +59,41 @@ renderItem errorDict item =
                 List.map (renderField errorDict) fields
 
 
-fieldGroupHelp : FieldGroupConfig -> List (Html msg) -> Html msg
+fieldGroupHelp : FieldGroupConfig msg -> List (Html msg) -> Html msg
 fieldGroupHelp config fields =
     fields
         |> addSideBySide config.sideBySide
+        |> addGroupHelpText config.helpText
         |> addHeader config.header
         |> addSegment
 
 
-addSideBySide : Bool -> List (Html msg) -> List (Html msg)
-addSideBySide add fields =
-    if add then
-        [ div
-            [ A.style
-                [ "display" => "grid"
-                , "grid-template-columns" => "repeat(" ++ toString (List.length fields) ++ ", auto)"
-                , "grid-column-gap" => "1rem"
+addSideBySide : Maybe Int -> List (Html msg) -> List (Html msg)
+addSideBySide config fields =
+    case config of
+        Just num ->
+            [ div
+                [ A.style
+                    [ "display" => "grid"
+                    , "grid-template-columns" => "repeat(" ++ toString num ++ ", auto)"
+                    , "grid-column-gap" => "1rem"
+                    ]
                 ]
+                fields
             ]
+
+        Nothing ->
             fields
-        ]
-    else
-        fields
+
+
+addGroupHelpText : Maybe (Html msg) -> List (Html msg) -> List (Html msg)
+addGroupHelpText maybeSnippet fields =
+    case maybeSnippet of
+        Just snippet ->
+            snippet :: fields
+
+        Nothing ->
+            fields
 
 
 addHeader : Maybe String -> List (Html msg) -> List (Html msg)
@@ -251,7 +264,7 @@ simpleFloatField meta defaultValue inputMsg =
             , A.name meta.name
             , E.onInput inputMsg
             , A.type_ "number"
-            , A.step "0.01"
+            , A.step "0.0001"
             , A.min "0"
             ]
         )

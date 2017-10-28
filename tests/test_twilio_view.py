@@ -1,4 +1,4 @@
-import sys
+from urllib.parse import urljoin
 
 import pytest
 from django.conf import settings
@@ -10,11 +10,12 @@ from twilio.request_validator import RequestValidator
 from apostello import tasks
 from apostello.models import *
 from apostello.views import *
+from site_config.models import SiteConfiguration
 
-if sys.version_info[0] == 3:
-    from urllib.parse import urljoin
-else:
-    from urlparse import urljoin
+
+def get_token():
+    config = SiteConfiguration.get_solo()
+    return config.twilio_auth_token
 
 
 class TwilioRequestFactory(RequestFactory):
@@ -95,7 +96,7 @@ def test_twilio_view(msg, reply, keywords, recipients):
     config = SiteConfiguration.get_solo()
     config.disable_all_replies = False
     config.save()
-    factory = TwilioRequestFactory(token=settings.TWILIO_AUTH_TOKEN)
+    factory = TwilioRequestFactory(token=get_token())
     data = test_request_data()
     data['Body'] = msg
     request = factory.post(uri, data=data)
@@ -112,7 +113,7 @@ def test_twilio_view_blocking_contact(keywords, recipients):
     config = SiteConfiguration.get_solo()
     config.disable_all_replies = False
     config.save()
-    factory = TwilioRequestFactory(token=settings.TWILIO_AUTH_TOKEN)
+    factory = TwilioRequestFactory(token=get_token())
     data = test_request_data_blocked()
     data['Body'] = u'Test'
     request = factory.post(uri, data=data)
@@ -130,7 +131,7 @@ def test_twilio_view_ask_for_name(keywords):
     config.disable_all_replies = False
     config.office_email = 'test@example.com'
     config.save()
-    factory = TwilioRequestFactory(token=settings.TWILIO_AUTH_TOKEN)
+    factory = TwilioRequestFactory(token=get_token())
     data = test_request_data()
     data['Body'] = u'Test'
     request = factory.post(uri, data=data)
@@ -153,7 +154,7 @@ def test_twilio_view_ask_for_name(keywords):
 @pytest.mark.django_db
 @twilio_vcr
 def test_twilio_view_no_replies(msg, reply, keywords):
-    factory = TwilioRequestFactory(token=settings.TWILIO_AUTH_TOKEN)
+    factory = TwilioRequestFactory(token=get_token())
     data = test_request_data()
     data['Body'] = msg
     request = factory.post(uri, data=data)

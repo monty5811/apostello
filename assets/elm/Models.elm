@@ -4,6 +4,7 @@ module Models
         , MenuModel(..)
         , Model
         , Settings
+        , TwilioSettings
         , decodeFlags
         , initialModel
         )
@@ -61,11 +62,17 @@ initialModel settings page =
 type alias Settings =
     { csrftoken : CSRFToken
     , userPerms : UserProfile
-    , twilioSendingCost : Float
-    , twilioFromNumber : String
+    , twilio : Maybe TwilioSettings
+    , isEmailSetup : Bool
     , smsCharLimit : Int
     , defaultNumberPrefix : String
     , blockedKeywords : List String
+    }
+
+
+type alias TwilioSettings =
+    { sendingCost : Float
+    , fromNumber : String
     }
 
 
@@ -74,11 +81,18 @@ decodeSettings =
     decode Settings
         |> required "csrftoken" (Decode.string |> Decode.andThen (\t -> Decode.succeed (CSRFToken t)))
         |> required "userPerms" decodeUserProfile
-        |> required "twilioSendingCost" Decode.float
-        |> required "twilioFromNumber" Decode.string
+        |> required "twilio" (Decode.maybe decodeTwilioSettings)
+        |> required "isEmailSetup" Decode.bool
         |> required "smsCharLimit" Decode.int
         |> required "defaultNumberPrefix" Decode.string
         |> required "blockedKeywords" (Decode.list Decode.string)
+
+
+decodeTwilioSettings : Decode.Decoder TwilioSettings
+decodeTwilioSettings =
+    decode TwilioSettings
+        |> required "sending_cost" Decode.float
+        |> required "from_num" Decode.string
 
 
 

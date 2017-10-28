@@ -131,6 +131,9 @@ fabLinks ds page canArchive =
         FirstRun _ ->
             []
 
+        Debug _ ->
+            defaultLinks
+
         AccessDenied ->
             defaultLinks
 

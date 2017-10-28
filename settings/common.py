@@ -139,14 +139,6 @@ REST_FRAMEWORK = {
 # email settings
 EMAIL_BACKEND = 'apostello.mail.ApostelloEmailBackend'
 EMAIL_USE_TLS = True
-# these email settings can be overridden in the SiteConfiguration model
-# this also allows for these settings to be left blank on initial setup and
-# filled in later
-EMAIL_HOST = os.environ.get('DJANGO_EMAIL_HOST', None)
-EMAIL_HOST_USER = os.environ.get('DJANGO_EMAIL_HOST_USER', None)
-EMAIL_HOST_PASSWORD = os.environ.get('DJANGO_EMAIL_HOST_PASSWORD', None)
-EMAIL_FROM = os.environ.get('DJANGO_FROM_EMAIL', None)
-EMAIL_PORT = int(os.environ.get('DJANGO_EMAIL_HOST_PORT', 587))
 
 # social login settings
 ACCOUNT_ADAPTER = 'apostello.account.ApostelloAccountAdapter'
@@ -169,12 +161,6 @@ ONEBODY_BASE_URL = os.environ.get('ONEBODY_BASE_URL')
 ONEBODY_USER_EMAIL = os.environ.get('ONEBODY_USER_EMAIL')
 ONEBODY_API_KEY = os.environ.get('ONEBODY_API_KEY')
 ONEBODY_WAIT_TIME = 10
-
-# Twilio credentials
-TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID', 'no SID found')
-TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN', 'no auth token found')
-TWILIO_FROM_NUM = os.environ.get('TWILIO_FROM_NUM', 'no number found')
-TWILIO_SENDING_COST = float(os.environ.get('TWILIO_SENDING_COST', '0.04'))  # cost in USD
 
 # Sms settings - note that messages over 160 will be charged twice
 MAX_NAME_LENGTH = 16

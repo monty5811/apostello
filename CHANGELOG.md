@@ -3,6 +3,21 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+**Note** - this release moves the Twilio and email sending configuration into the database to make managing and intial
+setup easier.
+Your existing settings will be imported when you run a migration `./manage.py migrate` after this upgrade.
+You must run this migration before attempting to update to the next release.
+
+### Changed
+
+ - Move the Twilio and Email settings into databse - no longer use enviroment variables. Smoother and quicker setup process.
+ - Nicer help messages on forms
+ - Don't refresh data needlessly in the background
+
+### Fixed
+
+ - Styling issue where group members were not visible
+
 ## [v2.5.4]
 
  - Fix bug that prevented sending of cloud notifications

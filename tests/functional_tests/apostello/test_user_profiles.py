@@ -3,10 +3,11 @@ from time import sleep
 import pytest
 from django.contrib.auth.models import User
 from flaky import flaky
+from tests.conftest import MAX_RUNS
 from tests.functional_tests.utils import assert_with_timeout
 
 
-@flaky(max_runs=5)
+@flaky(max_runs=MAX_RUNS)
 @pytest.mark.django_db
 @pytest.mark.slow
 @pytest.mark.selenium
@@ -48,6 +49,7 @@ class TestUserProfiles:
         # toggle
         toggle_button = browser_in.find_element_by_id('id_can_archive')
         toggle_button.click()
+        sleep(driver_wait_time)
         # submit
         save_button = browser_in.find_element_by_id('formSubmitButton')
         save_button.click()

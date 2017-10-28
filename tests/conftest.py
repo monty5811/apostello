@@ -12,6 +12,7 @@ from django.utils.timezone import get_current_timezone
 from selenium import webdriver
 
 from apostello.models import *
+from site_config.models import SiteConfiguration
 
 
 @pytest.fixture(autouse=True)
@@ -394,6 +395,20 @@ def browser_in_not_staff(request, live_server, users, driver_wait_time):
     driver.quit()
 
 
+@pytest.fixture()
+def setup_twilio():
+    config = SiteConfiguration.get_solo()
+    config.twilio_account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
+    config.twilio_auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
+    config.twilio_from_num = os.environ.get('TWILIO_FROM_NUM')
+    try:
+        cost = float(os.environ.get('TWILIO_SENDING_COST'))
+    except TypeError:
+        cost = None
+    config.twilio_sending_cost = cost
+    config.save()
+
+
 @pytest.mark.hookwrapper
 def pytest_runtest_makereport(item, call):
     pytest_html = item.config.pluginmanager.getplugin('html')
@@ -437,3 +452,6 @@ def post_json(client, url, data):
         json.dumps(data),
         content_type="application/json",
     )
+
+
+MAX_RUNS = int(os.environ.get('FLAKY_RUNS', 5))

@@ -13,7 +13,8 @@ from django.views.generic import TemplateView, View
 from rest_framework.parsers import JSONParser
 from twilio.base.exceptions import TwilioException
 
-from apostello.twilio import twilio_client
+from apostello.twilio import get_twilio_client
+from site_config.models import SiteConfiguration
 
 EnvVarSetting = namedtuple('EnvVarSetting', ['env_var_name', 'info', 'val'])
 
@@ -33,55 +34,22 @@ class FirstRunView(TemplateView):
     def get_context_data(self, **kwargs):
         """Inject data into context."""
         context = super(FirstRunView, self).get_context_data(**kwargs)
-
-        try:
-            numbers = twilio_client.incoming_phone_numbers.list()
-            number = [n for n in numbers if n.phone_number == settings.TWILIO_FROM_NUM]
-            if numbers:
-                number = numbers[0]
-                sms_url = number.sms_url
-                sms_method = number.sms_method
-            else:
-                sms_url = 'Number not found'
-                sms_method = 'Url not found'
-        except TwilioException:
-            sms_url = 'Uh oh, something went wrong, please refresh the page, or correct your twilio settings.'
-            sms_method = 'Uh oh, something went wrong, please refresh the page, or correct your twilio settings.'
-
-        context['number'] = {
-            'sms_url': sms_url,
-            'sms_method': sms_method,
-        }
-
         context['variables'] = [
-            EnvVarSetting('TWILIO_ACCOUNT_SID', 'Your Twilio account SID', settings.TWILIO_ACCOUNT_SID),
-            EnvVarSetting('TWILIO_AUTH_TOKEN', 'Your Twilio auth ID (hidden)', '****'),
-            EnvVarSetting('TWILIO_FROM_NUM', 'Your Twilio number', settings.TWILIO_FROM_NUM),
-            EnvVarSetting(
-                'TWILIO_SENDING_COST', 'Cost of sending a SMS using Twilio in your country',
-                settings.TWILIO_SENDING_COST
-            ),
-            EnvVarSetting('DJANGO_EMAIL_HOST', 'Email host', settings.EMAIL_HOST),
-            EnvVarSetting('DJANGO_EMAIL_HOST_USER', 'Email host user name', settings.EMAIL_HOST_USER),
-            EnvVarSetting('DJANGO_EMAIL_HOST_PASSWORD', 'Email host password (hidden)', '****'),
-            EnvVarSetting('DJANGO_FROM_EMAIL', 'Email from which to send', settings.EMAIL_FROM),
-            EnvVarSetting('DJANGO_EMAIL_HOST_PORT', 'Email host port', settings.EMAIL_PORT),
-            EnvVarSetting(
-                'ACCOUNT_DEFAULT_HTTP_PROTOCOL', 'Set to "http" if you do not have SSL setup',
-                settings.ACCOUNT_DEFAULT_HTTP_PROTOCOL
-            ),
+            EnvVarSetting('DJANGO_TIME_ZONE', 'Your timezone (e.g. "Europe/London")', settings.TIME_ZONE),
             EnvVarSetting(
                 'WHITELISTED_LOGIN_DOMAINS',
                 'Any users that sign up with an email address matching this domain will be granted "approved" status automatically',
                 '\n'.join(settings.WHITELISTED_LOGIN_DOMAINS)
             ),
-            EnvVarSetting('DJANGO_TIME_ZONE', 'Your timezone (e.g. "Europe/London"', settings.TIME_ZONE),
-            EnvVarSetting('DJANGO_SECRET_KEY', 'This should be a long random string (hidden for security)', '****'),
+            EnvVarSetting(
+                'ACCOUNT_DEFAULT_HTTP_PROTOCOL', 'Set to "http" if you do not have SSL setup',
+                settings.ACCOUNT_DEFAULT_HTTP_PROTOCOL
+            ),
             EnvVarSetting('ELVANTO_KEY', 'Your Elvanto API key', settings.ELVANTO_KEY),
             EnvVarSetting('COUNTRY_CODE', 'Used to normalise numbers from Elvanto', settings.COUNTRY_CODE),
             EnvVarSetting(
                 'LE_EMAIL',
-                'This is the email address associated with youe Let\'s Encrypt certificate. This is only required with Ansible deploys.',
+                'This is the email address associated with your Let\'s Encrypt certificate. This is only required with Ansible deploys.',
                 os.environ.get('LE_EMAIL')
             ),
         ]
@@ -90,20 +58,14 @@ class FirstRunView(TemplateView):
 
 
 class TestSetupView(View):
-    """Calls self.run_test() on post. Only works if User table is empty."""
+    """Calls self.run_test() on post."""
 
     def run_test(self, request, *args, **kwargs):
         """Placeholder for run_test method."""
-        pass
+        raise NotImplementedError
 
     def post(self, request, *args, **kwargs):
         """Actually run the test."""
-
-        if User.objects.count() > 0:
-            response = JsonResponse({'status': 'denied'})
-            response.status_code = 403
-            return response
-
         try:
             data = JSONParser().parse(request)
             self.run_test(data, *args, **kwargs)
@@ -132,11 +94,21 @@ class TestSmsView(TestSetupView):
 
     def run_test(self, data, *args, **kwargs):
         """Send message to posted number."""
-        twilio_client.messages.create(body=data['body_'], to=data['to_'], from_=settings.TWILIO_FROM_NUM)
+        twilio_num = str(SiteConfiguration.get_solo().twilio_from_num)
+        get_twilio_client().messages.create(body=data['body_'], to=data['to_'], from_=twilio_num)
 
 
 class CreateSuperUser(TestSetupView):
     """Create a superuser."""
+
+    def post(self, request, *args, **kwargs):
+        """Override post to first check if any users exist already."""
+        if User.objects.count() > 0:
+            response = JsonResponse({'status': 'denied'})
+            response.status_code = 403
+            return response
+        else:
+            return super().post(request, *args, **kwargs)
 
     def run_test(self, data, *args, **kwargs):
         """Create a new user and grant them full access rights."""

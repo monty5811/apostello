@@ -54,18 +54,19 @@ formErrors formStatus =
 type FormItem msg
     = FormField (Field msg)
     | FormHeader String
-    | FieldGroup FieldGroupConfig (List (Field msg))
+    | FieldGroup (FieldGroupConfig msg) (List (Field msg))
 
 
-type alias FieldGroupConfig =
+type alias FieldGroupConfig msg =
     { header : Maybe String
-    , sideBySide : Bool
+    , helpText : Maybe (Html msg)
+    , sideBySide : Maybe Int
     }
 
 
-defaultFieldGroupConfig : FieldGroupConfig
+defaultFieldGroupConfig : FieldGroupConfig msg
 defaultFieldGroupConfig =
-    FieldGroupConfig Nothing False
+    FieldGroupConfig Nothing Nothing Nothing
 
 
 type alias Field msg =

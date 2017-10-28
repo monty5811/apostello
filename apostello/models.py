@@ -21,6 +21,7 @@ from apostello.validators import (
     TWILIO_INFO_WORDS, TWILIO_START_WORDS, TWILIO_STOP_WORDS, gsm_validator, less_than_sms_char_limit,
     no_overlap_keyword, not_twilio_num, twilio_reserved, validate_lower
 )
+from site_config.models import ConfigurationError, SiteConfiguration
 
 logger = logging.getLogger('apostello')
 
@@ -73,7 +74,11 @@ class RecipientGroup(models.Model):
 
     def calculate_cost(self):
         """Calculate the cost of sending to this group."""
-        return settings.TWILIO_SENDING_COST * self.all_recipients.count()
+        try:
+            cost = SiteConfiguration.get_twilio_settings()['sending_cost']
+        except ConfigurationError:
+            cost = 0
+        return cost * self.all_recipients.count()
 
     def __str__(self):
         """Pretty representation."""
@@ -155,10 +160,11 @@ class Recipient(models.Model):
     @staticmethod
     def check_user_cost_limit(recipients, limit, msg):
         """Check the user has not exceeded their per SMS cost limit."""
+        cost = SiteConfiguration.get_twilio_settings()['sending_cost']
         num_sms = ceil(len(msg) / 160)
         if limit == 0:
             return
-        if limit < len(recipients) * settings.TWILIO_SENDING_COST * num_sms:
+        if limit < len(recipients) * cost * num_sms:
             raise ValidationError('Sorry, you can only send messages that cost no more than ${0}.'.format(limit))
 
     @cached_property

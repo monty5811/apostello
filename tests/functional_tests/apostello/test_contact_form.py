@@ -18,7 +18,7 @@ def load_page(b, wt, url):
 
 def send_form(b, wt):
     send_button = b.find_element_by_id('formSubmitButton')
-    click_and_wait(send_button, wt)
+    send_button.click()
     return b
 
 

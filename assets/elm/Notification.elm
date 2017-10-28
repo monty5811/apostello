@@ -3,9 +3,11 @@ module Notification
         ( DjangoMessage
         , Msg
         , Notification
+        , NotificationType(..)
         , Notifications
         , addListOfDjangoMessages
         , addRefreshNotif
+        , createError
         , createInfo
         , createLoadingFailed
         , createNotSaved
@@ -60,7 +62,7 @@ tView notification =
                     "info"
 
                 ErrorNotification ->
-                    "error"
+                    "danger"
 
         className =
             "alert alert-" ++ messageType
@@ -70,15 +72,19 @@ tView notification =
                 |> String.split "\n"
                 |> List.map Html.text
                 |> List.intersperse (Html.br [] [])
+
+        icon =
+            if notification.showClose then
+                [ Html.i
+                    [ class "fa fa-close float-right"
+                    , onClick <| Remove notification
+                    ]
+                    []
+                ]
+            else
+                []
     in
-    Html.div [ class className ] <|
-        [ Html.i
-            [ class "fa fa-close float-right"
-            , onClick <| Remove notification
-            ]
-            []
-        ]
-            ++ text
+    Html.div [ class className ] <| icon ++ text
 
 
 
@@ -88,6 +94,7 @@ tView notification =
 type alias Notification =
     { type_ : NotificationType
     , text : String
+    , showClose : Bool
     }
 
 
@@ -131,7 +138,7 @@ removeHelp notifToRemove curNotif =
 
 create : Notifications -> String -> NotificationType -> Notifications
 create notifications text type_ =
-    Notification type_ text :: notifications
+    Notification type_ text True :: notifications
 
 
 createFromDjangoMessage : DjangoMessage -> Notifications -> Notifications
@@ -170,6 +177,11 @@ refreshNotifMessage =
 addRefreshNotif : Notifications -> Notifications
 addRefreshNotif notifications =
     addListOfDjangoMessages [ refreshNotifMessage ] notifications
+
+
+createError : Notifications -> String -> Notifications
+createError notifications text =
+    create notifications text ErrorNotification
 
 
 createWarning : Notifications -> String -> Notifications

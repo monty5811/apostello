@@ -65,7 +65,9 @@ allUsersMenuItems settings wp =
         , item Urls.account_logout "Logout" True
         ]
     , Html.div [ A.id "webpush", A.style [ "margin-left" => "2rem" ] ] <| pushMenu isStaff userPerms wp
-    , Html.div [ A.class "text-right", A.style [ "margin-right" => "2rem" ] ] [ text settings.twilioFromNumber ]
+    , Html.div [ A.class "text-right", A.style [ "margin-right" => "2rem" ] ]
+        [ text <| Maybe.withDefault "" <| Maybe.map .fromNumber settings.twilio
+        ]
     ]
 
 

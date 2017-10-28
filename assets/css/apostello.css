@@ -141,6 +141,14 @@ label {
     margin-bottom: 0.5rem;
 }
 
+#nonmembers_item {
+    color: var(--color-black);
+}
+
+#members_item {
+    color: var(--color-black);
+}
+
 #close {
     grid-row: 1/2;
     grid-column-start: 1;

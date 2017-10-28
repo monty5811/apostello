@@ -3,7 +3,7 @@ from time import sleep
 import pytest
 from django.contrib.auth.models import User
 from django.core import mail
-from tests.functional_tests.utils import assert_with_timeout, click_and_wait
+from tests.functional_tests.utils import assert_with_timeout
 
 from site_config.models import SiteConfiguration
 
@@ -31,7 +31,7 @@ class TestSignup:
         password_box2 = browser.find_elements_by_name('password2')[0]
         password_box2.send_keys('top_secret')
         login_button = browser.find_element_by_id('signupButton')
-        click_and_wait(login_button, driver_wait_time)
+        login_button.click()
 
         def _test():
             assert '/accounts/confirm-email/' in browser.current_url

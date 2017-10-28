@@ -3,7 +3,7 @@ module Pages.Forms.Meta.SiteConfig exposing (meta)
 import Forms.Model exposing (FieldMeta)
 
 
-meta : { site_name : FieldMeta, sms_char_limit : FieldMeta, default_number_prefix : FieldMeta, disable_all_replies : FieldMeta, disable_email_login_form : FieldMeta, office_email : FieldMeta, auto_add_new_groups : FieldMeta, sms_expiration_date : FieldMeta, sms_rolling_expiration_days : FieldMeta, slack_url : FieldMeta, sync_elvanto : FieldMeta, not_approved_msg : FieldMeta, email_host : FieldMeta, email_port : FieldMeta, email_username : FieldMeta, email_password : FieldMeta, email_from : FieldMeta }
+meta : { site_name : FieldMeta, sms_char_limit : FieldMeta, default_number_prefix : FieldMeta, disable_all_replies : FieldMeta, disable_email_login_form : FieldMeta, office_email : FieldMeta, auto_add_new_groups : FieldMeta, sms_expiration_date : FieldMeta, sms_rolling_expiration_days : FieldMeta, slack_url : FieldMeta, sync_elvanto : FieldMeta, not_approved_msg : FieldMeta, email_host : FieldMeta, email_port : FieldMeta, email_username : FieldMeta, email_password : FieldMeta, email_from : FieldMeta, twilio_account_sid : FieldMeta, twilio_auth_token : FieldMeta, twilio_from_num : FieldMeta, twilio_sending_cost : FieldMeta }
 meta =
     { site_name = FieldMeta True "id_site_name" "site_name" "Site name" Nothing
     , sms_char_limit = FieldMeta True "id_sms_char_limit" "sms_char_limit" "Sms char limit" (Just "SMS length limit. The sending forms use this value to limit the size of messages. Check the Twilio pricing docs for pricing information.")
@@ -17,9 +17,13 @@ meta =
     , slack_url = FieldMeta False "id_slack_url" "slack_url" "Slack url" (Just "Post all incoming messages to this slack hook. Leave blank to disable.")
     , sync_elvanto = FieldMeta False "id_sync_elvanto" "sync_elvanto" "Sync elvanto" (Just "Toggle automatic syncing of Elvanto groups. Syncing will be done every 24 hours.")
     , not_approved_msg = FieldMeta True "id_not_approved_msg" "not_approved_msg" "Not approved msg" (Just "This message will be shown on the \"not approved\" page.")
-    , email_host = FieldMeta False "id_email_host" "email_host" "Email host" (Just "Email host. This will override values in settings.py")
-    , email_port = FieldMeta False "id_email_port" "email_port" "Email port" (Just "Email host port. This will override values in settings.py")
-    , email_username = FieldMeta False "id_email_username" "email_username" "Email username" (Just "Email user name. This will override values in settings.py")
-    , email_password = FieldMeta False "id_email_password" "email_password" "Email password" (Just "Email password. This will override values in settings.py")
-    , email_from = FieldMeta False "id_email_from" "email_from" "Email from" (Just "Email will be sent from this address. This will override values in settings.py")
+    , email_host = FieldMeta False "id_email_host" "email_host" "Email host" (Just "Email host.")
+    , email_port = FieldMeta False "id_email_port" "email_port" "Email port" (Just "Email host port.")
+    , email_username = FieldMeta False "id_email_username" "email_username" "Email username" (Just "Email user name.")
+    , email_password = FieldMeta False "id_email_password" "email_password" "Email password" (Just "Email password.")
+    , email_from = FieldMeta False "id_email_from" "email_from" "Email from" (Just "Email will be sent from this address.")
+    , twilio_account_sid = FieldMeta False "id_twilio_account_sid" "twilio_account_sid" "Twilio Account SID" (Just "Your Twilio Account SID. See https://support.twilio.com/hc/en-us/articles/223136607-What-is-an-Application-SID-")
+    , twilio_auth_token = FieldMeta False "id_twilio_auth_token" "twilio_auth_token" "Twilio Auth Token" (Just "Your Twilio Auth Token. See https://support.twilio.com/hc/en-us/articles/223136027-Auth-Tokens-and-how-to-change-them")
+    , twilio_from_num = FieldMeta False "id_twilio_from_num" "twilio_from_num" "Twilio Phone Number" (Just "Your Twilio Number. This is the number we will send messages from.")
+    , twilio_sending_cost = FieldMeta False "id_twilio_sending_cost" "twilio_sending_cost" "Twilio Sending Cost" (Just "The cost of sending an SMS. You can find this here: https://www.twilio.com/sms/pricing")
     }

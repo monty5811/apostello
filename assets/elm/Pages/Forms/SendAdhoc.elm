@@ -48,10 +48,10 @@ type Msg
     | UpdateAdhocFilter String
 
 
-update : Float -> Msg -> Model -> Model
-update twilioCost msg model =
+update : Maybe { a | sendingCost : Float } -> Msg -> Model -> Model
+update twilioSettings msg model =
     updateHelp msg model
-        |> updateCost twilioCost
+        |> updateCost twilioSettings
 
 
 updateHelp : Msg -> Model -> Model
@@ -71,21 +71,26 @@ updateHelp msg model =
             { model | adhocFilter = textToRegex text }
 
 
-updateCost : Float -> Model -> Model
-updateCost twilioCost model =
-    case model.content of
-        "" ->
+updateCost : Maybe { a | sendingCost : Float } -> Model -> Model
+updateCost twilioSettings model =
+    case Maybe.map .sendingCost twilioSettings of
+        Nothing ->
             { model | cost = Nothing }
 
-        c ->
-            case model.selectedContacts |> List.length of
-                0 ->
+        Just twilioCost ->
+            case model.content of
+                "" ->
                     { model | cost = Nothing }
 
-                n ->
-                    { model
-                        | cost = Just (calculateSmsCost (twilioCost * toFloat n) c)
-                    }
+                c ->
+                    case model.selectedContacts |> List.length of
+                        0 ->
+                            { model | cost = Nothing }
+
+                        n ->
+                            { model
+                                | cost = Just (calculateSmsCost (twilioCost * toFloat n) c)
+                            }
 
 
 

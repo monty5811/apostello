@@ -8,6 +8,7 @@ import Pages exposing (Page(..), initSendAdhoc)
 import Pages.AccessDenied as AD
 import Pages.ApiSetup as ApiSetup
 import Pages.Curator as C
+import Pages.Debug as DG
 import Pages.ElvantoImport as EI
 import Pages.Error404 as E404
 import Pages.FirstRun as FR
@@ -181,6 +182,9 @@ content model =
 
         FirstRun m ->
             Html.map M.FirstRunMsg <| FR.view m
+
+        Debug m ->
+            Html.map M.DebugMsg <| DG.view m
 
         AccessDenied ->
             AD.view

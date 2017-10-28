@@ -7,7 +7,7 @@ from twilio.base.exceptions import TwilioRestException
 from site_config.models import SiteConfiguration
 
 from .models import Keyword, Recipient, SmsInbound, SmsOutbound
-from .twilio import twilio_client
+from .twilio import get_twilio_client
 
 logger = logging.getLogger('apostello')
 
@@ -100,10 +100,11 @@ def handle_outgoing_sms(msg):
 
 def fetch_generator(direction):
     """Fetch generator from twilio."""
+    twilio_num = str(SiteConfiguration.get_solo().twilio_from_num)
     if direction == 'in':
-        return twilio_client.messages.list(to=settings.TWILIO_FROM_NUM)
+        return get_twilio_client().messages.list(to=twilio_num)
     if direction == 'out':
-        return twilio_client.messages.list(from_=settings.TWILIO_FROM_NUM)
+        return get_twilio_client().messages.list(from_=twilio_num)
     return []
 
 

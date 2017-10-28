@@ -1,7 +1,8 @@
 from time import sleep
 
+from tests.functional_tests.utils import assert_with_timeout, click_and_wait
+
 import pytest
-from tests.functional_tests.utils import click_and_wait
 
 URI = '/api-setup/'
 
@@ -18,19 +19,31 @@ class TestAPISetup:
         # show key
         show_button = b.find_element_by_id('showKeyButton')
         click_and_wait(show_button, driver_wait_time)
+
         # delete token that doesn't exist
-        del_button = b.find_element_by_id('delKeyButton')
-        click_and_wait(del_button, driver_wait_time)
-        assert no_api_token_txt in b.page_source
+        def _test():
+            b.find_element_by_id('delKeyButton').click()
+            assert no_api_token_txt in b.page_source
+
+        assert_with_timeout(_test, driver_wait_time)
+
         # generate token for first time
-        regen_button = b.find_element_by_id('genKeyButton')
-        click_and_wait(regen_button, driver_wait_time)
-        assert no_api_token_txt not in b.page_source
+        def _test():
+            b.find_element_by_id('genKeyButton').click()
+            assert no_api_token_txt not in b.page_source
+
+        assert_with_timeout(_test, driver_wait_time)
+
         # regenerate token
-        regen_button = b.find_element_by_id('genKeyButton')
-        click_and_wait(regen_button, driver_wait_time)
-        assert no_api_token_txt not in b.page_source
+        def _test():
+            b.find_element_by_id('genKeyButton').click()
+            assert no_api_token_txt not in b.page_source
+
+        assert_with_timeout(_test, driver_wait_time)
+
         # delete token
-        del_button = b.find_element_by_id('delKeyButton')
-        click_and_wait(del_button, driver_wait_time)
-        assert no_api_token_txt in b.page_source
+        def _test():
+            b.find_element_by_id('delKeyButton').click()
+            assert no_api_token_txt in b.page_source
+
+        assert_with_timeout(_test, driver_wait_time)

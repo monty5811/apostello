@@ -6,6 +6,7 @@ import Navigation
 import Notification as Notif
 import PageVisibility
 import Pages.ApiSetup as AS
+import Pages.Debug as DG
 import Pages.ElvantoImport as EI
 import Pages.FirstRun as FR
 import Pages.Forms.Contact as CF
@@ -38,6 +39,7 @@ type Msg
     | GroupComposerMsg GC.Msg
     | KeyRespTableMsg KRT.Msg
     | FirstRunMsg FR.Msg
+    | DebugMsg DG.Msg
     | SidePanelMsg SidePanelMsg
     | ApiSetupMsg AS.Msg
     | WebPushMsg WebPush.Msg

@@ -9,7 +9,7 @@ from django.utils import timezone
 from django_q.tasks import async
 from twilio.base.exceptions import TwilioRestException
 
-from apostello.twilio import twilio_client
+from apostello.twilio import get_twilio_client
 from apostello.utils import fetch_default_reply
 
 logger = logging.getLogger('apostello')
@@ -29,6 +29,7 @@ def group_send_message_task(body, group_name, sent_by, eta):
 def recipient_send_message_task(recipient_pk, body, group, sent_by):
     """Send a message asynchronously."""
     from apostello.models import Recipient
+    from site_config.models import SiteConfiguration
     recipient = Recipient.objects.get(pk=recipient_pk)
     if recipient.is_archived:
         # if recipient is not active, fail silently
@@ -39,7 +40,9 @@ def recipient_send_message_task(recipient_pk, body, group, sent_by):
     body = recipient.personalise(body)
     # send twilio message
     try:
-        message = twilio_client.messages.create(body=body, to=str(recipient.number), from_=settings.TWILIO_FROM_NUM)
+        message = get_twilio_client().messages.create(
+            body=body, to=str(recipient.number), from_=str(SiteConfiguration.get_solo().twilio_from_num)
+        )
         # add to sms out table
         sms = SmsOutbound(sid=message.sid, content=body, time_sent=timezone.now(), recipient=recipient, sent_by=sent_by)
         if group is not None:
@@ -134,11 +137,10 @@ def cleanup_expired_sms():
 
 def send_async_mail(subject, body, to):
     """Send email."""
-    # read email settings from DB, if they are empty, they will be read from
-    # settings.py instead
+    # read email settings from DB
     from site_config.models import SiteConfiguration
     s = SiteConfiguration.get_solo()
-    from_ = s.email_from or settings.EMAIL_FROM
+    from_ = s.email_from
     send_mail(subject, body, from_, to)
 
 

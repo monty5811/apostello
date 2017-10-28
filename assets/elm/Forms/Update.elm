@@ -1,4 +1,4 @@
-module Forms.Update exposing (initDateTimePickers, update)
+module Forms.Update exposing (initDateTimePickers, maybeFetchConfig, update)
 
 import Data exposing (Keyword, Recipient, RecipientGroup, UserProfile)
 import Date
@@ -10,7 +10,7 @@ import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Messages exposing (FormMsg(..), Msg(FormMsg))
-import Models exposing (Model, Settings)
+import Models exposing (Model, Settings, TwilioSettings)
 import Navigation as Nav
 import Notification as Notif
 import Pages as P
@@ -158,12 +158,15 @@ update msg model =
         ReceiveFormResp okMsg (Ok resp) ->
             case Decode.decodeString decodeFormResp resp.body of
                 Ok data ->
+                    -- update the form and refetch the site config, to update our settings
+                    -- in case we have just edited the site config form
                     ( { model
                         | formStatus = Success
                         , notifications = Notif.addListOfDjangoMessages data.messages model.notifications
                       }
                     , okMsg
                     )
+                        |> maybeFetchConfig
 
                 Err err ->
                     ( { model | formStatus = Failed <| formDecodeError err }, [] )
@@ -299,7 +302,7 @@ update msg model =
         SendAdhocMsg subMsg ->
             case model.page of
                 P.SendAdhoc saModel ->
-                    ( { model | page = P.SendAdhoc <| SAF.update model.settings.twilioSendingCost subMsg saModel }, [] )
+                    ( { model | page = P.SendAdhoc <| SAF.update model.settings.twilio subMsg saModel }, [] )
 
                 _ ->
                     ( model, [] )
@@ -340,10 +343,52 @@ update msg model =
 
 updateSettings : SCF.Model -> Settings -> Settings
 updateSettings newSCModel settings =
+    let
+        newTwilio =
+            Maybe.map2
+                TwilioSettings
+                newSCModel.twilio_sending_cost
+                newSCModel.twilio_from_num
+
+        newEmailSetup =
+            [ isJust newSCModel.email_from
+            , isJust newSCModel.email_host
+            , isJust newSCModel.email_password
+            , isJust newSCModel.email_port
+            , isJust newSCModel.email_username
+            ]
+                |> List.all identity
+    in
     { settings
         | smsCharLimit = newSCModel.sms_char_limit
         , defaultNumberPrefix = newSCModel.default_number_prefix
+        , twilio = newTwilio
+        , isEmailSetup = newEmailSetup
     }
+
+
+isJust : Maybe a -> Bool
+isJust m =
+    case m of
+        Just _ ->
+            True
+
+        Nothing ->
+            False
+
+
+maybeFetchConfig : ( Model, List (Cmd Msg) ) -> ( Model, List (Cmd Msg) )
+maybeFetchConfig ( model, cmds ) =
+    let
+        req =
+            Http.get Urls.api_site_config SCF.decodeModel
+    in
+    case model.page of
+        P.SiteConfigForm _ ->
+            ( model, cmds ++ [ Http.send (FormMsg << ReceiveSiteConfigFormModel) req ] )
+
+        _ ->
+            ( model, cmds )
 
 
 setInProgress : Model -> Model
@@ -506,11 +551,15 @@ postSiteConfigCmd csrf model =
             , ( "slack_url", Encode.string model.slack_url )
             , ( "sync_elvanto", Encode.bool model.sync_elvanto )
             , ( "not_approved_msg", Encode.string model.not_approved_msg )
-            , ( "email_host", Encode.string model.email_host )
+            , ( "email_host", encodeMaybe Encode.string model.email_host )
             , ( "email_port", encodeMaybe Encode.int model.email_port )
-            , ( "email_username", Encode.string model.email_username )
-            , ( "email_password", Encode.string model.email_password )
-            , ( "email_from", Encode.string model.email_from )
+            , ( "email_username", encodeMaybe Encode.string model.email_username )
+            , ( "email_password", encodeMaybe Encode.string model.email_password )
+            , ( "email_from", encodeMaybe Encode.string model.email_from )
+            , ( "twilio_from_num", encodeMaybe Encode.string model.twilio_from_num )
+            , ( "twilio_sending_cost", encodeMaybe Encode.float model.twilio_sending_cost )
+            , ( "twilio_auth_token", encodeMaybe Encode.string model.twilio_auth_token )
+            , ( "twilio_account_sid", encodeMaybe Encode.string model.twilio_account_sid )
             ]
     in
     rawPost csrf Urls.api_site_config body

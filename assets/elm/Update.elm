@@ -10,10 +10,10 @@ import Notification as Notif
 import PageVisibility
 import Pages as P
 import Pages.ApiSetup as ApiSetup
+import Pages.Debug as DG
 import Pages.ElvantoImport as ElvImp
 import Pages.FirstRun as FR
 import Pages.Forms.DefaultResponses as DRF
-import Pages.Forms.SiteConfig as SCF
 import Pages.Fragments.SidePanel as SidePanel
 import Pages.GroupComposer as GC
 import Pages.KeyRespTable as KRT
@@ -39,7 +39,11 @@ update msg model =
         newCmds =
             maybeSaveDataStore msg model newModel cmds
     in
-    ( newModel, Cmd.batch newCmds )
+    ( newModel
+        |> maybeAddEmailWarning
+        |> maybeAddTwilioWarning
+    , Cmd.batch newCmds
+    )
 
 
 updateHelper : Msg -> Model -> ( Model, List (Cmd Msg) )
@@ -84,7 +88,7 @@ updateHelper msg model =
                 , List.map (Cmd.map FormMsg) datePickerCmds
                 ]
             )
-                |> maybeFetchConfig
+                |> F.maybeFetchConfig
                 |> maybeFetchResps
 
         -- Load data
@@ -113,6 +117,19 @@ updateHelper msg model =
                     in
                     { model | page = P.FirstRun newFrModel }
                         => List.map (Cmd.map FirstRunMsg) frCmds
+
+                _ ->
+                    model => []
+
+        DebugMsg subMsg ->
+            case model.page of
+                P.Debug dgModel ->
+                    let
+                        ( newDgModel, dgCmds ) =
+                            DG.update model.settings.csrftoken subMsg dgModel
+                    in
+                    { model | page = P.Debug newDgModel }
+                        => List.map (Cmd.map DebugMsg) dgCmds
 
                 _ ->
                     model => []
@@ -245,15 +262,41 @@ maybeFetchResps ( model, cmds ) =
             ( model, cmds )
 
 
-maybeFetchConfig : ( Model, List (Cmd Msg) ) -> ( Model, List (Cmd Msg) )
-maybeFetchConfig ( model, cmds ) =
+maybeAddTwilioWarning : Model -> Model
+maybeAddTwilioWarning model =
     let
-        req =
-            Http.get Urls.api_site_config SCF.decodeModel
+        notif =
+            Notif.Notification
+                Notif.ErrorNotification
+                "You need to setup your Twilio credentials.\n\nYou won't be able to send messages until you do."
+                False
     in
-    case model.page of
-        P.SiteConfigForm _ ->
-            ( model, cmds ++ [ Http.send (FormMsg << ReceiveSiteConfigFormModel) req ] )
+    case model.settings.twilio of
+        Nothing ->
+            if List.member notif model.notifications then
+                model
+            else
+                { model | notifications = notif :: model.notifications }
 
-        _ ->
-            ( model, cmds )
+        Just _ ->
+            { model | notifications = Notif.remove notif model.notifications }
+
+
+maybeAddEmailWarning : Model -> Model
+maybeAddEmailWarning model =
+    let
+        notif =
+            Notif.Notification
+                Notif.WarningNotification
+                "You need to setup your email credentials.\n\napostello won't be able to send emails until you do. This means new users cannot confirm their email address and no notifications can be sent"
+                False
+    in
+    case model.settings.isEmailSetup of
+        False ->
+            if List.member notif model.notifications then
+                model
+            else
+                { model | notifications = notif :: model.notifications }
+
+        True ->
+            { model | notifications = Notif.remove notif model.notifications }

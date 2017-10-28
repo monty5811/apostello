@@ -6,7 +6,12 @@ from django.views.decorators.csrf import csrf_exempt
 from twilio.request_validator import RequestValidator
 from twilio.rest import Client
 
-twilio_client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+from site_config.models import ConfigurationError, SiteConfiguration
+
+
+def get_twilio_client():
+    twilio_settings = SiteConfiguration.get_twilio_settings()
+    return Client(twilio_settings['sid'], twilio_settings['auth_token'])
 
 
 def twilio_view(f):
@@ -68,10 +73,11 @@ def twilio_view(f):
 
             # Forgery check
             try:
-                validator = RequestValidator(settings.TWILIO_AUTH_TOKEN)
+                twilio_settings = SiteConfiguration.get_twilio_settings()
+                validator = RequestValidator(twilio_settings['auth_token'])
                 url = request.build_absolute_uri()
                 signature = request.META['HTTP_X_TWILIO_SIGNATURE']
-            except (AttributeError, KeyError):
+            except (AttributeError, KeyError, ConfigurationError):
                 return HttpResponseForbidden()
 
             if request.method == 'POST':

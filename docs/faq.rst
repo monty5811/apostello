@@ -7,7 +7,7 @@ What is the character limit for an SMS?
 By default, each SMS is limited to 160 characters.
 Twilio can send messages up to 1600 characters long, but it will charge you multiple times, e.g. a 1600 character message will be charged the same as 10 messages.
 
-The character limit can be increased on the Site Configuration page (``Tools --> Site Configuration``).
+The character limit can be increased on the Site Configuration page (``Menu --> Site Configuration``).
 
 How do I "mail merge" my messages?
 ----------------------------------
@@ -25,7 +25,7 @@ How do I setup the slack integration?
 -------------------------------------
 
 Create a new Slack incoming `webhook <https://my.slack.com/services/new/incoming-webhook/>`_.
-Then open the Site Configuration page (``Tools --> Site Configuration``) and paste the hook URL you were given by Slack.
+Then open the Site Configuration page (``Menu --> Site Configuration``) and paste the hook URL you were given by Slack.
 Click save and all your incoming messages should show up in the Slack channel you picked when creating the webhook.
 
 How do I prepopulate the send SMS form?
@@ -42,7 +42,7 @@ You can do this by opening ``<your domain>/admin/sites/site/``, click on the fir
 How can I get rid of old messages?
 ----------------------------------
 
-Open the Site Configuration page (``Tools --> Site Configuration``), scroll down to find the ``SMS Expiration`` section.
+Open the Site Configuration page (``Menu --> Site Configuration``), scroll down to find the ``SMS Expiration`` section.
 You can set a hard cut off date: any messages before this date will be purged from the system.
 Or you can choose the number of days to hold on to messages: any messages older than this number of days will be purged.
 The purge is run daily. You can use this to hide old messages you no longer care about or to make sure you stay within the limits of the Heroku hobby database.
@@ -59,4 +59,4 @@ There are a few steps to get this working:
 * Open you project, then go to ``Settings -> Cloud Messaging``
 * You need two bits of information from this page - the Sender ID and the Server Key. You need to provide these to apostello so we can send notifications. Do this by setting the environment variables ``CM_SENDER_ID`` and ``CM_SERVER_KEY``.
 
-Once you are all setup, open apostello, open the ``Tools`` menu and subscribe to notifications - you will be notified everytime a new SMS is received. You can turn it off at any time.
+Once you are all setup, open apostello, open the menu and subscribe to notifications - you will be notified everytime a new SMS is received. You can turn it off at any time.

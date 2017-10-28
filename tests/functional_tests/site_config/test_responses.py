@@ -1,9 +1,10 @@
 import pytest
 from flaky import flaky
+from tests.conftest import MAX_RUNS
 from tests.functional_tests.utils import assert_with_timeout
 
 
-@flaky(max_runs=5)
+@flaky(max_runs=MAX_RUNS)
 @pytest.mark.django_db
 @pytest.mark.slow
 @pytest.mark.selenium

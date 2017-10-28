@@ -35,11 +35,15 @@ type alias Model =
     , slack_url : String
     , sync_elvanto : Bool
     , not_approved_msg : String
-    , email_host : String
+    , email_host : Maybe String
     , email_port : Maybe Int
-    , email_username : String
-    , email_password : String
-    , email_from : String
+    , email_username : Maybe String
+    , email_password : Maybe String
+    , email_from : Maybe String
+    , twilio_account_sid : Maybe String
+    , twilio_auth_token : Maybe String
+    , twilio_from_num : Maybe String
+    , twilio_sending_cost : Maybe Float
     , groupsFilter : Regex.Regex
     }
 
@@ -60,11 +64,15 @@ decodeModel =
         |> required "slack_url" Decode.string
         |> required "sync_elvanto" Decode.bool
         |> required "not_approved_msg" Decode.string
-        |> required "email_host" Decode.string
+        |> required "email_host" (Decode.maybe Decode.string)
         |> required "email_port" (Decode.maybe Decode.int)
-        |> required "email_username" Decode.string
-        |> required "email_password" Decode.string
-        |> required "email_from" Decode.string
+        |> required "email_username" (Decode.maybe Decode.string)
+        |> required "email_password" (Decode.maybe Decode.string)
+        |> required "email_from" (Decode.maybe Decode.string)
+        |> required "twilio_account_sid" (Decode.maybe Decode.string)
+        |> required "twilio_auth_token" (Decode.maybe Decode.string)
+        |> required "twilio_from_num" (Decode.maybe Decode.string)
+        |> required "twilio_sending_cost" (Decode.maybe Decode.float)
         |> hardcoded (Regex.regex "")
 
 
@@ -73,7 +81,11 @@ decodeModel =
 
 
 type Msg
-    = UpdateSiteNameField Model String
+    = UpdateTwilioFromNum Model String
+    | UpdateTwilioSid Model String
+    | UpdateTwilioAuthToken Model String
+    | UpdateTwilioSendCost Model String
+    | UpdateSiteNameField Model String
     | UpdateSmsCharLimitField Model String
     | UpdateDefaultPrefixField Model String
     | UpdateDisableRepliesField Model
@@ -96,6 +108,23 @@ type Msg
 update : Msg -> Model
 update msg =
     case msg of
+        UpdateTwilioFromNum model text ->
+            { model | twilio_from_num = Just text }
+
+        UpdateTwilioSid model text ->
+            { model | twilio_account_sid = Just text }
+
+        UpdateTwilioAuthToken model text ->
+            { model | twilio_auth_token = Just text }
+
+        UpdateTwilioSendCost model text ->
+            case String.toFloat text of
+                Ok num ->
+                    { model | twilio_sending_cost = Just num }
+
+                Err _ ->
+                    model
+
         UpdateSiteNameField model text ->
             { model | site_name = text }
 
@@ -144,7 +173,7 @@ update msg =
             { model | not_approved_msg = text }
 
         UpdateEmailHostField model text ->
-            { model | email_host = text }
+            { model | email_host = Just text }
 
         UpdateEmailPortField model text ->
             case String.toInt text of
@@ -155,13 +184,13 @@ update msg =
                     model
 
         UpdateEmailUserField model text ->
-            { model | email_username = text }
+            { model | email_username = Just text }
 
         UpdateEmailPassField model text ->
-            { model | email_password = text }
+            { model | email_password = Just text }
 
         UpdateEmailFromField model text ->
-            { model | email_from = text }
+            { model | email_from = Just text }
 
         UpdateGroupsFilter model text ->
             { model | groupsFilter = textToRegex text }
@@ -195,9 +224,29 @@ view msgs groups maybeModel status =
                 (FV.submitButton (Just model) False)
 
 
+debugHelpText : Html msg
+debugHelpText =
+    Html.p []
+        [ Html.text "You can test these settings "
+        , Html.a [ A.href "/config/debug/", A.target "_blank" ] [ Html.text "here" ]
+        , Html.text "."
+        ]
+
+
 fieldsHelp : Messages msg -> RL.RemoteList RecipientGroup -> Model -> List (FormItem msg)
 fieldsHelp msgs groups model =
-    [ FieldGroup { defaultFieldGroupConfig | header = Just "Site Settings" }
+    [ FieldGroup
+        { defaultFieldGroupConfig
+            | header = Just "Twilio Settings"
+            , sideBySide = Just 2
+            , helpText = Just <| debugHelpText
+        }
+        [ Field meta.twilio_from_num (twilioFromNumField msgs meta.twilio_from_num model)
+        , Field meta.twilio_sending_cost (twilioSendCostField msgs meta.twilio_sending_cost model)
+        , Field meta.twilio_account_sid (twilioAccountSidField msgs meta.twilio_account_sid model)
+        , Field meta.twilio_auth_token (twilioAuthTokenField msgs meta.twilio_auth_token model)
+        ]
+    , FieldGroup { defaultFieldGroupConfig | header = Just "Site Settings" }
         [ Field meta.site_name (siteNameField msgs meta.site_name model)
         , Field meta.disable_email_login_form (emailLoginField msgs meta.disable_email_login_form model)
         , Field meta.not_approved_msg (notAppField msgs meta.not_approved_msg model)
@@ -208,7 +257,7 @@ fieldsHelp msgs groups model =
         , Field meta.disable_all_replies (allRepliesField msgs meta.disable_all_replies model)
         , Field meta.auto_add_new_groups (autoNewGroupsField msgs groups meta.auto_add_new_groups model)
         ]
-    , FieldGroup { defaultFieldGroupConfig | header = Just "SMS Expiration", sideBySide = True }
+    , FieldGroup { defaultFieldGroupConfig | header = Just "SMS Expiration", sideBySide = Just 2 }
         [ Field meta.sms_expiration_date (smsExpirationDateField msgs meta.sms_expiration_date model)
         , Field meta.sms_rolling_expiration_days (smsRollingExpireField msgs meta.sms_rolling_expiration_days model)
         ]
@@ -216,7 +265,12 @@ fieldsHelp msgs groups model =
         [ Field meta.office_email (officeEmailField msgs meta.office_email model)
         , Field meta.slack_url (slackField msgs meta.slack_url model)
         ]
-    , FieldGroup { defaultFieldGroupConfig | header = Just "Sending Email Settings" }
+    , FieldGroup
+        { defaultFieldGroupConfig
+            | header = Just "Sending Email Settings"
+            , sideBySide = Just 2
+            , helpText = Just <| debugHelpText
+        }
         [ Field meta.email_host (emailHostField msgs meta.email_host model)
         , Field meta.email_port (emailPortField msgs meta.email_port model)
         , Field meta.email_username (emailUserField msgs meta.email_username model)
@@ -227,6 +281,34 @@ fieldsHelp msgs groups model =
         [ Field meta.sync_elvanto (syncElvField msgs meta.sync_elvanto model)
         ]
     ]
+
+
+twilioFromNumField : Messages msg -> FieldMeta -> Model -> List (Html msg)
+twilioFromNumField msgs meta_ model =
+    FV.simpleTextField meta_
+        model.twilio_from_num
+        (msgs.form << UpdateTwilioFromNum model)
+
+
+twilioSendCostField : Messages msg -> FieldMeta -> Model -> List (Html msg)
+twilioSendCostField msgs meta_ model =
+    FV.simpleFloatField meta_
+        model.twilio_sending_cost
+        (msgs.form << UpdateTwilioSendCost model)
+
+
+twilioAuthTokenField : Messages msg -> FieldMeta -> Model -> List (Html msg)
+twilioAuthTokenField msgs meta_ model =
+    FV.simpleTextField meta_
+        model.twilio_auth_token
+        (msgs.form << UpdateTwilioAuthToken model)
+
+
+twilioAccountSidField : Messages msg -> FieldMeta -> Model -> List (Html msg)
+twilioAccountSidField msgs meta_ model =
+    FV.simpleTextField meta_
+        model.twilio_account_sid
+        (msgs.form << UpdateTwilioSid model)
 
 
 siteNameField : Messages msg -> FieldMeta -> Model -> List (Html msg)
@@ -375,7 +457,7 @@ notAppField msgs meta_ model =
 emailHostField : Messages msg -> FieldMeta -> Model -> List (Html msg)
 emailHostField msgs meta_ model =
     FV.simpleTextField meta_
-        (Just model.email_host)
+        model.email_host
         (msgs.form << UpdateEmailHostField model)
 
 
@@ -390,7 +472,7 @@ emailUserField : Messages msg -> FieldMeta -> Model -> List (Html msg)
 emailUserField msgs meta_ model =
     FV.simpleTextField
         meta_
-        (Just model.email_username)
+        model.email_username
         (msgs.form << UpdateEmailUserField model)
 
 
@@ -398,7 +480,7 @@ emailPassField : Messages msg -> FieldMeta -> Model -> List (Html msg)
 emailPassField msgs meta_ model =
     FV.simpleTextField
         meta_
-        (Just model.email_password)
+        model.email_password
         (msgs.form << UpdateEmailPassField model)
 
 
@@ -406,5 +488,5 @@ emailFromField : Messages msg -> FieldMeta -> Model -> List (Html msg)
 emailFromField msgs meta_ model =
     FV.simpleTextField
         meta_
-        (Just model.email_from)
+        model.email_from
         (msgs.form << UpdateEmailFromField model)

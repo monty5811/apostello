@@ -27,17 +27,28 @@ First Run
 After you have successfully installed apostello there are a few more steps to finish setup.
 
 * Open your instance of apostello, you will be redirected to the initial setup page
-* Here you can check various settings and tokens and test sending an email and an SMS
-* If you see an incorrect setting, change it and reload the page to check it has updated
+* This page lets you create a new admin user.
+* You can check various settings. If somthing doesn't look right change the setting and reload the page to check it has updated
 * If you have issues sending an email or SMS, you will be shown the corresponding error message. If you need help, please get in touch
-* When you are confident everything is working, use the form at the bottom to create an admin. Note that once you do this, you will lose access to this page
 * Once you have created your account, refresh the page and login with you email and password
-* Open the `Tools` menu where you can edit the site configuration and some canned responses
-* If you want to let users sign in with Google, then you need to follow the steps `here <https://django-allauth.readthedocs.org/en/stable/providers.html#google>`_
-* If you need to approve new users, you can use the User Permissions page under the tools menu
-* Now you need to :ref:`setup Twilio <setup-twilio>` so you can receive messages
 * You can now continue to set up apostello: import contacts, start sending messages, publicise your number, etc
+
+Configuration
+~~~~~~~~~~~~~
+
+Once you have successfully logged in, navigate to the Site Configuration page (click the menu button, then Site Configuration).
+There are various settings on this page, but the first thing to do is to configure Twilio and email.
+
+* Just fill in your credentials and submit the form
+* Now you need to :ref:`setup Twilio <setup-twilio>` so you can receive messages
+* You can also test your setup using the link provided
+
+Other options:
+
+* You can edit the default responses by going to `Menu -> Defaault Responses`
+* If you want to let users sign in with Google, then you need to follow the steps `here <https://django-allauth.readthedocs.org/en/stable/providers.html#google>`_
 * Any future users will be able to use the normal sign up page. If you do not whitelist any domains, you will need to approve new users manually before they can do anything. Please be extremely careful with the whitelisting setting - if you set it to a domain that you have no control over (e.g ``gmail.com``), then anyone will be able to access your instance of apostello
+* If you need to approve new users, use the User Permissions page
 
 
 .. _setup-twilio:
@@ -71,14 +82,4 @@ Emails are sent for a number of reasons by apostello:
 apostello needs a mail server to send these emails.
 We recommend using `Mailgun <https://www.mailgun.com/>`_ which allows you to send 10,000 emails for free each month.
 
-There are two ways to tell apostello about your mail server:
-
-1. Set environment variables. The relevant variables are:
-
-   * ``DJANGO_EMAIL_HOST``
-   * ``DJANGO_EMAIL_HOST_PORT``
-   * ``DJANGO_EMAIL_HOST_USER``
-   * ``DJANGO_EMAIL_HOST_PASSWORD``
-   * ``DJANGO_FROM_EMAIL``
-
-2. Use the `Site Configuration` form after getting apostello up and running. **N.B.** These values will override those set as environment variables.
+Use the `Site Configuration` form to tell apostello about your mail server.

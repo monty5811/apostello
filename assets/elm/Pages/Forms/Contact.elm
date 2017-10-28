@@ -138,7 +138,7 @@ viewHelp props maybeTable currentContact contacts_ model status =
             showArchiveNotice contacts currentContact model
 
         fields =
-            [ FieldGroup { defaultFieldGroupConfig | sideBySide = True, header = Just "Name" }
+            [ FieldGroup { defaultFieldGroupConfig | sideBySide = Just 2, header = Just "Name" }
                 [ Field meta.first_name <| firstNameField props meta.first_name currentContact
                 , Field meta.last_name <| lastNameField props meta.last_name currentContact
                 ]

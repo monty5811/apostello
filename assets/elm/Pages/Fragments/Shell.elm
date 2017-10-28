@@ -79,6 +79,9 @@ title page =
         AccessDenied ->
             ""
 
+        Debug _ ->
+            "Debug Configuration"
+
         ContactForm _ (Just _) ->
             "Edit Contact"
 
