@@ -38,7 +38,7 @@ commonShell model mainContent fab =
 
                 _ ->
                     spaLink Html.a [] [ Html.h2 [] [ text "apostello" ] ] Home
-            , Html.a [ class "button", E.onClick ToggleMenu ] [ text "Menu" ]
+            , Html.a [ class "button bounce", E.onClick ToggleMenu ] [ text "Menu" ]
             ]
         , Html.main_ [ id "wrap" ]
             [ fab
