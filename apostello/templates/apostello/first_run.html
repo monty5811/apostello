@@ -25,28 +25,26 @@
 
       <div id="elmContainer"></div>
 
-      <div style="margin: 1rem">
-        <div class="segment">
-          <h4>Configuration Variables</h4>
-          <table>
-            <thead>
-              <tr>
-                <th>Environment Variable</th>
-                <th>Description</th>
-                <th>Current Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for row in variables %}
-              <tr>
-                <td>{{ row.env_var_name }}</td>
-                <td>{{ row.info }}</td>
-                <td>{{ row.val|linebreaks }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+      <div class="segment">
+        <h4>Configuration Variables</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>Environment Variable</th>
+              <th>Description</th>
+              <th>Current Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in variables %}
+            <tr>
+              <td>{{ row.env_var_name }}</td>
+              <td>{{ row.info }}</td>
+              <td>{{ row.val|linebreaks }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
     </div>
     <script>

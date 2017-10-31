@@ -30,7 +30,7 @@ view model mainContent fab =
 commonShell : Model -> Html Msg -> Html Msg -> Html Msg
 commonShell model mainContent fab =
     Html.div
-        []
+        [ id "elmShell" ]
         [ Html.header [ id "head", class "text-center" ]
             [ case model.page of
                 Home ->

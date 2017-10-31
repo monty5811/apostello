@@ -17,6 +17,7 @@ You must run this migration before attempting to update to the next release.
 ### Fixed
 
  - Styling issue where group members were not visible
+ - Styling bug on live updating wall
 
 ## [v2.5.4]
 
