@@ -48,8 +48,10 @@ class TestUserProfiles:
         sleep(driver_wait_time)
         # toggle
         toggle_button = browser_in.find_element_by_id('id_can_archive')
+        assert toggle_button.is_selected()
         toggle_button.click()
         sleep(driver_wait_time)
+        assert not toggle_button.is_selected()
         # submit
         save_button = browser_in.find_element_by_id('formSubmitButton')
         save_button.click()

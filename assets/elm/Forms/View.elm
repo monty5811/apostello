@@ -289,15 +289,14 @@ checkboxField meta maybeRec getter toggleMsg =
         checked =
             Maybe.map getter maybeRec |> Maybe.withDefault False
     in
-    [ div
-        [ E.onClick <| toggleMsg maybeRec
-        ]
+    [ div []
         [ label []
             [ input
                 [ A.id meta.id
                 , A.name meta.name
                 , A.type_ "checkbox"
                 , A.checked checked
+                , E.onClick <| toggleMsg maybeRec
                 ]
                 []
             , Html.text <| " " ++ meta.label

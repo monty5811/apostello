@@ -96,12 +96,12 @@ update msg model =
 
         PostUserProfileForm ->
             case model.page of
-                P.UserProfileForm upfModel pk ->
+                P.UserProfileForm upfModel userPk ->
                     setInProgress model
                         => [ postUserProfileCmd
                                 model.settings.csrftoken
                                 upfModel
-                                (RL.filter (\x -> x.pk == pk) model.dataStore.userprofiles
+                                (RL.filter (\x -> x.user.pk == userPk) model.dataStore.userprofiles
                                     |> RL.toList
                                     |> List.head
                                 )
