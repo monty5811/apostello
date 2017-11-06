@@ -3,19 +3,26 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-**Note** - this release moves the Twilio and email sending configuration into the database to make managing and intial
-setup easier.
+## [v2.6.0]
+
+**Note** - this release moves the Twilio and email sending configuration into the database to make management and intial setup easier.
 Your existing settings will be imported when you run a migration `./manage.py migrate` after this upgrade.
-You must run this migration before attempting to update to the next release.
+
+*You must update to 2.6.0 and run the migrate command before attempting to update to the next release.*
 
 ### Changed
 
  - Move the Twilio and Email settings into databse - no longer use enviroment variables. Smoother and quicker setup process.
  - Nicer help messages on forms
+
+### Added
+
+ - Small animation to make the menu button more obvious
  - Don't refresh data needlessly in the background
 
 ### Fixed
 
+ - Bug in User Profile form that saved wrong permissions under some circumstances
  - Styling issue where group members were not visible
  - Styling bug on live updating wall
 
