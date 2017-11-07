@@ -82,9 +82,10 @@ class SiteConfiguration(SingletonModel):
         help_text='This message will be shown on the "not approved" page.',
     )
     # email sending settings
-    email_host = models.URLField(
+    email_host = models.CharField(
         blank=True,
         null=True,
+        max_length=255,
         help_text='Email host.',
     )
     email_port = models.PositiveIntegerField(

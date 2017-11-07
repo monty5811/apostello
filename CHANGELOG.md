@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [v2.6.1]
+
+### Fixed
+
+ - Prevent `http://` from being added to email host field
+
 ## [v2.6.0]
 
 **Note** - this release moves the Twilio and email sending configuration into the database to make management and intial setup easier.
