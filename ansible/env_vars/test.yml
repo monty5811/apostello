@@ -7,18 +7,8 @@ nginx_server_name: 127.0.0.1
 django_secret_key: 'this should be a very long string'
 # this is used in the account related emails and should match your server settings
 account_default_http_protocol: 'https'
-# Twilio Credentials
-twilio_account_sid: 'AC00000000000000000000000000000000'
-twilio_auth_token: '00000000000000000000000000000000'
-twilio_from_num: '+15005550006'
-twilio_sending_cost: 0.04
 # Whitelisted domains
 whitelisted_login_domains: ''
-# Email
-django_email_host: test
-django_email_host_user: test
-django_email_host_password: test
-django_from_email: test
 # locale and time zone:
 django_time_zone: 'Europe/London'
 # Elvanto
