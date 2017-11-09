@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [v2.6.3]
+
+### Fixed
+
+ - Fix formatting bug in email digest subject field
+
 ## [v2.6.2]
 
 **Before you upgrade**: if you want your Twilio and email settings to be copied into the database when you upgrade, you must upgrade to `2.6.0`, check the deploy and then upgrade to `2.6.2`.

@@ -190,7 +190,7 @@ def send_keyword_digest():
             new_responses = new_responses.filter(time_received__gt=keyword.last_email_sent_time)
         # if any, loop over subscribers and send email
         if new_responses.count() > 0:
-            subject = 'Daily update for "{0}" responses'.format(str(keyword)),
+            subject = 'Daily update for "{0}" responses'.format(str(keyword))
             body = digest.create_email_body(keyword, new_responses)
             for subscriber in keyword.subscribed_to_digest.all():
                 async('apostello.tasks.send_async_mail', subject, body, [subscriber.email])
