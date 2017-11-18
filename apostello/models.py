@@ -1,5 +1,6 @@
 import hashlib
 import logging
+import re
 from math import ceil
 
 from django.conf import settings
@@ -24,6 +25,10 @@ from apostello.validators import (
 from site_config.models import ConfigurationError, SiteConfiguration
 
 logger = logging.getLogger('apostello')
+
+
+# precompile regex to remove non-alphanumeric characters:
+re_non_alpha_numeric = re.compile('[\W_]+')
 
 
 class RecipientGroup(models.Model):
@@ -434,22 +439,25 @@ class Keyword(models.Model):
         self.keyword = self.keyword.lower()
         super(Keyword, self).save(force_insert, force_update, *args, **kwargs)
         async('apostello.tasks.populate_keyword_response_count', pk=self.pk)
+
     @staticmethod
     def _match(sms):
         """Match keyword or raises exception."""
-        if sms == "":
+        cleaned_sms = sms.lower().strip()
+        cleaned_sms = re_non_alpha_numeric.sub('', cleaned_sms)
+        if cleaned_sms == "":
             raise NoKeywordMatchException
-        if sms.lower().strip().startswith(TWILIO_STOP_WORDS):
+        if cleaned_sms.startswith(TWILIO_STOP_WORDS):
             return 'stop'
-        elif sms.lower().strip().startswith(TWILIO_START_WORDS):
+        elif cleaned_sms.startswith(TWILIO_START_WORDS):
             return 'start'
-        elif sms.lower().strip().startswith(TWILIO_INFO_WORDS):
+        elif cleaned_sms.startswith(TWILIO_INFO_WORDS):
             return 'info'
-        elif sms.lower().strip().startswith('name'):
+        elif cleaned_sms.startswith('name'):
             return 'name'
 
         for keyword in Keyword.objects.all():
-            if sms.lower().startswith(str(keyword)):
+            if cleaned_sms.startswith(str(keyword)):
                 query_keyword = keyword
                 # return <Keyword object>
                 return query_keyword

@@ -77,9 +77,7 @@ def test_request_data_blocked():
     return data
 
 
-@pytest.mark.slow
-@pytest.mark.parametrize(
-    "msg,reply", [
+_msg_and_replies = [
         (u"Test", u"Test custom response"),
         (u"2testing", u"your message has been received"),
         (u"name John", u"Something went wrong"),
@@ -87,7 +85,16 @@ def test_request_data_blocked():
         (u"name John Calvin", u"John"),
         (u"start", u"Thanks for signing up"),
     ]
-)
+
+msg_and_replies = []
+for msg, reply in _msg_and_replies:
+    msg_and_replies.append((msg, reply))
+    for c in """!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ """:
+        msg_and_replies.append((c + msg, reply))
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize("msg,reply", msg_and_replies)
 @pytest.mark.django_db
 @twilio_vcr
 def test_twilio_view(msg, reply, keywords, recipients):

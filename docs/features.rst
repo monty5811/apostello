@@ -47,9 +47,14 @@ Keyword Matching
 ~~~~~~~~~~~~~~~~
 
 A case insensitive greedy match is performed on the start of every incoming
-message up to the first space in the message. For example, the messages
-`connect John Calvin` and `connected John Calvin` would both match the keyword
-`connect`, but only the second message would match the keyword `connected`.
+message up to the first space in the message (none alphanumeric characters
+are also ignored if they begin the message).
+For example, the messages
+`connect John Calvin`,
+`connected John Calvin` and
+`"connect" John Calvin`
+would all match the keyword `connect`, but only the second message would match
+the keyword `connected`.
 
 There is an additional check when creating new keywords - you cannot create a
 keyword that cause a match collision. For example, if `connect` is a keyword,
