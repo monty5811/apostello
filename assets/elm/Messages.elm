@@ -57,7 +57,7 @@ type SidePanelMsg
 
 type FormMsg
     = PostKeywordForm
-    | PostContactForm
+    | PostContactForm Bool Bool
     | PostContactImportForm
     | PostCreateAllGroupForm
     | PostDefaultRespForm

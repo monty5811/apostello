@@ -21,10 +21,11 @@ class TestSendingSmsForm:
         """Test sending a message later."""
         num_sms = models.SmsOutbound.objects.count()
         users['c_staff'].post(
-            '/api/v2/actions/sms/send/adhoc/',
-            {'content': 'test',
-             'recipients': ['1'],
-             'scheduled_time': '2117-12-01 00:00'}
+            '/api/v2/actions/sms/send/adhoc/', {
+                'content': 'test',
+                'recipients': ['1'],
+                'scheduled_time': '2117-12-01 00:00'
+            }
         )
         tasks.send_queued_sms()
         assert models.SmsOutbound.objects.count() == num_sms
@@ -63,18 +64,21 @@ class TestSendingSmsForm:
         """Test sending a message now."""
         users['c_staff'].post(
             '/api/v2/actions/sms/send/group/',
-            {'content': 'test',
-             'recipient_group': groups['test_group'].pk}
+            {
+                'content': 'test',
+                'recipient_group': groups['test_group'].pk
+            }
         )
 
     @twilio_vcr
     def test_send_group_later(self, groups, users):
         """Test sending a message later."""
         users['c_staff'].post(
-            '/api/v2/actions/sms/send/group/',
-            {'content': 'test',
-             'recipient_group': '1',
-             'scheduled_time': '2117-12-01 00:00'}
+            '/api/v2/actions/sms/send/group/', {
+                'content': 'test',
+                'recipient_group': '1',
+                'scheduled_time': '2117-12-01 00:00'
+            }
         )
         tasks.send_queued_sms()
 
@@ -111,9 +115,11 @@ class TestGroupForm:
         pk = new_group.pk
         users['c_staff'].post(
             '/api/v2/groups/',
-            {'name': 'test_group_changed',
-             'description': 'this is a test',
-             'pk': pk}
+            {
+                'name': 'test_group_changed',
+                'description': 'this is a test',
+                'pk': pk
+            }
         )
         assert 'test_group_changed' == str(models.RecipientGroup.objects.get(pk=pk))
 

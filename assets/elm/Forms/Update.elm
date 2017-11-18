@@ -127,13 +127,15 @@ update msg model =
                 _ ->
                     model => []
 
-        PostContactForm ->
+        PostContactForm canSeeContactNum canSeeContactNotes ->
             case model.page of
                 P.ContactForm cfModel maybePk ->
                     setInProgress model
                         => [ postContactFormCmd
                                 model.settings.csrftoken
                                 cfModel
+                                canSeeContactNum
+                                canSeeContactNotes
                                 (RL.filter (\x -> Just x.pk == maybePk) model.dataStore.recipients
                                     |> RL.toList
                                     |> List.head
@@ -418,19 +420,36 @@ postKeywordFormCmd csrf now model maybeKeyword =
         |> Http.send (FormMsg << ReceiveFormResp [ Nav.newUrl <| page2loc <| P.KeywordTable False ])
 
 
-postContactFormCmd : CSRFToken -> CF.Model -> Maybe Recipient -> Cmd Msg
-postContactFormCmd csrf model maybeContact =
+postContactFormCmd : CSRFToken -> CF.Model -> Bool -> Bool -> Maybe Recipient -> Cmd Msg
+postContactFormCmd csrf model canSeeContactNum canSeeContactNotes maybeContact =
     let
         body =
             [ ( "first_name", Encode.string <| extractField .first_name model.first_name maybeContact )
             , ( "last_name", Encode.string <| extractField .last_name model.last_name maybeContact )
-            , ( "number", Encode.string <| extractField (Maybe.withDefault "" << .number) model.number maybeContact )
             , ( "do_not_reply", Encode.bool <| extractBool .do_not_reply model.do_not_reply maybeContact )
             ]
                 |> addPk maybeContact
+                |> addContactNumber model canSeeContactNum maybeContact
+                |> addContactNotes model canSeeContactNotes maybeContact
     in
     rawPost csrf (Urls.api_recipients Nothing) body
         |> Http.send (FormMsg << ReceiveFormResp [ Nav.newUrl <| page2loc <| P.RecipientTable False ])
+
+
+addContactNumber : CF.Model -> Bool -> Maybe Recipient -> List ( String, Encode.Value ) -> List ( String, Encode.Value )
+addContactNumber model canSeeContactNum maybeContact body =
+    if canSeeContactNum then
+        ( "number", Encode.string <| extractField (Maybe.withDefault "" << .number) model.number maybeContact ) :: body
+    else
+        body
+
+
+addContactNotes : CF.Model -> Bool -> Maybe Recipient -> List ( String, Encode.Value ) -> List ( String, Encode.Value )
+addContactNotes model canSeeContactNotes maybeContact body =
+    if canSeeContactNotes then
+        ( "notes", Encode.string <| extractField .notes model.notes maybeContact ) :: body
+    else
+        body
 
 
 postContactImportCmd : CSRFToken -> String -> Cmd Msg
@@ -579,6 +598,7 @@ postUserProfileCmd csrf model maybeProfile =
             , ( "can_see_incoming", Encode.bool <| extractBool .can_see_incoming model.can_see_incoming maybeProfile )
             , ( "can_send_sms", Encode.bool <| extractBool .can_send_sms model.can_send_sms maybeProfile )
             , ( "can_see_contact_nums", Encode.bool <| extractBool .can_see_contact_nums model.can_see_contact_nums maybeProfile )
+            , ( "can_see_contact_notes", Encode.bool <| extractBool .can_see_contact_notes model.can_see_contact_notes maybeProfile )
             , ( "can_import", Encode.bool <| extractBool .can_import model.can_import maybeProfile )
             , ( "can_archive", Encode.bool <| extractBool .can_archive model.can_archive maybeProfile )
             ]

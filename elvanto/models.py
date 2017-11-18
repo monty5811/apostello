@@ -50,8 +50,9 @@ class ElvantoGroup(models.Model):
             number = try_both_num_fields(prsn['mobile'], prsn['phone'])
         except NotValidPhoneNumber:
             print(
-                'Adding {0} {1} failed ({2},{3})'.
-                format(prsn['firstname'], prsn['lastname'], prsn['mobile'], prsn['phone'])
+                'Adding {0} {1} failed ({2},{3})'.format(
+                    prsn['firstname'], prsn['lastname'], prsn['mobile'], prsn['phone']
+                )
             )
             return
         # create person

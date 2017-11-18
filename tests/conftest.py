@@ -361,7 +361,6 @@ def browser_in(request, live_server, users, driver_wait_time):
     driver.get(live_server + '/')
     driver.add_cookie(
         {
-            u'domain': u'localhost',
             u'name': u'sessionid',
             u'value': users['c_staff'].session.session_key,
             u'path': u'/',
@@ -382,7 +381,6 @@ def browser_in_not_staff(request, live_server, users, driver_wait_time):
     driver.get(live_server + '/')
     driver.add_cookie(
         {
-            u'domain': u'localhost',
             u'name': u'sessionid',
             u'value': users['c_in'].session.session_key,
             u'path': u'/',

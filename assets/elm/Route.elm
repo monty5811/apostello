@@ -379,13 +379,8 @@ checkPerm blockedKeywords userPerms page =
                 GroupForm _ _ ->
                     userPerms.can_see_groups
 
-                ContactForm _ maybePk ->
-                    case maybePk of
-                        Nothing ->
-                            userPerms.can_see_contact_names
-
-                        Just _ ->
-                            userPerms.can_see_contact_nums
+                ContactForm _ _ ->
+                    userPerms.can_see_contact_names
 
                 KeywordForm _ maybeK ->
                     case maybeK of

@@ -33,7 +33,7 @@ urlpatterns = [
     ),
     url(
         r'^v2/recipients/(?:(?P<pk>\d+)/)?$',
-        v.Collection.as_view(
+        v.RecipientCollection.as_view(
             model_class=m.Recipient,
             form_class=f.RecipientForm,
             serializer_class=s.RecipientSerializer,

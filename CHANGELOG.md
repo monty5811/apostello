@@ -3,6 +3,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+ - Add a `notes` field to contacts
+ - Add ansible support for deploying to Ubuntu 16.04
+
+### Changed
+
+ - The contact edit page can now be viewed by any user with the `can_see_contact_names` permission - number and notes fields are only visible if the user has permission
+
+### Fixed
+
+ - Prevent users without correct permissions from changing phone numbers with the API
+
 ## [v2.6.2]
 
 **Before you upgrade**: if you want your Twilio and email settings to be copied into the database when you upgrade, you must upgrade to `2.6.0`, check the deploy and then upgrade to `2.6.2`.

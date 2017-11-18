@@ -76,8 +76,9 @@ class TestContactForm:
             assert '/recipient/all/' in b.current_url
             assert 'first' in b.page_source
             assert 'last' in b.page_source
-            assert str(models.Recipient.objects.get(pk=recipients['calvin'].pk).number
-                       ) == str(recipients['calvin'].number)
+            assert str(models.Recipient.objects.get(pk=recipients['calvin'].pk).number) == str(
+                recipients['calvin'].number
+            )
 
         assert_with_timeout(_test, 10 * driver_wait_time)
 

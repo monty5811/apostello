@@ -53,8 +53,9 @@ class TestKeywords():
 
     def test_fetch_archived_matched_responses(self, keywords, smsin):
         assert len(keywords['test'].fetch_archived_matches()) == 1
-        assert str(keywords['test'].fetch_archived_matches()[0]
-                   ) == str(SmsInbound.objects.filter(content="archived message")[0])
+        assert str(keywords['test'].fetch_archived_matches()[0]) == str(
+            SmsInbound.objects.filter(content="archived message")[0]
+        )
 
     def test_num_matches(self, keywords, smsin):
         keywords['test'].save()  # refresh cache

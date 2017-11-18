@@ -19,6 +19,7 @@ type alias Model =
     , can_see_incoming : Maybe Bool
     , can_send_sms : Maybe Bool
     , can_see_contact_nums : Maybe Bool
+    , can_see_contact_notes : Maybe Bool
     , can_import : Maybe Bool
     , can_archive : Maybe Bool
     }
@@ -35,6 +36,7 @@ initialModel =
     , can_see_incoming = Nothing
     , can_send_sms = Nothing
     , can_see_contact_nums = Nothing
+    , can_see_contact_notes = Nothing
     , can_import = Nothing
     , can_archive = Nothing
     }
@@ -54,6 +56,7 @@ type Msg
     | UpdateCanSeeIncoming (Maybe UserProfile)
     | UpdateCanSendSms (Maybe UserProfile)
     | UpdateCanSeeContactNums (Maybe UserProfile)
+    | UpdateCanSeeContactNotes (Maybe UserProfile)
     | UpdateCanImport (Maybe UserProfile)
     | UpdateCanArchive (Maybe UserProfile)
 
@@ -84,6 +87,9 @@ update msg model =
 
         UpdateCanSeeContactNums maybeProfile ->
             { model | can_see_contact_nums = getNewBool model.can_see_contact_nums (Maybe.map .can_see_contact_nums maybeProfile) }
+
+        UpdateCanSeeContactNotes maybeProfile ->
+            { model | can_see_contact_notes = getNewBool model.can_see_contact_notes (Maybe.map .can_see_contact_nums maybeProfile) }
 
         UpdateCanImport maybeProfile ->
             { model | can_import = getNewBool model.can_import (Maybe.map .can_import maybeProfile) }
@@ -154,6 +160,7 @@ viewHelp msgs model status profile =
             , Field meta.can_see_incoming (checkboxField meta.can_see_incoming (Just profile) .can_see_incoming (msgs.form << UpdateCanSeeIncoming))
             , Field meta.can_send_sms (checkboxField meta.can_send_sms (Just profile) .can_send_sms (msgs.form << UpdateCanSendSms))
             , Field meta.can_see_contact_nums (checkboxField meta.can_see_contact_nums (Just profile) .can_see_contact_nums (msgs.form << UpdateCanSeeContactNums))
+            , Field meta.can_see_contact_notes (checkboxField meta.can_see_contact_notes (Just profile) .can_see_contact_notes (msgs.form << UpdateCanSeeContactNotes))
             , Field meta.can_import (checkboxField meta.can_import (Just profile) .can_import (msgs.form << UpdateCanImport))
             , Field meta.can_archive (checkboxField meta.can_archive (Just profile) .can_archive (msgs.form << UpdateCanArchive))
             ]

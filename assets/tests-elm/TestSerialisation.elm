@@ -74,6 +74,7 @@ userProfile =
         |> Fuzz.andMap Fuzz.bool
         |> Fuzz.andMap Fuzz.bool
         |> Fuzz.andMap Fuzz.bool
+        |> Fuzz.andMap Fuzz.bool
 
 
 recipient : Fuzzer Recipient
@@ -86,6 +87,7 @@ recipient =
         |> Fuzz.andMap Fuzz.bool
         |> Fuzz.andMap Fuzz.bool
         |> Fuzz.andMap Fuzz.bool
+        |> Fuzz.andMap Fuzz.string
         |> Fuzz.andMap (Fuzz.maybe smsInbound)
 
 

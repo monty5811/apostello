@@ -117,6 +117,12 @@ class Recipient(models.Model):
         default=False,
         help_text="Tick this box to disable automated replies for this person.",
     )
+    notes = models.TextField(
+        "Notes",
+        max_length=2000,
+        blank=True,
+        null=True,
+    )
     groups = models.ManyToManyField(RecipientGroup, blank=True)
 
     def personalise(self, message):
@@ -676,6 +682,7 @@ class UserProfile(models.Model):
 
     can_send_sms = models.BooleanField(default=False)
     can_see_contact_nums = models.BooleanField(default=False)
+    can_see_contact_notes = models.BooleanField(default=False)
     can_import = models.BooleanField(default=False)
     can_archive = models.BooleanField(default=True)
 

@@ -206,6 +206,11 @@ class Collection(generics.ListAPIView):
         return handle_form(self, request)
 
 
+class RecipientCollection(Collection):
+    def post(self, request, format=None, **kwargs):
+        return handle_form(self, request, user=request.user)
+
+
 class UserCollection(Collection):
     def _get_queryset(self):
         return self.model_class.objects.all().order_by('email')
