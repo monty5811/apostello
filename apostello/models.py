@@ -48,6 +48,7 @@ class RecipientGroup(models.Model):
     def send_message(self, content, sent_by, eta=None):
         """Send message to group."""
         async('apostello.tasks.group_send_message_task', content, self.name, sent_by, eta)
+
     def archive(self):
         """Archive the group."""
         self.is_archived = True
@@ -139,12 +140,16 @@ class Recipient(models.Model):
         """
         return message.replace('%name%', self.first_name)
 
-    def send_message(self, content='test message', group=None, sent_by='', eta=None):
+    def send_message(self, content='', group=None, sent_by='', eta=None):
         """
         Send SMS to an individual.
 
         If the person is blocking us, we skip them.
         """
+        if not content:
+            # No content, skip sending a message
+            logger.info('Message content empty, skip api call')
+            return
         if self.is_blocking:
             return
         elif eta is None:
