@@ -222,7 +222,7 @@ class DefaultResponses(SingletonModel):
         ' But "%keyword%" is not active...',
         validators=[less_than_sms_char_limit],
         help_text='Default message for when a keyword is not currently active.'
-        ' ("%keyword" will be replaced with the matched keyword)'
+        ' ("%keyword%" will be replaced with the matched keyword)'
     )
     start_reply = models.TextField(
         max_length=1000,

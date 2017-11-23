@@ -50,12 +50,14 @@ commonShell model mainContent fab =
                     ]
             ]
         , div [ id "menuWrapper", class <| menuClass model.menuState ] <|
-            Html.a
-                [ class "button button-lg"
-                , id "close"
-                , E.onClick ToggleMenu
+            div [ class "text-right" ]
+                [ Html.a
+                    [ class "button button-lg"
+                    , id "close"
+                    , E.onClick ToggleMenu
+                    ]
+                    [ Html.i [ class "fa fa-close" ] [] ]
                 ]
-                [ text "Close" ]
                 :: Menu.menu model.settings model.webPush
         ]
 

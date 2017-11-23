@@ -47,6 +47,7 @@ type Msg
     | CurrentTime Time.Time
     | Nope
     | ToggleMenu
+    | KeyPressed Int
     | VisibilityChange PageVisibility.Visibility
 
 

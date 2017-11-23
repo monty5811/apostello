@@ -71,10 +71,56 @@ label {
     color: var(--color-white);
     min-height: 100vh;
     min-width: 100vw;
-    display: grid;
-    grid-template-columns: 50% 50%;
     padding: 1rem;
     user-select: none;
+}
+
+
+.menuVisible {
+    animation: slidedown 0.2s ease-in;
+    overflow-y: scroll;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    position: fixed;
+}
+
+.menuHidden{
+    display: none !important;
+}
+
+#menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr) );
+    margin: 0 2rem;
+    padding: 0;
+}
+
+#menuGroup {
+    margin: 1rem 0;
+}
+
+#menuGroup > ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0 1rem;
+}
+
+#menuGroup > ul > li {
+    color: var(--color-white);
+    border-bottom: solid 1px rgba(255, 255, 255, 0.1);
+    margin-bottom: 0.5rem;
+}
+
+#menuGroup > ul > li > a {
+    margin: 0rem;
+    color: var(--color-white);
+}
+
+#close {
+    margin-bottom: 2rem;
+    background: #e32;
 }
 
 @media screen and (min-width: 0px) and (max-width: 968px) {
@@ -96,43 +142,9 @@ label {
     margin-bottom: 2rem;
   }
 
-  #webpush {
-    margin-top: 2rem;
+  #menu {
+    display: block;
   }
-}
-
-
-.menuVisible {
-    animation: slidedown 0.2s ease-in;
-    overflow-y: scroll;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    position: fixed;
-}
-
-.menuHidden{
-    display: none !important;
-}
-
-#menu {
-    list-style: none;
-    margin: 0 2rem;
-    padding: 0;
-    grid-row: 2/2;
-}
-
-
-#menu > li {
-    color: var(--color-white);
-    border-bottom: solid 1px rgba(255, 255, 255, 0.1);
-    margin-bottom: 0.5rem;
-}
-
-#menu > li > a {
-    margin: 0rem 1rem;
-    color: var(--color-white);
 }
 
 .list > .item {
@@ -147,13 +159,6 @@ label {
 
 #members_item {
     color: var(--color-black);
-}
-
-#close {
-    grid-row: 1/2;
-    grid-column-start: 1;
-    grid-column-end: 3;
-    margin-bottom: 2rem;
 }
 
 #elmShell {
