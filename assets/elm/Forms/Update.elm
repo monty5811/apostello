@@ -406,6 +406,7 @@ postKeywordFormCmd csrf now model maybeKeyword =
             , ( "description", Encode.string <| extractField .description model.description maybeKeyword )
             , ( "disable_all_replies", Encode.bool <| extractBool .disable_all_replies model.disable_all_replies maybeKeyword )
             , ( "custom_response", Encode.string <| extractField .custom_response model.custom_response maybeKeyword )
+            , ( "custom_response_new_person", Encode.string <| extractField .custom_response_new_person model.custom_response_new_person maybeKeyword )
             , ( "deactivated_response", Encode.string <| extractField .deactivated_response model.deactivated_response maybeKeyword )
             , ( "too_early_response", Encode.string <| extractField .too_early_response model.too_early_response maybeKeyword )
             , ( "activate_time", encodeDate <| extractDate now .activate_time model.activate_time maybeKeyword )

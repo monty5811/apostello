@@ -45,6 +45,7 @@ class KeywordSerializer(BaseModelSerializer):
             'is_archived',
             'disable_all_replies',
             'custom_response',
+            'custom_response_new_person',
             'deactivated_response',
             'too_early_response',
             'activate_time',

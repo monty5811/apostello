@@ -228,6 +228,7 @@ type alias Keyword =
     , is_archived : Bool
     , disable_all_replies : Bool
     , custom_response : String
+    , custom_response_new_person : String
     , deactivated_response : String
     , too_early_response : String
     , activate_time : Date.Date
@@ -251,6 +252,7 @@ decodeKeyword =
         |> required "is_archived" Decode.bool
         |> required "disable_all_replies" Decode.bool
         |> required "custom_response" Decode.string
+        |> required "custom_response_new_person" Decode.string
         |> required "deactivated_response" Decode.string
         |> required "too_early_response" Decode.string
         |> required "activate_time" date
@@ -273,6 +275,7 @@ encodeKeyword keyword =
         , "is_archived" => Encode.bool keyword.is_archived
         , "disable_all_replies" => Encode.bool keyword.disable_all_replies
         , "custom_response" => Encode.string keyword.custom_response
+        , "custom_response_new_person" => Encode.string keyword.custom_response_new_person
         , "deactivated_response" => Encode.string keyword.deactivated_response
         , "too_early_response" => Encode.string keyword.too_early_response
         , "activate_time" => encodeDate keyword.activate_time

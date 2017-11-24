@@ -48,7 +48,13 @@ class TestConstructReply:
     def test_existing_keyword_new_contact(self, keywords):
         msg = InboundSms({'From': '+447927401749', 'Body': 'test msg'})
         reply = msg.construct_reply()
-        assert reply == "Test custom response with Unknown"
+        assert reply == "Thanks new person!"
+
+    @twilio_vcr
+    def test_existing_keyword_new_contact(self, keywords):
+        msg = InboundSms({'From': '+447927401749', 'Body': '2test msg'})
+        reply = msg.construct_reply()
+        assert reply == fetch_default_reply('default_no_keyword_auto_reply').replace('%name%', 'Unknown')
 
     def test_is_blocking_reply(self, recipients):
         msg = InboundSms({'From': str(recipients['wesley'].number), 'Body': 'test'})

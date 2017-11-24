@@ -76,9 +76,14 @@ def test_request_data_blocked():
     data['From'] = u'+447927401745'
     return data
 
+def test_request_data_unknown():
+    data = test_request_data()
+    data['From'] = u'+447097565645'
+    return data
+
 
 _msg_and_replies = [
-        (u"Test", u"Test custom response"),
+        (u"Test", u"Test custom response with John"),
         (u"2testing", u"your message has been received"),
         (u"name John", u"Something went wrong"),
         (u"name John Calvin\nthis is a really really long surname now", u"John"),
@@ -114,6 +119,24 @@ def test_twilio_view(msg, reply, keywords, recipients):
 @pytest.mark.slow
 @pytest.mark.django_db
 @twilio_vcr
+def test_twilio_view_unknown_contact(keywords, recipients):
+    # make sure replies are on:
+    from site_config.models import SiteConfiguration
+    config = SiteConfiguration.get_solo()
+    config.disable_all_replies = False
+    config.save()
+    factory = TwilioRequestFactory(token=get_token())
+    data = test_request_data_unknown()
+    data['Body'] = u'Test'
+    request = factory.post(uri, data=data)
+    resp = sms(request)
+    assert 'Unknown' not in str(resp.content)
+    assert 'Thanks new person!' in str(resp.content)
+
+
+@pytest.mark.slow
+@pytest.mark.django_db
+@twilio_vcr
 def test_twilio_view_blocking_contact(keywords, recipients):
     # make sure replies are on:
     from site_config.models import SiteConfiguration
@@ -143,21 +166,14 @@ def test_twilio_view_ask_for_name(keywords):
     data['Body'] = u'Test'
     request = factory.post(uri, data=data)
     resp = sms(request)
-    assert 'Unknown' in str(resp.content)
+    assert 'Unknown' not in str(resp.content)
+    assert 'Thanks new person!' in str(resp.content)
     assert len(mail.outbox) == 1
     assert 'asked for their name' in mail.outbox[0].body
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize(
-    "msg,reply", [
-        (u"Test", u"Test custom response"),
-        (u"2testing", u"your message has been received"),
-        (u"name John", u"Something went wrong"),
-        (u"name John Calvin", u"John"),
-        (u"start", u"Thanks for signing up"),
-    ]
-)
+@pytest.mark.parametrize("msg,reply", msg_and_replies)
 @pytest.mark.django_db
 @twilio_vcr
 def test_twilio_view_no_replies(msg, reply, keywords):

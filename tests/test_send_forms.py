@@ -136,7 +136,7 @@ class TestGroupForm:
         })
         assert resp.status_code == 201
         assert models.RecipientGroup.objects.all().count() == num_groups + 1
-        assert models.RecipientGroup.objects.get(name='test all group').all_recipients.count() == 6
+        assert models.RecipientGroup.objects.get(name='test all group').all_recipients.count() == 7
 
     def test_create_all_group_form_update(self, users, recipients, groups):
         """Test the form to create a group composed of all recipients.
@@ -147,4 +147,4 @@ class TestGroupForm:
         })
         assert resp.status_code == 201
         g = models.RecipientGroup.objects.get(name='Empty Group')
-        assert len(g.all_recipients) == 6
+        assert len(g.all_recipients) == 7

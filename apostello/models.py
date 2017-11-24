@@ -249,6 +249,15 @@ class Keyword(models.Model):
         'message matches this keyword. '
         'If empty, the site wide response will be used.'
     )
+    custom_response_new_person = models.CharField(
+        'Auto response used when the contact is new',
+        max_length=100,
+        blank=True,
+        validators=[gsm_validator, less_than_sms_char_limit],
+        help_text='This text will be sent back as a reply when any incoming '
+        'message matches this keyword and the contact is new. '
+        'If empty, the normal custom response will be used.'
+    )
     deactivated_response = models.CharField(
         "Deactivated response",
         max_length=100,
@@ -301,10 +310,10 @@ class Keyword(models.Model):
     )
     last_email_sent_time = models.DateTimeField("Time of last sent email", blank=True, null=True)
 
-    def construct_reply(self, sender):
+    def construct_reply(self, recipient):
         """Make reply to an incoming message."""
-        reply = self.current_response
-        return sender.personalise(reply)
+        reply = self.get_current_response(recipient=recipient)
+        return recipient.personalise(reply)
 
     def add_contact_to_groups(self, sender):
         """Add contact to linked group.
@@ -319,9 +328,7 @@ class Keyword(models.Model):
                 grp.recipient_set.add(sender)
                 grp.save()
 
-    @cached_property
-    def current_response(self):
-        """Currently active response"""
+    def get_current_response(self, recipient=None):
         if self.disable_all_replies:
             return ''
 
@@ -334,14 +341,18 @@ class Keyword(models.Model):
                 reply = fetch_default_reply('default_no_keyword_not_live')
         else:
             # keyword is active
-            if self.custom_response == '':
-                # no custom response, use generic form
-                reply = fetch_default_reply('default_no_keyword_auto_reply')
-            else:
-                # use custom response
-                reply = self.custom_response
+            reply = self.custom_response or fetch_default_reply('default_no_keyword_auto_reply')
+            if recipient is not None:
+                # check if user is unknown
+                if recipient.first_name == 'Unknown':
+                    reply = self.custom_response_new_person or reply
 
         return reply.replace("%keyword%", self.keyword)
+
+    @cached_property
+    def current_response(self, recipient=None):
+        """Currently active response"""
+        return self.get_current_response(recipient=recipient)
 
     @property
     def has_started(self):
