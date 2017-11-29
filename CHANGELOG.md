@@ -3,8 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [v2.7.0]
+
 ### Added
 
+ - Add a new custom response for keywords: option to have a different reply to contacts that we have not seen before
  - Add a `notes` field to contacts
  - Add ansible support for deploying to Ubuntu 16.04
  - Clear django cache on new ansible deploys
