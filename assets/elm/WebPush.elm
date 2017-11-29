@@ -80,8 +80,7 @@ removeId csrftoken endpoint =
 
 view : Model -> List (Html Msg)
 view model =
-    [ Html.h4 [] [ Html.text <| "Push Status:" ]
-    , Html.div [] [ Html.text <| header model ]
+    [ Html.div [] [ Html.text <| header model ]
     , case model of
         Unknown ->
             button CheckSubscribed "button-secondary" "Click to check"

@@ -45,6 +45,7 @@ class KeywordSerializer(BaseModelSerializer):
             'is_archived',
             'disable_all_replies',
             'custom_response',
+            'custom_response_new_person',
             'deactivated_response',
             'too_early_response',
             'activate_time',
@@ -79,11 +80,19 @@ class SmsInboundSerializer(BaseModelSerializer):
 class RecipientSerializer(BaseModelSerializer):
     """Serialize apostello.models.Recipient for use in table."""
     number = serializers.SerializerMethodField()
+    notes = serializers.SerializerMethodField()
 
     def get_number(self, obj):
         user = self.context['request'].user
         if user.profile.can_see_contact_nums or user.is_staff:
             return str(obj.number)
+
+        return ''
+
+    def get_notes(self, obj):
+        user = self.context['request'].user
+        if user.profile.can_see_contact_notes or user.is_staff:
+            return obj.notes
 
         return ''
 
@@ -94,6 +103,7 @@ class RecipientSerializer(BaseModelSerializer):
             'last_name',
             'number',
             'pk',
+            'notes',
             'full_name',
             'is_archived',
             'is_blocking',
@@ -183,6 +193,7 @@ class UserProfileSerializer(BaseModelSerializer):
             'can_see_incoming',
             'can_send_sms',
             'can_see_contact_nums',
+            'can_see_contact_notes',
             'can_import',
             'can_archive',
         )

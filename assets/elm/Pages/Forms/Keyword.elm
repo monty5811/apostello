@@ -24,6 +24,7 @@ type alias Model =
     , description : Maybe String
     , disable_all_replies : Maybe Bool
     , custom_response : Maybe String
+    , custom_response_new_person : Maybe String
     , deactivated_response : Maybe String
     , too_early_response : Maybe String
     , activate_time : Maybe Date.Date
@@ -45,6 +46,7 @@ initialModel =
     , description = Nothing
     , disable_all_replies = Nothing
     , custom_response = Nothing
+    , custom_response_new_person = Nothing
     , deactivated_response = Nothing
     , too_early_response = Nothing
     , activate_time = Nothing
@@ -65,6 +67,7 @@ type Msg
     | UpdateKeywordDescField String
     | UpdateKeywordDisableRepliesField (Maybe Keyword)
     | UpdateKeywordCustRespField String
+    | UpdateKeywordCustNewPersonRespField String
     | UpdateKeywordDeacRespField String
     | UpdateKeywordTooEarlyRespField String
     | UpdateActivateTime DateTimePicker.State (Maybe Date.Date)
@@ -105,6 +108,9 @@ update msg model =
 
         UpdateKeywordCustRespField text ->
             { model | custom_response = Just text }
+
+        UpdateKeywordCustNewPersonRespField text ->
+            { model | custom_response_new_person = Just text }
 
         UpdateKeywordDeacRespField text ->
             { model | deactivated_response = Just text }
@@ -207,6 +213,7 @@ viewHelp msgs keywords_ groups users currentKeyword model status =
             , FormField <| Field meta.disable_all_replies (disableRepliesField msgs meta.disable_all_replies currentKeyword)
             , FieldGroup { defaultFieldGroupConfig | header = Just "Replies" }
                 [ Field meta.custom_response (customRespField msgs meta.custom_response currentKeyword)
+                , Field meta.custom_response_new_person (customRespNewPersonField msgs meta.custom_response_new_person currentKeyword)
                 , Field meta.deactivated_response (deactivatedRespField msgs meta.deactivated_response currentKeyword)
                 , Field meta.too_early_response (tooEarlyRespField msgs meta.too_early_response currentKeyword)
                 ]
@@ -252,6 +259,11 @@ disableRepliesField msgs meta_ maybeKeyword =
 customRespField : Messages msg -> FieldMeta -> Maybe Keyword -> List (Html msg)
 customRespField msgs meta_ maybeKeyword =
     simpleTextField meta_ (Maybe.map .custom_response maybeKeyword) (msgs.k << UpdateKeywordCustRespField)
+
+
+customRespNewPersonField : Messages msg -> FieldMeta -> Maybe Keyword -> List (Html msg)
+customRespNewPersonField msgs meta_ maybeKeyword =
+    simpleTextField meta_ (Maybe.map .custom_response_new_person maybeKeyword) (msgs.k << UpdateKeywordCustNewPersonRespField)
 
 
 deactivatedRespField : Messages msg -> FieldMeta -> Maybe Keyword -> List (Html msg)

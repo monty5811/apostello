@@ -107,6 +107,7 @@ type alias Recipient =
     , is_archived : Bool
     , is_blocking : Bool
     , do_not_reply : Bool
+    , notes : String
     , last_sms : Maybe SmsInbound
     }
 
@@ -122,6 +123,7 @@ decodeRecipient =
         |> required "is_archived" Decode.bool
         |> required "is_blocking" Decode.bool
         |> required "do_not_reply" Decode.bool
+        |> optional "notes" Decode.string ""
         |> required "last_sms" (Decode.maybe decodeSmsInbound)
 
 
@@ -136,6 +138,7 @@ encodeRecipient contact =
         , "is_archived" => Encode.bool contact.is_archived
         , "is_blocking" => Encode.bool contact.is_blocking
         , "do_not_reply" => Encode.bool contact.do_not_reply
+        , "notes" => Encode.string contact.notes
         , "last_sms" => encodeMaybe encodeSmsInbound contact.last_sms
         ]
 
@@ -225,6 +228,7 @@ type alias Keyword =
     , is_archived : Bool
     , disable_all_replies : Bool
     , custom_response : String
+    , custom_response_new_person : String
     , deactivated_response : String
     , too_early_response : String
     , activate_time : Date.Date
@@ -248,6 +252,7 @@ decodeKeyword =
         |> required "is_archived" Decode.bool
         |> required "disable_all_replies" Decode.bool
         |> required "custom_response" Decode.string
+        |> required "custom_response_new_person" Decode.string
         |> required "deactivated_response" Decode.string
         |> required "too_early_response" Decode.string
         |> required "activate_time" date
@@ -270,6 +275,7 @@ encodeKeyword keyword =
         , "is_archived" => Encode.bool keyword.is_archived
         , "disable_all_replies" => Encode.bool keyword.disable_all_replies
         , "custom_response" => Encode.string keyword.custom_response
+        , "custom_response_new_person" => Encode.string keyword.custom_response_new_person
         , "deactivated_response" => Encode.string keyword.deactivated_response
         , "too_early_response" => Encode.string keyword.too_early_response
         , "activate_time" => encodeDate keyword.activate_time
@@ -373,6 +379,7 @@ type alias UserProfile =
     , can_see_incoming : Bool
     , can_send_sms : Bool
     , can_see_contact_nums : Bool
+    , can_see_contact_notes : Bool
     , can_import : Bool
     , can_archive : Bool
     }
@@ -392,6 +399,7 @@ decodeUserProfile =
         |> required "can_see_incoming" Decode.bool
         |> required "can_send_sms" Decode.bool
         |> required "can_see_contact_nums" Decode.bool
+        |> required "can_see_contact_notes" Decode.bool
         |> required "can_import" Decode.bool
         |> required "can_archive" Decode.bool
 
@@ -410,6 +418,7 @@ encodeUserProfile record =
         , "can_see_incoming" => Encode.bool record.can_see_incoming
         , "can_send_sms" => Encode.bool record.can_send_sms
         , "can_see_contact_nums" => Encode.bool record.can_see_contact_nums
+        , "can_see_contact_notes" => Encode.bool record.can_see_contact_notes
         , "can_import" => Encode.bool record.can_import
         , "can_archive" => Encode.bool record.can_archive
         ]

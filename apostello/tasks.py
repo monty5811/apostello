@@ -73,12 +73,17 @@ def ask_for_name(person_from_pk, sms_body, ask_for_name):
     if not config.disable_all_replies:
         from apostello.models import Recipient
         contact = Recipient.objects.get(pk=person_from_pk)
-        contact.send_message(content=fetch_default_reply('auto_name_request'), sent_by="auto name request")
+        msg_content = fetch_default_reply('auto_name_request')
+        if msg_content:
+            contact.send_message(content=msg_content, sent_by="auto name request")
+            email_content = 'SMS: {0}\nFrom: {1}\n\n\nThis person is unknown and has been asked for their name.'.format(sms_body, str(contact))
+        else:
+            email_content = 'SMS: {0}\nFrom: {1}\n\n\nThis person is unknown...'.format(sms_body, str(contact)),
+
         async(
             'apostello.tasks.notify_office_mail',
             '[Apostello] Unknown Contact!',
-            'SMS: {0}\nFrom: {1}\n\n\nThis person is unknown and has been'
-            ' asked for their name.'.format(sms_body, str(contact)),
+            email_content,
         )
 
 

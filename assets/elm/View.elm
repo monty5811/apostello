@@ -240,6 +240,12 @@ content model =
 
         ContactForm cfModel maybePk ->
             let
+                canSeeContactNum =
+                    model.settings.userPerms.can_see_contact_nums || model.settings.userPerms.user.is_staff
+
+                canSeeContactNotes =
+                    model.settings.userPerms.can_see_contact_notes || model.settings.userPerms.user.is_staff
+
                 incomingTable =
                     case maybePk of
                         Nothing ->
@@ -258,11 +264,13 @@ content model =
                                     }
             in
             CF.view
-                { postForm = FormMsg M.PostContactForm
+                { postForm = FormMsg <| M.PostContactForm canSeeContactNum canSeeContactNotes
                 , c = FormMsg << M.ContactFormMsg
                 , noop = M.Nope
                 , spa = \x -> spaLink Html.a [] [ Html.text "Archived Contact" ] <| ContactForm CF.initialModel x
                 , defaultNumberPrefix = model.settings.defaultNumberPrefix
+                , canSeeContactNum = canSeeContactNum
+                , canSeeContactNotes = canSeeContactNotes
                 }
                 incomingTable
                 maybePk

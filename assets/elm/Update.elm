@@ -214,6 +214,14 @@ updateHelper msg model =
                     }
                         => List.map (Cmd.map StoreMsg) storeCmds
 
+        KeyPressed keyCode ->
+            case ( model.menuState, keyCode ) of
+                ( MenuVisible, 27 ) ->
+                    { model | menuState = MenuHidden } => []
+
+                ( _, _ ) ->
+                    model => []
+
         WebPushMsg subMsg ->
             let
                 ( wpModel, wpCmd ) =

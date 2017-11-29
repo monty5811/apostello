@@ -56,6 +56,7 @@ def recipients():
         first_name="Thomas", last_name="Chalmers", number='+15005550009'
     )  # can't recieve
     beza = Recipient.objects.create(first_name="Theodore", last_name="Beza", number='+447927411115', do_not_reply=True)
+    unknown = Recipient.objects.create(first_name="Unknown", last_name="Person", number='+447097565645')
 
     objs = {
         'calvin': calvin,
@@ -65,6 +66,7 @@ def recipients():
         'john_owen': john_owen,
         'thomas_chalmers': thomas_chalmers,
         'beza': beza,
+        'unknown': unknown,
     }
     return objs
 
@@ -119,6 +121,7 @@ def keywords():
         keyword="test",
         description="This is an active test keyword with custom response",
         custom_response="Test custom response with %name%",
+        custom_response_new_person="Thanks new person!",
         activate_time=timezone.make_aware(
             datetime.strptime('Jun 1 1970  1:33PM', '%b %d %Y %I:%M%p'), get_current_timezone()
         ),
@@ -361,7 +364,6 @@ def browser_in(request, live_server, users, driver_wait_time):
     driver.get(live_server + '/')
     driver.add_cookie(
         {
-            u'domain': u'localhost',
             u'name': u'sessionid',
             u'value': users['c_staff'].session.session_key,
             u'path': u'/',
@@ -382,7 +384,6 @@ def browser_in_not_staff(request, live_server, users, driver_wait_time):
     driver.get(live_server + '/')
     driver.add_cookie(
         {
-            u'domain': u'localhost',
             u'name': u'sessionid',
             u'value': users['c_in'].session.session_key,
             u'path': u'/',

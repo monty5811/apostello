@@ -19,6 +19,6 @@
   roles:
     - base
     - db
-    - web
     - redis
+    - web
     - djangoq

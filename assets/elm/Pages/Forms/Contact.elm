@@ -2,7 +2,7 @@ module Pages.Forms.Contact exposing (Model, Msg, initialModel, update, view)
 
 import Data exposing (Recipient)
 import Forms.Model exposing (Field, FieldMeta, FormItem(FieldGroup, FormField), FormStatus, defaultFieldGroupConfig)
-import Forms.View exposing (checkboxField, form, simpleTextField, submitButton)
+import Forms.View exposing (checkboxField, form, longTextField, simpleTextField, submitButton)
 import Html exposing (Html, div, p, text)
 import Html.Attributes as A
 import Pages.Error404 as E404
@@ -19,6 +19,7 @@ type alias Model =
     , last_name : Maybe String
     , number : Maybe String
     , do_not_reply : Maybe Bool
+    , notes : Maybe String
     }
 
 
@@ -28,6 +29,7 @@ initialModel =
     , last_name = Nothing
     , number = Nothing
     , do_not_reply = Nothing
+    , notes = Nothing
     }
 
 
@@ -36,22 +38,23 @@ initialModel =
 
 
 type Msg
-    = UpdateContactDoNotReplyField (Maybe Recipient)
-    | UpdateContactFirstNameField String
-    | UpdateContactLastNameField String
-    | UpdateContactNumberField String
+    = UpdateDoNotReplyField (Maybe Recipient)
+    | UpdateFirstNameField String
+    | UpdateLastNameField String
+    | UpdateNumberField String
+    | UpdateNotesField String
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        UpdateContactFirstNameField text ->
+        UpdateFirstNameField text ->
             { model | first_name = Just text }
 
-        UpdateContactLastNameField text ->
+        UpdateLastNameField text ->
             { model | last_name = Just text }
 
-        UpdateContactDoNotReplyField maybeContact ->
+        UpdateDoNotReplyField maybeContact ->
             let
                 b =
                     case model.do_not_reply of
@@ -68,8 +71,11 @@ update msg model =
             in
             { model | do_not_reply = Just b }
 
-        UpdateContactNumberField text ->
+        UpdateNumberField text ->
             { model | number = Just text }
+
+        UpdateNotesField text ->
+            { model | notes = Just text }
 
 
 
@@ -82,6 +88,8 @@ type alias Props msg =
     , noop : msg
     , spa : Maybe Int -> Html msg
     , defaultNumberPrefix : String
+    , canSeeContactNum : Bool
+    , canSeeContactNotes : Bool
     }
 
 
@@ -138,13 +146,22 @@ viewHelp props maybeTable currentContact contacts_ model status =
             showArchiveNotice contacts currentContact model
 
         fields =
-            [ FieldGroup { defaultFieldGroupConfig | sideBySide = Just 2, header = Just "Name" }
-                [ Field meta.first_name <| firstNameField props meta.first_name currentContact
-                , Field meta.last_name <| lastNameField props meta.last_name currentContact
-                ]
-            , FormField <| Field meta.number <| numberField props meta.number props.defaultNumberPrefix currentContact
-            , FormField <| Field meta.do_not_reply <| doNotReplyField props meta.do_not_reply currentContact
+            [ Just <|
+                FieldGroup { defaultFieldGroupConfig | sideBySide = Just 2, header = Just "Name" }
+                    [ Field meta.first_name <| firstNameField props meta.first_name currentContact
+                    , Field meta.last_name <| lastNameField props meta.last_name currentContact
+                    ]
+            , if props.canSeeContactNum then
+                Just <| FormField <| Field meta.number <| numberField props meta.number props.defaultNumberPrefix currentContact
+              else
+                Nothing
+            , Just <| FormField <| Field meta.do_not_reply <| doNotReplyField props meta.do_not_reply currentContact
+            , if props.canSeeContactNotes then
+                Just <| FormField <| Field meta.notes <| notesField props meta.notes currentContact
+              else
+                Nothing
             ]
+                |> List.filterMap identity
     in
     div []
         [ archiveNotice props showAN contacts model.number
@@ -158,7 +175,7 @@ firstNameField props meta_ maybeContact =
     simpleTextField
         meta_
         (Maybe.map .first_name maybeContact)
-        (props.c << UpdateContactFirstNameField)
+        (props.c << UpdateFirstNameField)
 
 
 lastNameField : Props msg -> FieldMeta -> Maybe Recipient -> List (Html msg)
@@ -166,7 +183,7 @@ lastNameField props meta_ maybeContact =
     simpleTextField
         meta_
         (Maybe.map .last_name maybeContact)
-        (props.c << UpdateContactLastNameField)
+        (props.c << UpdateLastNameField)
 
 
 numberField : Props msg -> FieldMeta -> String -> Maybe Recipient -> List (Html msg)
@@ -183,7 +200,16 @@ numberField props meta_ defaultPrefix maybeContact =
     simpleTextField
         meta_
         num
-        (props.c << UpdateContactNumberField)
+        (props.c << UpdateNumberField)
+
+
+notesField : Props msg -> FieldMeta -> Maybe Recipient -> List (Html msg)
+notesField props meta_ maybeContact =
+    longTextField
+        5
+        meta_
+        (Maybe.map .notes maybeContact)
+        (props.c << UpdateNotesField)
 
 
 doNotReplyField : Props msg -> FieldMeta -> Maybe Recipient -> List (Html msg)
@@ -192,7 +218,7 @@ doNotReplyField props meta_ maybeContact =
         meta_
         maybeContact
         .do_not_reply
-        (props.c << UpdateContactDoNotReplyField)
+        (props.c << UpdateDoNotReplyField)
 
 
 showArchiveNotice : List Recipient -> Maybe Recipient -> Model -> Bool

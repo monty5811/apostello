@@ -23,6 +23,7 @@ keyword =
         |> Fuzz.andMap Fuzz.string
         |> Fuzz.andMap Fuzz.string
         |> Fuzz.andMap Fuzz.string
+        |> Fuzz.andMap Fuzz.string
         |> Fuzz.andMap fuzzDate
         |> Fuzz.andMap (Fuzz.maybe fuzzDate)
         |> Fuzz.andMap (Fuzz.list Fuzz.int)
@@ -74,6 +75,7 @@ userProfile =
         |> Fuzz.andMap Fuzz.bool
         |> Fuzz.andMap Fuzz.bool
         |> Fuzz.andMap Fuzz.bool
+        |> Fuzz.andMap Fuzz.bool
 
 
 recipient : Fuzzer Recipient
@@ -86,6 +88,7 @@ recipient =
         |> Fuzz.andMap Fuzz.bool
         |> Fuzz.andMap Fuzz.bool
         |> Fuzz.andMap Fuzz.bool
+        |> Fuzz.andMap Fuzz.string
         |> Fuzz.andMap (Fuzz.maybe smsInbound)
 
 

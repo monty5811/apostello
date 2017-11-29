@@ -13,6 +13,10 @@
   when: run_django_collectstatic
   tags: django
 
+- name: Clear Django cache
+  command: '{{virtualenv_path}}/bin/python {{ application_path}}/manage.py clear_cache --settings={{ django_settings_file}}'
+  tags: django
+
 - name: Setup clearsessions cron job
   cron: name="django {{application_name}} clearsessions"
         weekday="0"

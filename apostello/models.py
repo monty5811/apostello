@@ -1,5 +1,6 @@
 import hashlib
 import logging
+import re
 from math import ceil
 
 from django.conf import settings
@@ -26,6 +27,10 @@ from site_config.models import ConfigurationError, SiteConfiguration
 logger = logging.getLogger('apostello')
 
 
+# precompile regex to remove non-alphanumeric characters:
+re_non_alpha_numeric = re.compile('[\W_]+')
+
+
 class RecipientGroup(models.Model):
     """Stores groups of recipients."""
     is_archived = models.BooleanField("Archived", default=False)
@@ -43,6 +48,7 @@ class RecipientGroup(models.Model):
     def send_message(self, content, sent_by, eta=None):
         """Send message to group."""
         async('apostello.tasks.group_send_message_task', content, self.name, sent_by, eta)
+
     def archive(self):
         """Archive the group."""
         self.is_archived = True
@@ -117,6 +123,12 @@ class Recipient(models.Model):
         default=False,
         help_text="Tick this box to disable automated replies for this person.",
     )
+    notes = models.TextField(
+        "Notes",
+        max_length=2000,
+        blank=True,
+        null=True,
+    )
     groups = models.ManyToManyField(RecipientGroup, blank=True)
 
     def personalise(self, message):
@@ -128,12 +140,16 @@ class Recipient(models.Model):
         """
         return message.replace('%name%', self.first_name)
 
-    def send_message(self, content='test message', group=None, sent_by='', eta=None):
+    def send_message(self, content='', group=None, sent_by='', eta=None):
         """
         Send SMS to an individual.
 
         If the person is blocking us, we skip them.
         """
+        if not content:
+            # No content, skip sending a message
+            logger.info('Message content empty, skip api call')
+            return
         if self.is_blocking:
             return
         elif eta is None:
@@ -233,6 +249,15 @@ class Keyword(models.Model):
         'message matches this keyword. '
         'If empty, the site wide response will be used.'
     )
+    custom_response_new_person = models.CharField(
+        'Auto response used when the contact is new',
+        max_length=100,
+        blank=True,
+        validators=[gsm_validator, less_than_sms_char_limit],
+        help_text='This text will be sent back as a reply when any incoming '
+        'message matches this keyword and the contact is new. '
+        'If empty, the normal custom response will be used.'
+    )
     deactivated_response = models.CharField(
         "Deactivated response",
         max_length=100,
@@ -285,10 +310,10 @@ class Keyword(models.Model):
     )
     last_email_sent_time = models.DateTimeField("Time of last sent email", blank=True, null=True)
 
-    def construct_reply(self, sender):
+    def construct_reply(self, recipient):
         """Make reply to an incoming message."""
-        reply = self.current_response
-        return sender.personalise(reply)
+        reply = self.get_current_response(recipient=recipient)
+        return recipient.personalise(reply)
 
     def add_contact_to_groups(self, sender):
         """Add contact to linked group.
@@ -303,9 +328,7 @@ class Keyword(models.Model):
                 grp.recipient_set.add(sender)
                 grp.save()
 
-    @cached_property
-    def current_response(self):
-        """Currently active response"""
+    def get_current_response(self, recipient=None):
         if self.disable_all_replies:
             return ''
 
@@ -318,14 +341,18 @@ class Keyword(models.Model):
                 reply = fetch_default_reply('default_no_keyword_not_live')
         else:
             # keyword is active
-            if self.custom_response == '':
-                # no custom response, use generic form
-                reply = fetch_default_reply('default_no_keyword_auto_reply')
-            else:
-                # use custom response
-                reply = self.custom_response
+            reply = self.custom_response or fetch_default_reply('default_no_keyword_auto_reply')
+            if recipient is not None:
+                # check if user is unknown
+                if recipient.first_name == 'Unknown':
+                    reply = self.custom_response_new_person or reply
 
         return reply.replace("%keyword%", self.keyword)
+
+    @cached_property
+    def current_response(self, recipient=None):
+        """Currently active response"""
+        return self.get_current_response(recipient=recipient)
 
     @property
     def has_started(self):
@@ -428,22 +455,25 @@ class Keyword(models.Model):
         self.keyword = self.keyword.lower()
         super(Keyword, self).save(force_insert, force_update, *args, **kwargs)
         async('apostello.tasks.populate_keyword_response_count', pk=self.pk)
+
     @staticmethod
     def _match(sms):
         """Match keyword or raises exception."""
-        if sms == "":
+        cleaned_sms = sms.lower().strip()
+        cleaned_sms = re_non_alpha_numeric.sub('', cleaned_sms)
+        if cleaned_sms == "":
             raise NoKeywordMatchException
-        if sms.lower().strip().startswith(TWILIO_STOP_WORDS):
+        if cleaned_sms.startswith(TWILIO_STOP_WORDS):
             return 'stop'
-        elif sms.lower().strip().startswith(TWILIO_START_WORDS):
+        elif cleaned_sms.startswith(TWILIO_START_WORDS):
             return 'start'
-        elif sms.lower().strip().startswith(TWILIO_INFO_WORDS):
+        elif cleaned_sms.startswith(TWILIO_INFO_WORDS):
             return 'info'
-        elif sms.lower().strip().startswith('name'):
+        elif cleaned_sms.startswith('name'):
             return 'name'
 
         for keyword in Keyword.objects.all():
-            if sms.lower().startswith(str(keyword)):
+            if cleaned_sms.startswith(str(keyword)):
                 query_keyword = keyword
                 # return <Keyword object>
                 return query_keyword
@@ -676,6 +706,7 @@ class UserProfile(models.Model):
 
     can_send_sms = models.BooleanField(default=False)
     can_see_contact_nums = models.BooleanField(default=False)
+    can_see_contact_notes = models.BooleanField(default=False)
     can_import = models.BooleanField(default=False)
     can_archive = models.BooleanField(default=True)
 

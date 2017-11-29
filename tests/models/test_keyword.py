@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from datetime import datetime
 
 import pytest
@@ -33,6 +32,9 @@ class TestKeywords():
     def test_custom_reply(self, recipients, keywords):
         assert keywords['test'].construct_reply(recipients['calvin']) == "Test custom response with John"
 
+    def test_custom_reply_new_person(self, recipients, keywords):
+        assert keywords['test'].construct_reply(recipients['unknown']) == "Thanks new person!"
+
     def test_no_custom_reply(self, recipients, keywords):
         assert keywords['test2'].construct_reply(recipients['calvin']) == recipients['calvin'].personalise(
             fetch_default_reply('default_no_keyword_auto_reply')
@@ -53,8 +55,9 @@ class TestKeywords():
 
     def test_fetch_archived_matched_responses(self, keywords, smsin):
         assert len(keywords['test'].fetch_archived_matches()) == 1
-        assert str(keywords['test'].fetch_archived_matches()[0]
-                   ) == str(SmsInbound.objects.filter(content="archived message")[0])
+        assert str(keywords['test'].fetch_archived_matches()[0]) == str(
+            SmsInbound.objects.filter(content="archived message")[0]
+        )
 
     def test_num_matches(self, keywords, smsin):
         keywords['test'].save()  # refresh cache

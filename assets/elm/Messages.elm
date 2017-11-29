@@ -47,6 +47,7 @@ type Msg
     | CurrentTime Time.Time
     | Nope
     | ToggleMenu
+    | KeyPressed Int
     | VisibilityChange PageVisibility.Visibility
 
 
@@ -57,7 +58,7 @@ type SidePanelMsg
 
 type FormMsg
     = PostKeywordForm
-    | PostContactForm
+    | PostContactForm Bool Bool
     | PostContactImportForm
     | PostCreateAllGroupForm
     | PostDefaultRespForm

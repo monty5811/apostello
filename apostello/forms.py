@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from django.forms import ModelMultipleChoiceField
 
 from apostello.models import Keyword, Recipient, RecipientGroup, UserProfile
@@ -89,6 +90,33 @@ class RecipientForm(forms.ModelForm):
     class Meta:
         model = Recipient
         exclude = ['is_archived', 'is_blocking']
+
+    def _clean_restricted_field(self, field_name, perm_name):
+        field = self.fields[field_name]
+        initial_field_value = self.get_initial_for_field(field_name=field_name, field=field)
+
+        field_is_present = field_name in self.cleaned_data
+        user_has_perm = getattr(self.user.profile, perm_name) or self.user.is_staff
+        if field_is_present and (not user_has_perm):
+            # trying to set field, but does not have access:
+            if field.has_changed(initial=initial_field_value, data=self.cleaned_data[field_name]):
+                raise ValidationError(f'You do not have permission to change the {field_name} field.')
+
+        if field_name not in self.cleaned_data:
+            # field name is missing, let's use the existing value:
+            self.cleaned_data[field_name] = initial_field_value
+            if field_name in self.errors:
+                del self.errors[field_name]
+
+    def clean(self):
+        """Override clean method to check number permission."""
+        self.cleaned_data = super(RecipientForm, self).clean()
+        self._clean_restricted_field('number', 'can_see_contact_nums')
+        self._clean_restricted_field('notes', 'can_see_contact_notes')
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super(RecipientForm, self).__init__(*args, **kwargs)
 
 
 class KeywordForm(forms.ModelForm):
