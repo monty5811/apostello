@@ -116,6 +116,16 @@ api_default_responses =
     "/api/v2/responses/"
 
 
+api_docs_docs_index : String
+api_docs_docs_index =
+    "/api-docs/"
+
+
+api_docs_schema_js : String
+api_docs_schema_js =
+    "/api-docs/schema.js"
+
+
 api_elvanto_groups : String
 api_elvanto_groups =
     "/api/v2/elvanto/groups/"
@@ -215,11 +225,6 @@ api_user_profiles =
 api_users : String
 api_users =
     "/api/v2/users/"
-
-
-drfdocs : String
-drfdocs =
-    "/api-docs/"
 
 
 google_callback : String

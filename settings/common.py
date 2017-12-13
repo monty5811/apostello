@@ -27,7 +27,6 @@ INSTALLED_APPS = [
     # third party apps
     'rest_framework',
     'rest_framework.authtoken',
-    'rest_framework_docs',
     'django_extensions',
     'solo',
     'django_redis',

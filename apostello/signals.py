@@ -1,7 +1,10 @@
 from allauth.account.signals import user_signed_up
+from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.contrib.auth.models import User
 
 from apostello.tasks import send_async_mail
+from apostello.models import UserProfile
 
 
 @receiver(user_signed_up)
@@ -22,3 +25,10 @@ def email_admin_on_signup(request, user, **kwargs):
             body,
             [to_],
         )
+
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+    instance.profile.save()

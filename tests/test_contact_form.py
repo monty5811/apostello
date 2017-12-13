@@ -101,7 +101,7 @@ class TestContactForm:
         assert r.status_code == 400
         assert 'You do not have permission to change the notes field.' in r.json()['errors']['__all__']
         calvin.refresh_from_db()
-        assert not(calvin.notes == 'hi there')
+        assert not (calvin.notes == 'hi there')
 
     def test_notes_permissions_with_perm(self, recipients, users):
         calvin = recipients['calvin']

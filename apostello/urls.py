@@ -3,6 +3,7 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic.base import TemplateView
+from rest_framework.documentation import include_docs_urls
 
 from apostello import views as v
 
@@ -38,7 +39,7 @@ urlpatterns += [
     url(r'^config/', include('site_config.urls', namespace='site_config')),
     url(r'^graphs/', include('graphs.urls', namespace='graphs')),
     url(r'^api/', include('api.urls', namespace='api')),
-    url(r'^api-docs/', include('rest_framework_docs.urls')),
+    url(r'^api-docs/', include_docs_urls(title='apostello API', description='apostello API docs')),
     url(
         r'^offline/$',
         TemplateView.as_view(template_name="apostello/offline.html"),

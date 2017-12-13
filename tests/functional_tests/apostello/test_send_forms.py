@@ -122,6 +122,7 @@ class TestSendAdhoc():
     def test_too_expensive(self, live_server, browser_in, users, driver_wait_time, recipients):
         """Test good form submission but with a too expensive message."""
         user_profile = users['staff'].profile
+        user_profile.can_send_sms = True
         user_profile.message_cost_limit = 0.01
         user_profile.save()
 
@@ -212,6 +213,7 @@ class TestSendGroup:
     def test_too_expensive(self, live_server, browser_in, users, driver_wait_time, groups):
         """Test good form submission but with a too expensive message."""
         user_profile = users['staff'].profile
+        user_profile.can_send_sms = True
         user_profile.message_cost_limit = 0.01
         user_profile.save()
 

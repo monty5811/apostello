@@ -26,7 +26,6 @@ from site_config.models import ConfigurationError, SiteConfiguration
 
 logger = logging.getLogger('apostello')
 
-
 # precompile regex to remove non-alphanumeric characters:
 re_non_alpha_numeric = re.compile('[\W_]+')
 
@@ -213,6 +212,7 @@ class Recipient(models.Model):
         if add_to_group_flag:
             from apostello.tasks import add_new_contact_to_groups
             async('apostello.tasks.add_new_contact_to_groups', self.pk)
+
     def __str__(self):
         """Pretty representation."""
         return self.full_name
@@ -564,6 +564,7 @@ class SmsInbound(models.Model):
         cache.set('last_msg__{0}'.format(self.sender_num), None, 0)
         # update number of matched responses caches
         async('apostello.tasks.populate_keyword_response_count')
+
     class Meta:
         ordering = ['-time_received']
         index_together = ['is_archived', 'matched_keyword']
@@ -679,7 +680,11 @@ class UserProfile(models.Model):
 
     The default profile is created on first access to user.profile.
     """
-    user = models.OneToOneField(User, unique=True)
+    user = models.OneToOneField(
+        User,
+        unique=True,
+        related_name='profile',
+    )
 
     approved = models.BooleanField(default=False, help_text='This must be true to grant users access to the site.')
     show_tour = models.BooleanField(
@@ -755,4 +760,4 @@ class UserProfile(models.Model):
         super(UserProfile, self).save(*args, **kwargs)
 
 
-User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
+# User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])

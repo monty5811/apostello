@@ -10,6 +10,7 @@ from django.test import Client
 from django.utils import timezone
 from django.utils.timezone import get_current_timezone
 from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
 
 from apostello.models import *
 from site_config.models import SiteConfiguration
@@ -334,8 +335,10 @@ def driver_wait_time():
 def create_browser(request, driver_wait_time, tries=0):
     """This sometimes fails to start firefox on CI, so we retry..."""
     max_tries = 5
+    options = Options()
+    options.add_argument('-headless')
     try:
-        driver = webdriver.Firefox()
+        driver = webdriver.Firefox(firefox_options=options)
         driver.implicitly_wait(driver_wait_time)
         driver.set_window_size(1200, 1200)
 

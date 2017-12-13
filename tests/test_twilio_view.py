@@ -76,6 +76,7 @@ def test_request_data_blocked():
     data['From'] = u'+447927401745'
     return data
 
+
 def test_request_data_unknown():
     data = test_request_data()
     data['From'] = u'+447097565645'
@@ -83,13 +84,13 @@ def test_request_data_unknown():
 
 
 _msg_and_replies = [
-        (u"Test", u"Test custom response with John"),
-        (u"2testing", u"your message has been received"),
-        (u"name John", u"Something went wrong"),
-        (u"name John Calvin\nthis is a really really long surname now", u"John"),
-        (u"name John Calvin", u"John"),
-        (u"start", u"Thanks for signing up"),
-    ]
+    (u"Test", u"Test custom response with John"),
+    (u"2testing", u"your message has been received"),
+    (u"name John", u"Something went wrong"),
+    (u"name John Calvin\nthis is a really really long surname now", u"John"),
+    (u"name John Calvin", u"John"),
+    (u"start", u"Thanks for signing up"),
+]
 
 msg_and_replies = []
 for msg, reply in _msg_and_replies:

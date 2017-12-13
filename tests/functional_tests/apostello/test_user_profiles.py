@@ -29,12 +29,15 @@ class TestUserProfiles:
             assert 'test@example.com' in table.text
 
         assert_with_timeout(_test1, 10 * driver_wait_time)
-        # toggle all negative permissions
-        for toggle in browser_in.find_elements_by_class_name('minus'):
-            toggle.click()
+        # toggle approved button:
+        user_staff_approved_button_attr = f'[data-test-id=approved-{users["staff"].profile.pk}]'
+        toggle = browser_in.find_element_by_css_selector(user_staff_approved_button_attr)
+        assert toggle.text == '✔'
+        toggle.click()
 
         def _test2():
-            assert users['staff'].profile.approved
+            assert toggle.text == '✖'
+            assert not users['staff'].profile.approved
 
         assert_with_timeout(_test2, 10 * driver_wait_time)
 

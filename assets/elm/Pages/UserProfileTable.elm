@@ -3,7 +3,7 @@ module Pages.UserProfileTable exposing (view)
 import Data exposing (UserProfile)
 import FilteringTable as FT
 import Html exposing (Html, button, td, text, th, thead, tr)
-import Html.Attributes exposing (class)
+import Html.Attributes as A exposing (class)
 import Html.Events exposing (onClick)
 import RemoteList as RL
 
@@ -93,9 +93,15 @@ toggleCell props userprofile field =
         [ button
             [ class className
             , onClick (props.toggleField (toggleField field userprofile))
+            , A.attribute "data-test-id" (toggleDataAttr field userprofile)
             ]
             [ text iconType ]
         ]
+
+
+toggleDataAttr : Field -> UserProfile -> String
+toggleDataAttr fieldName profile =
+    (toString fieldName |> String.toLower) ++ "-" ++ toString profile.pk
 
 
 lookupField : Field -> UserProfile -> Bool

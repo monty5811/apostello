@@ -249,7 +249,7 @@ class ActionObj(APIView):
         obj.save()
         return obj
 
-    def action(self, request, obj):
+    def _action(self, request, obj):
         raise NotImplementedError
 
     def get_obj(self, kwargs):
@@ -263,7 +263,7 @@ class ActionObj(APIView):
     def post(self, request, format=None, **kwargs):
         obj = self.get_obj(kwargs)
         try:
-            obj = self.action(request, obj)
+            obj = self._action(request, obj)
         except ActionForbidden:
             return Response({}, status=status.HTTP_403_FORBIDDEN)
 
@@ -274,7 +274,7 @@ class ActionObj(APIView):
 class ArchiveObj(ActionObj):
     """Post to this view will archive the relevant object."""
 
-    def action(self, request, obj):
+    def _action(self, request, obj):
         """Handle toggle buttons."""
         archived = request.data.get('archived')
         if archived is not None:
@@ -293,7 +293,7 @@ class ArchiveObj(ActionObj):
 class ReingestObj(ActionObj):
     """Post to this view will call `reingest` on object"""
 
-    def action(self, request, obj):
+    def _action(self, request, obj):
         if request.data.get('reingest'):
             obj = obj.reimport()
         return obj
@@ -302,7 +302,7 @@ class ReingestObj(ActionObj):
 class CancelObj(ActionObj):
     """Post to this view will call `cancel` on object"""
 
-    def action(self, request, obj):
+    def _action(self, request, obj):
         cancel_queued_sms = request.data.get('cancel_sms')
         if cancel_queued_sms is not None:
             obj.cancel()
@@ -312,13 +312,13 @@ class CancelObj(ActionObj):
 class ObjSimpleUpdate(ActionObj):
     field = None
 
-    def action(self, request, obj):
+    def _action(self, request, obj):
         obj = self.simple_update(request, obj, self.field)
         return obj
 
 
 class UpdateUserProfile(ActionObj):
-    def action(self, request, obj):
+    def _action(self, request, obj):
         user_profile = request.data.get('user_profile')
         if user_profile is not None:
             user_profile.pop('user')
@@ -371,7 +371,7 @@ class RemoveCloudMessageId(CloudMessageView):
 
 
 class UpdateGroupMembers(ActionObj):
-    def action(self, request, obj):
+    def _action(self, request, obj):
         is_member = request.data.get('member')
         if is_member is not None:
             contact = Recipient.objects.get(pk=request.data.get('contactPk'))

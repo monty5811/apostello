@@ -76,7 +76,9 @@ def ask_for_name(person_from_pk, sms_body, ask_for_name):
         msg_content = fetch_default_reply('auto_name_request')
         if msg_content:
             contact.send_message(content=msg_content, sent_by="auto name request")
-            email_content = 'SMS: {0}\nFrom: {1}\n\n\nThis person is unknown and has been asked for their name.'.format(sms_body, str(contact))
+            email_content = 'SMS: {0}\nFrom: {1}\n\n\nThis person is unknown and has been asked for their name.'.format(
+                sms_body, str(contact)
+            )
         else:
             email_content = 'SMS: {0}\nFrom: {1}\n\n\nThis person is unknown...'.format(sms_body, str(contact)),
 
