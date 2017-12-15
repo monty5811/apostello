@@ -217,17 +217,6 @@ update msg model =
         ReceiveSiteConfigFormModel (Err _) ->
             ( model, [] )
 
-        ReceiveDefaultResponsesFormModel (Ok drModel) ->
-            case model.page of
-                P.DefaultResponsesForm _ ->
-                    ( { model | page = P.DefaultResponsesForm <| Just drModel }, [] )
-
-                _ ->
-                    ( model, [] )
-
-        ReceiveDefaultResponsesFormModel (Err _) ->
-            ( model, [] )
-
         UserProfileFormMsg subMsg ->
             case model.page of
                 P.UserProfileForm upfModel pk ->
@@ -291,9 +280,9 @@ update msg model =
 
         DefaultResponsesFormMsg subMsg ->
             case model.page of
-                P.DefaultResponsesForm _ ->
+                P.DefaultResponsesForm maybeDrfModel ->
                     ( { model
-                        | page = P.DefaultResponsesForm <| Just <| DRF.update subMsg
+                        | page = P.DefaultResponsesForm <| DRF.update subMsg maybeDrfModel
                       }
                     , []
                     )

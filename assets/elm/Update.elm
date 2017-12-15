@@ -264,7 +264,7 @@ maybeFetchResps ( model, cmds ) =
     in
     case model.page of
         P.DefaultResponsesForm _ ->
-            ( model, cmds ++ [ Http.send (FormMsg << ReceiveDefaultResponsesFormModel) req ] )
+            ( model, cmds ++ [ Http.send (FormMsg << DefaultResponsesFormMsg << DRF.ReceiveInitialModel) req ] )
 
         _ ->
             ( model, cmds )

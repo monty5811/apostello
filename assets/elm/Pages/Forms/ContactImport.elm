@@ -33,7 +33,7 @@ view : Messages msg -> FormStatus -> Html msg
 view msgs status =
     let
         fields =
-            [ FormField <| Field meta.csv_data <| longTextField 20 meta.csv_data (Just "") (msgs.form << UpdateText)
+            [ FormField <| Field meta.csv_data <| longTextField 20 (Just "") (msgs.form << UpdateText)
             ]
 
         button =

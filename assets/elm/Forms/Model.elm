@@ -71,7 +71,7 @@ defaultFieldGroupConfig =
 
 type alias Field msg =
     { meta : FieldMeta
-    , view : List (Html msg)
+    , view : FieldMeta -> List (Html msg)
     }
 
 

@@ -32,7 +32,7 @@ view : Messages msg -> String -> FormStatus -> Html msg
 view msgs model status =
     let
         field =
-            simpleTextField meta.group_name (Just model) (msgs.form << UpdateGroupName)
+            simpleTextField (Just model) (msgs.form << UpdateGroupName)
                 |> Field meta.group_name
                 |> FormField
 

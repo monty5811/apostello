@@ -125,8 +125,8 @@ viewHelp props currentGroup groups_ model status =
             showArchiveNotice groups currentGroup model
 
         fields =
-            [ Field meta.name (nameField props meta.name currentGroup)
-            , Field meta.description (descField props meta.description currentGroup)
+            [ Field meta.name (nameField props currentGroup)
+            , Field meta.description (descField props currentGroup)
             ]
                 |> List.map FormField
     in
@@ -185,16 +185,16 @@ archiveNotice props show groups name =
                 ]
 
 
-nameField : Props msg -> FieldMeta -> Maybe RecipientGroup -> List (Html msg)
-nameField props meta_ maybeGroup =
-    simpleTextField meta_
+nameField : Props msg -> Maybe RecipientGroup -> (FieldMeta -> List (Html msg))
+nameField props maybeGroup =
+    simpleTextField
         (Maybe.map .name maybeGroup)
         (props.form << UpdateGroupNameField)
 
 
-descField : Props msg -> FieldMeta -> Maybe RecipientGroup -> List (Html msg)
-descField props meta_ maybeGroup =
-    simpleTextField meta_
+descField : Props msg -> Maybe RecipientGroup -> (FieldMeta -> List (Html msg))
+descField props maybeGroup =
+    simpleTextField
         (Maybe.map .description maybeGroup)
         (props.form << UpdateGroupDescField)
 

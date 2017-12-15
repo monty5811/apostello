@@ -128,13 +128,13 @@ renderField errorDict field =
     in
     div [ A.class (errorFieldClass className errors) ]
         (List.append
-            field.view
+            (field.view field.meta)
             (List.map fieldMessage errors)
         )
 
 
-dateTimeField : (DateTimePicker.State -> Maybe Date.Date -> msg) -> FieldMeta -> DateTimePicker.State -> Maybe Date.Date -> List (Html msg)
-dateTimeField msg meta datePickerState date =
+dateTimeField : (DateTimePicker.State -> Maybe Date.Date -> msg) -> DateTimePicker.State -> Maybe Date.Date -> FieldMeta -> List (Html msg)
+dateTimeField msg datePickerState date meta =
     let
         config =
             DateTimePicker.Config.defaultDateTimePickerConfig msg
@@ -166,8 +166,8 @@ dateTimeField msg meta datePickerState date =
     ]
 
 
-dateField : (DateTimePicker.State -> Maybe Date.Date -> msg) -> FieldMeta -> DateTimePicker.State -> Maybe Date.Date -> List (Html msg)
-dateField msg meta datePickerState date =
+dateField : (DateTimePicker.State -> Maybe Date.Date -> msg) -> DateTimePicker.State -> Maybe Date.Date -> FieldMeta -> List (Html msg)
+dateField msg datePickerState date meta =
     let
         config =
             DateTimePicker.Config.defaultDatePickerConfig msg
@@ -198,8 +198,8 @@ dateField msg meta datePickerState date =
     ]
 
 
-simpleTextField : FieldMeta -> Maybe String -> (String -> msg) -> List (Html msg)
-simpleTextField meta defaultValue inputMsg =
+simpleTextField : Maybe String -> (String -> msg) -> FieldMeta -> List (Html msg)
+simpleTextField defaultValue inputMsg meta =
     [ label [ A.for meta.id ] [ Html.text meta.label ]
     , input
         [ A.id meta.id
@@ -213,8 +213,8 @@ simpleTextField meta defaultValue inputMsg =
     ]
 
 
-longTextField : Int -> FieldMeta -> Maybe String -> (String -> msg) -> List (Html msg)
-longTextField rows meta defaultValue inputMsg =
+longTextField : Int -> Maybe String -> (String -> msg) -> FieldMeta -> List (Html msg)
+longTextField rows defaultValue inputMsg meta =
     [ label [ A.for meta.id ] [ Html.text meta.label ]
     , Html.textarea
         [ A.id meta.id
@@ -228,8 +228,8 @@ longTextField rows meta defaultValue inputMsg =
     ]
 
 
-simpleIntField : FieldMeta -> Maybe Int -> (String -> msg) -> List (Html msg)
-simpleIntField meta defaultValue inputMsg =
+simpleIntField : Maybe Int -> (String -> msg) -> FieldMeta -> List (Html msg)
+simpleIntField defaultValue inputMsg meta =
     [ label [ A.for meta.id ] [ Html.text meta.label ]
     , input
         (addDefaultInt defaultValue
@@ -255,8 +255,8 @@ addDefaultInt defaultValue attrs =
             (A.defaultValue <| toString num) :: attrs
 
 
-simpleFloatField : FieldMeta -> Maybe Float -> (String -> msg) -> List (Html msg)
-simpleFloatField meta defaultValue inputMsg =
+simpleFloatField : Maybe Float -> (String -> msg) -> FieldMeta -> List (Html msg)
+simpleFloatField defaultValue inputMsg meta =
     [ label [ A.for meta.id ] [ Html.text meta.label ]
     , input
         (addDefaultFloat defaultValue
@@ -283,8 +283,8 @@ addDefaultFloat defaultValue attrs =
             (A.defaultValue <| toString num) :: attrs
 
 
-checkboxField : FieldMeta -> Maybe a -> (a -> Bool) -> (Maybe a -> msg) -> List (Html msg)
-checkboxField meta maybeRec getter toggleMsg =
+checkboxField : Maybe a -> (a -> Bool) -> (Maybe a -> msg) -> FieldMeta -> List (Html msg)
+checkboxField maybeRec getter toggleMsg meta =
     let
         checked =
             Maybe.map getter maybeRec |> Maybe.withDefault False
@@ -349,8 +349,8 @@ type alias MultiSelectField msg a =
     }
 
 
-multiSelectField : FieldMeta -> MultiSelectField msg a -> List (Html msg)
-multiSelectField meta props =
+multiSelectField : MultiSelectField msg a -> FieldMeta -> List (Html msg)
+multiSelectField props meta =
     let
         pks =
             case props.selectedPks of
@@ -452,8 +452,8 @@ formClass status =
 -- Sending SMS Forms
 
 
-contentField : FieldMeta -> Int -> (String -> msg) -> String -> List (Html msg)
-contentField meta smsCharLimit msg content =
+contentField : Int -> (String -> msg) -> String -> FieldMeta -> List (Html msg)
+contentField smsCharLimit msg content meta =
     [ label [ A.for meta.id ] [ Html.text meta.label ]
     , Html.textarea
         [ A.id meta.id
@@ -467,9 +467,9 @@ contentField meta smsCharLimit msg content =
     ]
 
 
-timeField : (DateTimePicker.State -> Maybe Date.Date -> msg) -> FieldMeta -> DateTimePicker.State -> Maybe Date.Date -> List (Html msg)
-timeField msg meta datePickerState date =
-    dateTimeField msg meta datePickerState date
+timeField : (DateTimePicker.State -> Maybe Date.Date -> msg) -> DateTimePicker.State -> Maybe Date.Date -> FieldMeta -> List (Html msg)
+timeField msg datePickerState date meta =
+    dateTimeField msg datePickerState date meta
 
 
 

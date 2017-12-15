@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 
  - Non-alphanumeric characters will be ignored at the start of a message when trying to match a keyword. E.g. `"keyword"` will now match `keyword`
  - The contact edit page can now be viewed by any user with the `can_see_contact_names` permission - number and notes fields are only visible if the user has permission
+ - Allow "name reply" to be blank so that no `name` message is sent to unknown contacts
 
 ### Fixed
 

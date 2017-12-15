@@ -132,9 +132,9 @@ sendForm : Props msg -> Model -> RL.RemoteList RecipientGroup -> FormStatus -> H
 sendForm props model groups status =
     let
         fields =
-            [ Field meta.content <| contentField meta.content props.smsCharLimit (props.form << UpdateSGContent) model.content
-            , Field meta.recipient_group <| groupField props meta.recipient_group model groups
-            , Field meta.scheduled_time <| timeField (updateSGDate props) meta.scheduled_time model.datePickerState model.date
+            [ Field meta.content <| contentField props.smsCharLimit (props.form << UpdateSGContent) model.content
+            , Field meta.recipient_group <| groupField props model groups
+            , Field meta.scheduled_time <| timeField (updateSGDate props) model.datePickerState model.date
             ]
                 |> List.map FormField
     in
@@ -149,8 +149,8 @@ updateSGDate props state maybeDate =
     props.form <| UpdateSGDate state maybeDate
 
 
-groupField : Props msg -> FieldMeta -> Model -> RL.RemoteList RecipientGroup -> List (Html msg)
-groupField props meta_ model groups =
+groupField : Props msg -> Model -> RL.RemoteList RecipientGroup -> FieldMeta -> List (Html msg)
+groupField props model groups meta_ =
     [ label [ for meta_.id ] [ text meta_.label ]
     , div [ class "segment" ]
         [ loadingMessage groups

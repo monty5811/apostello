@@ -208,23 +208,23 @@ viewHelp msgs keywords_ groups users currentKeyword model status =
             showArchiveNotice keywords currentKeyword model
 
         fields =
-            [ FormField <| Field meta.keyword (keywordField msgs meta.keyword currentKeyword)
-            , FormField <| Field meta.description (descField msgs meta.description currentKeyword)
-            , FormField <| Field meta.disable_all_replies (disableRepliesField msgs meta.disable_all_replies currentKeyword)
+            [ FormField <| Field meta.keyword (keywordField msgs currentKeyword)
+            , FormField <| Field meta.description (descField msgs currentKeyword)
+            , FormField <| Field meta.disable_all_replies (disableRepliesField msgs currentKeyword)
             , FieldGroup { defaultFieldGroupConfig | header = Just "Replies" }
-                [ Field meta.custom_response (customRespField msgs meta.custom_response currentKeyword)
-                , Field meta.custom_response_new_person (customRespNewPersonField msgs meta.custom_response_new_person currentKeyword)
-                , Field meta.deactivated_response (deactivatedRespField msgs meta.deactivated_response currentKeyword)
-                , Field meta.too_early_response (tooEarlyRespField msgs meta.too_early_response currentKeyword)
+                [ Field meta.custom_response (customRespField msgs currentKeyword)
+                , Field meta.custom_response_new_person (customRespNewPersonField msgs currentKeyword)
+                , Field meta.deactivated_response (deactivatedRespField msgs currentKeyword)
+                , Field meta.too_early_response (tooEarlyRespField msgs currentKeyword)
                 ]
             , FieldGroup { defaultFieldGroupConfig | header = Just "Scheduling" }
-                [ Field meta.activate_time (activateTimeField msgs meta.activate_time model currentKeyword)
-                , Field meta.deactivate_time (deactivateTimeField msgs meta.deactivate_time model currentKeyword)
+                [ Field meta.activate_time (activateTimeField msgs model currentKeyword)
+                , Field meta.deactivate_time (deactivateTimeField msgs model currentKeyword)
                 ]
             , FieldGroup { defaultFieldGroupConfig | header = Just "Other Settings" }
-                [ Field meta.linked_groups (linkedGroupsField msgs meta.linked_groups model groups currentKeyword)
-                , Field meta.owners (ownersField msgs meta.owners model users currentKeyword)
-                , Field meta.subscribed_to_digest (digestField msgs meta.subscribed_to_digest model users currentKeyword)
+                [ Field meta.linked_groups (linkedGroupsField msgs model groups currentKeyword)
+                , Field meta.owners (ownersField msgs model users currentKeyword)
+                , Field meta.subscribed_to_digest (digestField msgs model users currentKeyword)
                 ]
             ]
     in
@@ -234,50 +234,50 @@ viewHelp msgs keywords_ groups users currentKeyword model status =
         ]
 
 
-keywordField : Messages msg -> FieldMeta -> Maybe Keyword -> List (Html msg)
-keywordField msgs meta_ maybeKeyword =
-    simpleTextField meta_
+keywordField : Messages msg -> Maybe Keyword -> FieldMeta -> List (Html msg)
+keywordField msgs maybeKeyword =
+    simpleTextField
         (Maybe.map .keyword maybeKeyword)
         (msgs.k << UpdateKeywordKeywordField)
 
 
-descField : Messages msg -> FieldMeta -> Maybe Keyword -> List (Html msg)
-descField msgs meta_ maybeKeyword =
-    simpleTextField meta_
+descField : Messages msg -> Maybe Keyword -> FieldMeta -> List (Html msg)
+descField msgs maybeKeyword =
+    simpleTextField
         (Maybe.map .description maybeKeyword)
         (msgs.k << UpdateKeywordDescField)
 
 
-disableRepliesField : Messages msg -> FieldMeta -> Maybe Keyword -> List (Html msg)
-disableRepliesField msgs meta_ maybeKeyword =
-    checkboxField meta_
+disableRepliesField : Messages msg -> Maybe Keyword -> FieldMeta -> List (Html msg)
+disableRepliesField msgs maybeKeyword =
+    checkboxField
         maybeKeyword
         .disable_all_replies
         (msgs.k << UpdateKeywordDisableRepliesField)
 
 
-customRespField : Messages msg -> FieldMeta -> Maybe Keyword -> List (Html msg)
-customRespField msgs meta_ maybeKeyword =
-    simpleTextField meta_ (Maybe.map .custom_response maybeKeyword) (msgs.k << UpdateKeywordCustRespField)
+customRespField : Messages msg -> Maybe Keyword -> FieldMeta -> List (Html msg)
+customRespField msgs maybeKeyword =
+    simpleTextField (Maybe.map .custom_response maybeKeyword) (msgs.k << UpdateKeywordCustRespField)
 
 
-customRespNewPersonField : Messages msg -> FieldMeta -> Maybe Keyword -> List (Html msg)
-customRespNewPersonField msgs meta_ maybeKeyword =
-    simpleTextField meta_ (Maybe.map .custom_response_new_person maybeKeyword) (msgs.k << UpdateKeywordCustNewPersonRespField)
+customRespNewPersonField : Messages msg -> Maybe Keyword -> FieldMeta -> List (Html msg)
+customRespNewPersonField msgs maybeKeyword =
+    simpleTextField (Maybe.map .custom_response_new_person maybeKeyword) (msgs.k << UpdateKeywordCustNewPersonRespField)
 
 
-deactivatedRespField : Messages msg -> FieldMeta -> Maybe Keyword -> List (Html msg)
-deactivatedRespField msgs meta_ maybeKeyword =
-    simpleTextField meta_ (Maybe.map .deactivated_response maybeKeyword) (msgs.k << UpdateKeywordDeacRespField)
+deactivatedRespField : Messages msg -> Maybe Keyword -> FieldMeta -> List (Html msg)
+deactivatedRespField msgs maybeKeyword =
+    simpleTextField (Maybe.map .deactivated_response maybeKeyword) (msgs.k << UpdateKeywordDeacRespField)
 
 
-tooEarlyRespField : Messages msg -> FieldMeta -> Maybe Keyword -> List (Html msg)
-tooEarlyRespField msgs meta_ maybeKeyword =
-    simpleTextField meta_ (Maybe.map .custom_response maybeKeyword) (msgs.k << UpdateKeywordTooEarlyRespField)
+tooEarlyRespField : Messages msg -> Maybe Keyword -> FieldMeta -> List (Html msg)
+tooEarlyRespField msgs maybeKeyword =
+    simpleTextField (Maybe.map .custom_response maybeKeyword) (msgs.k << UpdateKeywordTooEarlyRespField)
 
 
-activateTimeField : Messages msg -> FieldMeta -> Model -> Maybe Keyword -> List (Html msg)
-activateTimeField msgs meta_ model maybeKeyword =
+activateTimeField : Messages msg -> Model -> Maybe Keyword -> FieldMeta -> List (Html msg)
+activateTimeField msgs model maybeKeyword =
     let
         time =
             case model.activate_time of
@@ -292,7 +292,7 @@ activateTimeField msgs meta_ model maybeKeyword =
                 Just t ->
                     Just t
     in
-    dateTimeField (updateActTime msgs) meta_ model.datePickerActState time
+    dateTimeField (updateActTime msgs) model.datePickerActState time
 
 
 updateActTime : Messages msg -> DateTimePicker.State -> Maybe Date.Date -> msg
@@ -300,8 +300,8 @@ updateActTime msgs state maybeDate =
     msgs.k <| UpdateActivateTime state maybeDate
 
 
-deactivateTimeField : Messages msg -> FieldMeta -> Model -> Maybe Keyword -> List (Html msg)
-deactivateTimeField msgs meta_ model maybeKeyword =
+deactivateTimeField : Messages msg -> Model -> Maybe Keyword -> FieldMeta -> List (Html msg)
+deactivateTimeField msgs model maybeKeyword =
     let
         time =
             case model.deactivate_time of
@@ -316,7 +316,7 @@ deactivateTimeField msgs meta_ model maybeKeyword =
                 Just t ->
                     Just t
     in
-    dateTimeField (updateDeactTime msgs) meta_ model.datePickerDeactState time
+    dateTimeField (updateDeactTime msgs) model.datePickerDeactState time
 
 
 updateDeactTime : Messages msg -> DateTimePicker.State -> Maybe Date.Date -> msg
@@ -324,10 +324,9 @@ updateDeactTime msgs state maybeDate =
     msgs.k <| UpdateDeactivateTime state maybeDate
 
 
-linkedGroupsField : Messages msg -> FieldMeta -> Model -> RL.RemoteList RecipientGroup -> Maybe Keyword -> List (Html msg)
-linkedGroupsField msgs meta_ model groups maybeKeyword =
+linkedGroupsField : Messages msg -> Model -> RL.RemoteList RecipientGroup -> Maybe Keyword -> FieldMeta -> List (Html msg)
+linkedGroupsField msgs model groups maybeKeyword =
     multiSelectField
-        meta_
         (MultiSelectField
             groups
             model.linked_groups
@@ -376,10 +375,9 @@ groupViewHelper selectedPks group =
         ]
 
 
-ownersField : Messages msg -> FieldMeta -> Model -> RL.RemoteList User -> Maybe Keyword -> List (Html msg)
-ownersField msgs meta_ model users maybeKeyword =
+ownersField : Messages msg -> Model -> RL.RemoteList User -> Maybe Keyword -> FieldMeta -> List (Html msg)
+ownersField msgs model users maybeKeyword =
     multiSelectField
-        meta_
         (MultiSelectField
             users
             model.owners
@@ -391,10 +389,9 @@ ownersField msgs meta_ model users maybeKeyword =
         )
 
 
-digestField : Messages msg -> FieldMeta -> Model -> RL.RemoteList User -> Maybe Keyword -> List (Html msg)
-digestField msgs meta_ model users maybeKeyword =
+digestField : Messages msg -> Model -> RL.RemoteList User -> Maybe Keyword -> FieldMeta -> List (Html msg)
+digestField msgs model users maybeKeyword =
     multiSelectField
-        meta_
         (MultiSelectField
             users
             model.subscribers

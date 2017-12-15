@@ -148,16 +148,16 @@ viewHelp props maybeTable currentContact contacts_ model status =
         fields =
             [ Just <|
                 FieldGroup { defaultFieldGroupConfig | sideBySide = Just 2, header = Just "Name" }
-                    [ Field meta.first_name <| firstNameField props meta.first_name currentContact
-                    , Field meta.last_name <| lastNameField props meta.last_name currentContact
+                    [ Field meta.first_name <| firstNameField props currentContact
+                    , Field meta.last_name <| lastNameField props currentContact
                     ]
             , if props.canSeeContactNum then
-                Just <| FormField <| Field meta.number <| numberField props meta.number props.defaultNumberPrefix currentContact
+                Just <| FormField <| Field meta.number <| numberField props props.defaultNumberPrefix currentContact
               else
                 Nothing
-            , Just <| FormField <| Field meta.do_not_reply <| doNotReplyField props meta.do_not_reply currentContact
+            , Just <| FormField <| Field meta.do_not_reply <| doNotReplyField props currentContact
             , if props.canSeeContactNotes then
-                Just <| FormField <| Field meta.notes <| notesField props meta.notes currentContact
+                Just <| FormField <| Field meta.notes <| notesField props currentContact
               else
                 Nothing
             ]
@@ -170,24 +170,22 @@ viewHelp props maybeTable currentContact contacts_ model status =
         ]
 
 
-firstNameField : Props msg -> FieldMeta -> Maybe Recipient -> List (Html msg)
-firstNameField props meta_ maybeContact =
+firstNameField : Props msg -> Maybe Recipient -> (FieldMeta -> List (Html msg))
+firstNameField props maybeContact =
     simpleTextField
-        meta_
         (Maybe.map .first_name maybeContact)
         (props.c << UpdateFirstNameField)
 
 
-lastNameField : Props msg -> FieldMeta -> Maybe Recipient -> List (Html msg)
-lastNameField props meta_ maybeContact =
+lastNameField : Props msg -> Maybe Recipient -> (FieldMeta -> List (Html msg))
+lastNameField props maybeContact =
     simpleTextField
-        meta_
         (Maybe.map .last_name maybeContact)
         (props.c << UpdateLastNameField)
 
 
-numberField : Props msg -> FieldMeta -> String -> Maybe Recipient -> List (Html msg)
-numberField props meta_ defaultPrefix maybeContact =
+numberField : Props msg -> String -> Maybe Recipient -> (FieldMeta -> List (Html msg))
+numberField props defaultPrefix maybeContact =
     let
         num =
             case maybeContact of
@@ -198,24 +196,21 @@ numberField props meta_ defaultPrefix maybeContact =
                     contact.number
     in
     simpleTextField
-        meta_
         num
         (props.c << UpdateNumberField)
 
 
-notesField : Props msg -> FieldMeta -> Maybe Recipient -> List (Html msg)
-notesField props meta_ maybeContact =
+notesField : Props msg -> Maybe Recipient -> (FieldMeta -> List (Html msg))
+notesField props maybeContact =
     longTextField
         5
-        meta_
         (Maybe.map .notes maybeContact)
         (props.c << UpdateNotesField)
 
 
-doNotReplyField : Props msg -> FieldMeta -> Maybe Recipient -> List (Html msg)
-doNotReplyField props meta_ maybeContact =
+doNotReplyField : Props msg -> Maybe Recipient -> (FieldMeta -> List (Html msg))
+doNotReplyField props maybeContact =
     checkboxField
-        meta_
         maybeContact
         .do_not_reply
         (props.c << UpdateDoNotReplyField)

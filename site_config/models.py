@@ -237,7 +237,8 @@ class DefaultResponses(SingletonModel):
         "\n'name John Smith'",
         validators=[less_than_sms_char_limit],
         help_text='Message to send when we first receive a message from'
-        ' someone not in the contacts list.'
+        ' someone not in the contacts list.',
+        blank=True,
     )
     name_update_reply = models.TextField(
         max_length=1000,

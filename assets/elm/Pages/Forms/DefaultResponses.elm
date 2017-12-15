@@ -3,6 +3,7 @@ module Pages.Forms.DefaultResponses exposing (Model, Msg(..), decodeModel, updat
 import Forms.Model exposing (Field, FieldMeta, FormItem(FieldGroup), FormStatus, defaultFieldGroupConfig)
 import Forms.View as FV
 import Html exposing (Html)
+import Http
 import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (decode, required)
 import Pages.Forms.Meta.DefaultResponses exposing (meta)
@@ -37,14 +38,48 @@ decodeModel =
 
 
 type Msg
-    = UpdateField (String -> Model) String
+    = UpdateKeywordNoMatch String
+    | UpdateNoKeywordAutoReply String
+    | UpdateDefaultNoKeywordNotLive String
+    | UpdateStartReply String
+    | UpdateAutoName String
+    | UpdateNameUpdateReply String
+    | UpdateNameFailReply String
+    | ReceiveInitialModel (Result Http.Error Model)
 
 
-update : Msg -> Model
-update msg =
-    case msg of
-        UpdateField updater text ->
-            updater text
+update : Msg -> Maybe Model -> Maybe Model
+update msg maybeModel =
+    case ( msg, maybeModel ) of
+        ( UpdateKeywordNoMatch text, Just model ) ->
+            Just { model | keyword_no_match = text }
+
+        ( UpdateNoKeywordAutoReply text, Just model ) ->
+            Just { model | default_no_keyword_auto_reply = text }
+
+        ( UpdateDefaultNoKeywordNotLive text, Just model ) ->
+            Just { model | default_no_keyword_not_live = text }
+
+        ( UpdateStartReply text, Just model ) ->
+            Just { model | start_reply = text }
+
+        ( UpdateAutoName text, Just model ) ->
+            Just { model | auto_name_request = text }
+
+        ( UpdateNameUpdateReply text, Just model ) ->
+            Just { model | name_update_reply = text }
+
+        ( UpdateNameFailReply text, Just model ) ->
+            Just { model | name_failure_reply = text }
+
+        ( ReceiveInitialModel (Ok initialModel), _ ) ->
+            Just initialModel
+
+        ( ReceiveInitialModel (Err _), _ ) ->
+            Nothing
+
+        ( _, Nothing ) ->
+            Nothing
 
 
 
@@ -67,15 +102,15 @@ view msgs maybeModel status =
             let
                 fields =
                     [ FieldGroup { defaultFieldGroupConfig | header = Just "Keyword" }
-                        [ Field meta.keyword_no_match (keywordNoMatchField msgs meta.keyword_no_match model)
-                        , Field meta.default_no_keyword_auto_reply (noKAutoReplyField msgs meta.default_no_keyword_auto_reply model)
-                        , Field meta.default_no_keyword_not_live (noKNotLiveField msgs meta.default_no_keyword_not_live model)
+                        [ Field meta.keyword_no_match (keywordNoMatchField msgs model)
+                        , Field meta.default_no_keyword_auto_reply (noKAutoReplyField msgs model)
+                        , Field meta.default_no_keyword_not_live (noKNotLiveField msgs model)
                         ]
                     , FieldGroup { defaultFieldGroupConfig | header = Just "Contact Signup" }
-                        [ Field meta.start_reply (startReplyField msgs meta.start_reply model)
-                        , Field meta.auto_name_request (autoNameField msgs meta.auto_name_request model)
-                        , Field meta.name_update_reply (nameUpdateField msgs meta.name_update_reply model)
-                        , Field meta.name_failure_reply (nameFailField msgs meta.name_failure_reply model)
+                        [ Field meta.start_reply (startReplyField msgs model)
+                        , Field meta.auto_name_request (autoNameField msgs model)
+                        , Field meta.name_update_reply (nameUpdateField msgs model)
+                        , Field meta.name_failure_reply (nameFailField msgs model)
                         ]
                     ]
             in
@@ -88,85 +123,50 @@ view msgs maybeModel status =
                 ]
 
 
-keywordNoMatchField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-keywordNoMatchField msgs meta_ model =
-    let
-        updater text =
-            { model | keyword_no_match = text }
-    in
+keywordNoMatchField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+keywordNoMatchField msgs model =
     FV.longTextField 10
-        meta_
         (Just model.keyword_no_match)
-        (msgs.form << UpdateField updater)
+        (msgs.form << UpdateKeywordNoMatch)
 
 
-noKAutoReplyField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-noKAutoReplyField msgs meta_ model =
-    let
-        updater text =
-            { model | default_no_keyword_auto_reply = text }
-    in
+noKAutoReplyField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+noKAutoReplyField msgs model =
     FV.longTextField 10
-        meta_
         (Just model.default_no_keyword_auto_reply)
-        (msgs.form << UpdateField updater)
+        (msgs.form << UpdateNoKeywordAutoReply)
 
 
-noKNotLiveField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-noKNotLiveField msgs meta_ model =
-    let
-        updater text =
-            { model | default_no_keyword_not_live = text }
-    in
+noKNotLiveField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+noKNotLiveField msgs model =
     FV.longTextField 10
-        meta_
         (Just model.default_no_keyword_not_live)
-        (msgs.form << UpdateField updater)
+        (msgs.form << UpdateDefaultNoKeywordNotLive)
 
 
-startReplyField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-startReplyField msgs meta_ model =
-    let
-        updater text =
-            { model | start_reply = text }
-    in
+startReplyField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+startReplyField msgs model =
     FV.longTextField 10
-        meta_
         (Just model.start_reply)
-        (msgs.form << UpdateField updater)
+        (msgs.form << UpdateStartReply)
 
 
-autoNameField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-autoNameField msgs meta_ model =
-    let
-        updater text =
-            { model | auto_name_request = text }
-    in
+autoNameField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+autoNameField msgs model =
     FV.longTextField 10
-        meta_
         (Just model.auto_name_request)
-        (msgs.form << UpdateField updater)
+        (msgs.form << UpdateAutoName)
 
 
-nameUpdateField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-nameUpdateField msgs meta_ model =
-    let
-        updater text =
-            { model | name_update_reply = text }
-    in
+nameUpdateField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+nameUpdateField msgs model =
     FV.longTextField 10
-        meta_
         (Just model.name_update_reply)
-        (msgs.form << UpdateField updater)
+        (msgs.form << UpdateNameUpdateReply)
 
 
-nameFailField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-nameFailField msgs meta_ model =
-    let
-        updater text =
-            { model | name_failure_reply = text }
-    in
+nameFailField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+nameFailField msgs model =
     FV.longTextField 10
-        meta_
         (Just model.name_failure_reply)
-        (msgs.form << UpdateField updater)
+        (msgs.form << UpdateNameFailReply)

@@ -132,9 +132,9 @@ sendForm : Props msg -> Model -> RL.RemoteList Recipient -> FormStatus -> Html m
 sendForm props model contacts status =
     let
         fields =
-            [ Field meta.content <| contentField meta.content props.smsCharLimit (props.form << UpdateContent) model.content
-            , Field meta.recipients <| contactsField props meta.recipients model contacts
-            , Field meta.scheduled_time <| timeField (updateSADate props) meta.scheduled_time model.datePickerState model.date
+            [ Field meta.content <| contentField props.smsCharLimit (props.form << UpdateContent) model.content
+            , Field meta.recipients <| contactsField props model contacts
+            , Field meta.scheduled_time <| timeField (updateSADate props) model.datePickerState model.date
             ]
                 |> List.map FormField
     in
@@ -175,8 +175,8 @@ loadingMessage rl =
             text ""
 
 
-contactsField : Props msg -> FieldMeta -> Model -> RL.RemoteList Recipient -> List (Html msg)
-contactsField props meta_ model contacts =
+contactsField : Props msg -> Model -> RL.RemoteList Recipient -> FieldMeta -> List (Html msg)
+contactsField props model contacts meta_ =
     [ label [ A.for meta_.id ] [ text meta_.label ]
     , div [ A.class "segment" ]
         [ loadingMessage contacts

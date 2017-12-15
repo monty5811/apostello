@@ -241,29 +241,29 @@ fieldsHelp msgs groups model =
             , sideBySide = Just 2
             , helpText = Just <| debugHelpText
         }
-        [ Field meta.twilio_from_num (twilioFromNumField msgs meta.twilio_from_num model)
-        , Field meta.twilio_sending_cost (twilioSendCostField msgs meta.twilio_sending_cost model)
-        , Field meta.twilio_account_sid (twilioAccountSidField msgs meta.twilio_account_sid model)
-        , Field meta.twilio_auth_token (twilioAuthTokenField msgs meta.twilio_auth_token model)
+        [ Field meta.twilio_from_num (twilioFromNumField msgs model)
+        , Field meta.twilio_sending_cost (twilioSendCostField msgs model)
+        , Field meta.twilio_account_sid (twilioAccountSidField msgs model)
+        , Field meta.twilio_auth_token (twilioAuthTokenField msgs model)
         ]
     , FieldGroup { defaultFieldGroupConfig | header = Just "Site Settings" }
-        [ Field meta.site_name (siteNameField msgs meta.site_name model)
-        , Field meta.disable_email_login_form (emailLoginField msgs meta.disable_email_login_form model)
-        , Field meta.not_approved_msg (notAppField msgs meta.not_approved_msg model)
+        [ Field meta.site_name (siteNameField msgs model)
+        , Field meta.disable_email_login_form (emailLoginField msgs model)
+        , Field meta.not_approved_msg (notAppField msgs model)
         ]
     , FieldGroup { defaultFieldGroupConfig | header = Just "SMS Settings" }
-        [ Field meta.sms_char_limit (smsLimitField msgs meta.sms_char_limit model)
-        , Field meta.default_number_prefix (defaultPrefixField msgs meta.default_number_prefix model)
-        , Field meta.disable_all_replies (allRepliesField msgs meta.disable_all_replies model)
-        , Field meta.auto_add_new_groups (autoNewGroupsField msgs groups meta.auto_add_new_groups model)
+        [ Field meta.sms_char_limit (smsLimitField msgs model)
+        , Field meta.default_number_prefix (defaultPrefixField msgs model)
+        , Field meta.disable_all_replies (allRepliesField msgs model)
+        , Field meta.auto_add_new_groups (autoNewGroupsField msgs groups model)
         ]
     , FieldGroup { defaultFieldGroupConfig | header = Just "SMS Expiration", sideBySide = Just 2 }
-        [ Field meta.sms_expiration_date (smsExpirationDateField msgs meta.sms_expiration_date model)
-        , Field meta.sms_rolling_expiration_days (smsRollingExpireField msgs meta.sms_rolling_expiration_days model)
+        [ Field meta.sms_expiration_date (smsExpirationDateField msgs model)
+        , Field meta.sms_rolling_expiration_days (smsRollingExpireField msgs model)
         ]
     , FieldGroup { defaultFieldGroupConfig | header = Just "Notification Settings" }
-        [ Field meta.office_email (officeEmailField msgs meta.office_email model)
-        , Field meta.slack_url (slackField msgs meta.slack_url model)
+        [ Field meta.office_email (officeEmailField msgs model)
+        , Field meta.slack_url (slackField msgs model)
         ]
     , FieldGroup
         { defaultFieldGroupConfig
@@ -271,77 +271,77 @@ fieldsHelp msgs groups model =
             , sideBySide = Just 2
             , helpText = Just <| debugHelpText
         }
-        [ Field meta.email_host (emailHostField msgs meta.email_host model)
-        , Field meta.email_port (emailPortField msgs meta.email_port model)
-        , Field meta.email_username (emailUserField msgs meta.email_username model)
-        , Field meta.email_password (emailPassField msgs meta.email_password model)
-        , Field meta.email_from (emailFromField msgs meta.email_from model)
+        [ Field meta.email_host (emailHostField msgs model)
+        , Field meta.email_port (emailPortField msgs model)
+        , Field meta.email_username (emailUserField msgs model)
+        , Field meta.email_password (emailPassField msgs model)
+        , Field meta.email_from (emailFromField msgs model)
         ]
     , FieldGroup { defaultFieldGroupConfig | header = Just "Sync Settings" }
-        [ Field meta.sync_elvanto (syncElvField msgs meta.sync_elvanto model)
+        [ Field meta.sync_elvanto (syncElvField msgs model)
         ]
     ]
 
 
-twilioFromNumField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-twilioFromNumField msgs meta_ model =
-    FV.simpleTextField meta_
+twilioFromNumField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+twilioFromNumField msgs model =
+    FV.simpleTextField
         model.twilio_from_num
         (msgs.form << UpdateTwilioFromNum model)
 
 
-twilioSendCostField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-twilioSendCostField msgs meta_ model =
-    FV.simpleFloatField meta_
+twilioSendCostField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+twilioSendCostField msgs model =
+    FV.simpleFloatField
         model.twilio_sending_cost
         (msgs.form << UpdateTwilioSendCost model)
 
 
-twilioAuthTokenField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-twilioAuthTokenField msgs meta_ model =
-    FV.simpleTextField meta_
+twilioAuthTokenField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+twilioAuthTokenField msgs model =
+    FV.simpleTextField
         model.twilio_auth_token
         (msgs.form << UpdateTwilioAuthToken model)
 
 
-twilioAccountSidField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-twilioAccountSidField msgs meta_ model =
-    FV.simpleTextField meta_
+twilioAccountSidField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+twilioAccountSidField msgs model =
+    FV.simpleTextField
         model.twilio_account_sid
         (msgs.form << UpdateTwilioSid model)
 
 
-siteNameField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-siteNameField msgs meta_ model =
-    FV.simpleTextField meta_
+siteNameField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+siteNameField msgs model =
+    FV.simpleTextField
         (Just model.site_name)
         (msgs.form << UpdateSiteNameField model)
 
 
-smsLimitField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-smsLimitField msgs meta_ model =
-    FV.simpleIntField meta_
+smsLimitField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+smsLimitField msgs model =
+    FV.simpleIntField
         (Just model.sms_char_limit)
         (msgs.form << UpdateSmsCharLimitField model)
 
 
-smsRollingExpireField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-smsRollingExpireField msgs meta_ model =
-    FV.simpleIntField meta_
+smsRollingExpireField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+smsRollingExpireField msgs model =
+    FV.simpleIntField
         model.sms_rolling_expiration_days
         (msgs.form << UpdateRollingExpiration model)
 
 
-defaultPrefixField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-defaultPrefixField msgs meta_ model =
-    FV.simpleTextField meta_
+defaultPrefixField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+defaultPrefixField msgs model =
+    FV.simpleTextField
         (Just model.default_number_prefix)
         (msgs.form << UpdateDefaultPrefixField model)
 
 
-allRepliesField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-allRepliesField msgs meta_ model =
-    FV.checkboxField meta_
+allRepliesField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+allRepliesField msgs model =
+    FV.checkboxField
         (Just model)
         .disable_all_replies
         (msgOrNope msgs (msgs.form << UpdateDisableRepliesField))
@@ -357,24 +357,24 @@ msgOrNope msgs msg maybeRec =
             msg rec
 
 
-emailLoginField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-emailLoginField msgs meta_ model =
-    FV.checkboxField meta_
+emailLoginField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+emailLoginField msgs model =
+    FV.checkboxField
         (Just model)
         .disable_email_login_form
         (msgOrNope msgs (msgs.form << UpdateDisableLoginEmailField))
 
 
-officeEmailField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-officeEmailField msgs meta_ model =
-    FV.simpleTextField meta_
+officeEmailField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+officeEmailField msgs model =
+    FV.simpleTextField
         (Just model.office_email)
         (msgs.form << UpdateOfficeEmailField model)
 
 
-autoNewGroupsField : Messages msg -> RL.RemoteList RecipientGroup -> FieldMeta -> Model -> List (Html msg)
-autoNewGroupsField msgs groups meta_ model =
-    FV.multiSelectField meta_
+autoNewGroupsField : Messages msg -> RL.RemoteList RecipientGroup -> Model -> (FieldMeta -> List (Html msg))
+autoNewGroupsField msgs groups model =
+    FV.multiSelectField
         (FV.MultiSelectField
             groups
             (Just model.auto_add_new_groups)
@@ -386,9 +386,9 @@ autoNewGroupsField msgs groups meta_ model =
         )
 
 
-smsExpirationDateField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-smsExpirationDateField msgs meta_ model =
-    FV.dateField (updateExpDate msgs model) meta_ model.datePickerSmsExpiredState model.sms_expiration_date
+smsExpirationDateField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+smsExpirationDateField msgs model =
+    FV.dateField (updateExpDate msgs model) model.datePickerSmsExpiredState model.sms_expiration_date
 
 
 updateExpDate : Messages msg -> Model -> DateTimePicker.State -> Maybe Date.Date -> msg
@@ -430,63 +430,59 @@ groupViewHelper selectedPks group =
         ]
 
 
-slackField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-slackField msgs meta_ model =
-    FV.simpleTextField meta_
+slackField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+slackField msgs model =
+    FV.simpleTextField
         (Just model.slack_url)
         (msgs.form << UpdateSlackUrlField model)
 
 
-syncElvField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-syncElvField msgs meta_ model =
-    FV.checkboxField meta_
+syncElvField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+syncElvField msgs model =
+    FV.checkboxField
         (Just model)
         .sync_elvanto
         (msgOrNope msgs (msgs.form << UpdateSyncElvantoField))
 
 
-notAppField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-notAppField msgs meta_ model =
+notAppField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+notAppField msgs model =
     FV.longTextField
         10
-        meta_
         (Just model.not_approved_msg)
         (msgs.form << UpdateNotApprovedField model)
 
 
-emailHostField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-emailHostField msgs meta_ model =
-    FV.simpleTextField meta_
+emailHostField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+emailHostField msgs model =
+    FV.simpleTextField
         model.email_host
         (msgs.form << UpdateEmailHostField model)
 
 
-emailPortField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-emailPortField msgs meta_ model =
-    FV.simpleIntField meta_
+emailPortField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+emailPortField msgs model =
+    FV.simpleIntField
         model.email_port
         (msgs.form << UpdateEmailPortField model)
 
 
-emailUserField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-emailUserField msgs meta_ model =
+emailUserField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+emailUserField msgs model =
     FV.simpleTextField
-        meta_
         model.email_username
         (msgs.form << UpdateEmailUserField model)
 
 
-emailPassField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-emailPassField msgs meta_ model =
+emailPassField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+emailPassField msgs model =
     FV.simpleTextField
-        meta_
         model.email_password
         (msgs.form << UpdateEmailPassField model)
 
 
-emailFromField : Messages msg -> FieldMeta -> Model -> List (Html msg)
-emailFromField msgs meta_ model =
+emailFromField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+emailFromField msgs model =
     FV.simpleTextField
-        meta_
         model.email_from
         (msgs.form << UpdateEmailFromField model)

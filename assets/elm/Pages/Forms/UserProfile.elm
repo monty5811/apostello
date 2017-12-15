@@ -152,17 +152,17 @@ viewHelp msgs model status profile =
     let
         fields =
             [ Field meta.approved (approvedField msgs profile)
-            , Field meta.message_cost_limit (simpleFloatField meta.message_cost_limit (Just profile.message_cost_limit) (msgs.form << UpdateMessageCostLimit))
-            , Field meta.can_see_groups (checkboxField meta.can_see_groups (Just profile) .can_see_groups (msgs.form << UpdateCanSeeGroups))
-            , Field meta.can_see_contact_names (checkboxField meta.can_see_contact_names (Just profile) .can_see_contact_names (msgs.form << UpdateCanSeeContactNames))
-            , Field meta.can_see_keywords (checkboxField meta.can_see_keywords (Just profile) .can_see_keywords (msgs.form << UpdateCanSeeKeywords))
-            , Field meta.can_see_outgoing (checkboxField meta.can_see_outgoing (Just profile) .can_see_outgoing (msgs.form << UpdateCanSeeOutgoing))
-            , Field meta.can_see_incoming (checkboxField meta.can_see_incoming (Just profile) .can_see_incoming (msgs.form << UpdateCanSeeIncoming))
-            , Field meta.can_send_sms (checkboxField meta.can_send_sms (Just profile) .can_send_sms (msgs.form << UpdateCanSendSms))
-            , Field meta.can_see_contact_nums (checkboxField meta.can_see_contact_nums (Just profile) .can_see_contact_nums (msgs.form << UpdateCanSeeContactNums))
-            , Field meta.can_see_contact_notes (checkboxField meta.can_see_contact_notes (Just profile) .can_see_contact_notes (msgs.form << UpdateCanSeeContactNotes))
-            , Field meta.can_import (checkboxField meta.can_import (Just profile) .can_import (msgs.form << UpdateCanImport))
-            , Field meta.can_archive (checkboxField meta.can_archive (Just profile) .can_archive (msgs.form << UpdateCanArchive))
+            , Field meta.message_cost_limit (simpleFloatField (Just profile.message_cost_limit) (msgs.form << UpdateMessageCostLimit))
+            , Field meta.can_see_groups (checkboxField (Just profile) .can_see_groups (msgs.form << UpdateCanSeeGroups))
+            , Field meta.can_see_contact_names (checkboxField (Just profile) .can_see_contact_names (msgs.form << UpdateCanSeeContactNames))
+            , Field meta.can_see_keywords (checkboxField (Just profile) .can_see_keywords (msgs.form << UpdateCanSeeKeywords))
+            , Field meta.can_see_outgoing (checkboxField (Just profile) .can_see_outgoing (msgs.form << UpdateCanSeeOutgoing))
+            , Field meta.can_see_incoming (checkboxField (Just profile) .can_see_incoming (msgs.form << UpdateCanSeeIncoming))
+            , Field meta.can_send_sms (checkboxField (Just profile) .can_send_sms (msgs.form << UpdateCanSendSms))
+            , Field meta.can_see_contact_nums (checkboxField (Just profile) .can_see_contact_nums (msgs.form << UpdateCanSeeContactNums))
+            , Field meta.can_see_contact_notes (checkboxField (Just profile) .can_see_contact_notes (msgs.form << UpdateCanSeeContactNotes))
+            , Field meta.can_import (checkboxField (Just profile) .can_import (msgs.form << UpdateCanImport))
+            , Field meta.can_archive (checkboxField (Just profile) .can_archive (msgs.form << UpdateCanArchive))
             ]
                 |> List.map FormField
     in
@@ -175,10 +175,10 @@ viewHelp msgs model status profile =
         ]
 
 
-approvedField : Messages msg -> UserProfile -> List (Html msg)
-approvedField msgs profile =
+approvedField : Messages msg -> UserProfile -> FieldMeta -> List (Html msg)
+approvedField msgs profile fieldMeta =
     checkboxField
-        meta.approved
         (Just profile)
         .approved
         (msgs.form << UpdateApproved)
+        fieldMeta
