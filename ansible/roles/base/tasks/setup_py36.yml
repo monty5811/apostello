@@ -5,7 +5,7 @@
 
 - name: "[py36] add deadsnakes ppa"
   apt_repository:
-    repo: "ppa:fkrull/deadsnakes"
+    repo: "ppa:deadsnakes/ppa"
   when: py36bin.stat.exists == false
 
 - name: "[py36] install"
