@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [v2.7.1]
+
+### Fixed
+
+ - Update deadsnakes ppa to fix ansible deploys
+
 ## [v2.7.0]
 
 ### Added
