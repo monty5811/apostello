@@ -184,7 +184,7 @@ class Collection(generics.ListAPIView):
             return objs.filter(keyword=identifier)
 
     def get_queryset(self):
-        return self._get_queryset()
+        return self._get_queryset()[0:5000]
 
     def _get_queryset(self):
         """Handle get requests."""
@@ -223,7 +223,7 @@ class SmsCollection(Collection):
             return qs
 
         blocked_keywords = [x.keyword for x in Keyword.objects.all() if not x.can_user_access(self.request.user)]
-        return qs.exclude(matched_keyword__in=blocked_keywords)
+        return qs.exclude(matched_keyword__in=blocked_keywords)[0:5000]
 
 
 class QueuedSmsCollection(Collection):
