@@ -2,13 +2,12 @@ module Pages.Usage exposing (view)
 
 import Html exposing (Html, div, embed, figure, h3, text)
 import Html.Attributes as A
-import Rocket exposing ((=>))
 
 
 view : Html msg
 view =
     div
-        [ A.style [ "margin" => "2rem" ] ]
+        [ A.style [ ( "margin", "2rem" ) ] ]
         [ row
             [ fig "Contacts" "/graphs/contacts/" "3 / 6"
             , fig "Groups" "/graphs/groups/" "7 / 10"
@@ -29,9 +28,9 @@ row : List (Html msg) -> Html msg
 row l =
     div
         [ A.style
-            [ "display" => "grid"
-            , "min-height" => "40vh"
-            , "grid-template-columns" => "repeat(16, auto)"
+            [ ( "display", "grid" )
+            , ( "min-height", "40vh" )
+            , ( "grid-template-columns", "repeat(16, auto)" )
             ]
         ]
         l
@@ -39,7 +38,7 @@ row l =
 
 fig : String -> String -> String -> Html msg
 fig header src col =
-    div [ A.style [ "grid-column" => col ] ]
+    div [ A.style [ ( "grid-column", col ) ] ]
         [ h3 [] [ text header ]
         , figure [] [ embed [ A.type_ "image/svg+xml", A.src src ] [] ]
         ]

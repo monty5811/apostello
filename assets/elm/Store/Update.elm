@@ -1,6 +1,6 @@
 module Store.Update exposing (..)
 
-import Data exposing (ElvantoGroup, Keyword, QueuedSms, Recipient, RecipientGroup, RecipientSimple, SmsInbound, SmsOutbound, User, UserProfile, decodeElvantoGroup, decodeKeyword, decodeQueuedSms, decodeRecipient, decodeRecipientGroup, decodeSmsInbound, decodeSmsOutbound, decodeUser, decodeUserProfile)
+import Data exposing (ElvantoGroup, Keyword, QueuedSms, Recipient, RecipientGroup, SmsInbound, SmsOutbound, User, UserProfile, decodeElvantoGroup, decodeKeyword, decodeQueuedSms, decodeRecipient, decodeRecipientGroup, decodeSmsInbound, decodeSmsOutbound, decodeUser, decodeUserProfile)
 import Date
 import Dict
 import Helpers exposing (handleNotSaved)
@@ -10,7 +10,6 @@ import Json.Decode.Pipeline exposing (decode, optional, required)
 import Models exposing (Model)
 import Notification as Notif
 import RemoteList as RL
-import Rocket exposing ((=>))
 import Store.DataTypes exposing (RemoteDataType(..))
 import Store.Decode exposing (decodeDataStore)
 import Store.Messages exposing (StoreMsg(..))
@@ -29,7 +28,7 @@ update msg model =
                 ( ds, cmds ) =
                     maybeFetchData model.page model.dataStore
             in
-            { model | dataStore = ds } => cmds
+            ( { model | dataStore = ds }, cmds )
 
         LoadDataStore str ->
             let

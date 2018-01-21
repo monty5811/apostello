@@ -7,7 +7,6 @@ import Html exposing (Html, a, div, td, text, th, thead, tr)
 import Html.Attributes as A
 import Html.Events exposing (onClick)
 import RemoteList as RL
-import Rocket exposing ((=>))
 import Time
 
 
@@ -62,7 +61,7 @@ smsRow props sms =
         style =
             case sms.failed of
                 True ->
-                    [ "background" => "var(--color-red)" ]
+                    [ ( "background", "var(--color-red)" ) ]
 
                 False ->
                     []

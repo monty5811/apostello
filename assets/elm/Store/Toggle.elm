@@ -1,10 +1,9 @@
 module Store.Toggle exposing (..)
 
-import Data exposing (ElvantoGroup, RecipientGroup, SmsInbound, UserProfile, decodeElvantoGroup, decodeRecipientGroup, decodeSmsInbound, decodeUserProfile, encodeUserProfile)
+import Data exposing (ElvantoGroup, UserProfile, decodeElvantoGroup, decodeRecipientGroup, decodeSmsInbound, decodeUserProfile, encodeUserProfile)
 import DjangoSend exposing (CSRFToken, archivePost, archivePostRaw, post, rawPost)
 import Http
 import Json.Encode as Encode
-import Rocket exposing ((=>))
 import Store.Messages exposing (StoreMsg(..))
 import Urls
 
@@ -13,7 +12,7 @@ smsDealtWith : CSRFToken -> Bool -> Int -> Cmd StoreMsg
 smsDealtWith csrf isDealtWith pk =
     let
         body =
-            [ "dealt_with" => Encode.bool isDealtWith ]
+            [ ( "dealt_with", Encode.bool isDealtWith ) ]
     in
     post csrf (Urls.api_toggle_deal_with_sms pk) body decodeSmsInbound
         |> Http.send ReceiveToggleInboundSmsDealtWith
@@ -29,7 +28,7 @@ reprocessSms : CSRFToken -> Int -> Cmd StoreMsg
 reprocessSms csrf pk =
     let
         body =
-            [ "reingest" => Encode.bool True ]
+            [ ( "reingest", Encode.bool True ) ]
     in
     post csrf (Urls.api_act_reingest_sms pk) body decodeSmsInbound
         |> Http.send ReceiveReprocessSms
@@ -42,7 +41,7 @@ profileField csrf profile =
             Urls.api_user_profile_update profile.pk
 
         body =
-            [ "user_profile" => encodeUserProfile profile ]
+            [ ( "user_profile", encodeUserProfile profile ) ]
     in
     post csrf url body decodeUserProfile
         |> Http.send ReceiveToggleProfileField
@@ -73,7 +72,7 @@ wallDisplay csrf isDisplayed pk =
             Urls.api_toggle_display_on_wall pk
 
         body =
-            [ "display_on_wall" => Encode.bool isDisplayed ]
+            [ ( "display_on_wall", Encode.bool isDisplayed ) ]
     in
     post csrf url body decodeSmsInbound
         |> Http.send ReceiveToggleWallDisplay
@@ -86,7 +85,7 @@ cancelSms csrf pk =
             Urls.api_act_cancel_queued_sms pk
 
         body =
-            [ "cancel_sms" => Encode.bool True ]
+            [ ( "cancel_sms", Encode.bool True ) ]
     in
     rawPost csrf url body
         |> Http.send ReceiveLazy
@@ -96,8 +95,8 @@ groupMembership : CSRFToken -> Int -> Int -> Bool -> Cmd StoreMsg
 groupMembership csrf groupPk contactPk isMember =
     let
         body =
-            [ "member" => Encode.bool isMember
-            , "contactPk" => Encode.int contactPk
+            [ ( "member", Encode.bool isMember )
+            , ( "contactPk", Encode.int contactPk )
             ]
 
         url =
@@ -114,7 +113,7 @@ elvantoGroupSync csrf group =
             Urls.api_toggle_elvanto_group_sync group.pk
 
         body =
-            [ "sync" => Encode.bool group.sync ]
+            [ ( "sync", Encode.bool group.sync ) ]
     in
     post csrf url body decodeElvantoGroup
         |> Http.send ReceiveToggleElvantoGroupSync

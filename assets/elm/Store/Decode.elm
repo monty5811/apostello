@@ -1,6 +1,6 @@
 module Store.Decode exposing (decodeDataStore)
 
-import Data exposing (ElvantoGroup, Keyword, QueuedSms, Recipient, RecipientGroup, RecipientSimple, SmsInbound, SmsOutbound, User, UserProfile, decodeElvantoGroup, decodeKeyword, decodeQueuedSms, decodeRecipient, decodeRecipientGroup, decodeSmsInbound, decodeSmsOutbound, decodeUser, decodeUserProfile)
+import Data exposing (decodeElvantoGroup, decodeKeyword, decodeQueuedSms, decodeRecipient, decodeRecipientGroup, decodeSmsInbound, decodeSmsOutbound, decodeUser, decodeUserProfile)
 import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (decode, required)
 import RemoteList exposing (RemoteList(NotAsked))

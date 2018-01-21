@@ -1,4 +1,4 @@
-module Pages.Forms.SendGroup exposing (Model, Msg(UpdateSGDate), initialModel, update, view)
+module Pages.Forms.SendGroup exposing (Model, Msg(UpdateSGDate), init, initialModel, update, view)
 
 import Data exposing (RecipientGroup, nullGroup)
 import Date
@@ -13,7 +13,23 @@ import Html.Keyed
 import Pages.Forms.Meta.SendGroup exposing (meta)
 import Regex
 import RemoteList as RL
-import Rocket exposing ((=>))
+
+
+-- Init
+
+
+init : Model -> Cmd Msg
+init model =
+    DateTimePicker.initialCmd initSendGroupDate model.datePickerState
+
+
+initSendGroupDate : DateTimePicker.State -> Maybe Date.Date -> Msg
+initSendGroupDate state maybeDate =
+    UpdateSGDate state maybeDate
+
+
+
+-- Model
 
 
 type alias Model =
@@ -158,9 +174,9 @@ groupField props model groups meta_ =
         , div
             [ class "list"
             , style
-                [ "min-height" => "25vh"
-                , "max-height" => "50vh"
-                , "overflow-y" => "auto"
+                [ ( "min-height", "25vh" )
+                , ( "max-height", "50vh" )
+                , ( "overflow-y", "auto" )
                 ]
             ]
             (groups
@@ -204,7 +220,7 @@ groupItem props selectedPk group =
 
 groupItemHelper : Maybe Int -> RecipientGroup -> Html msg
 groupItemHelper selectedPk group =
-    div [ style [ "color" => "#000" ] ]
+    div [ style [ ( "color", "#000" ) ] ]
         [ Html.span [ class "float-right" ] [ text <| "($" ++ toString group.cost ++ ")" ]
         , Html.span []
             [ selectedIcon selectedPk group
@@ -224,7 +240,7 @@ selectedIcon selectedPk group =
                 True ->
                     i
                         [ class "fa fa-check"
-                        , style [ "color" => "var(--color-purple)" ]
+                        , style [ ( "color", "var(--color-purple)" ) ]
                         ]
                         []
 

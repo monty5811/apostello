@@ -1,16 +1,15 @@
-module Forms.Update exposing (initDateTimePickers, maybeFetchConfig, update)
+module Forms.Update exposing (update)
 
 import Data exposing (Keyword, Recipient, RecipientGroup, UserProfile)
 import Date
-import DateTimePicker
 import DjangoSend exposing (CSRFToken, rawPost)
 import Encode exposing (encodeDate, encodeMaybe, encodeMaybeDate, encodeMaybeDateOnly)
-import Forms.Model exposing (FormErrors, FormStatus(Failed, InProgress, Success), decodeFormResp, formDecodeError, noErrors)
+import Forms.Model exposing (FormStatus(Failed, InProgress, Success), decodeFormResp, formDecodeError, noErrors)
 import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Messages exposing (FormMsg(..), Msg(FormMsg))
-import Models exposing (Model, Settings, TwilioSettings)
+import Models exposing (Model)
 import Navigation as Nav
 import Notification as Notif
 import Pages as P
@@ -25,7 +24,6 @@ import Pages.Forms.SendGroup as SGF
 import Pages.Forms.SiteConfig as SCF
 import Pages.Forms.UserProfile as UPF
 import RemoteList as RL
-import Rocket exposing ((=>))
 import Route exposing (page2loc)
 import Time
 import Urls
@@ -37,125 +35,135 @@ update msg model =
         PostCreateAllGroupForm ->
             case model.page of
                 P.CreateAllGroup name ->
-                    setInProgress model
-                        => [ postCreateAllGroupCmd model.settings.csrftoken name ]
+                    ( setInProgress model
+                    , [ postCreateAllGroupCmd model.settings.csrftoken name ]
+                    )
 
                 _ ->
-                    model => []
+                    ( model, [] )
 
         PostDefaultRespForm ->
             case model.page of
                 P.DefaultResponsesForm (Just drModel) ->
-                    setInProgress model
-                        => [ postDefautlRespCmd model.settings.csrftoken drModel ]
+                    ( setInProgress model
+                    , [ postDefautlRespCmd model.settings.csrftoken drModel ]
+                    )
 
                 _ ->
-                    model => []
+                    ( model, [] )
 
         PostGroupForm ->
             case model.page of
                 P.GroupForm gfModel maybePk ->
-                    setInProgress model
-                        => [ postGroupCmd model.settings.csrftoken
-                                gfModel
-                                (RL.filter (\x -> Just x.pk == maybePk) model.dataStore.groups
-                                    |> RL.toList
-                                    |> List.head
-                                )
-                           ]
+                    ( setInProgress model
+                    , [ postGroupCmd model.settings.csrftoken
+                            gfModel
+                            (RL.filter (\x -> Just x.pk == maybePk) model.dataStore.groups
+                                |> RL.toList
+                                |> List.head
+                            )
+                      ]
+                    )
 
                 _ ->
-                    model => []
+                    ( model, [] )
 
         PostSendAdhocForm ->
             case model.page of
                 P.SendAdhoc saModel ->
-                    setInProgress model
-                        => [ postSendAdhocCmd model.settings.csrftoken model.settings.userPerms saModel ]
+                    ( setInProgress model
+                    , [ postSendAdhocCmd model.settings.csrftoken model.settings.userPerms saModel ]
+                    )
 
                 _ ->
-                    model => []
+                    ( model, [] )
 
         PostSendGroupForm ->
             case model.page of
                 P.SendGroup sgModel ->
-                    setInProgress model
-                        => [ postSendGroupCmd model.settings.csrftoken model.settings.userPerms sgModel ]
+                    ( setInProgress model
+                    , [ postSendGroupCmd model.settings.csrftoken model.settings.userPerms sgModel ]
+                    )
 
                 _ ->
-                    model => []
+                    ( model, [] )
 
         PostSiteConfigForm ->
             case model.page of
                 P.SiteConfigForm (Just scModel) ->
-                    setInProgress model
-                        => [ postSiteConfigCmd model.settings.csrftoken scModel ]
+                    ( setInProgress model
+                    , [ postSiteConfigCmd model.settings.csrftoken scModel ]
+                    )
 
                 _ ->
-                    model => []
+                    ( model, [] )
 
         PostUserProfileForm ->
             case model.page of
                 P.UserProfileForm upfModel userPk ->
-                    setInProgress model
-                        => [ postUserProfileCmd
-                                model.settings.csrftoken
-                                upfModel
-                                (RL.filter (\x -> x.user.pk == userPk) model.dataStore.userprofiles
-                                    |> RL.toList
-                                    |> List.head
-                                )
-                           ]
+                    ( setInProgress model
+                    , [ postUserProfileCmd
+                            model.settings.csrftoken
+                            upfModel
+                            (RL.filter (\x -> x.user.pk == userPk) model.dataStore.userprofiles
+                                |> RL.toList
+                                |> List.head
+                            )
+                      ]
+                    )
 
                 _ ->
-                    model => []
+                    ( model, [] )
 
         PostKeywordForm ->
             case model.page of
                 P.KeywordForm kfModel maybeK ->
-                    setInProgress model
-                        => [ postKeywordFormCmd
-                                model.settings.csrftoken
-                                model.currentTime
-                                kfModel
-                                (RL.filter (\x -> Just x.keyword == maybeK) model.dataStore.keywords
-                                    |> RL.toList
-                                    |> List.head
-                                )
-                           ]
+                    ( setInProgress model
+                    , [ postKeywordFormCmd
+                            model.settings.csrftoken
+                            model.currentTime
+                            kfModel
+                            (RL.filter (\x -> Just x.keyword == maybeK) model.dataStore.keywords
+                                |> RL.toList
+                                |> List.head
+                            )
+                      ]
+                    )
 
                 _ ->
-                    model => []
+                    ( model, [] )
 
         PostContactForm canSeeContactNum canSeeContactNotes ->
             case model.page of
                 P.ContactForm cfModel maybePk ->
-                    setInProgress model
-                        => [ postContactFormCmd
-                                model.settings.csrftoken
-                                cfModel
-                                canSeeContactNum
-                                canSeeContactNotes
-                                (RL.filter (\x -> Just x.pk == maybePk) model.dataStore.recipients
-                                    |> RL.toList
-                                    |> List.head
-                                )
-                           ]
+                    ( setInProgress model
+                    , [ postContactFormCmd
+                            model.settings.csrftoken
+                            cfModel
+                            canSeeContactNum
+                            canSeeContactNotes
+                            (RL.filter (\x -> Just x.pk == maybePk) model.dataStore.recipients
+                                |> RL.toList
+                                |> List.head
+                            )
+                      ]
+                    )
 
                 _ ->
-                    model => []
+                    ( model, [] )
 
         PostContactImportForm ->
             case model.page of
                 P.ContactImport ciModel ->
-                    setInProgress model
-                        => [ postContactImportCmd
-                                model.settings.csrftoken
-                                ciModel
-                           ]
+                    ( setInProgress model
+                    , [ postContactImportCmd
+                            model.settings.csrftoken
+                            ciModel
+                      ]
+                    )
 
                 _ ->
-                    model => []
+                    ( model, [] )
 
         ReceiveFormResp okMsg (Ok resp) ->
             case Decode.decodeString decodeFormResp resp.body of
@@ -166,9 +174,9 @@ update msg model =
                         | formStatus = Success
                         , notifications = Notif.addListOfDjangoMessages data.messages model.notifications
                       }
-                    , okMsg
+                    , Cmd.map (FormMsg << SiteConfigFormMsg) SCF.init
+                        :: okMsg
                     )
-                        |> maybeFetchConfig
 
                 Err err ->
                     ( { model | formStatus = Failed <| formDecodeError err }, [] )
@@ -200,22 +208,6 @@ update msg model =
                       }
                     , []
                     )
-
-        ReceiveSiteConfigFormModel (Ok scModel) ->
-            let
-                newModel =
-                    case model.page of
-                        P.SiteConfigForm _ ->
-                            { model | page = P.SiteConfigForm <| Just scModel }
-
-                        _ ->
-                            model
-            in
-            { newModel | settings = updateSettings scModel newModel.settings }
-                => List.map (Cmd.map FormMsg) (initDateTimePickers model.page)
-
-        ReceiveSiteConfigFormModel (Err _) ->
-            ( model, [] )
 
         UserProfileFormMsg subMsg ->
             case model.page of
@@ -267,12 +259,13 @@ update msg model =
 
         SiteConfigFormMsg subMsg ->
             case model.page of
-                P.SiteConfigForm _ ->
-                    ( { model
-                        | page =
-                            P.SiteConfigForm <| Just <| SCF.update subMsg
-                      }
-                    , []
+                P.SiteConfigForm scModel ->
+                    let
+                        ( newSCModel, scCmd ) =
+                            SCF.update subMsg scModel
+                    in
+                    ( { model | page = P.SiteConfigForm newSCModel }
+                    , [ Cmd.map (FormMsg << SiteConfigFormMsg) scCmd ]
                     )
 
                 _ ->
@@ -325,61 +318,11 @@ update msg model =
 
         ContactImportMsg subMsg ->
             case model.page of
-                P.ContactImport ciModel ->
+                P.ContactImport _ ->
                     ( { model | page = P.ContactImport <| CI.update subMsg }, [] )
 
                 _ ->
                     ( model, [] )
-
-
-updateSettings : SCF.Model -> Settings -> Settings
-updateSettings newSCModel settings =
-    let
-        newTwilio =
-            Maybe.map2
-                TwilioSettings
-                newSCModel.twilio_sending_cost
-                newSCModel.twilio_from_num
-
-        newEmailSetup =
-            [ isJust newSCModel.email_from
-            , isJust newSCModel.email_host
-            , isJust newSCModel.email_password
-            , isJust newSCModel.email_port
-            , isJust newSCModel.email_username
-            ]
-                |> List.all identity
-    in
-    { settings
-        | smsCharLimit = newSCModel.sms_char_limit
-        , defaultNumberPrefix = newSCModel.default_number_prefix
-        , twilio = newTwilio
-        , isEmailSetup = newEmailSetup
-    }
-
-
-isJust : Maybe a -> Bool
-isJust m =
-    case m of
-        Just _ ->
-            True
-
-        Nothing ->
-            False
-
-
-maybeFetchConfig : ( Model, List (Cmd Msg) ) -> ( Model, List (Cmd Msg) )
-maybeFetchConfig ( model, cmds ) =
-    let
-        req =
-            Http.get Urls.api_site_config SCF.decodeModel
-    in
-    case model.page of
-        P.SiteConfigForm _ ->
-            ( model, cmds ++ [ Http.send (FormMsg << ReceiveSiteConfigFormModel) req ] )
-
-        _ ->
-            ( model, cmds )
 
 
 setInProgress : Model -> Model
@@ -680,63 +623,3 @@ extractFloat fn field maybeRec =
 
         Just s ->
             s
-
-
-
--- Date Pickers
-
-
-initDateTimePickers : P.Page -> List (Cmd FormMsg)
-initDateTimePickers page =
-    initDateTimePickersHelp page
-
-
-initDateTimePickersHelp : P.Page -> List (Cmd FormMsg)
-initDateTimePickersHelp page =
-    case page of
-        P.KeywordForm model _ ->
-            [ DateTimePicker.initialCmd initActTime model.datePickerActState
-            , DateTimePicker.initialCmd initDeactTime model.datePickerDeactState
-            ]
-
-        P.SendAdhoc model ->
-            [ DateTimePicker.initialCmd initSendAdhocDate model.datePickerState ]
-
-        P.SendGroup model ->
-            [ DateTimePicker.initialCmd initSendGroupDate model.datePickerState ]
-
-        P.SiteConfigForm maybeModel ->
-            case maybeModel of
-                Just model ->
-                    [ DateTimePicker.initialCmd (initSmsExpireDate model) model.datePickerSmsExpiredState ]
-
-                Nothing ->
-                    []
-
-        _ ->
-            []
-
-
-initActTime : DateTimePicker.State -> Maybe Date.Date -> FormMsg
-initActTime state maybeDate =
-    KeywordFormMsg <| KF.UpdateActivateTime state maybeDate
-
-
-initDeactTime : DateTimePicker.State -> Maybe Date.Date -> FormMsg
-initDeactTime state maybeDate =
-    KeywordFormMsg <| KF.UpdateDeactivateTime state maybeDate
-
-
-initSendAdhocDate : DateTimePicker.State -> Maybe Date.Date -> FormMsg
-initSendAdhocDate state maybeDate =
-    SendAdhocMsg <| SAF.UpdateDate state maybeDate
-
-
-initSendGroupDate : DateTimePicker.State -> Maybe Date.Date -> FormMsg
-initSendGroupDate state maybeDate =
-    SendGroupMsg <| SGF.UpdateSGDate state maybeDate
-
-
-initSmsExpireDate : SCF.Model -> DateTimePicker.State -> Maybe Date.Date -> FormMsg
-initSmsExpireDate model datePickerSmsExpiredState maybeDate =
-    SiteConfigFormMsg <| SCF.UpdateSmsExpiredDate model datePickerSmsExpiredState model.sms_expiration_date

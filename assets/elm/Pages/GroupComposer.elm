@@ -18,7 +18,6 @@ import Html.Events as E
 import List.Extra exposing (findIndices, uniqueBy)
 import Regex exposing (regex)
 import RemoteList as RL
-import Rocket exposing ((=>))
 import Set exposing (Set)
 
 
@@ -150,8 +149,8 @@ dataView : Props msg -> List RecipientGroup -> List RecipientSimple -> List Int 
 dataView props groups people activeGroupPks =
     div
         [ A.style
-            [ "display" => "grid"
-            , "grid-template-columns" => "50% 50%"
+            [ ( "display", "grid" )
+            , ( "grid-template-columns", "50% 50%" )
             ]
         ]
         [ groupsList props groups activeGroupPks, groupPreview props people ]
@@ -189,7 +188,7 @@ activeGroupStyle : List Int -> RecipientGroup -> List ( String, String )
 activeGroupStyle activeGroupPks group =
     case List.member group.pk activeGroupPks of
         True ->
-            [ "color" => "#38AF3C" ]
+            [ ( "color", "#38AF3C" ) ]
 
         False ->
             []

@@ -1,6 +1,6 @@
 module Store.Model exposing (..)
 
-import Data exposing (ElvantoGroup, Keyword, QueuedSms, Recipient, RecipientGroup, RecipientSimple, SmsInbound, SmsOutbound, User, UserProfile)
+import Data exposing (ElvantoGroup, Keyword, QueuedSms, Recipient, RecipientGroup, SmsInbound, SmsOutbound, User, UserProfile)
 import Pages exposing (Page)
 import RemoteList as RL
 import Store.DataTypes exposing (..)

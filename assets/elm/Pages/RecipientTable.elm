@@ -6,7 +6,6 @@ import Helpers exposing (archiveCell, formatDate)
 import Html exposing (Html, div, td, text, th, thead, tr)
 import Html.Attributes as A
 import RemoteList as RL
-import Rocket exposing ((=>))
 
 
 type alias Props msg =
@@ -40,7 +39,7 @@ recipientRow props recipient =
         style =
             case recipient.is_blocking of
                 True ->
-                    [ "background" => "var(--color-red)" ]
+                    [ ( "background", "var(--color-red)" ) ]
 
                 False ->
                     []

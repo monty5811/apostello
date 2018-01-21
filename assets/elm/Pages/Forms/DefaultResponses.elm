@@ -1,4 +1,4 @@
-module Pages.Forms.DefaultResponses exposing (Model, Msg(..), decodeModel, update, view)
+module Pages.Forms.DefaultResponses exposing (Model, Msg(..), decodeModel, init, update, view)
 
 import Forms.Model exposing (Field, FieldMeta, FormItem(FieldGroup), FormStatus, defaultFieldGroupConfig)
 import Forms.View as FV
@@ -8,6 +8,13 @@ import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (decode, required)
 import Pages.Forms.Meta.DefaultResponses exposing (meta)
 import Pages.Fragments.Loader exposing (loader)
+import Urls
+
+
+init : Cmd Msg
+init =
+    Http.get Urls.api_default_responses decodeModel
+        |> Http.send ReceiveInitialData
 
 
 type alias Model =
@@ -45,7 +52,7 @@ type Msg
     | UpdateAutoName String
     | UpdateNameUpdateReply String
     | UpdateNameFailReply String
-    | ReceiveInitialModel (Result Http.Error Model)
+    | ReceiveInitialData (Result Http.Error Model)
 
 
 update : Msg -> Maybe Model -> Maybe Model
@@ -72,10 +79,10 @@ update msg maybeModel =
         ( UpdateNameFailReply text, Just model ) ->
             Just { model | name_failure_reply = text }
 
-        ( ReceiveInitialModel (Ok initialModel), _ ) ->
+        ( ReceiveInitialData (Ok initialModel), _ ) ->
             Just initialModel
 
-        ( ReceiveInitialModel (Err _), _ ) ->
+        ( ReceiveInitialData (Err _), _ ) ->
             Nothing
 
         ( _, Nothing ) ->

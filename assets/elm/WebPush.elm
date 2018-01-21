@@ -15,7 +15,6 @@ import Html.Events as E
 import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
-import Rocket exposing ((=>))
 import Urls
 
 
@@ -40,7 +39,7 @@ update csrftoken msg model =
                     Decode.decodeValue decodeEvent eventValue
             in
             case event of
-                Err err ->
+                Err _ ->
                     Error ! []
 
                 Ok CheckFailed ->
@@ -69,13 +68,13 @@ update csrftoken msg model =
 addId : CSRFToken -> String -> Cmd Msg
 addId csrftoken endpoint =
     Http.send (\_ -> NoOp) <|
-        post csrftoken Urls.api_act_add_cm_id [ "endpoint" => Encode.string endpoint ] (Decode.succeed ())
+        post csrftoken Urls.api_act_add_cm_id [ ( "endpoint", Encode.string endpoint ) ] (Decode.succeed ())
 
 
 removeId : CSRFToken -> String -> Cmd Msg
 removeId csrftoken endpoint =
     Http.send (\_ -> NoOp) <|
-        post csrftoken Urls.api_act_remove_cm_id [ "endpoint" => Encode.string endpoint ] (Decode.succeed ())
+        post csrftoken Urls.api_act_remove_cm_id [ ( "endpoint", Encode.string endpoint ) ] (Decode.succeed ())
 
 
 view : Model -> List (Html Msg)

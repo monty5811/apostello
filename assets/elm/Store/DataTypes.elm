@@ -27,7 +27,7 @@ dt2Url dt =
 
         Contacts maybePk ->
             case maybePk of
-                Just pk ->
+                Just _ ->
                     ( True, Urls.api_recipients maybePk )
 
                 Nothing ->
@@ -35,7 +35,7 @@ dt2Url dt =
 
         Groups maybePk ->
             case maybePk of
-                Just pk ->
+                Just _ ->
                     ( True, Urls.api_recipient_groups maybePk )
 
                 Nothing ->
@@ -46,7 +46,7 @@ dt2Url dt =
                 Nothing ->
                     ( False, Urls.api_keywords maybeK )
 
-                Just k ->
+                Just _ ->
                     ( True, Urls.api_keywords maybeK )
 
         ScheduledSms ->

@@ -7,13 +7,12 @@ import DateTimePicker.Config
 import Dict
 import FilteringTable exposing (filterInput, filterRecord)
 import Forms.Model exposing (..)
-import Html exposing (Html, button, div, i, input, label, textarea)
+import Html exposing (Html, button, div, i, input, label)
 import Html.Attributes as A
 import Html.Events as E exposing (onInput)
 import Pages.Fragments.Loader exposing (loader)
 import Regex
 import RemoteList as RL
-import Rocket exposing ((=>))
 import Round
 
 
@@ -74,9 +73,9 @@ addSideBySide config fields =
         Just num ->
             [ div
                 [ A.style
-                    [ "display" => "grid"
-                    , "grid-template-columns" => "repeat(" ++ toString num ++ ", auto)"
-                    , "grid-column-gap" => "1rem"
+                    [ ( "display", "grid" )
+                    , ( "grid-template-columns", "repeat(" ++ toString num ++ ", auto)" )
+                    , ( "grid-column-gap", "1rem" )
                     ]
                 ]
                 fields
@@ -146,7 +145,7 @@ dateTimeField msg datePickerState date meta =
     , DateTimePicker.dateTimePickerWithConfig
         { config
             | timePickerType = DateTimePicker.Config.Digital
-            , autoClose = True
+            , autoClose = False
             , i18n =
                 { i18nConfig
                     | inputFormat =
@@ -370,9 +369,9 @@ multiSelectField props meta =
         , div
             [ A.class "list"
             , A.style
-                [ "min-height" => "25vh"
-                , "max-height" => "50vh"
-                , "overflow-y" => "auto"
+                [ ( "min-height", "25vh" )
+                , ( "max-height", "50vh" )
+                , ( "overflow-y", "auto" )
                 ]
             ]
             (props.items
@@ -420,7 +419,7 @@ selectedIcon selectedPks item =
             Html.text ""
 
         True ->
-            i [ A.class "fa fa-check", A.style [ "color" => "var(--state-primary)" ] ] []
+            i [ A.class "fa fa-check", A.style [ ( "color", "var(--state-primary)" ) ] ] []
 
 
 fieldMessage : String -> Html msg

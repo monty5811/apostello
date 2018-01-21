@@ -1,6 +1,6 @@
 module Pages.KeyRespTable exposing (Msg, update, view)
 
-import Data exposing (Recipient, SmsInbound)
+import Data exposing (SmsInbound)
 import DjangoSend exposing (CSRFToken, post)
 import FilteringTable as FT
 import Helpers exposing (..)

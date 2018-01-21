@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Json.Decode as Decode
 import Messages exposing (Msg(UrlChange))
-import Models exposing (Flags, Model, decodeFlags, initialModel)
+import Models exposing (Model, decodeFlags, initialModel)
 import Navigation
 import Route exposing (loc2Page)
 import Subscriptions exposing (subscriptions)
@@ -30,7 +30,10 @@ init flagsVal location =
 
                 Err msg ->
                     Debug.crash <| "Try reloading the page\n" ++ msg
+
+        ( page, _ ) =
+            loc2Page location flags.settings
     in
-    loc2Page location flags.settings
+    page
         |> initialModel flags.settings
         |> update (UrlChange location)

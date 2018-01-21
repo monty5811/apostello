@@ -1,4 +1,4 @@
-module Pages.Forms.SiteConfig exposing (Model, Msg(..), decodeModel, update, view)
+module Pages.Forms.SiteConfig exposing (Model, Msg(..), decodeModel, init, update, view)
 
 import Data exposing (RecipientGroup)
 import Date
@@ -11,6 +11,7 @@ import Html exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
 import Html.Keyed
+import Http
 import Json.Decode as Decode
 import Json.Decode.Extra exposing (date)
 import Json.Decode.Pipeline exposing (decode, hardcoded, required)
@@ -18,7 +19,13 @@ import Pages.Forms.Meta.SiteConfig exposing (meta)
 import Pages.Fragments.Loader exposing (loader)
 import Regex
 import RemoteList as RL
-import Rocket exposing ((=>))
+import Urls
+
+
+init : Cmd Msg
+init =
+    Http.get Urls.api_site_config decodeModel
+        |> Http.send ReceiveInitialData
 
 
 type alias Model =
@@ -81,119 +88,143 @@ decodeModel =
 
 
 type Msg
-    = UpdateTwilioFromNum Model String
-    | UpdateTwilioSid Model String
-    | UpdateTwilioAuthToken Model String
-    | UpdateTwilioSendCost Model String
-    | UpdateSiteNameField Model String
-    | UpdateSmsCharLimitField Model String
-    | UpdateDefaultPrefixField Model String
-    | UpdateDisableRepliesField Model
-    | UpdateDisableLoginEmailField Model
-    | UpdateOfficeEmailField Model String
-    | UpdateAutoAddGroupsField Model Int
-    | UpdateSmsExpiredDate Model DateTimePicker.State (Maybe Date.Date)
-    | UpdateRollingExpiration Model String
-    | UpdateSlackUrlField Model String
-    | UpdateSyncElvantoField Model
-    | UpdateNotApprovedField Model String
-    | UpdateEmailHostField Model String
-    | UpdateEmailPortField Model String
-    | UpdateEmailUserField Model String
-    | UpdateEmailPassField Model String
-    | UpdateEmailFromField Model String
-    | UpdateGroupsFilter Model String
+    = UpdateTwilioFromNum String
+    | UpdateTwilioSid String
+    | UpdateTwilioAuthToken String
+    | UpdateTwilioSendCost String
+    | UpdateSiteNameField String
+    | UpdateSmsCharLimitField String
+    | UpdateDefaultPrefixField String
+    | UpdateDisableRepliesField
+    | UpdateDisableLoginEmailField
+    | UpdateOfficeEmailField String
+    | UpdateAutoAddGroupsField Int
+    | UpdateSmsExpiredDate DateTimePicker.State (Maybe Date.Date)
+    | UpdateRollingExpiration String
+    | UpdateSlackUrlField String
+    | UpdateSyncElvantoField
+    | UpdateNotApprovedField String
+    | UpdateEmailHostField String
+    | UpdateEmailPortField String
+    | UpdateEmailUserField String
+    | UpdateEmailPassField String
+    | UpdateEmailFromField String
+    | UpdateGroupsFilter String
+    | ReceiveInitialData (Result Http.Error Model)
 
 
-update : Msg -> Model
-update msg =
+update : Msg -> Maybe Model -> ( Maybe Model, Cmd Msg )
+update msg maybeModel =
     case msg of
-        UpdateTwilioFromNum model text ->
-            { model | twilio_from_num = Just text }
+        ReceiveInitialData (Ok initialModel) ->
+            ( Just initialModel
+            , DateTimePicker.initialCmd (initSmsExpireDate initialModel) initialModel.datePickerSmsExpiredState
+            )
 
-        UpdateTwilioSid model text ->
-            { model | twilio_account_sid = Just text }
+        _ ->
+            ( Maybe.andThen (updateHelp msg) maybeModel, Cmd.none )
 
-        UpdateTwilioAuthToken model text ->
-            { model | twilio_auth_token = Just text }
 
-        UpdateTwilioSendCost model text ->
+initSmsExpireDate : Model -> DateTimePicker.State -> Maybe Date.Date -> Msg
+initSmsExpireDate model datePickerSmsExpiredState maybeDate =
+    UpdateSmsExpiredDate datePickerSmsExpiredState model.sms_expiration_date
+
+
+updateHelp : Msg -> Model -> Maybe Model
+updateHelp msg model =
+    case msg of
+        ReceiveInitialData (Ok initialModel) ->
+            Just initialModel
+
+        ReceiveInitialData (Err _) ->
+            Nothing
+
+        UpdateTwilioFromNum text ->
+            Just { model | twilio_from_num = Just text }
+
+        UpdateTwilioSid text ->
+            Just { model | twilio_account_sid = Just text }
+
+        UpdateTwilioAuthToken text ->
+            Just { model | twilio_auth_token = Just text }
+
+        UpdateTwilioSendCost text ->
             case String.toFloat text of
                 Ok num ->
-                    { model | twilio_sending_cost = Just num }
+                    Just { model | twilio_sending_cost = Just num }
 
                 Err _ ->
-                    model
+                    Just model
 
-        UpdateSiteNameField model text ->
-            { model | site_name = text }
+        UpdateSiteNameField text ->
+            Just { model | site_name = text }
 
-        UpdateSmsCharLimitField model text ->
+        UpdateSmsCharLimitField text ->
             case String.toInt text of
                 Ok num ->
-                    { model | sms_char_limit = num }
+                    Just { model | sms_char_limit = num }
 
                 Err _ ->
-                    model
+                    Just model
 
-        UpdateDefaultPrefixField model text ->
-            { model | default_number_prefix = text }
+        UpdateDefaultPrefixField text ->
+            Just { model | default_number_prefix = text }
 
-        UpdateDisableRepliesField model ->
-            { model | disable_all_replies = not model.disable_all_replies }
+        UpdateDisableRepliesField ->
+            Just { model | disable_all_replies = not model.disable_all_replies }
 
-        UpdateDisableLoginEmailField model ->
-            { model | disable_email_login_form = not model.disable_email_login_form }
+        UpdateDisableLoginEmailField ->
+            Just { model | disable_email_login_form = not model.disable_email_login_form }
 
-        UpdateOfficeEmailField model text ->
-            { model | office_email = text }
+        UpdateOfficeEmailField text ->
+            Just { model | office_email = text }
 
-        UpdateAutoAddGroupsField model pk ->
-            { model | auto_add_new_groups = toggleSelectedPk pk model.auto_add_new_groups }
+        UpdateAutoAddGroupsField pk ->
+            Just { model | auto_add_new_groups = toggleSelectedPk pk model.auto_add_new_groups }
 
-        UpdateSmsExpiredDate model state maybeDate ->
-            { model | sms_expiration_date = maybeDate, datePickerSmsExpiredState = state }
+        UpdateSmsExpiredDate state maybeDate ->
+            Just { model | sms_expiration_date = maybeDate, datePickerSmsExpiredState = state }
 
-        UpdateRollingExpiration model maybeNum ->
+        UpdateRollingExpiration maybeNum ->
             let
                 num =
                     maybeNum
                         |> String.toInt
                         |> Result.toMaybe
             in
-            { model | sms_rolling_expiration_days = num }
+            Just { model | sms_rolling_expiration_days = num }
 
-        UpdateSlackUrlField model text ->
-            { model | slack_url = text }
+        UpdateSlackUrlField text ->
+            Just { model | slack_url = text }
 
-        UpdateSyncElvantoField model ->
-            { model | sync_elvanto = not model.sync_elvanto }
+        UpdateSyncElvantoField ->
+            Just { model | sync_elvanto = not model.sync_elvanto }
 
-        UpdateNotApprovedField model text ->
-            { model | not_approved_msg = text }
+        UpdateNotApprovedField text ->
+            Just { model | not_approved_msg = text }
 
-        UpdateEmailHostField model text ->
-            { model | email_host = Just text }
+        UpdateEmailHostField text ->
+            Just { model | email_host = Just text }
 
-        UpdateEmailPortField model text ->
+        UpdateEmailPortField text ->
             case String.toInt text of
                 Ok num ->
-                    { model | email_port = Just num }
+                    Just { model | email_port = Just num }
 
                 Err _ ->
-                    model
+                    Just model
 
-        UpdateEmailUserField model text ->
-            { model | email_username = Just text }
+        UpdateEmailUserField text ->
+            Just { model | email_username = Just text }
 
-        UpdateEmailPassField model text ->
-            { model | email_password = Just text }
+        UpdateEmailPassField text ->
+            Just { model | email_password = Just text }
 
-        UpdateEmailFromField model text ->
-            { model | email_from = Just text }
+        UpdateEmailFromField text ->
+            Just { model | email_from = Just text }
 
-        UpdateGroupsFilter model text ->
-            { model | groupsFilter = textToRegex text }
+        UpdateGroupsFilter text ->
+            Just { model | groupsFilter = textToRegex text }
 
 
 
@@ -203,7 +234,6 @@ update msg =
 type alias Messages msg =
     { form : Msg -> msg
     , postForm : msg
-    , noop : msg
     }
 
 
@@ -214,14 +244,10 @@ view msgs groups maybeModel status =
             loader
 
         Just model ->
-            let
-                fields =
-                    fieldsHelp msgs groups model
-            in
             FV.form status
-                fields
+                (fieldsHelp msgs groups model)
                 msgs.postForm
-                (FV.submitButton (Just model) False)
+                (FV.submitButton maybeModel False)
 
 
 debugHelpText : Html msg
@@ -287,56 +313,56 @@ twilioFromNumField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
 twilioFromNumField msgs model =
     FV.simpleTextField
         model.twilio_from_num
-        (msgs.form << UpdateTwilioFromNum model)
+        (msgs.form << UpdateTwilioFromNum)
 
 
 twilioSendCostField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
 twilioSendCostField msgs model =
     FV.simpleFloatField
         model.twilio_sending_cost
-        (msgs.form << UpdateTwilioSendCost model)
+        (msgs.form << UpdateTwilioSendCost)
 
 
 twilioAuthTokenField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
 twilioAuthTokenField msgs model =
     FV.simpleTextField
         model.twilio_auth_token
-        (msgs.form << UpdateTwilioAuthToken model)
+        (msgs.form << UpdateTwilioAuthToken)
 
 
 twilioAccountSidField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
 twilioAccountSidField msgs model =
     FV.simpleTextField
         model.twilio_account_sid
-        (msgs.form << UpdateTwilioSid model)
+        (msgs.form << UpdateTwilioSid)
 
 
 siteNameField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
 siteNameField msgs model =
     FV.simpleTextField
         (Just model.site_name)
-        (msgs.form << UpdateSiteNameField model)
+        (msgs.form << UpdateSiteNameField)
 
 
 smsLimitField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
 smsLimitField msgs model =
     FV.simpleIntField
         (Just model.sms_char_limit)
-        (msgs.form << UpdateSmsCharLimitField model)
+        (msgs.form << UpdateSmsCharLimitField)
 
 
 smsRollingExpireField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
 smsRollingExpireField msgs model =
     FV.simpleIntField
         model.sms_rolling_expiration_days
-        (msgs.form << UpdateRollingExpiration model)
+        (msgs.form << UpdateRollingExpiration)
 
 
 defaultPrefixField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
 defaultPrefixField msgs model =
     FV.simpleTextField
         (Just model.default_number_prefix)
-        (msgs.form << UpdateDefaultPrefixField model)
+        (msgs.form << UpdateDefaultPrefixField)
 
 
 allRepliesField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
@@ -344,17 +370,7 @@ allRepliesField msgs model =
     FV.checkboxField
         (Just model)
         .disable_all_replies
-        (msgOrNope msgs (msgs.form << UpdateDisableRepliesField))
-
-
-msgOrNope : Messages msg -> (a -> msg) -> Maybe a -> msg
-msgOrNope msgs msg maybeRec =
-    case maybeRec of
-        Nothing ->
-            msgs.noop
-
-        Just rec ->
-            msg rec
+        (\_ -> msgs.form UpdateDisableRepliesField)
 
 
 emailLoginField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
@@ -362,14 +378,14 @@ emailLoginField msgs model =
     FV.checkboxField
         (Just model)
         .disable_email_login_form
-        (msgOrNope msgs (msgs.form << UpdateDisableLoginEmailField))
+        (\_ -> msgs.form UpdateDisableLoginEmailField)
 
 
 officeEmailField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
 officeEmailField msgs model =
     FV.simpleTextField
         (Just model.office_email)
-        (msgs.form << UpdateOfficeEmailField model)
+        (msgs.form << UpdateOfficeEmailField)
 
 
 autoNewGroupsField : Messages msg -> RL.RemoteList RecipientGroup -> Model -> (FieldMeta -> List (Html msg))
@@ -380,34 +396,34 @@ autoNewGroupsField msgs groups model =
             (Just model.auto_add_new_groups)
             (Just model.auto_add_new_groups)
             model.groupsFilter
-            (msgs.form << UpdateGroupsFilter model)
-            (groupView msgs model)
-            (groupLabelView msgs model)
+            (msgs.form << UpdateGroupsFilter)
+            (groupView msgs)
+            (groupLabelView msgs)
         )
 
 
 smsExpirationDateField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
 smsExpirationDateField msgs model =
-    FV.dateField (updateExpDate msgs model) model.datePickerSmsExpiredState model.sms_expiration_date
+    FV.dateField (updateExpDate msgs) model.datePickerSmsExpiredState model.sms_expiration_date
 
 
-updateExpDate : Messages msg -> Model -> DateTimePicker.State -> Maybe Date.Date -> msg
-updateExpDate msgs model state maybeDate =
-    msgs.form <| UpdateSmsExpiredDate model state maybeDate
+updateExpDate : Messages msg -> DateTimePicker.State -> Maybe Date.Date -> msg
+updateExpDate msgs state maybeDate =
+    msgs.form <| UpdateSmsExpiredDate state maybeDate
 
 
-groupLabelView : Messages msg -> Model -> Maybe (List Int) -> RecipientGroup -> Html msg
-groupLabelView msgs model maybePks group =
+groupLabelView : Messages msg -> Maybe (List Int) -> RecipientGroup -> Html msg
+groupLabelView msgs maybePks group =
     Html.div
         [ A.class "badge"
-        , A.style [ "user-select" => "none" ]
-        , E.onClick <| msgs.form <| UpdateAutoAddGroupsField model group.pk
+        , A.style [ ( "user-select", "none" ) ]
+        , E.onClick <| msgs.form <| UpdateAutoAddGroupsField group.pk
         ]
         [ Html.text group.name ]
 
 
-groupView : Messages msg -> Model -> Maybe (List Int) -> RecipientGroup -> Html msg
-groupView msgs model maybeSelectedPks group =
+groupView : Messages msg -> Maybe (List Int) -> RecipientGroup -> Html msg
+groupView msgs maybeSelectedPks group =
     let
         selectedPks =
             case maybeSelectedPks of
@@ -418,13 +434,13 @@ groupView msgs model maybeSelectedPks group =
                     pks
     in
     Html.Keyed.node "div"
-        [ A.class "item", E.onClick <| msgs.form <| UpdateAutoAddGroupsField model group.pk ]
+        [ A.class "item", E.onClick <| msgs.form <| UpdateAutoAddGroupsField group.pk ]
         [ ( toString group.pk, groupViewHelper selectedPks group ) ]
 
 
 groupViewHelper : List Int -> RecipientGroup -> Html msg
 groupViewHelper selectedPks group =
-    Html.div [ A.style [ "color" => "#000" ] ]
+    Html.div [ A.style [ ( "color", "#000" ) ] ]
         [ FV.selectedIcon selectedPks group
         , Html.text group.name
         ]
@@ -434,7 +450,7 @@ slackField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
 slackField msgs model =
     FV.simpleTextField
         (Just model.slack_url)
-        (msgs.form << UpdateSlackUrlField model)
+        (msgs.form << UpdateSlackUrlField)
 
 
 syncElvField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
@@ -442,7 +458,7 @@ syncElvField msgs model =
     FV.checkboxField
         (Just model)
         .sync_elvanto
-        (msgOrNope msgs (msgs.form << UpdateSyncElvantoField))
+        (\_ -> msgs.form UpdateSyncElvantoField)
 
 
 notAppField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
@@ -450,39 +466,39 @@ notAppField msgs model =
     FV.longTextField
         10
         (Just model.not_approved_msg)
-        (msgs.form << UpdateNotApprovedField model)
+        (msgs.form << UpdateNotApprovedField)
 
 
 emailHostField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
 emailHostField msgs model =
     FV.simpleTextField
         model.email_host
-        (msgs.form << UpdateEmailHostField model)
+        (msgs.form << UpdateEmailHostField)
 
 
 emailPortField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
 emailPortField msgs model =
     FV.simpleIntField
         model.email_port
-        (msgs.form << UpdateEmailPortField model)
+        (msgs.form << UpdateEmailPortField)
 
 
 emailUserField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
 emailUserField msgs model =
     FV.simpleTextField
         model.email_username
-        (msgs.form << UpdateEmailUserField model)
+        (msgs.form << UpdateEmailUserField)
 
 
 emailPassField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
 emailPassField msgs model =
     FV.simpleTextField
         model.email_password
-        (msgs.form << UpdateEmailPassField model)
+        (msgs.form << UpdateEmailPassField)
 
 
 emailFromField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
 emailFromField msgs model =
     FV.simpleTextField
         model.email_from
-        (msgs.form << UpdateEmailFromField model)
+        (msgs.form << UpdateEmailFromField)

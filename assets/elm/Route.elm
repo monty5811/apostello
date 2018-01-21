@@ -5,17 +5,34 @@ import Html exposing (Attribute, Html)
 import Html.Attributes exposing (href)
 import Html.Events exposing (onWithOptions)
 import Json.Decode as Decode
-import Messages exposing (Msg(NewUrl))
+import Messages
+    exposing
+        ( FormMsg
+            ( DefaultResponsesFormMsg
+            , KeywordFormMsg
+            , SendAdhocMsg
+            , SendGroupMsg
+            , SiteConfigFormMsg
+            )
+        , Msg(FormMsg, NewUrl)
+        )
 import Models exposing (Settings)
 import Navigation
 import Pages exposing (Page(..), initSendAdhoc, initSendGroup)
 import Pages.Debug as DG
 import Pages.FirstRun as FR
 import Pages.Forms.Contact as CF
+import Pages.Forms.DefaultResponses
 import Pages.Forms.Group as GF
 import Pages.Forms.Keyword as KF
+import Pages.Forms.SendAdhoc
+import Pages.Forms.SendGroup
+import Pages.Forms.SiteConfig
 import Pages.Forms.UserProfile as UP
 import Pages.GroupComposer as GC
+import Process
+import Task
+import Time
 import UrlParser as Url exposing ((</>), (<?>), customParam, int, intParam, s, string, stringParam, top)
 
 
@@ -86,11 +103,34 @@ parseListInts str =
                 Nothing
 
 
-loc2Page : Navigation.Location -> Settings -> Page
+loc2Page : Navigation.Location -> Settings -> ( Page, Cmd Msg )
 loc2Page location settings =
     Url.parsePath route location
         |> Maybe.withDefault Error404
+        |> withEffects
         |> checkPagePerms settings
+
+
+withEffects : Page -> ( Page, Cmd Msg )
+withEffects page =
+    case page of
+        SendAdhoc model ->
+            ( page, Cmd.map (FormMsg << SendAdhocMsg) (Pages.Forms.SendAdhoc.init model) )
+
+        SendGroup model ->
+            ( page, Cmd.map (FormMsg << SendGroupMsg) (Pages.Forms.SendGroup.init model) )
+
+        KeywordForm model _ ->
+            ( page, Cmd.map (FormMsg << KeywordFormMsg) (KF.init model) )
+
+        SiteConfigForm _ ->
+            ( page, Cmd.map (FormMsg << SiteConfigFormMsg) Pages.Forms.SiteConfig.init )
+
+        DefaultResponsesForm _ ->
+            ( page, Cmd.map (FormMsg << DefaultResponsesFormMsg) Pages.Forms.DefaultResponses.init )
+
+        _ ->
+            ( page, Cmd.none )
 
 
 spaLink : (List (Attribute Msg) -> List (Html Msg) -> Html Msg) -> List (Attribute Msg) -> List (Html Msg) -> Page -> Html Msg
@@ -301,17 +341,24 @@ groupParam g =
 -- permissions check
 
 
-checkPagePerms : Settings -> Page -> Page
-checkPagePerms settings page =
+delayedNavigate : Time.Time -> Page -> Cmd Msg
+delayedNavigate t page =
+    Process.sleep t
+        |> Task.andThen (always <| Task.succeed (NewUrl <| page2loc page))
+        |> Task.perform identity
+
+
+checkPagePerms : Settings -> ( Page, Cmd Msg ) -> ( Page, Cmd Msg )
+checkPagePerms settings ( page, cmd ) =
     case settings.userPerms.user.is_staff of
         True ->
-            page
+            ( page, cmd )
 
         False ->
             checkPerm settings.blockedKeywords settings.userPerms page
 
 
-checkPerm : List String -> UserProfile -> Page -> Page
+checkPerm : List String -> UserProfile -> Page -> ( Page, Cmd Msg )
 checkPerm blockedKeywords userPerms page =
     let
         permBool =
@@ -422,7 +469,7 @@ checkPerm blockedKeywords userPerms page =
     in
     case permBool of
         True ->
-            page
+            ( page, Cmd.none )
 
         False ->
-            AccessDenied
+            ( AccessDenied, delayedNavigate (3 * Time.second) Home )

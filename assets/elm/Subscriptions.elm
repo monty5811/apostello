@@ -8,7 +8,7 @@ import Pages exposing (Page(Curator, SendAdhoc, SendGroup, Wall))
 import Ports exposing (loadDataStore)
 import Store.Messages exposing (StoreMsg(LoadData, LoadDataStore))
 import Store.Model as Store
-import Time exposing (Time, second)
+import Time exposing (second)
 import WebPush
 
 

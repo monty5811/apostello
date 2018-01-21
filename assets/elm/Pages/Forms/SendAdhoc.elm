@@ -1,4 +1,4 @@
-module Pages.Forms.SendAdhoc exposing (Model, Msg(UpdateDate), initialModel, update, view)
+module Pages.Forms.SendAdhoc exposing (Model, Msg(UpdateDate), init, initialModel, update, view)
 
 import Data exposing (Recipient)
 import Date
@@ -13,7 +13,16 @@ import Html.Keyed
 import Pages.Forms.Meta.SendAdhoc exposing (meta)
 import Regex
 import RemoteList as RL
-import Rocket exposing ((=>))
+
+
+init : Model -> Cmd Msg
+init model =
+    DateTimePicker.initialCmd initSendAdhocDate model.datePickerState
+
+
+initSendAdhocDate : DateTimePicker.State -> Maybe Date.Date -> Msg
+initSendAdhocDate state maybeDate =
+    UpdateDate state maybeDate
 
 
 type alias Model =
@@ -185,9 +194,9 @@ contactsField props model contacts meta_ =
         , div
             [ A.class "list"
             , A.style
-                [ "min-height" => "25vh"
-                , "max-height" => "50vh"
-                , "overflow-y" => "auto"
+                [ ( "min-height", "25vh" )
+                , ( "max-height", "50vh" )
+                , ( "overflow-y", "auto" )
                 ]
             ]
             (contacts
@@ -208,14 +217,14 @@ selectedContacts props selectedPks contacts_ =
                 |> List.filter (\c -> List.member c.pk selectedPks)
                 |> List.map (contactLabel props)
     in
-    Html.div [ A.style [ "margin-bottom" => "1rem" ] ] selected
+    Html.div [ A.style [ ( "margin-bottom", "1rem" ) ] ] selected
 
 
 contactLabel : Props msg -> Recipient -> Html msg
 contactLabel props contact =
     Html.div
         [ A.class "badge"
-        , A.style [ "user-select" => "none" ]
+        , A.style [ ( "user-select", "none" ) ]
         , onClick <| props.form <| ToggleSelectedContact contact.pk
         ]
         [ Html.text contact.full_name ]
@@ -233,7 +242,7 @@ contactItem props selectedPks contact =
 
 contactItemHelper : List Int -> Recipient -> Html msg
 contactItemHelper selectedPks contact =
-    div [ A.style [ "color" => "#000" ] ]
+    div [ A.style [ ( "color", "#000" ) ] ]
         [ selectedIcon selectedPks contact
         , text contact.full_name
         ]
@@ -246,4 +255,4 @@ selectedIcon selectedPks contact =
             text ""
 
         True ->
-            i [ A.class "fa fa-check", A.style [ "color" => "var(--color-purple)" ] ] []
+            i [ A.class "fa fa-check", A.style [ ( "color", "var(--color-purple)" ) ] ] []

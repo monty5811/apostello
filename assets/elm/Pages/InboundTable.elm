@@ -7,7 +7,6 @@ import Html exposing (Html, a, b, td, text, th, thead, tr)
 import Html.Attributes as A
 import Html.Events as E
 import RemoteList as RL
-import Rocket exposing ((=>))
 
 
 -- Main view
@@ -44,7 +43,7 @@ view props =
 smsRow : Props msg -> SmsInbound -> ( String, Html msg )
 smsRow props sms =
     ( toString sms.pk
-    , tr [ A.style [ "backgroundColor" => sms.matched_colour ] ]
+    , tr [ A.style [ ( "backgroundColor", sms.matched_colour ) ] ]
         [ recipientCell props sms
         , keywordCell props sms
         , td [] [ text sms.content ]

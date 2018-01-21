@@ -2,9 +2,8 @@ module Update exposing (update)
 
 import FilteringTable as FT
 import Forms.Update as F
-import Http
 import Messages exposing (..)
-import Models exposing (MenuModel(MenuHidden, MenuVisible), Model, Settings)
+import Models exposing (MenuModel(MenuHidden, MenuVisible), Model, Settings, TwilioSettings)
 import Navigation
 import Notification as Notif
 import PageVisibility
@@ -13,12 +12,11 @@ import Pages.ApiSetup as ApiSetup
 import Pages.Debug as DG
 import Pages.ElvantoImport as ElvImp
 import Pages.FirstRun as FR
-import Pages.Forms.DefaultResponses as DRF
+import Pages.Forms.SiteConfig as SCF
 import Pages.Fragments.SidePanel as SidePanel
 import Pages.GroupComposer as GC
 import Pages.KeyRespTable as KRT
 import Ports exposing (saveDataStore)
-import Rocket exposing ((=>))
 import Route exposing (loc2Page)
 import Store.Encode exposing (encodeDataStore)
 import Store.Messages exposing (StoreMsg(LoadDataStore))
@@ -26,7 +24,6 @@ import Store.Model as Store
 import Store.Optimistic
 import Store.Request exposing (maybeFetchData)
 import Store.Update as SU
-import Urls
 import WebPush
 
 
@@ -52,6 +49,12 @@ updateHelper msg model =
         Nope ->
             ( model, [] )
 
+        FormMsg ((SiteConfigFormMsg (SCF.ReceiveInitialData (Ok scData))) as formMsg) ->
+            -- when we get new site config data from the server, we need to update our settings
+            -- and then we call the `F.update` function as normal:
+            { model | settings = updateSettings scData model.settings }
+                |> F.update formMsg
+
         ToggleMenu ->
             case model.menuState of
                 MenuHidden ->
@@ -70,7 +73,7 @@ updateHelper msg model =
 
         UrlChange location ->
             let
-                page =
+                ( page, pageCmd ) =
                     loc2Page location model.settings
 
                 ( newDs, storeCmds ) =
@@ -78,18 +81,13 @@ updateHelper msg model =
 
                 newModel =
                     { model | dataStore = newDs, page = page, table = FT.initialModel }
-
-                datePickerCmds =
-                    F.initDateTimePickers model.page
             in
             ( newModel
             , List.concat
                 [ List.map (Cmd.map StoreMsg) storeCmds
-                , List.map (Cmd.map FormMsg) datePickerCmds
+                , [ pageCmd ]
                 ]
             )
-                |> F.maybeFetchConfig
-                |> maybeFetchResps
 
         -- Load data
         StoreMsg subMsg ->
@@ -97,7 +95,7 @@ updateHelper msg model =
                 ( newModel, storeCmds ) =
                     SU.update subMsg model
             in
-            newModel => List.map (Cmd.map StoreMsg) storeCmds
+            ( newModel, List.map (Cmd.map StoreMsg) storeCmds )
 
         FormMsg subMsg ->
             F.update subMsg model
@@ -115,11 +113,12 @@ updateHelper msg model =
                         ( newFrModel, frCmds ) =
                             FR.update model.settings.csrftoken subMsg frModel
                     in
-                    { model | page = P.FirstRun newFrModel }
-                        => List.map (Cmd.map FirstRunMsg) frCmds
+                    ( { model | page = P.FirstRun newFrModel }
+                    , List.map (Cmd.map FirstRunMsg) frCmds
+                    )
 
                 _ ->
-                    model => []
+                    ( model, [] )
 
         DebugMsg subMsg ->
             case model.page of
@@ -128,11 +127,12 @@ updateHelper msg model =
                         ( newDgModel, dgCmds ) =
                             DG.update model.settings.csrftoken subMsg dgModel
                     in
-                    { model | page = P.Debug newDgModel }
-                        => List.map (Cmd.map DebugMsg) dgCmds
+                    ( { model | page = P.Debug newDgModel }
+                    , List.map (Cmd.map DebugMsg) dgCmds
+                    )
 
                 _ ->
-                    model => []
+                    ( model, [] )
 
         ElvantoMsg subMsg ->
             case model.page of
@@ -140,7 +140,7 @@ updateHelper msg model =
                     ElvImp.update { topLevelMsg = ElvantoMsg, csrftoken = model.settings.csrftoken } subMsg model
 
                 _ ->
-                    model => []
+                    ( model, [] )
 
         GroupComposerMsg subMsg ->
             case model.page of
@@ -164,14 +164,15 @@ updateHelper msg model =
                                 , optArchiveMatchingSms = Store.Optimistic.optArchiveMatchingSms
                                 }
                     in
-                    { model
+                    ( { model
                         | page = P.KeyRespTable newKRModel newIsArchive newK
                         , dataStore = newStore
-                    }
-                        => List.map (Cmd.map KeyRespTableMsg) krtCmds
+                      }
+                    , List.map (Cmd.map KeyRespTableMsg) krtCmds
+                    )
 
                 _ ->
-                    model => []
+                    ( model, [] )
 
         ApiSetupMsg subMsg ->
             case model.page of
@@ -184,11 +185,12 @@ updateHelper msg model =
                                 , csrftoken = model.settings.csrftoken
                                 }
                     in
-                    { model | page = P.ApiSetup newKey, notifications = notifications }
-                        => List.map (Cmd.map ApiSetupMsg) apiCmds
+                    ( { model | page = P.ApiSetup newKey, notifications = notifications }
+                    , List.map (Cmd.map ApiSetupMsg) apiCmds
+                    )
 
                 _ ->
-                    model => []
+                    ( model, [] )
 
         -- Filtering Table
         TableMsg subMsg ->
@@ -200,7 +202,7 @@ updateHelper msg model =
         VisibilityChange state ->
             case state of
                 PageVisibility.Hidden ->
-                    { model | pageVisibility = state } => []
+                    ( { model | pageVisibility = state }, [] )
 
                 PageVisibility.Visible ->
                     -- fetch data when page becomes visible again
@@ -208,19 +210,20 @@ updateHelper msg model =
                         ( newDataStore, storeCmds ) =
                             maybeFetchData model.page model.dataStore
                     in
-                    { model
+                    ( { model
                         | dataStore = newDataStore
                         , pageVisibility = state
-                    }
-                        => List.map (Cmd.map StoreMsg) storeCmds
+                      }
+                    , List.map (Cmd.map StoreMsg) storeCmds
+                    )
 
         KeyPressed keyCode ->
             case ( model.menuState, keyCode ) of
                 ( MenuVisible, 27 ) ->
-                    { model | menuState = MenuHidden } => []
+                    ( { model | menuState = MenuHidden }, [] )
 
                 ( _, _ ) ->
-                    model => []
+                    ( model, [] )
 
         WebPushMsg subMsg ->
             let
@@ -254,20 +257,6 @@ addSaveDataStoreCmd oldModel newModel cmds =
         False ->
             (saveDataStore <| encodeDataStore newModel.dataStore)
                 :: cmds
-
-
-maybeFetchResps : ( Model, List (Cmd Msg) ) -> ( Model, List (Cmd Msg) )
-maybeFetchResps ( model, cmds ) =
-    let
-        req =
-            Http.get Urls.api_default_responses DRF.decodeModel
-    in
-    case model.page of
-        P.DefaultResponsesForm _ ->
-            ( model, cmds ++ [ Http.send (FormMsg << DefaultResponsesFormMsg << DRF.ReceiveInitialModel) req ] )
-
-        _ ->
-            ( model, cmds )
 
 
 maybeAddTwilioWarning : Model -> Model
@@ -308,3 +297,34 @@ maybeAddEmailWarning model =
 
         True ->
             { model | notifications = Notif.remove notif model.notifications }
+
+
+updateSettings : SCF.Model -> Settings -> Settings
+updateSettings newSCModel settings =
+    let
+        newTwilio =
+            Maybe.map2
+                TwilioSettings
+                newSCModel.twilio_sending_cost
+                newSCModel.twilio_from_num
+
+        newEmailSetup =
+            [ isJust newSCModel.email_from
+            , isJust newSCModel.email_host
+            , isJust newSCModel.email_password
+            , isJust newSCModel.email_port
+            , isJust newSCModel.email_username
+            ]
+                |> List.all identity
+    in
+    { settings
+        | smsCharLimit = newSCModel.sms_char_limit
+        , defaultNumberPrefix = newSCModel.default_number_prefix
+        , twilio = newTwilio
+        , isEmailSetup = newEmailSetup
+    }
+
+
+isJust : Maybe a -> Bool
+isJust m =
+    m /= Nothing

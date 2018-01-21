@@ -4,7 +4,6 @@ import Data exposing (SmsInbound)
 import Html exposing (Html, div, p, span, text)
 import Html.Attributes exposing (class, style)
 import RemoteList as RL
-import Rocket exposing ((=>))
 
 
 -- Main view
@@ -15,12 +14,12 @@ view sms =
     div
         [ class "text-center"
         , style
-            [ "background-color" => "#5c569c"
-            , "height" => "100vh"
-            , "width" => "100vw"
+            [ ( "background-color", "#5c569c" )
+            , ( "height", "100vh" )
+            , ( "width", "100vw" )
             ]
         ]
-        [ div [ style [ "padding" => "2rem" ] ]
+        [ div [ style [ ( "padding", "2rem" ) ] ]
             (sms
                 |> RL.toList
                 |> List.filter (\s -> s.display_on_wall)
@@ -33,14 +32,14 @@ smsCard : SmsInbound -> Html msg
 smsCard sms =
     div
         [ style
-            [ "backgroundColor" => "#ffffff"
-            , "fontSize" => "200%"
-            , "padding" => ".5rem"
-            , "margin" => ".5rem"
+            [ ( "backgroundColor", "#ffffff" )
+            , ( "fontSize", "200%" )
+            , ( "padding", ".5rem" )
+            , ( "margin", ".5rem" )
             ]
         ]
         [ p []
-            [ span [ style [ "color" => "#d3d3d3" ] ] [ text <| firstWord sms ]
+            [ span [ style [ ( "color", "#d3d3d3" ) ] ] [ text <| firstWord sms ]
             , text <| restOfMessage sms
             ]
         ]

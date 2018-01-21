@@ -76,6 +76,5 @@ type FormMsg
     | DefaultResponsesFormMsg DRF.Msg
     | CreateAllGroupMsg CAG.Msg
     | ContactImportMsg CI.Msg
-    | ReceiveSiteConfigFormModel (Result Http.Error SCF.Model)
     | SendAdhocMsg SAF.Msg
     | SendGroupMsg SGF.Msg

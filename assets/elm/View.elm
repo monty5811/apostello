@@ -38,7 +38,6 @@ import Pages.Usage as Usage
 import Pages.UserProfileTable as UPT
 import Pages.Wall as W
 import RemoteList as RL
-import Rocket exposing ((=>))
 import Route exposing (spaLink)
 import Store.Messages as S
 import Store.Model exposing (filterArchived)
@@ -220,7 +219,7 @@ content model =
         Help ->
             Help.view
 
-        ContactImport ciModel ->
+        ContactImport _ ->
             CI.view
                 { post = FormMsg M.PostContactImportForm, form = FormMsg << M.ContactImportMsg }
                 model.formStatus
@@ -294,7 +293,7 @@ content model =
 
         SiteConfigForm scModel ->
             SCF.view
-                { postForm = FormMsg M.PostSiteConfigForm, form = FormMsg << M.SiteConfigFormMsg, noop = M.Nope }
+                { postForm = FormMsg M.PostSiteConfigForm, form = FormMsg << M.SiteConfigFormMsg }
                 (filterArchived False model.dataStore.groups)
                 scModel
                 model.formStatus
@@ -351,7 +350,7 @@ smsToReplyLink sms =
 smsToContactLink : { a | sender_name : String, sender_pk : Maybe Int } -> Html Msg
 smsToContactLink sms =
     spaLink Html.a
-        [ A.style [ "color" => "var(--color-black)" ] ]
+        [ A.style [ ( "color", "var(--color-black)" ) ] ]
         [ Html.text sms.sender_name ]
         (ContactForm CF.initialModel sms.sender_pk)
 

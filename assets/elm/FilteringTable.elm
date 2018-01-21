@@ -19,7 +19,6 @@ import List.Extra as LE
 import Pages.Fragments.Loader exposing (loader)
 import Regex
 import RemoteList as RL
-import Rocket exposing ((=>))
 
 
 -- Model
@@ -139,7 +138,7 @@ filterInput msg =
     Html.input
         [ A.type_ "text"
         , A.placeholder "Filter..."
-        , A.style [ "margin-bottom" => "1rem" ]
+        , A.style [ ( "margin-bottom", "1rem" ) ]
         , E.onInput msg
         ]
         []

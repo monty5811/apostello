@@ -1,6 +1,6 @@
 module Pages.Forms.CreateAllGroup exposing (Msg(..), update, view)
 
-import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus)
+import Forms.Model exposing (Field, FormItem(FormField), FormStatus)
 import Forms.View exposing (..)
 import Html exposing (Html)
 import Pages.Forms.Meta.CreateAllGroup exposing (meta)

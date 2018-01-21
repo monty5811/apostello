@@ -11,7 +11,6 @@ import Http
 import Json.Decode as Decode
 import Notification exposing (Notifications, createInfo, createSuccess)
 import RemoteList as RL
-import Rocket exposing ((=>))
 import Urls
 
 
@@ -99,7 +98,7 @@ fetchButton props =
         [ A.class "button button-success"
         , onClick (props.topMsg FetchGroups)
         , A.id "fetch_button"
-        , A.style [ "width" => "50%" ]
+        , A.style [ ( "width", "50%" ) ]
         ]
         [ text "Fetch Groups" ]
 
@@ -110,7 +109,7 @@ pullButton props =
         [ A.class "button button-info"
         , onClick (props.topMsg PullGroups)
         , A.id "pull_button"
-        , A.style [ "width" => "50%" ]
+        , A.style [ ( "width", "50%" ) ]
         ]
         [ text "Pull Groups" ]
 

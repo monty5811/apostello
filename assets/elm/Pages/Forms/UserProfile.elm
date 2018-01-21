@@ -110,7 +110,7 @@ getNewBool : Maybe Bool -> Maybe Bool -> Maybe Bool
 getNewBool modelVal profileVal =
     case modelVal of
         Just curVal ->
-            -- we haev edited the form, toggle the val
+            -- we have edited the form, toggle the val
             Just <| not curVal
 
         Nothing ->

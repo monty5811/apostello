@@ -12,7 +12,6 @@ import Pages.Forms.Meta.Group exposing (meta)
 import Pages.Fragments.Loader exposing (loader)
 import Regex
 import RemoteList as RL
-import Rocket exposing ((=>))
 
 
 type alias Model =
@@ -222,8 +221,8 @@ membershipToggles props maybeGroup model =
                 , Html.p [] [ Html.text "Click a person to toggle their membership." ]
                 , Html.div
                     [ A.style
-                        [ "display" => "grid"
-                        , "grid-template-columns" => "50% 50%"
+                        [ ( "display", "grid" )
+                        , ( "grid-template-columns", "50% 50%" )
                         ]
                     ]
                     [ Html.div []

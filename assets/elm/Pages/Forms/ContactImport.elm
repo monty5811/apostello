@@ -1,6 +1,6 @@
 module Pages.Forms.ContactImport exposing (Msg(UpdateText), update, view)
 
-import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus)
+import Forms.Model exposing (Field, FormItem(FormField), FormStatus)
 import Forms.View exposing (form, longTextField)
 import Html exposing (Html)
 import Html.Attributes as A

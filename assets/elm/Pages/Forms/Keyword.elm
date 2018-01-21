@@ -16,7 +16,31 @@ import Pages.Forms.Meta.Keyword exposing (meta)
 import Pages.Fragments.Loader exposing (loader)
 import Regex
 import RemoteList as RL
-import Rocket exposing ((=>))
+
+
+-- Init
+
+
+init : Model -> Cmd Msg
+init model =
+    Cmd.batch
+        [ DateTimePicker.initialCmd initActTime model.datePickerActState
+        , DateTimePicker.initialCmd initDeactTime model.datePickerDeactState
+        ]
+
+
+initActTime : DateTimePicker.State -> Maybe Date.Date -> Msg
+initActTime state maybeDate =
+    UpdateActivateTime state maybeDate
+
+
+initDeactTime : DateTimePicker.State -> Maybe Date.Date -> Msg
+initDeactTime state maybeDate =
+    UpdateDeactivateTime state maybeDate
+
+
+
+-- Model
 
 
 type alias Model =
@@ -342,7 +366,7 @@ groupLabelView : Messages msg -> Maybe (List Int) -> RecipientGroup -> Html msg
 groupLabelView msgs maybePks group =
     Html.div
         [ A.class "badge"
-        , A.style [ "user-select" => "none" ]
+        , A.style [ ( "user-select", "none" ) ]
         , E.onClick <| msgs.k <| UpdateSelectedLinkedGroup (Maybe.withDefault [] maybePks) group.pk
         ]
         [ Html.text group.name ]
@@ -361,15 +385,15 @@ groupView msgs maybeSelectedPks group =
     in
     Html.Keyed.node "div"
         [ A.class "item"
-        , A.style [ "user-select" => "none" ]
+        , A.style [ ( "user-select", "none" ) ]
         , E.onClick <| msgs.k <| UpdateSelectedLinkedGroup selectedPks group.pk
         ]
-        [ toString group.pk => groupViewHelper selectedPks group ]
+        [ ( toString group.pk, groupViewHelper selectedPks group ) ]
 
 
 groupViewHelper : List Int -> RecipientGroup -> Html msg
 groupViewHelper selectedPks group =
-    Html.div [ A.style [ "color" => "#000" ] ]
+    Html.div [ A.style [ ( "color", "#000" ) ] ]
         [ selectedIcon selectedPks group
         , Html.text group.name
         ]
@@ -407,7 +431,7 @@ userLabelView : Messages msg -> (List Int -> Int -> Msg) -> Maybe (List Int) -> 
 userLabelView msgs msg selectedPks user =
     Html.div
         [ A.class "badge"
-        , A.style [ "user-select" => "none" ]
+        , A.style [ ( "user-select", "none" ) ]
         , E.onClick <| msgs.k <| msg (Maybe.withDefault [] selectedPks) user.pk
         ]
         [ Html.text user.email ]
@@ -440,16 +464,16 @@ userView msgs toMsg maybeSelectedPks owner =
     in
     Html.Keyed.node "div"
         [ A.class "item"
-        , A.style [ "user-select" => "none" ]
+        , A.style [ ( "user-select", "none" ) ]
         , E.onClick <| msgs.k <| msg
         , A.id <| "user" ++ id
         ]
-        [ toString owner.pk => userViewHelper selectedPks owner ]
+        [ ( toString owner.pk, userViewHelper selectedPks owner ) ]
 
 
 userViewHelper : List Int -> User -> Html msg
 userViewHelper selectedPks owner =
-    Html.div [ A.style [ "color" => "#000" ] ]
+    Html.div [ A.style [ ( "color", "#000" ) ] ]
         [ selectedIcon selectedPks owner
         , Html.text owner.email
         ]

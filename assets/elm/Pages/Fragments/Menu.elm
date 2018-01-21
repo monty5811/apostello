@@ -1,13 +1,11 @@
 module Pages.Fragments.Menu exposing (allUsersMenuItems, menu)
 
-import Data exposing (UserProfile)
 import Html exposing (Html, a, text)
 import Html.Attributes as A exposing (class, href)
 import Messages exposing (Msg(WebPushMsg))
 import Models exposing (Settings)
 import Pages exposing (Page(..), initSendAdhoc, initSendGroup)
 import Pages.GroupComposer as GC
-import Rocket exposing ((=>))
 import Route exposing (spaLink)
 import Urls
 import WebPush
@@ -74,7 +72,7 @@ allUsersMenuItems settings wp =
             [ lockedItem False Urls.account_change_password "Change Password" (not userPerms.user.is_social)
             , item Urls.account_logout "Logout" True
             ]
-        , menuGroup "Push Status" [ isStaff || userPerms.can_see_incoming ] <| pushMenu isStaff userPerms wp
+        , menuGroup "Push Status" [ isStaff || userPerms.can_see_incoming ] <| pushMenu isStaff wp
         ]
     , twilioNumber <| Maybe.map .fromNumber settings.twilio
     ]
@@ -90,8 +88,8 @@ twilioNumber maybeNum =
             Html.div
                 [ A.class "text-center"
                 , A.style
-                    [ "margin-right" => "2rem"
-                    , "margin-top" => "2rem"
+                    [ ( "margin-right", "2rem" )
+                    , ( "margin-top", "2rem" )
                     ]
                 ]
                 [ text <| "Twilio Number: " ++ num
@@ -106,15 +104,15 @@ menuGroup title perms items =
         ]
 
 
-pushMenu : Bool -> UserProfile -> WebPush.Model -> List (Html Msg)
-pushMenu isStaff perms wp =
+pushMenu : Bool -> WebPush.Model -> List (Html Msg)
+pushMenu isStaff wp =
     List.map (Html.map WebPushMsg) (WebPush.view wp)
 
 
 header : String -> List Bool -> Html Msg
 header s check =
     if List.foldl (||) False check then
-        Html.h4 [ A.style [ "user-select" => "none" ], class "text-left" ] [ text s ]
+        Html.h4 [ A.style [ ( "user-select", "none" ) ], class "text-left" ] [ text s ]
     else
         Html.text ""
 
