@@ -2,7 +2,7 @@ import re
 import subprocess
 
 from django.core.management.base import BaseCommand
-from django.urls.resolvers import RegexURLPattern, RegexURLResolver
+from django.urls.resolvers import URLPattern, URLResolver, RegexPattern, RoutePattern
 
 from apostello.urls import urlpatterns
 
@@ -130,20 +130,30 @@ def add_namespacing(top, url):
 
     if isinstance(url['url'], tuple):
         url['url'] = url['url'][0]
-    url['url'] = top.regex.pattern + url['url']
+
+    url['url'] = top.pattern.regex.pattern + url['url']
     return url
+
+
+def pattern2url(p):
+    if isinstance(p, RegexPattern):
+        return p.regex.pattern
+    elif isinstance(p, RoutePattern):
+        return p.regex.pattern
+    else:
+        raise NotImplementedError
 
 
 def extract_urls(urlpatterns):
     url_data = []
     for u in urlpatterns:
-        if isinstance(u, RegexURLPattern):
+        if isinstance(u, URLPattern):
             if u.name is not None:
                 url_data.append({
-                    'url': u.regex.pattern,
+                    'url': pattern2url(u.pattern),
                     'name': u.name,
                 })
-        elif isinstance(u, RegexURLResolver):
+        elif isinstance(u, URLResolver):
             tmp_urls = extract_urls(u.url_patterns)
             tmp_urls = [add_namespacing(u, tmp) for tmp in tmp_urls]
             url_data += tmp_urls

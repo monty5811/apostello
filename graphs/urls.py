@@ -3,6 +3,8 @@ from django.conf.urls import url
 from graphs import renderers as r
 from graphs import views as v
 
+app_name = 'graphs'
+
 urlpatterns = [
     url(r'^recent/', v.GraphView.as_view(
         graph_renderer=r.recent,

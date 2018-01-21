@@ -1,6 +1,7 @@
 from allauth.account.views import PasswordChangeView
 from django.conf import settings
 from django.conf.urls import include, url
+from django.urls import path
 from django.contrib import admin
 from django.views.generic.base import TemplateView
 from rest_framework.documentation import include_docs_urls
@@ -21,7 +22,7 @@ urlpatterns += [url(r'^sms/$', v.sms)]
 
 # auth and admin
 urlpatterns += [
-    url(r'^admin/', include(admin.site.urls)),
+    path(r'admin/', admin.site.urls),
     # over ride success url:
     url(r"^accounts/password/change/$", PasswordChangeView.as_view(success_url='/'), name="account_change_password"),
     url(r'^accounts/', include('allauth.urls')),

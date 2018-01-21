@@ -9,6 +9,8 @@ from apostello import forms as f
 from apostello import models as m
 from elvanto.models import ElvantoGroup
 
+app_name = 'api'
+
 # api
 urlpatterns = [
     # list views:

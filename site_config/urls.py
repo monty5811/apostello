@@ -2,6 +2,8 @@ from django.conf.urls import url
 
 from site_config import views
 
+app_name = 'site_config'
+
 urlpatterns = [
     url(
         r'^first_run/',

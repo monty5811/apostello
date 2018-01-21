@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.cache.utils import make_template_fragment_key
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -585,8 +585,11 @@ class QueuedSms(models.Model):
     )
     recipient_group = models.ForeignKey(
         RecipientGroup, null=True, blank=True, help_text="Group (if any) that message was sent to"
+        ,on_delete=models.CASCADE,
     )
-    recipient = models.ForeignKey(Recipient, blank=True, null=True)
+    recipient = models.ForeignKey(Recipient, blank=True, null=True
+                                  ,on_delete=models.CASCADE,
+                                  )
 
     def cancel(self):
         """Cancel message."""
@@ -645,8 +648,11 @@ class SmsOutbound(models.Model):
     )
     recipient_group = models.ForeignKey(
         RecipientGroup, null=True, blank=True, help_text="Group (if any) that message was sent to"
+        ,on_delete=models.CASCADE,
     )
-    recipient = models.ForeignKey(Recipient, blank=True, null=True)
+    recipient = models.ForeignKey(Recipient, blank=True, null=True
+                                  ,on_delete=models.CASCADE,
+                                  )
 
     def __str__(self):
         """Pretty representation."""
@@ -684,6 +690,7 @@ class UserProfile(models.Model):
         User,
         unique=True,
         related_name='profile',
+        on_delete=models.CASCADE,
     )
 
     approved = models.BooleanField(default=False, help_text='This must be true to grant users access to the site.')
