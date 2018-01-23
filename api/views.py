@@ -1,6 +1,7 @@
 import csv
 import io
 
+from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
@@ -184,7 +185,7 @@ class Collection(generics.ListAPIView):
             return objs.filter(keyword=identifier)
 
     def get_queryset(self):
-        return self._get_queryset()[0:5000]
+        return self._get_queryset()[0:settings.MAX_SMS_N]
 
     def _get_queryset(self):
         """Handle get requests."""
@@ -223,7 +224,7 @@ class SmsCollection(Collection):
             return qs
 
         blocked_keywords = [x.keyword for x in Keyword.objects.all() if not x.can_user_access(self.request.user)]
-        return qs.exclude(matched_keyword__in=blocked_keywords)[0:5000]
+        return qs.exclude(matched_keyword__in=blocked_keywords)[0:settings.MAX_SMS_N]
 
 
 class QueuedSmsCollection(Collection):

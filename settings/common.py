@@ -187,3 +187,11 @@ SOLO_CACHE = 'default'
 # cloud messaging server key:
 CM_SERVER_KEY = os.environ.get('CM_SERVER_KEY', '')
 CM_SENDER_ID = os.environ.get('CM_SENDER_ID', '')
+
+# maximum number of SMS to send to clients from api
+# if this is too large it may crash the elm run time
+MAX_SMS_N = os.environ.get('MAX_SMS_TO_CLIENT', 5000)
+try:
+    MAX_SMS_N = int(MAX_SMS_N)
+except ValueError:
+    MAX_SMS_N = 5000
