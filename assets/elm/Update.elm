@@ -16,10 +16,7 @@ import Pages.Forms.SiteConfig as SCF
 import Pages.Fragments.SidePanel as SidePanel
 import Pages.GroupComposer as GC
 import Pages.KeyRespTable as KRT
-import Ports exposing (saveDataStore)
 import Route exposing (loc2Page)
-import Store.Encode exposing (encodeDataStore)
-import Store.Messages exposing (StoreMsg(LoadDataStore))
 import Store.Model as Store
 import Store.Optimistic
 import Store.Request exposing (maybeFetchData)
@@ -32,14 +29,11 @@ update msg model =
     let
         ( newModel, cmds ) =
             updateHelper msg model
-
-        newCmds =
-            maybeSaveDataStore msg model newModel cmds
     in
     ( newModel
         |> maybeAddEmailWarning
         |> maybeAddTwilioWarning
-    , Cmd.batch newCmds
+    , Cmd.batch cmds
     )
 
 
@@ -231,32 +225,6 @@ updateHelper msg model =
                     WebPush.update model.settings.csrftoken subMsg model.webPush
             in
             ( { model | webPush = wpModel }, [ Cmd.map WebPushMsg wpCmd ] )
-
-
-maybeSaveDataStore : Msg -> Model -> Model -> List (Cmd Msg) -> List (Cmd Msg)
-maybeSaveDataStore msg oldModel newModel cmds =
-    case msg of
-        StoreMsg subMsg ->
-            case subMsg of
-                LoadDataStore _ ->
-                    cmds
-
-                _ ->
-                    addSaveDataStoreCmd oldModel newModel cmds
-
-        _ ->
-            addSaveDataStoreCmd oldModel newModel cmds
-
-
-addSaveDataStoreCmd : Model -> Model -> List (Cmd Msg) -> List (Cmd Msg)
-addSaveDataStoreCmd oldModel newModel cmds =
-    case newModel.dataStore == oldModel.dataStore of
-        True ->
-            cmds
-
-        False ->
-            (saveDataStore <| encodeDataStore newModel.dataStore)
-                :: cmds
 
 
 maybeAddTwilioWarning : Model -> Model

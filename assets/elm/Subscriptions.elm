@@ -5,7 +5,6 @@ import Messages as M
 import Models exposing (MenuModel(MenuHidden, MenuVisible), Model)
 import PageVisibility
 import Pages exposing (Page(Curator, SendAdhoc, SendGroup, Wall))
-import Ports exposing (loadDataStore)
 import Store.Messages exposing (StoreMsg(LoadData, LoadDataStore))
 import Store.Model as Store
 import Time exposing (second)
@@ -17,7 +16,6 @@ subscriptions model =
     Sub.batch
         [ reloadData model.pageVisibility model.page model.dataStore
         , getCurrentTime
-        , loadDataStore (M.StoreMsg << LoadDataStore)
         , Sub.map M.WebPushMsg <| WebPush.subscriptions model.webPush
         , PageVisibility.visibilityChanges M.VisibilityChange
         , keyUps model
