@@ -2043,10 +2043,6 @@ onecolor@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/onecolor/-/onecolor-3.0.4.tgz#75a46f80da6c7aaa5b4daae17a47198bd9652494"
 
-opbeat-js@3.1.4:
-  version "3.1.4"
-  resolved "https://registry.yarnpkg.com/opbeat-js/-/opbeat-js-3.1.4.tgz#33eeed3756daf9e8ebf92bcc8337ca99de624766"
-
 os-browserify@^0.2.0:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/os-browserify/-/os-browserify-0.2.1.tgz#63fc4ccee5d2d7763d26bbf8601078e6c2e0044f"

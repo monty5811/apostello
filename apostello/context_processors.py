@@ -9,16 +9,5 @@ def global_settings(request):
     return {
         'CONFIG': SiteConfiguration.get_solo(),
         'DISPLAY_GOOGLE_LOGIN': SocialApp.objects.filter(provider='google').count(),
-    }
-
-
-def opbeat_js_settings(request):
-    """Expose opbeat frontend credentials."""
-    opbeat_vals = [settings.OPBEAT_JS_APP_ID, settings.OPBEAT_JS_ORG_ID]
-    if any(val is None for val in opbeat_vals):
-        return {}
-
-    return {
-        'OPBEAT_JS_APP_ID': settings.OPBEAT_JS_APP_ID,
-        'OPBEAT_JS_ORG_ID': settings.OPBEAT_JS_ORG_ID,
+        'ROLLBAR_ACCESS_TOKEN_CLIENT': settings.ROLLBAR_ACCESS_TOKEN_CLIENT,
     }

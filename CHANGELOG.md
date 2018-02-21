@@ -3,6 +3,18 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## Changed
+
+ - Opbeat removed in favour of rollbar. Opbeat is shutting down in May and moving to Elastic APM. This release replaces opbeat with rollbar instead, partly due to better django-q support
+
+## Added
+
+ - Add configuration to allow limiting number of items sent to client
+
+## Removed
+
+ - Inter-tab sync removed to simplify code, no real downsides
+
 ## [v2.7.1]
 
 ### Fixed

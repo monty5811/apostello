@@ -50,13 +50,6 @@
     <script>
       var elmSettings = {% elm_settings request.user %};
     </script>
-    {% if OPBEAT_JS_APP_ID %}
-    <script src="https://d3tvtfb6518e3e.cloudfront.net/1/opbeat.min.js"
-            data-org-id="{{ OPBEAT_JS_ORG_ID }}"
-            data-app-id="{{ OPBEAT_JS_APP_ID }}"
-            async
-            ></script>
-    {% endif %}
-    <script src="{% static 'js/app.js' %}"></script>
+    {% include 'includes/js.html' %}
   </body>
 </html>

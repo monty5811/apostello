@@ -14,12 +14,9 @@ django_time_zone: 'Europe/London'
 # Elvanto
 elvanto_key: '00000000000000000000000000000000'
 country_code: 44
-# Opbeat
-opbeat_organization_id: ''
-opbeat_app_id: ''
-opbeat_secret_token: ''
-opbeat_js_org_id: ''
-opbeat_js_app_id: ''
+# Rollbar
+rollbar_access_token: ''
+rollbar_access_token_client: ''
 # Cloud messaging
 cm_server_key: ''
 cm_sender_id: ''

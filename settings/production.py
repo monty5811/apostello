@@ -61,23 +61,19 @@ LOGGING = {
     },
 }
 
-if OPBEAT['ORGANIZATION_ID']:
-    INSTALLED_APPS += [
-        'opbeat.contrib.django',
-    ]
+if ROLLBAR_ACCESS_TOKEN is not None:
+    MIDDLEWARE = ['rollbar.contrib.django.middleware.RollbarNotifierMiddleware', ] + MIDDLEWARE
 
-    MIDDLEWARE = [
-        'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
-    ] + MIDDLEWARE
+    ROLLBAR = {
+        'access_token': ROLLBAR_ACCESS_TOKEN,
+        'environment': 'development' if DEBUG else 'production',
+        'branch': 'master',
+        'root':  os.path.join(BASE_DIR, '..'),
+    }
 
-    LOGGING['handlers']['opbeat'] = {
-        'level': 'WARNING',
-        'class': 'opbeat.contrib.django.handlers.OpbeatHandler',
+    Q_CLUSTER['error_reporter'] = {
+        'rollbar': {
+            'access_token': ROLLBAR_ACCESS_TOKEN,
+            'environment': 'Django-Q'
+        }
     }
-    LOGGING['loggers']['opbeat.errors'] = {
-        'level': 'ERROR',
-        'handlers': ['console'],
-        'propagate': False,
-    }
-    LOGGING['loggers']['apostello']['handlers'] += ['opbeat']
-    LOGGING['loggers']['django']['handlers'] += ['opbeat']

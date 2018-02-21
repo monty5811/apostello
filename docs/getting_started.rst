@@ -17,7 +17,7 @@ Prerequisites
 * *Required*: An SMTP server or `Mailgun <https://www.mailgun.com/>`_, etc account for sending email notifications. You can setup apostello without this, but it will not be able to send emails. See :ref:`Email Setup <email-setup>` for more details.
 * *Optional*: A web app registered for authentication with a Google account
 * *Optional*: An `Elvanto <https://www.elvanto.com/r_Y7HXKNE6>`_ API Key for importing Elvanto groups.
-* *Optional*: An `opbeat <https://opbeat.com/>`_ account for error logging. You can setup opbeat logging on the front and back ends in separate opbeat apps: one for the django app and one for the js front end.
+* *Optional*: A `rollbar <https://rollbar.com/>`_ account for error logging.
 
 .. _first-run:
 
