@@ -5,8 +5,10 @@
   when: setup_git_repo
   tags: git
 
-- rollbar_deployment:
-    token: {{ rollbar_access_token }}
+- name: Tell rollbar about deployment
+  when: rollbar_access_token != ''
+  rollbar_deployment:
+    token: '{{ rollbar_access_token }}'
     environment: production
     user: ansible
-    revision: {{ git_version }}
+    revision: '{{ git_version }}'
