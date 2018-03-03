@@ -93,6 +93,7 @@ def handle_outgoing_sms(msg):
             sms.time_sent = msg.date_sent
             sms.sent_by = "[Imported]"
             sms.recipient = recip
+            sms.status = msg.status
             sms.save()
     except Exception:
         logger.error('Could not import sms.', exc_info=True, extra={'msg': msg})

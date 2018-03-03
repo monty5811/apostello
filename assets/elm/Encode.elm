@@ -1,7 +1,7 @@
 module Encode exposing (encodeDate, encodeMaybe, encodeMaybeDate, encodeMaybeDateOnly)
 
 import Date
-import Date.Format
+import DateFormat
 import Json.Encode as Encode
 
 
@@ -18,19 +18,53 @@ encodeMaybe encoder ms =
 encodeMaybeDate : Maybe Date.Date -> Encode.Value
 encodeMaybeDate date =
     date
-        |> Maybe.map (Date.Format.format "%Y-%m-%d %H:%M:%S")
+        |> Maybe.map
+            (DateFormat.format
+                [ DateFormat.yearNumber
+                , DateFormat.text "-"
+                , DateFormat.monthFixed
+                , DateFormat.text "-"
+                , DateFormat.dayOfMonthFixed
+                , DateFormat.text " "
+                , DateFormat.hourMilitaryFixed
+                , DateFormat.text ":"
+                , DateFormat.minuteFixed
+                , DateFormat.text ":"
+                , DateFormat.secondFixed
+                ]
+            )
         |> encodeMaybe Encode.string
 
 
 encodeMaybeDateOnly : Maybe Date.Date -> Encode.Value
 encodeMaybeDateOnly date =
     date
-        |> Maybe.map (Date.Format.format "%Y-%m-%d")
+        |> Maybe.map
+            (DateFormat.format
+                [ DateFormat.yearNumber
+                , DateFormat.text "-"
+                , DateFormat.monthFixed
+                , DateFormat.text "-"
+                , DateFormat.dayOfMonthFixed
+                ]
+            )
         |> encodeMaybe Encode.string
 
 
 encodeDate : Date.Date -> Encode.Value
 encodeDate date =
     date
-        |> Date.Format.format "%Y-%m-%d %H:%M:%S"
+        |> DateFormat.format
+            [ DateFormat.yearNumber
+            , DateFormat.text "-"
+            , DateFormat.monthFixed
+            , DateFormat.text "-"
+            , DateFormat.dayOfMonthFixed
+            , DateFormat.text " "
+            , DateFormat.hourMilitaryFixed
+            , DateFormat.text ":"
+            , DateFormat.minuteFixed
+            , DateFormat.text ":"
+            , DateFormat.secondFixed
+            ]
         |> Encode.string

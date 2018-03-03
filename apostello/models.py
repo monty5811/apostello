@@ -653,6 +653,9 @@ class SmsOutbound(models.Model):
     recipient = models.ForeignKey(Recipient, blank=True, null=True
                                   ,on_delete=models.CASCADE,
                                   )
+    status = models.CharField(
+        'Status', max_length=50, help_text='Status of SMS (from Twilio)',
+    )
 
     def __str__(self):
         """Pretty representation."""

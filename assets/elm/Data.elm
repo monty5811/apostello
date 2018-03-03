@@ -4,7 +4,7 @@ import Date
 import Encode exposing (encodeDate, encodeMaybe, encodeMaybeDate)
 import Json.Decode as Decode
 import Json.Decode.Extra exposing (date)
-import Json.Decode.Pipeline exposing (decode, optional, required)
+import Json.Decode.Pipeline exposing (custom, decode, optional, required)
 import Json.Encode as Encode
 
 
@@ -69,6 +69,7 @@ type alias SmsOutbound =
     , time_sent : Maybe Date.Date
     , sent_by : String
     , recipient : Maybe RecipientSimple
+    , status : MessageDeliveryStatus
     }
 
 
@@ -80,6 +81,7 @@ decodeSmsOutbound =
         |> required "time_sent" (Decode.maybe date)
         |> required "sent_by" Decode.string
         |> required "recipient" (Decode.maybe decodeRecipientSimple)
+        |> custom (Decode.at [ "status" ] (Decode.andThen decodeStatus Decode.string))
 
 
 encodeSmsOutbound : SmsOutbound -> Encode.Value
@@ -90,7 +92,98 @@ encodeSmsOutbound sms =
         , ( "time_sent", encodeMaybeDate sms.time_sent )
         , ( "sent_by", Encode.string sms.sent_by )
         , ( "recipient", encodeMaybe encodeRecipientSimple sms.recipient )
+        , ( "status", Encode.string (String.toLower <| stringFromMDStatus sms.status) )
         ]
+
+
+
+-- Status
+
+
+decodeStatus : String -> Decode.Decoder MessageDeliveryStatus
+decodeStatus status =
+    Decode.succeed (mdStatusFromString status)
+
+
+type MessageDeliveryStatus
+    = Accepted
+    | Queued
+    | Sending
+    | Sent
+    | Receiving
+    | Received
+    | Delivered
+    | Undelivered
+    | Failed
+    | Unknown
+
+
+mdStatusFromString : String -> MessageDeliveryStatus
+mdStatusFromString str =
+    case str of
+        "accepted" ->
+            Accepted
+
+        "queued" ->
+            Queued
+
+        "sending" ->
+            Sending
+
+        "sent" ->
+            Sent
+
+        "receiving" ->
+            Receiving
+
+        "received" ->
+            Received
+
+        "delivered" ->
+            Delivered
+
+        "undelivered" ->
+            Undelivered
+
+        "failed" ->
+            Failed
+
+        _ ->
+            Unknown
+
+
+stringFromMDStatus : MessageDeliveryStatus -> String
+stringFromMDStatus status =
+    case status of
+        Accepted ->
+            "Accepted"
+
+        Queued ->
+            "Queued"
+
+        Sending ->
+            "Sending"
+
+        Sent ->
+            "Sent"
+
+        Receiving ->
+            "Receiving"
+
+        Received ->
+            "Received"
+
+        Delivered ->
+            "Delivered"
+
+        Undelivered ->
+            "Undelivered"
+
+        Failed ->
+            "Failed"
+
+        Unknown ->
+            "Unknown"
 
 
 

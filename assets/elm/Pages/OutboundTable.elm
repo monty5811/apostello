@@ -1,6 +1,6 @@
 module Pages.OutboundTable exposing (view)
 
-import Data exposing (SmsOutbound)
+import Data exposing (SmsOutbound, stringFromMDStatus)
 import FilteringTable as FT
 import Helpers exposing (formatDate)
 import Html exposing (Html, td, text, th, thead, tr)
@@ -27,6 +27,7 @@ tableHead =
             [ th [] [ text "To" ]
             , th [] [ text "Message" ]
             , th [] [ text "Sent" ]
+            , th [] [ text "Status from Twilio" ]
             ]
         ]
 
@@ -47,5 +48,6 @@ smsRow props sms =
         [ td [] [ props.contactLink recipient ]
         , td [] [ text sms.content ]
         , td [] [ text (formatDate sms.time_sent) ]
+        , td [] [ text (stringFromMDStatus sms.status) ]
         ]
     )

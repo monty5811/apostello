@@ -1,7 +1,7 @@
 module Helpers exposing (..)
 
 import Date
-import Date.Format
+import DateFormat
 import Html exposing (Attribute, Html, a, td, text)
 import Html.Attributes exposing (class, id)
 import Html.Events exposing (onWithOptions)
@@ -42,7 +42,16 @@ formatDate : Maybe Date.Date -> String
 formatDate date =
     case date of
         Just d ->
-            Date.Format.format "%H:%M - %d %b" d
+            DateFormat.format
+                [ DateFormat.hourMilitaryFixed
+                , DateFormat.text ":"
+                , DateFormat.minuteFixed
+                , DateFormat.text " - "
+                , DateFormat.dayOfMonthSuffix
+                , DateFormat.text " "
+                , DateFormat.monthNameFirstThree
+                ]
+                d
 
         Nothing ->
             ""

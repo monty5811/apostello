@@ -20,6 +20,7 @@ class MockMsg:
         self.to = settings.to = '447922537999'
         self.date_created = timezone.now()
         self.date_sent = timezone.now()
+        self.status = 'unknown'
 
 
 @pytest.mark.django_db

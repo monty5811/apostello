@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 ## Added
 
  - Add configuration to allow limiting number of items sent to client
+ - Add Twilio Message Status to Outgoing log
 
 ## Removed
 

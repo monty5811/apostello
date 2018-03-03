@@ -134,6 +134,7 @@ class SmsOutboundSerializer(BaseModelSerializer):
             'time_sent',
             'sent_by',
             'recipient',
+            'status',
         )
 
 

@@ -1,6 +1,6 @@
 module TestSerialisation exposing (serialisation)
 
-import Data exposing (ElvantoGroup, Keyword, QueuedSms, Recipient, RecipientGroup, RecipientSimple, SmsInbound, SmsOutbound, User, UserProfile, decodeElvantoGroup, decodeKeyword, decodeQueuedSms, decodeRecipient, decodeRecipientGroup, decodeRecipientSimple, decodeSmsInbound, decodeSmsOutbound, decodeUser, decodeUserProfile, encodeElvantoGroup, encodeKeyword, encodeQueuedSms, encodeRecipient, encodeRecipientGroup, encodeRecipientSimple, encodeSmsInbound, encodeSmsOutbound, encodeUser, encodeUserProfile)
+import Data exposing (ElvantoGroup, Keyword, MessageDeliveryStatus(..), QueuedSms, Recipient, RecipientGroup, RecipientSimple, SmsInbound, SmsOutbound, User, UserProfile, decodeElvantoGroup, decodeKeyword, decodeQueuedSms, decodeRecipient, decodeRecipientGroup, decodeRecipientSimple, decodeSmsInbound, decodeSmsOutbound, decodeUser, decodeUserProfile, encodeElvantoGroup, encodeKeyword, encodeQueuedSms, encodeRecipient, encodeRecipientGroup, encodeRecipientSimple, encodeSmsInbound, encodeSmsOutbound, encodeUser, encodeUserProfile)
 import Date
 import Expect
 import Fuzz exposing (Fuzzer)
@@ -58,6 +58,23 @@ smsOutbound =
         |> Fuzz.andMap (Fuzz.maybe fuzzDate)
         |> Fuzz.andMap Fuzz.string
         |> Fuzz.andMap (Fuzz.maybe recipientSimple)
+        |> Fuzz.andMap mdStatus
+
+
+mdStatus : Fuzzer MessageDeliveryStatus
+mdStatus =
+    Fuzz.oneOf
+        [ Fuzz.constant Accepted
+        , Fuzz.constant Queued
+        , Fuzz.constant Sending
+        , Fuzz.constant Sent
+        , Fuzz.constant Receiving
+        , Fuzz.constant Received
+        , Fuzz.constant Delivered
+        , Fuzz.constant Undelivered
+        , Fuzz.constant Failed
+        , Fuzz.constant Unknown
+        ]
 
 
 userProfile : Fuzzer UserProfile

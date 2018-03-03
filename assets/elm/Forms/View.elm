@@ -1,7 +1,7 @@
 module Forms.View exposing (..)
 
 import Date
-import Date.Format
+import DateFormat
 import DateTimePicker
 import DateTimePicker.Config
 import Dict
@@ -149,7 +149,18 @@ dateTimeField msg datePickerState date meta =
             , i18n =
                 { i18nConfig
                     | inputFormat =
-                        { inputFormatter = Date.Format.format "%Y-%m-%d %H:%M"
+                        { inputFormatter =
+                            DateFormat.format
+                                [ DateFormat.yearNumber
+                                , DateFormat.text "-"
+                                , DateFormat.monthFixed
+                                , DateFormat.text "-"
+                                , DateFormat.dayOfMonthFixed
+                                , DateFormat.text " "
+                                , DateFormat.hourMilitaryFixed
+                                , DateFormat.text ":"
+                                , DateFormat.minuteFixed
+                                ]
                         , inputParser = Date.fromString >> Result.toMaybe
                         }
                 }
@@ -181,7 +192,14 @@ dateField msg datePickerState date meta =
             , i18n =
                 { i18nConfig
                     | inputFormat =
-                        { inputFormatter = Date.Format.format "%Y-%m-%d"
+                        { inputFormatter =
+                            DateFormat.format
+                                [ DateFormat.yearNumber
+                                , DateFormat.text "-"
+                                , DateFormat.monthFixed
+                                , DateFormat.text "-"
+                                , DateFormat.dayOfMonthFixed
+                                ]
                         , inputParser = Date.fromString >> Result.toMaybe
                         }
                 }
