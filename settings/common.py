@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'solo',
     'django_redis',
     'django_q',
+    'cookielaw',
     # auth
     'allauth',
     'allauth.account',

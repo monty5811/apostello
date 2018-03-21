@@ -1,6 +1,8 @@
 coreapi==2.3.3
 dj-database-url==0.5.0
 django-allauth==0.35.0
+django-classy-tags==0.8.0
+django-cookie-law==1.0.13
 django-extensions==2.0.6
 django-phonenumber-field==2.0.0
 django-q[rollbar]==0.9.4

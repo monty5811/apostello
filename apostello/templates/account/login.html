@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load account socialaccount %}
 {% load staticfiles %}
+{% load cookielaw_tags %}
 {% block content %}
 {% get_providers as socialaccount_providers %}
 
@@ -26,4 +27,6 @@
 <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
 </form>
 {% endif %}
+{% cookielaw_banner %}
+<script src="{% static 'cookielaw/js/cookielaw.js' %}"></script>
 {% endblock %}

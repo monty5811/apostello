@@ -203,3 +203,10 @@ label {
 .bounce {
   animation: bounce 1s 1;
 }
+
+#CookielawBanner {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding: 0 10vw;
+}
