@@ -1,8 +1,6 @@
 import uuid
 import warnings
 
-import fakeredis
-
 from .common import *
 
 if os.environ.get('DATABASE_POSTGRESQL_USERNAME'):
@@ -39,17 +37,6 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
 ]
 
 ALLOWED_HOSTS = ['testserver']
-
-#
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": '127.0.0.1:6379',
-        "OPTIONS": {
-            "REDIS_CLIENT_CLASS": "fakeredis.FakeStrictRedis",
-        }
-    }
-}
 
 Q_CLUSTER = {
     'name': 'apostello_test',

@@ -95,8 +95,8 @@ _msg_and_replies = [
 msg_and_replies = []
 for msg, reply in _msg_and_replies:
     msg_and_replies.append((msg, reply))
-    for c in """!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ """:
-        msg_and_replies.append((c + msg, reply))
+    c = """!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~"""
+    msg_and_replies.append((c + msg, reply))
 
 
 @pytest.mark.slow

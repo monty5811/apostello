@@ -1,5 +1,6 @@
 import pytest
 from django.core import mail
+from django.core.cache import cache
 from django.test import Client
 from tests.conftest import post_json, twilio_vcr
 
@@ -11,6 +12,7 @@ class TestFirstRun:
 
     @twilio_vcr
     def test_first_run_page(self):
+        cache.clear()
         c = Client()
         resp = c.get('/')
         assert resp.status_code == 302
