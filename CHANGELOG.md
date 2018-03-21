@@ -3,18 +3,21 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## Changed
+## [v2.8.0]
+
+### Changed
 
  - Opbeat removed in favour of rollbar. Opbeat is shutting down in May and moving to Elastic APM. This release replaces opbeat with rollbar instead, partly due to better django-q support
 
-## Added
+### Added
 
  - Add configuration to allow limiting number of items sent to client
  - Add Twilio Message Status to Outgoing log
+ - Add a cookie notifcation to comply with eu laws
 
-## Removed
+### Removed
 
- - Inter-tab sync removed to simplify code, no real downsides
+ - Inter-tab sync removed to simplify code
 
 ## [v2.7.1]
 
