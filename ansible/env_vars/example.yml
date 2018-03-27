@@ -17,8 +17,8 @@ django_time_zone: 'Europe/London' # change me
 elvanto_key:
 country_code:
 # rollbar
-rollbar_access_token:
-rollbar_access_token_client:
+rollbar_access_token: ''
+rollbar_access_token_client: ''
 # Cloud messaging
 cm_server_key:
 cm_sender_id:
