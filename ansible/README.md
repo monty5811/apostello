@@ -9,12 +9,13 @@ repo.
 ```
 virtualenv venv
 . venv/bin/activate
-pip install ansible==2.2.0.0
+pip install ansible==2.5.0.0
 ansible-playbook --ask-vault-pass -i sms.example.com,  production.yml
 ```
 
 Tested on
 
+ - *coming soon*: Ubuntu 18.04 LTS x64
  - Ubuntu 16.04 LTS x64
  - Ubuntu 14.04 LTS x64
 

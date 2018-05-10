@@ -1,7 +1,7 @@
 ---
 
 - name: Install Nginx
-  apt: name=nginx-extras update_cache={{ update_apt_cache }} state=installed
+  apt: name=nginx-extras update_cache={{ update_apt_cache }} state=present
   tags: packages
 
 - name: Create the Nginx configuration file
@@ -29,3 +29,7 @@
 
 - name: Ensure Nginx service is started
   service: name=nginx state=started enabled=yes
+
+- name: Fix for 16.04 - ensure nginx has started
+  shell: service nginx start
+  when: (ansible_distribution == 'Ubuntu' and ansible_distribution_version == '16.04')

@@ -1,7 +1,7 @@
 ---
 
 - name: Install Supervisor
-  apt: name=supervisor update_cache={{ update_apt_cache }} state=installed
+  apt: name=supervisor update_cache={{ update_apt_cache }} state=present
   tags:
     - django_q
 

@@ -34,7 +34,7 @@ pull_repo() {
         virtualenv venv --no-site-packages
         ./venv/bin/pip install -q -U pip
         ./venv/bin/pip install -q -U setuptools
-        ./venv/bin/pip install -q ansible==2.2.0.0
+        ./venv/bin/pip install -q ansible==2.5.0.0
     else
         echo "Updating apostello..."
         cd $APOSTELLO_INSTALL_DIR

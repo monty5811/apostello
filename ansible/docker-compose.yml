@@ -7,3 +7,8 @@ test_ubuntu_16.04:
   build: .
   dockerfile: ./dockerfiles/ubuntu_16.04
   command: bash docker_test_cmd.sh
+
+test_ubuntu_18.04:
+  build: .
+  dockerfile: ./dockerfiles/ubuntu_18.04
+  command: bash docker_test_cmd.sh

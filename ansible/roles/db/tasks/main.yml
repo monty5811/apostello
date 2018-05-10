@@ -1,7 +1,7 @@
 ---
 
 - name: Install PostgreSQL
-  apt: name={{ item }} update_cache={{ update_apt_cache }} state=installed
+  apt: name={{ item }} update_cache={{ update_apt_cache }} state=present
   with_items:
     - postgresql
     - postgresql-contrib
@@ -29,6 +29,7 @@
                    password={{ db_password }}
                    priv=ALL
                    state=present
+                   encrypted=yes
 
 - name: Ensure user does not have unnecessary privileges
   become_user: postgres

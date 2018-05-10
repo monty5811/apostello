@@ -9,7 +9,7 @@
   when: py36bin.stat.exists == false
 
 - name: "[py36] install"
-  apt: name={{ item }} update_cache={{ update_apt_cache }} force=yes state=installed
+  apt: name={{ item }} update_cache={{ update_apt_cache }} force=yes state=present
   with_items:
     - python3.6
     - python3.6-dev

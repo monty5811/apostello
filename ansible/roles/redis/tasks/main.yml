@@ -1,7 +1,7 @@
 ---
 
 - name: Install redis
-  apt: name={{ item }} update_cache={{ update_apt_cache }} state=installed
+  apt: name={{ item }} update_cache={{ update_apt_cache }} state=present
   with_items:
     - redis-server
     - python-redis
