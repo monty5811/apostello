@@ -6,7 +6,7 @@
   tags: git
 
 - name: Tell rollbar about deployment
-  when: rollbar_access_token != ''
+  when: 'rollbar_access_token|length > 0'
   rollbar_deployment:
     token: '{{ rollbar_access_token }}'
     environment: production
