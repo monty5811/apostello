@@ -29,6 +29,20 @@ class SmsInboundAdmin(admin.ModelAdmin):
     )
 
 
+@admin.register(models.QueuedSms)
+class QueuedSmsAdmin(admin.ModelAdmin):
+    """Admin class for apostello.models.QueuedSms."""
+    list_display = (
+        'time_to_send',
+        'sent',
+        'failed',
+        'content',
+        'sent_by',
+        'recipient_group',
+        'recipient',
+    )
+
+
 @admin.register(models.Keyword)
 class KeywordAdmin(admin.ModelAdmin):
     """Admin class for apostello.models.Keyword."""

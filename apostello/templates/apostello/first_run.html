@@ -4,47 +4,42 @@
   <head>
     {% include 'apostello/includes/head.html' %}
     {% block morehead %}
-    <style>
-      body{
-        max-width: 60rem;
-        padding: 0 2rem;
-        margin: 2rem auto;
-      }
-    </style>
     {% endblock %}
   </head>
-  <body>
-    <div class="twelve wide column">
-      <img src="{% static 'images/favicons/apostello-logo.svg' %}" style="height: 150px;">
-      <h1>apostello initial setup</h1>
+  <body class="bg-grey-lighter">
+    <div class="min-w-full min-h-screen sm:p-2 md:p-4 lg:p-6">
+      <div class="bg-white mx-auto p-4 max-w-lg rounded shadow-md">
+          <img class="max-w-xs" src="{% static 'images/favicons/apostello-logo.svg' %}"/>
+          <h1 class="my-4">apostello initial setup</h1>
 
-      <p>This page will help you verify your installation and configuration of apostello.
-      You can see your configured settings and set up an admin user account.</p>
+          <p class="mb-2">This page will help you verify your installation and configuration of apostello.
+          You can see your configured settings and set up an admin user account.</p>
 
-      <p><b>Note:</b> for security reasons, once a user has been created, this page will no longer be accessible.</p>
+          <p class="mb-2"><b>Note:</b> for security reasons, once a user has been created, this page will no longer be accessible.</p>
 
-      <div id="elmContainer"></div>
+          <div id="elmContainer"></div>
 
-      <div class="segment">
-        <h4>Configuration Variables</h4>
-        <table>
-          <thead>
-            <tr>
-              <th>Environment Variable</th>
-              <th>Description</th>
-              <th>Current Value</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for row in variables %}
-            <tr>
-              <td>{{ row.env_var_name }}</td>
-              <td>{{ row.info }}</td>
-              <td>{{ row.val|linebreaks }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+          <div class="mt-4">
+            <h4>Configuration Variables</h4>
+            <table>
+              <thead>
+                <tr>
+                  <th>Environment Variable</th>
+                  <th>Description</th>
+                  <th>Current Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in variables %}
+                <tr>
+                  <td>{{ row.env_var_name }}</td>
+                  <td>{{ row.info }}</td>
+                  <td>{{ row.val|linebreaks }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
       </div>
     </div>
     <script>

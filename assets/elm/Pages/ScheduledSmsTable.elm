@@ -1,9 +1,10 @@
 module Pages.ScheduledSmsTable exposing (view)
 
+import Css
 import Data exposing (QueuedSms, Recipient, RecipientGroup)
 import Date
 import FilteringTable as FT
-import Html exposing (Html, a, div, td, text, th, thead, tr)
+import Html exposing (Html)
 import Html.Attributes as A
 import Html.Events exposing (onClick)
 import RemoteList as RL
@@ -31,17 +32,15 @@ view props =
         |> FT.defaultTable { top = props.tableMsg } tableHead props.tableModel (smsRow props)
 
 
-tableHead : Html msg
+tableHead : FT.Head
 tableHead =
-    thead []
-        [ tr []
-            [ th [] [ text "Queued By" ]
-            , th [] [ text "Recipient" ]
-            , th [] [ text "Group" ]
-            , th [] [ text "Message" ]
-            , th [] [ text "Scheduled Time" ]
-            , th [] []
-            ]
+    FT.Head
+        [ "Queued By"
+        , "Recipient"
+        , "Group"
+        , "Message"
+        , "Scheduled Time"
+        , ""
         ]
 
 
@@ -55,34 +54,34 @@ onlyFuture t sms =
             False
 
 
-smsRow : Props msg -> QueuedSms -> ( String, Html msg )
+smsRow : Props msg -> QueuedSms -> FT.Row msg
 smsRow props sms =
     let
         style =
             case sms.failed of
                 True ->
-                    [ ( "background", "var(--color-red)" ) ]
+                    [ Css.bg_red ]
 
                 False ->
                     []
     in
-    ( toString sms.pk
-    , tr [ A.style style ]
-        [ td [] [ text sms.sent_by ]
-        , td [] [ props.contactLink sms.recipient ]
-        , td [] [ groupLink props sms.recipient_group ]
-        , td [] [ text sms.content ]
-        , td [] [ text sms.time_to_send_formatted ]
-        , td [] [ cancelButton props sms ]
+    FT.Row
+        style
+        [ FT.Cell [] [ Html.text sms.sent_by ]
+        , FT.Cell [] [ props.contactLink sms.recipient ]
+        , FT.Cell [] [ groupLink props sms.recipient_group ]
+        , FT.Cell [] [ Html.text sms.content ]
+        , FT.Cell [ Css.collapsing ] [ Html.text sms.time_to_send_formatted ]
+        , FT.Cell [ Css.collapsing ] [ cancelButton props sms ]
         ]
-    )
+        (toString sms.pk)
 
 
 groupLink : Props msg -> Maybe RecipientGroup -> Html msg
 groupLink props group =
     case group of
         Nothing ->
-            div [] []
+            Html.div [] []
 
         Just g ->
             props.groupLink g
@@ -90,9 +89,10 @@ groupLink props group =
 
 cancelButton : Props msg -> QueuedSms -> Html msg
 cancelButton props sms =
-    a
-        [ A.class "button button-danger"
-        , onClick (props.cancelSms sms.pk)
+    Html.a
+        [ onClick (props.cancelSms sms.pk)
         , A.id "cancelSmsButton"
+        , Css.btn
+        , Css.btn_red
         ]
-        [ text "Cancel" ]
+        [ Html.text "Cancel" ]

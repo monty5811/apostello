@@ -1,10 +1,11 @@
-module Pages.Fragments.SidePanel exposing (update, view)
+module Pages.Fragments.ActionsPanel exposing (update, view)
 
+import Css
 import Data exposing (Keyword)
 import DjangoSend exposing (CSRFToken, archivePost)
 import Helpers exposing (decodeAlwaysTrue)
 import Html exposing (..)
-import Html.Attributes as A exposing (class, href, id)
+import Html.Attributes as A exposing (href)
 import Html.Events exposing (onClick)
 import Http
 import Messages exposing (..)
@@ -23,7 +24,7 @@ import Urls as U
 -- Update
 
 
-update : SidePanelMsg -> Model -> ( Model, List (Cmd Msg) )
+update : ActionsPanelMsg -> Model -> ( Model, List (Cmd Msg) )
 update msg model =
     case msg of
         ArchiveItem redirectUrl url isArchived ->
@@ -39,16 +40,16 @@ update msg model =
 archiveItem : CSRFToken -> String -> String -> Bool -> Cmd Msg
 archiveItem csrf redirectUrl url isArchived =
     archivePost csrf url isArchived decodeAlwaysTrue
-        |> Http.send (SidePanelMsg << ReceiveArchiveResp redirectUrl)
+        |> Http.send (ActionsPanelMsg << ReceiveArchiveResp redirectUrl)
 
 
 
 -- View
 
 
-view : DataStore -> Page -> Bool -> Html Msg
+view : DataStore -> Page -> Bool -> List (Html Msg)
 view ds page canArchive =
-    Html.nav [ id "nav" ] (fabLinks ds page canArchive)
+    fabLinks ds page canArchive
 
 
 fabLinks : DataStore -> Page -> Bool -> List (Html Msg)
@@ -241,12 +242,12 @@ fabLinks ds page canArchive =
 
 fabLink : String -> String -> Html Msg
 fabLink uri linkText =
-    a [ href uri ] [ text linkText ]
+    a [ href uri, Css.flex_1, Css.btn, Css.btn_purple, Css.text_sm, Css.inline_block ] [ text linkText ]
 
 
 fabSpaLink : Page -> String -> Html Msg
 fabSpaLink page linkText =
-    spaLink a [] [ text linkText ] page
+    spaLink Html.button [ Css.flex_1, Css.btn, Css.btn_purple, Css.text_sm ] [ text linkText ] page
 
 
 
@@ -263,29 +264,35 @@ archiveButton page url maybeIsArchived canArchive =
         True ->
             case maybeIsArchived of
                 Nothing ->
-                    div [ class "button button-secondary" ] [ text "Loading..." ]
+                    div [ Css.flex_1 ] [ text "..." ]
 
                 Just isArchived ->
                     let
                         clickAction =
-                            SidePanelMsg <| ArchiveItem (page2loc page) url isArchived
+                            ActionsPanelMsg <| ArchiveItem (page2loc page) url isArchived
                     in
                     case isArchived of
                         True ->
                             Html.button
-                                [ class "button-success"
-                                , A.type_ "button"
+                                [ A.type_ "button"
                                 , onClick clickAction
                                 , A.id "restoreItemButton"
+                                , Css.btn
+                                , Css.btn_green
+                                , Css.text_sm
+                                , Css.flex_1
                                 ]
                                 [ text "Restore" ]
 
                         False ->
                             Html.button
-                                [ class "button-danger"
-                                , A.type_ "button"
+                                [ A.type_ "button"
                                 , onClick clickAction
                                 , A.id "archiveItemButton"
+                                , Css.btn
+                                , Css.btn_red
+                                , Css.text_sm
+                                , Css.flex_1
                                 ]
                                 [ text "Remove" ]
 

@@ -1,4 +1,4 @@
-{% extends 'account/base_apsotello.html' %}
+{% extends 'account/base_apostello.html' %}
 {% load i18n %}
 {% load account socialaccount %}
 {% load staticfiles %}
@@ -6,7 +6,7 @@
 {% block content %}
 {% get_providers as socialaccount_providers %}
 
-<h3>{% trans "Sign In" %}</h3>
+<h3 class="mb-4">{% trans "Sign In" %}</h3>
 {% if DISPLAY_GOOGLE_LOGIN %}
 <a href="/accounts/google/login/?next=%2F&process=login"><img src="{% static 'images/goog_login.png' %}" height="46" alt="Google"></a>
 {% endif %}
@@ -16,17 +16,27 @@
 {% endif %}
 <form method="POST" action="{% url 'account_login' %}">
   {% csrf_token %}
-  {{ form.as_p }}
+  {% for field in form %}
+     <label class="{{ form.label_class }}"
+            for="{{ field.name }}">{{ field.label }}</label>
+     {{ field }}
+  {% endfor %}
   {% if redirect_field_value %}
   <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
   {% endif %}
-  <button type="submit" id="login_button" class="button button-dark">{% trans "Sign In" %}</button>
-  <br><br>
-  <p><a href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a></p>
-<p>{% blocktrans %}If you have not yet created an account, please
+  <div class="flex items-center justify-between my-4">
+  <button class="btn btn-purple"
+        type="submit" id="login_button">
+        {% trans "Sign In" %}
+  </button>
+  <a class="inline-block align-baseline font-bold text-sm" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+  </div>
+<p class="text-sm">{% blocktrans %}If you have not yet created an account, please
 <a href="{{ signup_url }}">sign up</a> first.{% endblocktrans %}</p>
 </form>
 {% endif %}
+{% endblock %}
+{% block cookie_banner %}
 {% cookielaw_banner %}
 <script src="{% static 'cookielaw/js/cookielaw.js' %}"></script>
 {% endblock %}

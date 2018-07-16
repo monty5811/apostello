@@ -62,18 +62,15 @@ LOGGING = {
 }
 
 if ROLLBAR_ACCESS_TOKEN is not None:
-    MIDDLEWARE = ['rollbar.contrib.django.middleware.RollbarNotifierMiddleware', ] + MIDDLEWARE
+    MIDDLEWARE = [
+        'rollbar.contrib.django.middleware.RollbarNotifierMiddleware',
+    ] + MIDDLEWARE
 
     ROLLBAR = {
         'access_token': ROLLBAR_ACCESS_TOKEN,
         'environment': 'development' if DEBUG else 'production',
         'branch': 'master',
-        'root':  os.path.join(BASE_DIR, '..'),
+        'root': os.path.join(BASE_DIR, '..'),
     }
 
-    Q_CLUSTER['error_reporter'] = {
-        'rollbar': {
-            'access_token': ROLLBAR_ACCESS_TOKEN,
-            'environment': 'Django-Q'
-        }
-    }
+    Q_CLUSTER['error_reporter'] = {'rollbar': {'access_token': ROLLBAR_ACCESS_TOKEN, 'environment': 'Django-Q'}}

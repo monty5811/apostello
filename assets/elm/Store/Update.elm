@@ -194,7 +194,7 @@ handleLoadingFailed dt err model =
     in
     ( { model
         | dataStore = handleFailed dt niceMsg model.dataStore
-        , notifications = Notif.createLoadingFailed niceMsg model.notifications
+        , notifications = Notif.addLoadingFailed niceMsg model.notifications
       }
     , []
     )

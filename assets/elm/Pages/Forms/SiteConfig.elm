@@ -9,8 +9,6 @@ import Forms.View as FV
 import Helpers exposing (toggleSelectedPk)
 import Html exposing (Html)
 import Html.Attributes as A
-import Html.Events as E
-import Html.Keyed
 import Http
 import Json.Decode as Decode
 import Json.Decode.Extra exposing (date)
@@ -294,7 +292,7 @@ fieldsHelp msgs groups model =
     , FieldGroup
         { defaultFieldGroupConfig
             | header = Just "Sending Email Settings"
-            , sideBySide = Just 2
+            , sideBySide = Just 3
             , helpText = Just <| debugHelpText
         }
         [ Field meta.email_host (emailHostField msgs model)
@@ -414,36 +412,22 @@ updateExpDate msgs state maybeDate =
 
 groupLabelView : Messages msg -> Maybe (List Int) -> RecipientGroup -> Html msg
 groupLabelView msgs maybePks group =
-    Html.div
-        [ A.class "badge"
-        , A.style [ ( "user-select", "none" ) ]
-        , E.onClick <| msgs.form <| UpdateAutoAddGroupsField group.pk
-        ]
-        [ Html.text group.name ]
+    FV.multiSelectItemLabelHelper
+        .name
+        (msgs.form <| UpdateAutoAddGroupsField group.pk)
+        group
 
 
 groupView : Messages msg -> Maybe (List Int) -> RecipientGroup -> Html msg
 groupView msgs maybeSelectedPks group =
-    let
-        selectedPks =
-            case maybeSelectedPks of
-                Nothing ->
-                    []
-
-                Just pks ->
-                    pks
-    in
-    Html.Keyed.node "div"
-        [ A.class "item", E.onClick <| msgs.form <| UpdateAutoAddGroupsField group.pk ]
-        [ ( toString group.pk, groupViewHelper selectedPks group ) ]
-
-
-groupViewHelper : List Int -> RecipientGroup -> Html msg
-groupViewHelper selectedPks group =
-    Html.div [ A.style [ ( "color", "#000" ) ] ]
-        [ FV.selectedIcon selectedPks group
-        , Html.text group.name
-        ]
+    FV.multiSelectItemHelper
+        { itemToStr = .name
+        , maybeSelectedPks = maybeSelectedPks
+        , itemToKey = .pk >> toString
+        , toggleMsg = msgs.form << UpdateAutoAddGroupsField
+        , itemToId = .pk >> toString >> (++) "group"
+        }
+        group
 
 
 slackField : Messages msg -> Model -> (FieldMeta -> List (Html msg))

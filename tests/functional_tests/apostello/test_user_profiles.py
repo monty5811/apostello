@@ -21,7 +21,7 @@ class TestUserProfiles:
 
         # check table is there
         def _test1():
-            tables = browser_in.find_elements_by_class_name('table-bordered')
+            tables = browser_in.find_elements_by_css_selector('table')
             assert len(tables) == 1
             table = tables[0]
             assert 'Approved' in table.text

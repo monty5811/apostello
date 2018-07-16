@@ -30,11 +30,8 @@ def click_send(b, wt):
     return b
 
 
-def add_recipient(b, wt):
-    for x in b.find_elements_by_id('contactItem'):
-        if x.text == 'John Calvin':
-            recipient = x
-            break
+def add_recipient(b, wt, pk):
+    recipient = b.find_element_by_id(f'contact{pk}')
     click_and_wait(recipient, wt)
     return b
 
@@ -70,9 +67,9 @@ def add_scheduled_time(b, wt):
     return b
 
 
-def add_content_and_recipient(b, wt):
+def add_content_and_recipient(b, wt, pk):
     b = add_content(b, wt)
-    b = add_recipient(b, wt)
+    b = add_recipient(b, wt, pk)
     return b
 
 
@@ -99,7 +96,7 @@ class TestSendAdhoc():
     def test_good_form(self, live_server, browser_in, users, driver_wait_time, recipients):
         """Test good form submission."""
         b = load_page(browser_in, driver_wait_time, live_server + ADHOC_URI)
-        b = add_content_and_recipient(b, driver_wait_time)
+        b = add_content_and_recipient(b, driver_wait_time, recipients['calvin'].pk)
         b = click_send(b, driver_wait_time)
 
         assert 'Please check the logs for verification' in b.page_source
@@ -111,7 +108,7 @@ class TestSendAdhoc():
         b = load_page(browser_in, driver_wait_time, live_server + ADHOC_URI)
         # add scheduled time
         b = add_scheduled_time(b, driver_wait_time)
-        b = add_content_and_recipient(b, driver_wait_time)
+        b = add_content_and_recipient(b, driver_wait_time, recipients['calvin'].pk)
         b = click_send(b, driver_wait_time)
 
         def _test():
@@ -127,7 +124,7 @@ class TestSendAdhoc():
         user_profile.save()
 
         b = load_page(browser_in, driver_wait_time, live_server + ADHOC_URI)
-        b = add_content_and_recipient(b, driver_wait_time)
+        b = add_content_and_recipient(b, driver_wait_time, recipients['calvin'].pk)
         b = click_send(b, driver_wait_time)
 
         assert 'cost no more than' in b.page_source
@@ -140,7 +137,7 @@ class TestSendAdhoc():
         s.sms_char_limit = 2
         s.save()
         b = load_page(browser_in, driver_wait_time, live_server + ADHOC_URI)
-        b = add_content_and_recipient(b, driver_wait_time)
+        b = add_content_and_recipient(b, driver_wait_time, recipients['calvin'].pk)
         b = click_send(b, driver_wait_time)
 
         assert 'You have exceeded' in b.page_source

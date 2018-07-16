@@ -1,7 +1,10 @@
 module FilteringTable
     exposing
-        ( Model
+        ( Cell
+        , Head
+        , Model
         , Msg
+        , Row
         , defaultTable
         , filterInput
         , filterRecord
@@ -11,6 +14,7 @@ module FilteringTable
         , update
         )
 
+import Css
 import Html exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
@@ -35,6 +39,23 @@ initialModel =
     { filter = Regex.regex ""
     , page = 1
     }
+
+
+type alias Row msg =
+    { classes : List (Html.Attribute msg)
+    , cells : List (Cell msg)
+    , key : String
+    }
+
+
+type alias Cell msg =
+    { classes : List (Html.Attribute msg)
+    , content : List (Html msg)
+    }
+
+
+type alias Head =
+    { headings : List String }
 
 
 
@@ -79,12 +100,12 @@ textToRegex t =
 
 emptyView : Html msg
 emptyView =
-    Html.div [ A.class "alert alert-info" ] [ Html.text "No data to display" ]
+    Html.div [ Css.px_4, Css.py_3, Css.bg_blue, Css.text_white ] [ Html.text "No data to display" ]
 
 
-defaultTable : Messages msg -> Html msg -> Model -> (a -> ( String, Html msg )) -> RL.RemoteList a -> Html msg
+defaultTable : Messages msg -> Head -> Model -> (a -> Row msg) -> RL.RemoteList a -> Html msg
 defaultTable msgs tableHead tableModel rowConstructor data =
-    table msgs "" tableHead tableModel rowConstructor data
+    table msgs [] tableHead tableModel rowConstructor data
 
 
 type alias Messages msg =
@@ -92,8 +113,8 @@ type alias Messages msg =
     }
 
 
-table : Messages msg -> String -> Html msg -> Model -> (a -> ( String, Html msg )) -> RL.RemoteList a -> Html msg
-table msgs tableClass tableHead model rowConstructor data =
+table : Messages msg -> List (Html.Attribute msg) -> Head -> Model -> (a -> Row msg) -> RL.RemoteList a -> Html msg
+table msgs tableAttrs tableHead model rowConstructor data =
     let
         items =
             RL.toList data
@@ -123,14 +144,30 @@ table msgs tableClass tableHead model rowConstructor data =
                     emptyView
 
         _ ->
-            Html.div [ A.class "xOverflow" ]
+            Html.div []
                 [ filterInput (msgs.top << UpdateFilter)
-                , Html.table [ A.class tableClass ]
-                    [ tableHead
-                    , Html.Keyed.node "tbody" [] (getPage curPage pages |> List.map rowConstructor)
+                , Html.table tableAttrs
+                    [ head tableHead
+                    , Html.Keyed.node "tbody" [] (getPage curPage pages |> List.map (rowConstructor >> row))
                     ]
                 , pageControls msgs curPage numPages
                 ]
+
+
+row : Row msg -> ( String, Html msg )
+row r =
+    ( r.key, Html.tr ([] ++ r.classes) (List.map cell r.cells) )
+
+
+cell : Cell msg -> Html msg
+cell c =
+    Html.td c.classes c.content
+
+
+head : Head -> Html msg
+head h =
+    Html.thead [ Css.text_left ]
+        [ Html.tr [] <| List.map (Html.text >> List.singleton >> Html.th []) h.headings ]
 
 
 filterInput : (String -> msg) -> Html msg
@@ -138,8 +175,8 @@ filterInput msg =
     Html.input
         [ A.type_ "text"
         , A.placeholder "Filter..."
-        , A.style [ ( "margin-bottom", "1rem" ) ]
         , E.onInput msg
+        , Css.filterBox
         ]
         []
 
@@ -162,7 +199,7 @@ pageControls msgs page numPages =
             Html.text ""
 
         False ->
-            Html.div [] <|
+            Html.div [ Css.p_4, Css.flex ] <|
                 buttons msgs page numPages
 
 
@@ -203,7 +240,7 @@ leftButtons msgs curPage =
     if curPage == 2 then
         [ Html.text "" ]
     else
-        [ Html.div [ A.class "button", A.disabled True ] [ Html.text "..." ]
+        [ Html.div [ Css.py_2, Css.px_4, A.disabled True ] [ Html.text "..." ]
         , pageButton msgs (curPage - 1) curPage
         ]
 
@@ -214,7 +251,7 @@ rightButtons msgs curPage numPages =
         [ Html.text "" ]
     else
         [ pageButton msgs (curPage + 1) curPage
-        , Html.div [ A.class "button", A.disabled True ] [ Html.text "..." ]
+        , Html.div [ Css.py_2, Css.px_4, A.disabled True ] [ Html.text "..." ]
         ]
 
 
@@ -224,10 +261,10 @@ prevButton msgs curPage =
         attrs =
             case curPage == 1 of
                 True ->
-                    [ A.class "button button-white", A.disabled True ]
+                    [ Css.border_2, Css.py_2, Css.px_4, A.disabled True ]
 
                 False ->
-                    [ A.class "button button-white", A.disabled False, E.onClick <| msgs.top <| GoToPage <| curPage - 1 ]
+                    [ Css.border_2, Css.py_2, Css.px_4, A.disabled False, E.onClick <| msgs.top <| GoToPage <| curPage - 1 ]
     in
     Html.button attrs [ Html.i [ A.class "fa fa-chevron-left" ] [] ]
 
@@ -238,10 +275,10 @@ nextButton msgs curPage numPages =
         attrs =
             case curPage == numPages of
                 True ->
-                    [ A.class "button button-white", A.disabled True ]
+                    [ Css.border_2, Css.py_2, Css.px_4, A.disabled True ]
 
                 False ->
-                    [ A.class "button button-white", E.onClick <| msgs.top <| GoToPage <| curPage + 1 ]
+                    [ Css.border_2, Css.py_2, Css.px_4, E.onClick <| msgs.top <| GoToPage <| curPage + 1 ]
     in
     Html.button attrs [ Html.i [ A.class "fa fa-chevron-right" ] [] ]
 
@@ -252,12 +289,20 @@ pageButton msgs goToPage curPage =
         class =
             case curPage == goToPage of
                 True ->
-                    "button"
+                    [ Css.text_purple, Css.select_none ]
 
                 False ->
-                    "button button-white"
+                    [ Css.text_black, Css.cursor_pointer ]
     in
-    Html.a [ A.class class, E.onClick <| msgs.top <| GoToPage goToPage ] [ Html.text (toString goToPage) ]
+    Html.a
+        (class
+            ++ [ Css.border_2
+               , Css.py_2
+               , Css.px_4
+               , E.onClick <| msgs.top <| GoToPage goToPage
+               ]
+        )
+        [ Html.text (toString goToPage) ]
 
 
 clampPage : Int -> Int -> Int

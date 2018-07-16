@@ -8,9 +8,9 @@ port module WebPush
         , view
         )
 
+import Css
 import DjangoSend exposing (CSRFToken, post)
 import Html exposing (Html)
-import Html.Attributes as A
 import Html.Events as E
 import Http
 import Json.Decode as Decode
@@ -79,16 +79,16 @@ removeId csrftoken endpoint =
 
 view : Model -> List (Html Msg)
 view model =
-    [ Html.div [] [ Html.text <| header model ]
+    [ Html.div [ Css.ml_2 ] [ Html.text <| header model ]
     , case model of
         Unknown ->
-            button CheckSubscribed "button-secondary" "Click to check"
+            button CheckSubscribed Css.btn_grey "Click to check"
 
         Subscribed ->
-            button Unregister "button-info" "Click to stop"
+            button Unregister Css.btn_purple "Click to stop"
 
         NotSubscribed ->
-            button Register "button-info" "Click to start"
+            button Register Css.btn_purple "Click to start"
 
         NoSupport ->
             Html.text ""
@@ -117,11 +117,13 @@ header m =
             "Error! Reload and try again."
 
 
-button : Msg -> String -> String -> Html Msg
+button : Msg -> Html.Attribute Msg -> String -> Html Msg
 button msg colour text =
     Html.button
-        [ A.class <| "button " ++ colour
-        , E.onClick msg
+        [ E.onClick msg
+        , Css.btn
+        , colour
+        , Css.ml_2
         ]
         [ Html.text text ]
 

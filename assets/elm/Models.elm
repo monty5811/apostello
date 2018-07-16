@@ -1,7 +1,6 @@
 module Models
     exposing
         ( Flags
-        , MenuModel(..)
         , Model
         , Settings
         , TwilioSettings
@@ -35,7 +34,6 @@ type alias Model =
     , currentTime : Time.Time
     , formStatus : FormStatus
     , webPush : WebPush.Model
-    , menuState : MenuModel
     , pageVisibility : PageVisibility.Visibility
     }
 
@@ -50,7 +48,6 @@ initialModel settings page =
     , currentTime = 0
     , formStatus = NoAction
     , webPush = WebPush.initial
-    , menuState = MenuHidden
     , pageVisibility = PageVisibility.Visible -- default to visible, perhaps, should do something more sophisticated on init
     }
 
@@ -108,12 +105,3 @@ decodeFlags : Decode.Decoder Flags
 decodeFlags =
     decode Flags
         |> required "settings" decodeSettings
-
-
-
--- Menu model
-
-
-type MenuModel
-    = MenuHidden
-    | MenuVisible

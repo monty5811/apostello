@@ -4,8 +4,7 @@ from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from solo.models import SingletonModel
 
-from apostello.validators import (less_than_sms_char_limit,
-                                  validate_starts_with_plus)
+from apostello.validators import (less_than_sms_char_limit, validate_starts_with_plus)
 
 
 class ConfigurationError(Exception):
@@ -152,12 +151,7 @@ class SiteConfiguration(SingletonModel):
         cache.delete('twilio_settings')
 
     def is_twilio_setup(self):
-        vals = [
-            self.twilio_account_sid,
-            self.twilio_auth_token,
-            self.twilio_from_num,
-            self.twilio_sending_cost
-        ]
+        vals = [self.twilio_account_sid, self.twilio_auth_token, self.twilio_from_num, self.twilio_sending_cost]
         return all([x is not None for x in vals])
 
     def is_email_setup(self):

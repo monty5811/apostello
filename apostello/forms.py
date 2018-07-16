@@ -4,6 +4,7 @@ from django.forms import ModelMultipleChoiceField
 
 from apostello.models import Keyword, Recipient, RecipientGroup, UserProfile
 from apostello.validators import gsm_validator, less_than_sms_char_limit
+import allauth.account.forms
 
 
 class SendAdhocRecipientsForm(forms.Form):
@@ -50,6 +51,7 @@ class SendRecipientGroupForm(forms.Form):
         queryset=RecipientGroup.objects.filter(is_archived=False),
         required=True,
         empty_label='Choose a group...',
+        label="Recipient Group",
     )
     scheduled_time = forms.DateTimeField(
         required=False,
@@ -153,3 +155,61 @@ class GroupAllCreateForm(forms.Form):
         max_length=150,
         label='Group Name',
     )
+
+
+class TailwindForm():
+    def add_classes(self, skip_fields=['remember']):
+        for field_name in self.fields:
+            if field_name not in skip_fields:
+                self.fields[field_name].widget.attrs['class'] = 'formInput'
+
+        self.label_class = 'label'
+
+
+class LoginForm(allauth.account.forms.LoginForm, TailwindForm):
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(LoginForm, self).__init__(*args, **kwargs)
+        self.add_classes()
+
+
+class SignupForm(allauth.account.forms.SignupForm, TailwindForm):
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(SignupForm, self).__init__(*args, **kwargs)
+        self.add_classes()
+
+
+class AddEmailForm(allauth.account.forms.AddEmailForm, TailwindForm):
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(AddEmailForm, self).__init__(*args, **kwargs)
+        self.add_classes()
+
+
+class ChangePasswordForm(allauth.account.forms.ChangePasswordForm, TailwindForm):
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(ChangePasswordForm, self).__init__(*args, **kwargs)
+        self.add_classes()
+
+
+class SetPasswordForm(allauth.account.forms.SetPasswordForm, TailwindForm):
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(SetPasswordForm, self).__init__(*args, **kwargs)
+        self.add_classes()
+
+
+class ResetPasswordForm(allauth.account.forms.ResetPasswordForm, TailwindForm):
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(ResetPasswordForm, self).__init__(*args, **kwargs)
+        self.add_classes()
+
+
+class ResetPasswordKeyForm(allauth.account.forms.ResetPasswordKeyForm, TailwindForm):
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(ResetPasswordKeyForm, self).__init__(*args, **kwargs)
+        self.add_classes()

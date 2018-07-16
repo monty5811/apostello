@@ -1,10 +1,10 @@
 module Pages.RecipientTable exposing (view)
 
+import Css
 import Data exposing (Recipient)
 import FilteringTable as FT
 import Helpers exposing (archiveCell, formatDate)
-import Html exposing (Html, div, td, text, th, thead, tr)
-import Html.Attributes as A
+import Html exposing (Html)
 import RemoteList as RL
 
 
@@ -19,31 +19,22 @@ type alias Props msg =
 
 view : Props msg -> Html msg
 view props =
-    let
-        head =
-            thead []
-                [ tr []
-                    [ th [] [ text "Name" ]
-                    , th [] [ text "Last Message" ]
-                    , th [] [ text "Received" ]
-                    , th [ A.class "hide-sm-down" ] []
-                    ]
-                ]
-    in
     FT.defaultTable { top = props.tableMsg } head props.tableModel (recipientRow props) props.recipients
 
 
-recipientRow : Props msg -> Recipient -> ( String, Html msg )
+head : FT.Head
+head =
+    FT.Head
+        [ "Name"
+        , "Last Message"
+        , "Received"
+        , ""
+        ]
+
+
+recipientRow : Props msg -> Recipient -> FT.Row msg
 recipientRow props recipient =
     let
-        style =
-            case recipient.is_blocking of
-                True ->
-                    [ ( "background", "var(--color-red)" ) ]
-
-                False ->
-                    []
-
         timeReceived =
             Maybe.andThen .time_received recipient.last_sms
 
@@ -55,24 +46,35 @@ recipientRow props recipient =
                 Nothing ->
                     ""
     in
-    ( toString recipient.pk
-    , tr [ A.style style ]
-        [ td []
+    FT.Row
+        []
+        [ FT.Cell []
             [ props.contactLink recipient
             , doNotReplyIndicator recipient.do_not_reply
+            , blockingIndicator recipient.is_blocking
             ]
-        , td [] [ text content ]
-        , td [] [ text <| formatDate timeReceived ]
-        , archiveCell recipient.is_archived (props.toggleRecipientArchive recipient.is_archived recipient.pk)
+        , FT.Cell [] [ Html.text content ]
+        , FT.Cell [] [ Html.text <| formatDate timeReceived ]
+        , FT.Cell [ Css.collapsing ] [ archiveCell recipient.is_archived (props.toggleRecipientArchive recipient.is_archived recipient.pk) ]
         ]
-    )
+        (toString recipient.pk)
 
 
 doNotReplyIndicator : Bool -> Html msg
 doNotReplyIndicator reply =
     case reply of
         True ->
-            div [ A.class "badge badge-danger" ] [ text "No Reply" ]
+            Html.span [ Css.pill_sm, Css.pill_orange, Css.displayInline ] [ Html.text "Do Not Reply" ]
 
         False ->
-            text ""
+            Html.text ""
+
+
+blockingIndicator : Bool -> Html msg
+blockingIndicator blocking =
+    case blocking of
+        True ->
+            Html.span [ Css.pill_sm, Css.pill_red, Css.displayInline ] [ Html.text "Blocked Us" ]
+
+        False ->
+            Html.text ""

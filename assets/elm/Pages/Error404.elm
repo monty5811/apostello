@@ -1,9 +1,8 @@
 module Pages.Error404 exposing (view)
 
-import Html exposing (Html, div, text)
-import Html.Attributes as A
+import Html exposing (Html)
 
 
 view : Html msg
 view =
-    div [ A.class "alert alert-warning" ] [ text "Uh, oh! That page doesn't exist..." ]
+    Html.div [] [ Html.text "Uh, oh! That page doesn't exist..." ]

@@ -1,10 +1,10 @@
 module Pages.GroupTable exposing (view)
 
+import Css
 import Data exposing (RecipientGroup)
 import FilteringTable as FT
 import Helpers exposing (archiveCell)
-import Html exposing (Html, td, text, th, thead, tr)
-import Html.Attributes as A
+import Html exposing (Html)
 import RemoteList as RL
 import Round
 
@@ -26,25 +26,22 @@ view props =
     FT.defaultTable { top = props.tableMsg } tableHead props.tableModel (groupRow props) props.groups
 
 
-tableHead : Html msg
+tableHead : FT.Head
 tableHead =
-    thead []
-        [ tr []
-            [ th [] [ text "Name" ]
-            , th [ A.class "hide-sm-down" ] [ text "Description" ]
-            , th [] [ text "Cost" ]
-            , th [ A.class "hide-sm-down" ] []
-            ]
+    FT.Head
+        [ "Name"
+        , "Description"
+        , "Cost"
+        , ""
         ]
 
 
-groupRow : Props msg -> RecipientGroup -> ( String, Html msg )
+groupRow : Props msg -> RecipientGroup -> FT.Row msg
 groupRow props group =
-    ( toString group.pk
-    , tr []
-        [ td [] [ props.groupFormLink group ]
-        , td [ A.class "hide-sm-down" ] [ text group.description ]
-        , td [] [ text ("$" ++ Round.round 2 group.cost) ]
-        , archiveCell group.is_archived (props.toggleArchiveGroup group.is_archived group.pk)
+    FT.Row []
+        [ FT.Cell [] [ props.groupFormLink group ]
+        , FT.Cell [] [ Html.text group.description ]
+        , FT.Cell [ Css.collapsing ] [ Html.text ("$" ++ Round.round 2 group.cost) ]
+        , FT.Cell [ Css.collapsing ] [ archiveCell group.is_archived (props.toggleArchiveGroup group.is_archived group.pk) ]
         ]
-    )
+        (toString group.pk)

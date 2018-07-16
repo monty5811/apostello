@@ -3,7 +3,7 @@ module Update exposing (update)
 import FilteringTable as FT
 import Forms.Update as F
 import Messages exposing (..)
-import Models exposing (MenuModel(MenuHidden, MenuVisible), Model, Settings, TwilioSettings)
+import Models exposing (Model, Settings, TwilioSettings)
 import Navigation
 import Notification as Notif
 import PageVisibility
@@ -13,10 +13,11 @@ import Pages.Debug as DG
 import Pages.ElvantoImport as ElvImp
 import Pages.FirstRun as FR
 import Pages.Forms.SiteConfig as SCF
-import Pages.Fragments.SidePanel as SidePanel
+import Pages.Fragments.ActionsPanel as ActionsPanel
 import Pages.GroupComposer as GC
 import Pages.KeyRespTable as KRT
-import Route exposing (loc2Page)
+import Ports
+import Route exposing (loc2Page, page2loc)
 import Store.Model as Store
 import Store.Optimistic
 import Store.Request exposing (maybeFetchData)
@@ -49,18 +50,12 @@ updateHelper msg model =
             { model | settings = updateSettings scData model.settings }
                 |> F.update formMsg
 
-        ToggleMenu ->
-            case model.menuState of
-                MenuHidden ->
-                    ( { model | menuState = MenuVisible }, [] )
-
-                MenuVisible ->
-                    ( { model | menuState = MenuHidden }, [] )
+        ScrollToId id ->
+            ( model, [ scrollTo id ] )
 
         NewUrl str ->
             ( { model
                 | notifications = Notif.empty
-                , menuState = MenuHidden
               }
             , [ Navigation.newUrl str ]
             )
@@ -79,7 +74,7 @@ updateHelper msg model =
             ( newModel
             , List.concat
                 [ List.map (Cmd.map StoreMsg) storeCmds
-                , [ pageCmd ]
+                , [ scrollTo "elmContainer", pageCmd ]
                 ]
             )
 
@@ -94,8 +89,8 @@ updateHelper msg model =
         FormMsg subMsg ->
             F.update subMsg model
 
-        SidePanelMsg subMsg ->
-            SidePanel.update subMsg model
+        ActionsPanelMsg subMsg ->
+            ActionsPanel.update subMsg model
 
         NotificationMsg subMsg ->
             ( { model | notifications = Notif.update subMsg model.notifications }, [] )
@@ -211,14 +206,6 @@ updateHelper msg model =
                     , List.map (Cmd.map StoreMsg) storeCmds
                     )
 
-        KeyPressed keyCode ->
-            case ( model.menuState, keyCode ) of
-                ( MenuVisible, 27 ) ->
-                    ( { model | menuState = MenuHidden }, [] )
-
-                ( _, _ ) ->
-                    ( model, [] )
-
         WebPushMsg subMsg ->
             let
                 ( wpModel, wpCmd ) =
@@ -296,3 +283,8 @@ updateSettings newSCModel settings =
 isJust : Maybe a -> Bool
 isJust m =
     m /= Nothing
+
+
+scrollTo : String -> Cmd Msg
+scrollTo id =
+    Ports.scrollIntoView id

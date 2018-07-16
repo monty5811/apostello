@@ -147,6 +147,16 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = os.environ.get('ACCOUNT_DEFAULT_HTTP_PROTOCOL', 'https')
 WHITELISTED_LOGIN_DOMAINS = os.environ.get('WHITELISTED_LOGIN_DOMAINS', '').split(',')
 
+ACCOUNT_FORMS = {
+    'login': 'apostello.forms.LoginForm',
+    'signup': 'apostello.forms.SignupForm',
+    'add_email': 'apostello.forms.AddEmailForm',
+    'change_password': 'apostello.forms.ChangePasswordForm',
+    'set_password': 'apostello.forms.SetPasswordForm',
+    'reset_password': 'apostello.forms.ResetPasswordForm',
+    'reset_password_from_key': 'apostello.forms.ResetPasswordKeyForm',
+}
+
 LOGIN_REDIRECT_URL = '/'
 
 # Elvanto credentials

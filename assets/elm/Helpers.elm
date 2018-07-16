@@ -1,9 +1,10 @@
 module Helpers exposing (..)
 
+import Css
 import Date
 import DateFormat
-import Html exposing (Attribute, Html, a, td, text)
-import Html.Attributes exposing (class, id)
+import Html exposing (Attribute, Html, a, text)
+import Html.Attributes exposing (id)
 import Html.Events exposing (onWithOptions)
 import Json.Decode as Decode
 import List.Extra as LE
@@ -31,7 +32,7 @@ decodeAlwaysTrue =
 
 handleNotSaved : { a | notifications : Notif.Notifications } -> ( { a | notifications : Notif.Notifications }, List (Cmd msg) )
 handleNotSaved model =
-    ( { model | notifications = Notif.createNotSaved model.notifications }, [] )
+    ( { model | notifications = Notif.addNotSaved model.notifications }, [] )
 
 
 
@@ -74,9 +75,14 @@ calculateSmsCost smsCostPerMsg msg =
 
 archiveCell : Bool -> msg -> Html msg
 archiveCell isArchived msg =
-    td [ class "hide-sm-down" ]
-        [ a [ class "button button-secondary", onClick msg, id "archiveItemButton" ] [ text <| archiveText isArchived ]
+    a
+        [ Css.btn
+        , Css.btn_grey
+        , Css.text_sm
+        , onClick msg
+        , id "archiveItemButton"
         ]
+        [ text <| archiveText isArchived ]
 
 
 archiveText : Bool -> String

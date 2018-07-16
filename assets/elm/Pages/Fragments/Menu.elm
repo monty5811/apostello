@@ -1,10 +1,13 @@
 module Pages.Fragments.Menu exposing (allUsersMenuItems, menu)
 
-import Html exposing (Html, a, text)
-import Html.Attributes as A exposing (class, href)
-import Messages exposing (Msg(WebPushMsg))
+import Css
+import Html exposing (Html)
+import Html.Attributes as A
+import Html.Events as E
+import Messages exposing (Msg(ScrollToId, WebPushMsg))
 import Models exposing (Settings)
 import Pages exposing (Page(..), initSendAdhoc, initSendGroup)
+import Pages.Forms.ContactImport as CI
 import Pages.GroupComposer as GC
 import Route exposing (spaLink)
 import Urls
@@ -31,50 +34,51 @@ allUsersMenuItems settings wp =
         itemSpa =
             lockedSpaItem isStaff
     in
-    [ Html.div [ A.id "menu" ]
-        [ menuGroup "Keywords"
-            [ isStaff, userPerms.can_see_keywords ]
-            [ itemSpa (KeywordTable False) "Keywords" userPerms.can_see_keywords ]
-        , menuGroup "SMS"
-            [ isStaff, userPerms.can_send_sms, userPerms.can_see_incoming, userPerms.can_see_outgoing ]
-            [ itemSpa (initSendAdhoc Nothing Nothing) "Send to Individuals" userPerms.can_send_sms
-            , itemSpa (initSendGroup Nothing Nothing) "Send to a Group" userPerms.can_send_sms
-            , itemSpa InboundTable "Incoming SMS" userPerms.can_see_incoming
-            , itemSpa OutboundTable "Outgoing SMS" userPerms.can_see_outgoing
-            , itemSpa ScheduledSmsTable "Scheduled Messages" isStaff
-            ]
-        , menuGroup "Contacts"
-            [ isStaff, userPerms.can_see_contact_names, userPerms.can_see_groups ]
-            [ itemSpa (RecipientTable False) "Contacts" userPerms.can_see_contact_names
-            , itemSpa (GroupTable False) "Groups" userPerms.can_see_groups
-            , itemSpa (CreateAllGroup "") "Create \"all\" group" isStaff
-            , itemSpa (GroupComposer GC.initialModel) "Compose group" userPerms.can_see_groups
-            ]
-        , menuGroup "Settings"
-            [ isStaff ]
-            [ itemSpa (SiteConfigForm Nothing) "Site Configuration" isStaff
-            , itemSpa (DefaultResponsesForm Nothing) "Default Responses" isStaff
-            , itemSpa UserProfileTable "User Permissions" isStaff
-            ]
-        , menuGroup "Import"
-            [ isStaff, userPerms.can_import ]
-            [ itemSpa (ContactImport "") "CSV" userPerms.can_import
-            , itemSpa ElvantoImport "Elvanto" userPerms.can_import
-            ]
-        , menuGroup "Misc"
-            [ isStaff ]
-            [ itemSpa Usage "Usage Dashboard" isStaff
-            , item "/admin/" "Admin" isStaff
-            , itemSpa (ApiSetup Nothing) "API Setup" isStaff
-            ]
-        , menuGroup "Account"
-            [ True ]
-            [ lockedItem False Urls.account_change_password "Change Password" (not userPerms.user.is_social)
-            , item Urls.account_logout "Logout" True
-            ]
-        , menuGroup "Push Status" [ isStaff || userPerms.can_see_incoming ] <| pushMenu isStaff wp
+    [ menuGroup "Keywords"
+        [ isStaff, userPerms.can_see_keywords ]
+        [ itemSpa (KeywordTable False) "Keywords" userPerms.can_see_keywords ]
+    , menuGroup "SMS"
+        [ isStaff, userPerms.can_send_sms, userPerms.can_see_incoming, userPerms.can_see_outgoing ]
+        [ itemSpa (initSendAdhoc Nothing Nothing) "Send to Individuals" userPerms.can_send_sms
+        , itemSpa (initSendGroup Nothing Nothing) "Send to a Group" userPerms.can_send_sms
+        , itemSpa InboundTable "Incoming SMS" userPerms.can_see_incoming
+        , itemSpa OutboundTable "Outgoing SMS" userPerms.can_see_outgoing
+        , itemSpa ScheduledSmsTable "Scheduled Messages" isStaff
         ]
+    , menuGroup "Contacts"
+        [ isStaff, userPerms.can_see_contact_names, userPerms.can_see_groups ]
+        [ itemSpa (RecipientTable False) "Contacts" userPerms.can_see_contact_names
+        , itemSpa (GroupTable False) "Groups" userPerms.can_see_groups
+        , itemSpa (CreateAllGroup "") "Create \"all\" group" isStaff
+        , itemSpa (GroupComposer GC.initialModel) "Compose group" userPerms.can_see_groups
+        ]
+    , menuGroup "Settings"
+        [ isStaff ]
+        [ itemSpa (SiteConfigForm Nothing) "Site Configuration" isStaff
+        , itemSpa (DefaultResponsesForm Nothing) "Default Responses" isStaff
+        , itemSpa UserProfileTable "User Permissions" isStaff
+        ]
+    , menuGroup "Import"
+        [ isStaff, userPerms.can_import ]
+        [ itemSpa (ContactImport CI.initialModel) "CSV" userPerms.can_import
+        , itemSpa ElvantoImport "Elvanto" userPerms.can_import
+        ]
+    , menuGroup "Misc"
+        [ isStaff ]
+        [ itemSpa Usage "Usage Dashboard" isStaff
+        , item "/admin/" "Admin" isStaff
+        , itemSpa (ApiSetup Nothing) "API Setup" isStaff
+        ]
+    , menuGroup "Account"
+        [ True ]
+        [ lockedItem False Urls.account_change_password "Change Password" (not userPerms.user.is_social)
+        , item Urls.account_logout "Logout" True
+        ]
+    , menuGroup "Push Status" [ isStaff || userPerms.can_see_incoming ] <| pushMenu isStaff wp
     , twilioNumber <| Maybe.map .fromNumber settings.twilio
+    , Html.div [] []
+    , Html.div [] []
+    , backToTopButton
     ]
 
 
@@ -86,21 +90,31 @@ twilioNumber maybeNum =
 
         Just num ->
             Html.div
-                [ A.class "text-center"
-                , A.style
-                    [ ( "margin-right", "2rem" )
-                    , ( "margin-top", "2rem" )
-                    ]
+                [ Css.mt_4 ]
+                [ Html.text <| "Twilio Number: " ++ num
                 ]
-                [ text <| "Twilio Number: " ++ num
-                ]
+
+
+backToTopButton : Html Msg
+backToTopButton =
+    Html.div
+        [ E.onClick <| ScrollToId "elmContainer"
+        , Css.text_sm
+        , Css.select_none
+        , Css.cursor_pointer
+        , Css.lg__hidden
+        , Css.btn
+        , Css.btn_purple
+        , Css.ml_auto
+        ]
+        [ Html.text "Back to Top" ]
 
 
 menuGroup : String -> List Bool -> List (Html Msg) -> Html Msg
 menuGroup title perms items =
-    Html.div [ A.id "menuGroup" ]
+    Html.div [ A.id "menuGroup", Css.mt_4 ]
         [ header title perms
-        , Html.ul [] items
+        , Html.ul [ Css.list_reset ] items
         ]
 
 
@@ -112,7 +126,7 @@ pushMenu isStaff wp =
 header : String -> List Bool -> Html Msg
 header s check =
     if List.foldl (||) False check then
-        Html.h4 [ A.style [ ( "user-select", "none" ) ], class "text-left" ] [ text s ]
+        Html.h4 [] [ Html.text s ]
     else
         Html.text ""
 
@@ -121,17 +135,17 @@ lockedSpaItem : Bool -> Page -> String -> Bool -> Html Msg
 lockedSpaItem isStaff page desc perm =
     case isStaff || perm of
         True ->
-            Html.li [] [ spaLink a [] [ text desc ] page ]
+            Html.li [ Css.pl_2 ] [ spaLink Html.a [] [ Html.text desc ] page ]
 
         False ->
-            text ""
+            Html.text ""
 
 
 lockedItem : Bool -> String -> String -> Bool -> Html Msg
 lockedItem isStaff uri desc perm =
     case isStaff || perm of
         True ->
-            Html.li [] [ a [ href uri ] [ text desc ] ]
+            Html.li [ Css.pl_2 ] [ Html.a [ A.href uri ] [ Html.text desc ] ]
 
         False ->
-            text ""
+            Html.text ""

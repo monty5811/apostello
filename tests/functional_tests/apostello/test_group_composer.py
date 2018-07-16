@@ -21,9 +21,6 @@ class TestGroupComposer:
         # check input box is there
         input_ = browser_in.find_elements_by_id('queryInputBox')
         assert len(input_) == 1
-        # check reload button is there
-        reload_ = browser_in.find_elements_by_id('refreshButton')
-        assert len(reload_) == 1
         # check correct number of groups appear
         groups_ = browser_in.find_elements_by_id('groupRow')
         num_groups = 0

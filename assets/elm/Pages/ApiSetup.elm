@@ -1,5 +1,6 @@
 module Pages.ApiSetup exposing (Msg, update, view)
 
+import Css
 import DjangoSend exposing (CSRFToken, post)
 import Html exposing (Html)
 import Html.Attributes as A
@@ -75,12 +76,18 @@ view : Maybe String -> Html Msg
 view maybeApiKey =
     case maybeApiKey of
         Nothing ->
-            Html.div []
-                [ Html.button [ A.class "button", E.onClick Get, A.id "showKeyButton" ] [ Html.text "Show Key" ]
+            Html.div [ Css.m_4 ]
+                [ Html.button
+                    [ E.onClick Get
+                    , A.id "showKeyButton"
+                    , Css.btn
+                    , Css.btn_purple
+                    ]
+                    [ Html.text "Show Key" ]
                 ]
 
         Just apiKey ->
-            Html.div []
+            Html.div [ Css.m_4 ]
                 [ Html.p []
                     [ Html.text "For more details and help, please read the "
                     , Html.a [ A.href "https://apostello.readthedocs.io/en/latest/api.html" ] [ Html.text "docs" ]
@@ -88,7 +95,19 @@ view maybeApiKey =
                     ]
                 , Html.br [] []
                 , Html.p [] [ Html.text "API Token" ]
-                , Html.pre [] [ Html.text apiKey ]
-                , Html.button [ A.class "button button-success", E.onClick Generate, A.id "genKeyButton" ] [ Html.text "(Re)Generate Token" ]
-                , Html.button [ A.class "button button-danger", E.onClick Delete, A.id "delKeyButton" ] [ Html.text "Delete Token" ]
+                , Html.pre [ Css.my_2 ] [ Html.text apiKey ]
+                , Html.button
+                    [ E.onClick Generate
+                    , A.id "genKeyButton"
+                    , Css.btn
+                    , Css.btn_green
+                    ]
+                    [ Html.text "(Re)Generate Token" ]
+                , Html.button
+                    [ E.onClick Delete
+                    , A.id "delKeyButton"
+                    , Css.btn
+                    , Css.btn_red
+                    ]
+                    [ Html.text "Delete Token" ]
                 ]

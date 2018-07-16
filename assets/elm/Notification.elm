@@ -5,22 +5,27 @@ module Notification
         , Notification
         , NotificationType(..)
         , Notifications
+        , addError
+        , addInfo
         , addListOfDjangoMessages
+        , addLoadingFailed
+        , addNotSaved
+        , addNs
         , addRefreshNotif
-        , createError
-        , createInfo
-        , createLoadingFailed
-        , createNotSaved
-        , createSuccess
+        , addSuccess
+        , createListOfDjangoMessages
         , decodeDjangoMessage
         , empty
+        , refreshNotifMessage
         , remove
         , update
+        , updateNotifications
         , view
         )
 
+import Css
 import Html exposing (Html)
-import Html.Attributes exposing (class)
+import Html.Attributes as A
 import Html.Events exposing (onClick)
 import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (decode, required)
@@ -35,6 +40,11 @@ update msg notifs =
     case msg of
         Remove n ->
             remove n notifs
+
+
+updateNotifications : Notifications -> { a | notifications : Notifications } -> { a | notifications : Notifications }
+updateNotifications new a =
+    { a | notifications = addNs new a.notifications }
 
 
 empty : Notifications
@@ -64,9 +74,6 @@ tView notification =
                 ErrorNotification ->
                     "danger"
 
-        className =
-            "alert alert-" ++ messageType
-
         text =
             notification.text
                 |> String.split "\n"
@@ -76,15 +83,23 @@ tView notification =
         icon =
             if notification.showClose then
                 [ Html.i
-                    [ class "fa fa-close float-right"
+                    [ A.class "fa fa-close"
                     , onClick <| Remove notification
+                    , Css.float_right
                     ]
                     []
                 ]
             else
                 []
     in
-    Html.div [ class className ] <| icon ++ text
+    Html.div
+        [ Css.mb_2
+        , A.class <| "alert alert-" ++ messageType
+        , A.attribute "role" "alert"
+        ]
+    <|
+        icon
+            ++ text
 
 
 
@@ -136,13 +151,13 @@ removeHelp notifToRemove curNotif =
     not (notifToRemove == curNotif)
 
 
-create : Notifications -> String -> NotificationType -> Notifications
-create notifications text type_ =
-    Notification type_ text True :: notifications
+createListOfDjangoMessages : List DjangoMessage -> Notifications
+createListOfDjangoMessages dms =
+    List.map createFromDjangoMessage dms
 
 
-createFromDjangoMessage : DjangoMessage -> Notifications -> Notifications
-createFromDjangoMessage dm notifications =
+createFromDjangoMessage : DjangoMessage -> Notification
+createFromDjangoMessage dm =
     let
         type_ =
             case dm.type_ of
@@ -161,49 +176,70 @@ createFromDjangoMessage dm notifications =
                 _ ->
                     WarningNotification
     in
-    create notifications dm.text type_
+    Notification type_ dm.text True
+
+
+add : Notifications -> String -> NotificationType -> Notifications
+add notifications text type_ =
+    Notification type_ text True :: notifications
+
+
+addN : Notification -> Notifications -> Notifications
+addN n notifications =
+    n :: notifications
+
+
+addNs : Notifications -> Notifications -> Notifications
+addNs new notifications =
+    new ++ notifications
+
+
+addDjangoMessage : DjangoMessage -> Notifications -> Notifications
+addDjangoMessage dm notifications =
+    addN (createFromDjangoMessage dm) notifications
 
 
 addListOfDjangoMessages : List DjangoMessage -> Notifications -> Notifications
 addListOfDjangoMessages msgs notifications =
-    List.foldl createFromDjangoMessage notifications msgs
+    List.foldl addDjangoMessage notifications msgs
 
 
-refreshNotifMessage : DjangoMessage
+refreshNotifMessage : Notification
 refreshNotifMessage =
-    DjangoMessage "error" "Something went wrong there, try refreshing the page and going again."
+    createFromDjangoMessage <|
+        DjangoMessage "error" "Something went wrong there, try refreshing the page and going again."
 
 
 addRefreshNotif : Notifications -> Notifications
 addRefreshNotif notifications =
-    addListOfDjangoMessages [ refreshNotifMessage ] notifications
+    addN refreshNotifMessage notifications
 
 
-createError : Notifications -> String -> Notifications
-createError notifications text =
-    create notifications text ErrorNotification
+addError : Notifications -> String -> Notifications
+addError notifications text =
+    add notifications text ErrorNotification
 
 
-createWarning : Notifications -> String -> Notifications
-createWarning notifications text =
-    create notifications text WarningNotification
+addWarning : Notifications -> String -> Notifications
+addWarning notifications text =
+    add notifications text WarningNotification
 
 
-createInfo : Notifications -> String -> Notifications
-createInfo notifications text =
-    create notifications text InfoNotification
+addInfo : Notifications -> String -> Notifications
+addInfo notifications text =
+    add notifications text InfoNotification
 
 
-createSuccess : Notifications -> String -> Notifications
-createSuccess notifications text =
-    create notifications text SuccessNotification
+addSuccess : Notifications -> String -> Notifications
+addSuccess notifications text =
+    add notifications text SuccessNotification
 
 
-createNotSaved : Notifications -> Notifications
-createNotSaved notifications =
-    createWarning notifications "Something went wrong, there :-( Your changes may not have been saved"
+addNotSaved : Notifications -> Notifications
+addNotSaved notifications =
+    addWarning notifications "Something went wrong, there :-( Your changes may not have been saved"
 
 
-createLoadingFailed : String -> Notifications -> Notifications
-createLoadingFailed msg notifications =
-    createWarning notifications msg
+addLoadingFailed : String -> Notifications -> Notifications
+addLoadingFailed msg notifications =
+    addWarning notifications msg

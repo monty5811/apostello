@@ -584,12 +584,18 @@ class QueuedSms(models.Model):
         "Sender", max_length=200, help_text='User that sent message. Stored for auditing purposes.'
     )
     recipient_group = models.ForeignKey(
-        RecipientGroup, null=True, blank=True, help_text="Group (if any) that message was sent to"
-        ,on_delete=models.CASCADE,
+        RecipientGroup,
+        null=True,
+        blank=True,
+        help_text="Group (if any) that message was sent to",
+        on_delete=models.CASCADE,
     )
-    recipient = models.ForeignKey(Recipient, blank=True, null=True
-                                  ,on_delete=models.CASCADE,
-                                  )
+    recipient = models.ForeignKey(
+        Recipient,
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+    )
 
     def cancel(self):
         """Cancel message."""
@@ -647,14 +653,22 @@ class SmsOutbound(models.Model):
         "Sender", max_length=200, help_text='User that sent message. Stored for auditing purposes.'
     )
     recipient_group = models.ForeignKey(
-        RecipientGroup, null=True, blank=True, help_text="Group (if any) that message was sent to"
-        ,on_delete=models.CASCADE,
+        RecipientGroup,
+        null=True,
+        blank=True,
+        help_text="Group (if any) that message was sent to",
+        on_delete=models.CASCADE,
     )
-    recipient = models.ForeignKey(Recipient, blank=True, null=True
-                                  ,on_delete=models.CASCADE,
-                                  )
+    recipient = models.ForeignKey(
+        Recipient,
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+    )
     status = models.CharField(
-        'Status', max_length=50, help_text='Status of SMS (from Twilio)',
+        'Status',
+        max_length=50,
+        help_text='Status of SMS (from Twilio)',
     )
 
     def __str__(self):

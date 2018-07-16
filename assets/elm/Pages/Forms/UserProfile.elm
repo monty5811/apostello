@@ -1,5 +1,6 @@
 module Pages.Forms.UserProfile exposing (Model, Msg, initialModel, update, view)
 
+import Css
 import Data exposing (UserProfile)
 import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus)
 import Forms.View exposing (..)
@@ -167,7 +168,7 @@ viewHelp msgs model status profile =
                 |> List.map FormField
     in
     Html.div []
-        [ Html.h3 [] [ Html.text <| "User Profile: " ++ profile.user.email ]
+        [ Html.h3 [ Css.max_w_md, Css.mx_auto ] [ Html.text <| "User Profile: " ++ profile.user.email ]
         , form status
             fields
             msgs.postForm

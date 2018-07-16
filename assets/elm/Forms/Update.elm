@@ -4,9 +4,8 @@ import Data exposing (Keyword, Recipient, RecipientGroup, UserProfile)
 import Date
 import DjangoSend exposing (CSRFToken, rawPost)
 import Encode exposing (encodeDate, encodeMaybe, encodeMaybeDate, encodeMaybeDateOnly)
-import Forms.Model exposing (FormStatus(Failed, InProgress, Success), decodeFormResp, formDecodeError, noErrors)
+import Forms.Helpers exposing (..)
 import Http
-import Json.Decode as Decode
 import Json.Encode as Encode
 import Messages exposing (FormMsg(..), Msg(FormMsg))
 import Models exposing (Model)
@@ -46,7 +45,7 @@ update msg model =
             case model.page of
                 P.DefaultResponsesForm (Just drModel) ->
                     ( setInProgress model
-                    , [ postDefautlRespCmd model.settings.csrftoken drModel ]
+                    , [ postDefaultRespCmd model.settings.csrftoken drModel ]
                     )
 
                 _ ->
@@ -165,49 +164,25 @@ update msg model =
                 _ ->
                     ( model, [] )
 
-        ReceiveFormResp okMsg (Ok resp) ->
-            case Decode.decodeString decodeFormResp resp.body of
-                Ok data ->
-                    -- update the form and refetch the site config, to update our settings
-                    -- in case we have just edited the site config form
-                    ( { model
-                        | formStatus = Success
-                        , notifications = Notif.addListOfDjangoMessages data.messages model.notifications
-                      }
-                    , Cmd.map (FormMsg << SiteConfigFormMsg) SCF.init
-                        :: okMsg
-                    )
-
-                Err err ->
-                    ( { model | formStatus = Failed <| formDecodeError err }, [] )
+        ReceiveFormResp okCmds (Ok resp) ->
+            let
+                ( formStatus, newNotifs, cmds ) =
+                    handleGoodFormResp okCmds resp
+            in
+            ( { model | formStatus = formStatus }
+                |> Notif.updateNotifications newNotifs
+            , cmds
+            )
 
         ReceiveFormResp _ (Err err) ->
-            case err of
-                Http.BadStatus resp ->
-                    case Decode.decodeString decodeFormResp resp.body of
-                        Ok data ->
-                            ( { model
-                                | formStatus = Failed data.errors
-                                , notifications = Notif.addListOfDjangoMessages data.messages model.notifications
-                              }
-                            , []
-                            )
-
-                        Err e ->
-                            ( { model
-                                | formStatus = Failed <| formDecodeError e
-                                , notifications = Notif.addRefreshNotif model.notifications
-                              }
-                            , []
-                            )
-
-                _ ->
-                    ( { model
-                        | formStatus = Failed noErrors
-                        , notifications = Notif.addRefreshNotif model.notifications
-                      }
-                    , []
-                    )
+            let
+                ( formStatus, newNotifs ) =
+                    handleBadFormResp err
+            in
+            ( { model | formStatus = formStatus }
+                |> Notif.updateNotifications newNotifs
+            , []
+            )
 
         UserProfileFormMsg subMsg ->
             case model.page of
@@ -222,9 +197,7 @@ update msg model =
         GroupFormMsg subMsg ->
             case model.page of
                 P.GroupForm gfModel maybePk ->
-                    ( { model | page = P.GroupForm (GF.update subMsg gfModel) maybePk }
-                    , []
-                    )
+                    ( { model | page = P.GroupForm (GF.update subMsg gfModel) maybePk }, [] )
 
                 _ ->
                     ( model, [] )
@@ -325,11 +298,6 @@ update msg model =
                     ( model, [] )
 
 
-setInProgress : Model -> Model
-setInProgress model =
-    { model | formStatus = InProgress }
-
-
 postKeywordFormCmd : CSRFToken -> Time.Time -> KF.Model -> Maybe Keyword -> Cmd Msg
 postKeywordFormCmd csrf now model maybeKeyword =
     let
@@ -405,8 +373,8 @@ postCreateAllGroupCmd csrf name =
         |> Http.send (FormMsg << ReceiveFormResp [ Nav.newUrl <| page2loc <| P.GroupTable False ])
 
 
-postDefautlRespCmd : CSRFToken -> DRF.Model -> Cmd Msg
-postDefautlRespCmd csrf model =
+postDefaultRespCmd : CSRFToken -> DRF.Model -> Cmd Msg
+postDefaultRespCmd csrf model =
     let
         body =
             [ ( "keyword_no_match", Encode.string model.keyword_no_match )
@@ -515,7 +483,7 @@ postSiteConfigCmd csrf model =
             ]
     in
     rawPost csrf Urls.api_site_config body
-        |> Http.send (FormMsg << ReceiveFormResp [ Nav.newUrl <| page2loc <| P.Home ])
+        |> Http.send (FormMsg << ReceiveFormResp [ Nav.load <| page2loc <| P.Home ])
 
 
 postUserProfileCmd : CSRFToken -> UPF.Model -> Maybe UserProfile -> Cmd Msg
@@ -544,16 +512,6 @@ postUserProfileCmd csrf model maybeProfile =
         Just _ ->
             rawPost csrf Urls.api_user_profiles body
                 |> Http.send (FormMsg << ReceiveFormResp [ Nav.newUrl <| page2loc <| P.UserProfileTable ])
-
-
-addPk : Maybe { a | pk : Int } -> List ( String, Encode.Value ) -> List ( String, Encode.Value )
-addPk maybeRecord body =
-    case maybeRecord of
-        Nothing ->
-            body
-
-        Just rec ->
-            ( "pk", Encode.int rec.pk ) :: body
 
 
 extractDate : Time.Time -> (Keyword -> Date.Date) -> Maybe Date.Date -> Maybe Keyword -> Date.Date
@@ -588,38 +546,3 @@ extractPks fn field maybeKeyword =
 
         Just pks ->
             pks
-
-
-extractBool : (a -> Bool) -> Maybe Bool -> Maybe a -> Bool
-extractBool fn field maybeRec =
-    case field of
-        Nothing ->
-            Maybe.map fn maybeRec
-                |> Maybe.withDefault False
-
-        Just b ->
-            b
-
-
-extractField : (a -> String) -> Maybe String -> Maybe a -> String
-extractField fn field maybeRec =
-    case field of
-        Nothing ->
-            -- never edited the field, use existing or default to ""
-            Maybe.map fn maybeRec
-                |> Maybe.withDefault ""
-
-        Just s ->
-            s
-
-
-extractFloat : (a -> Float) -> Maybe Float -> Maybe a -> Float
-extractFloat fn field maybeRec =
-    case field of
-        Nothing ->
-            -- never edited the field, use existing or default to 0
-            Maybe.map fn maybeRec
-                |> Maybe.withDefault 0
-
-        Just s ->
-            s

@@ -82,22 +82,22 @@ class TestButton:
         assert len(tables) == 1
         table = tables[0]
         assert 'Hidden' in table.text
-        hidden_buttons = browser_in.find_elements_by_class_name('button-danger')
+        hidden_buttons = browser_in.find_elements_by_class_name('btn-red')
         num_buttons = len(hidden_buttons)
         while num_buttons > 0:
             click_and_wait(hidden_buttons[0], driver_wait_time)
-            hidden_buttons = browser_in.find_elements_by_class_name('button-danger')
+            hidden_buttons = browser_in.find_elements_by_class_name('btn-red')
             assert num_buttons - 1 == len(hidden_buttons)
             num_buttons = len(hidden_buttons)
 
         sleep(driver_wait_time)
         sms.refresh_from_db()
         assert sms.display_on_wall
-        displaying_buttons = browser_in.find_elements_by_class_name('button-success')
+        displaying_buttons = browser_in.find_elements_by_class_name('btn-green')
         num_buttons = len(displaying_buttons)
         while len(displaying_buttons) > 0:
             click_and_wait(displaying_buttons[0], driver_wait_time)
-            displaying_buttons = browser_in.find_elements_by_class_name('button-success')
+            displaying_buttons = browser_in.find_elements_by_class_name('btn-green')
             assert num_buttons - 1 == len(displaying_buttons)
             num_buttons = len(displaying_buttons)
         sleep(driver_wait_time)

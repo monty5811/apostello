@@ -1,4 +1,4 @@
-{% extends 'account/base_apsotello.html' %}
+{% extends 'account/base_apostello.html' %}
 {% load i18n %}
 {% load account %}
 {% block content %}
@@ -12,7 +12,12 @@
 
 <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
 {% csrf_token %}
-    <button type="button" class="button-dark" id="confirmButton" type="submit">{% trans 'Confirm' %}</button>
+    <button class="btn btn-purple"
+            type="button"
+            id="confirmButton"
+            type="submit">
+            {% trans 'Confirm' %}
+    </button>
 </form>
 
 {% else %}

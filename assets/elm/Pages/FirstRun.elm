@@ -1,6 +1,8 @@
 module Pages.FirstRun exposing (Model, Msg, decodeFirstRunResp, initialModel, update, view)
 
+import Css
 import DjangoSend exposing (CSRFToken, post)
+import Forms.View as FV
 import Html exposing (Html)
 import Html.Attributes as A
 import Html.Events exposing (onInput, onSubmit)
@@ -132,48 +134,66 @@ view model =
 createAdminView : Model -> Html Msg
 createAdminView model =
     Html.div [ A.id "create_admin_user" ]
-        [ Html.div [ A.class "segment" ]
+        [ Html.div []
             [ Html.h3 [] [ Html.text "Create Admin User" ]
             , Html.form [ onSubmit CreateAdminUser ]
                 [ formMsg model.adminFormStatus adminSuccessMsg
-                , Html.div [ A.class "input-field" ]
-                    [ Html.label [] [ Html.text "Admin Email" ]
+                , Html.div []
+                    [ FV.label <| makeMeta "admin_email" "Admin Email"
                     , Html.input
                         [ A.type_ "email"
                         , A.name "email"
                         , A.placeholder "you@example.com"
                         , A.id "admin_email"
                         , onInput UpdateAdminEmailField
+                        , Css.formInput
                         ]
                         []
                     ]
-                , Html.div [ A.class "two-column" ]
-                    [ Html.div [ A.class "input-field" ]
-                        [ Html.label [] [ Html.text "Password" ]
+                , Html.div []
+                    [ Html.div []
+                        [ FV.label <| makeMeta "admin_pass1" "Password"
                         , Html.input
                             [ A.type_ "password"
                             , A.name "password"
                             , A.id "admin_pass1"
                             , onInput UpdateAdminPass1Field
+                            , Css.formInput
                             ]
                             []
                         ]
-                    , Html.div [ A.class "input-field" ]
-                        [ Html.label [] [ Html.text "Password Again" ]
+                    , Html.div []
+                        [ FV.label <| makeMeta "admin_pass2" "Password Again"
                         , Html.input
                             [ A.type_ "password"
                             , A.name "password"
                             , A.id "admin_pass2"
                             , onInput UpdateAdminPass2Field
+                            , Css.formInput
                             ]
                             []
                         ]
                     ]
-                , Html.button [ A.class "button", A.id "create_admin_button" ]
+                , Html.button
+                    [ A.id "create_admin_button"
+                    , Css.btn
+                    , Css.btn_purple
+                    , Css.mt_4
+                    ]
                     [ Html.text "Create" ]
                 ]
             ]
         ]
+
+
+makeMeta : String -> String -> { id : String, label : String, required : Bool, name : String, help : Maybe String }
+makeMeta id label =
+    { id = id
+    , label = label
+    , required = True
+    , name = label
+    , help = Just label
+    }
 
 
 formMsg : FirstRunFormStatus -> Html Msg -> Html Msg
@@ -189,7 +209,7 @@ formMsg status successDiv =
             successDiv
 
         Failed e ->
-            Html.div [ A.class "alert alert-danger" ]
+            Html.div []
                 [ Html.h4 [] [ Html.text "Uh oh, something went wrong!" ]
                 , Html.p [] [ Html.text "Check your settings and try again." ]
                 , Html.p [] [ Html.text "Error:" ]
@@ -199,7 +219,11 @@ formMsg status successDiv =
 
 adminSuccessMsg : Html Msg
 adminSuccessMsg =
-    Html.div [ A.class "alert alert-success" ]
+    Html.div
+        [ Css.mb_2
+        , A.class <| "alert alert-success"
+        , A.attribute "role" "alert"
+        ]
         [ Html.h4 [] [ Html.text "Admin User Created" ]
         , Html.p [] [ Html.text "Refresh this page and you will be able to login" ]
         ]

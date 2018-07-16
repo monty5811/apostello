@@ -11,6 +11,7 @@ module Pages.GroupComposer
         , view
         )
 
+import Css
 import Data exposing (GroupPk, RecipientGroup, RecipientSimple, nullGroup)
 import Html exposing (..)
 import Html.Attributes as A
@@ -70,7 +71,6 @@ update (UpdateQueryString text) =
 type alias Props msg =
     { form : Msg -> msg
     , groupLink : Maybe (List Int) -> Html msg
-    , loadData : msg
     }
 
 
@@ -83,9 +83,9 @@ view props model groups_ =
         ( activePeople, activeGroupPks ) =
             runQuery groups (collectPeople groups) (Maybe.withDefault "" model)
     in
-    div []
-        [ div [] [ helpView ]
-        , div [] [ queryEntry props model ]
+    Html.div [ Css.mx_4 ]
+        [ Html.div [ Css.notRaisedSegment ] helpView
+        , Html.div [ A.class "px-4 m-1" ] [ queryEntry props model ]
         , dataView props groups activePeople activeGroupPks
         ]
 
@@ -129,16 +129,15 @@ runQuery groups people queryString =
 
 queryEntry : Props msg -> Maybe String -> Html msg
 queryEntry props query =
-    div []
-        [ input
-            [ A.placeholder "Query goes here: e.g. 1 + 2 - 3"
-            , A.type_ "text"
-            , A.id "queryInputBox"
-            , E.onInput <| props.form << UpdateQueryString
-            , A.value (Maybe.withDefault "" query)
-            ]
-            []
+    input
+        [ A.placeholder "Query goes here: e.g. 1 + 2 - 3"
+        , A.type_ "text"
+        , A.id "queryInputBox"
+        , E.onInput <| props.form << UpdateQueryString
+        , A.value (Maybe.withDefault "" query)
+        , Css.formInput
         ]
+        []
 
 
 
@@ -147,11 +146,9 @@ queryEntry props query =
 
 dataView : Props msg -> List RecipientGroup -> List RecipientSimple -> List Int -> Html msg
 dataView props groups people activeGroupPks =
-    div
-        [ A.style
-            [ ( "display", "grid" )
-            , ( "grid-template-columns", "50% 50%" )
-            ]
+    Html.div
+        [ Css.flex
+        , Css.notRaisedSegment
         ]
         [ groupsList props groups activeGroupPks, groupPreview props people ]
 
@@ -162,33 +159,31 @@ dataView props groups people activeGroupPks =
 
 groupsList : Props msg -> List RecipientGroup -> List Int -> Html msg
 groupsList props groups activeGroupPks =
-    div []
-        [ div [ A.class "segment" ]
-            [ h4 []
-                [ text "Groups"
-                , Html.button
-                    [ A.class "button float-right", E.onClick <| props.loadData, A.id "refreshButton" ]
-                    [ Html.text "Refresh" ]
-                ]
-            , br [] []
-            , div [ A.class "list" ] <| List.map (groupRow activeGroupPks) groups
-            ]
+    Html.div [ Css.w_full, Css.px_2 ]
+        [ h4 [] [ text "Groups" ]
+        , br [] []
+        , Html.div [] <| List.map (groupRow activeGroupPks) groups
         ]
 
 
 groupRow : List Int -> RecipientGroup -> Html msg
 groupRow activeGroupPks group =
-    div [ A.class "item", A.style (activeGroupStyle activeGroupPks group), A.id "groupRow" ]
-        [ div [ A.class "float-right" ] [ text (toString group.pk) ]
-        , div [] [ text group.name ]
+    Html.div
+        ([ A.id "groupRow"
+         , Css.border_b_2
+         ]
+            ++ activeGroupStyle activeGroupPks group
+        )
+        [ Html.span [] [ text group.name ]
+        , Html.span [ Css.float_right ] [ text (toString group.pk) ]
         ]
 
 
-activeGroupStyle : List Int -> RecipientGroup -> List ( String, String )
+activeGroupStyle : List Int -> RecipientGroup -> List (Html.Attribute msg)
 activeGroupStyle activeGroupPks group =
     case List.member group.pk activeGroupPks of
         True ->
-            [ ( "color", "#38AF3C" ) ]
+            [ Css.text_green ]
 
         False ->
             []
@@ -200,26 +195,25 @@ activeGroupStyle activeGroupPks group =
 
 groupPreview : Props msg -> List RecipientSimple -> Html msg
 groupPreview props people =
-    div []
-        [ div [ A.class "segment" ]
-            [ h4 []
-                [ text "Live preview"
-                , groupLink props people
-                ]
-            , div [ A.class "list" ] (List.map personRow people)
+    Html.div [ Css.w_full, Css.px_2 ]
+        [ h4 []
+            [ text "Live preview"
+            , groupLink props people
             ]
+        , br [] []
+        , Html.div [] (List.map personRow people)
         ]
 
 
 personRow : RecipientSimple -> Html msg
 personRow person =
-    div [ A.class "item" ] [ text person.full_name ]
+    Html.div [ Css.border_b_2 ] [ text person.full_name ]
 
 
 groupLink : Props msg -> List RecipientSimple -> Html msg
 groupLink props people =
     if List.isEmpty people then
-        div [] []
+        Html.div [] []
     else
         people
             |> List.map .pk
@@ -231,28 +225,26 @@ groupLink props people =
 -- Help
 
 
-helpView : Html msg
+helpView : List (Html msg)
 helpView =
-    div []
-        [ h2 [] [ text "Group Composer" ]
-        , p []
-            [ text "You can use this tool to \"compose\" an adhoc group." ]
-        , p
-            []
-            [ text "Enter a query in the box below. E.g. \"1|2\" would result in a group made up of everyone in group 1 as well as everyone in group 2." ]
-        , p
-            []
-            [ text "There are 3 operators available:" ]
-        , ul
-            []
-            [ li [] [ b [] [ text "|" ], text " : Keep all members (union)" ]
-            , li [] [ b [] [ text "+" ], text " : Keep members that are in both (intersect)" ]
-            , li [] [ b [] [ text "-" ], text " : Keep member that do not exist on right hand side (diff)" ]
-            ]
-        , p [] [ text "The operators are applied from left to right. Use brackets to build more complex queries." ]
-        , p [] [ text "The best thing to do is experiment and use the live preview." ]
-        , br [] []
+    [ h2 [ Css.mb_2 ] [ text "Group Composer" ]
+    , p []
+        [ text "You can use this tool to \"compose\" an adhoc group." ]
+    , p
+        []
+        [ text "Enter a query in the box below. E.g. \"1|2\" would result in a group made up of everyone in group 1 as well as everyone in group 2." ]
+    , p
+        []
+        [ text "There are 3 operators available:" ]
+    , ul
+        []
+        [ li [] [ b [] [ text "|" ], text " : Keep all members (union)" ]
+        , li [] [ b [] [ text "+" ], text " : Keep members that are in both (intersect)" ]
+        , li [] [ b [] [ text "-" ], text " : Keep member that do not exist on right hand side (diff)" ]
         ]
+    , p [] [ text "The operators are applied from left to right. Use brackets to build more complex queries." ]
+    , p [] [ text "The best thing to do is experiment and use the live preview." ]
+    ]
 
 
 

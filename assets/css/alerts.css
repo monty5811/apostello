@@ -1,0 +1,28 @@
+.alert {
+    @apply .border-l-4;
+    @apply .p-4;
+}
+
+.alert-warning {
+    @apply .bg-orange-lighter;
+    @apply .border-orange;
+    @apply .text-orange-dark;
+}
+
+.alert-success {
+    @apply .bg-green-lightest;
+    @apply .border-green;
+    @apply .text-green-dark;
+}
+
+.alert-danger {
+    @apply .bg-red-lightest;
+    @apply .border-red;
+    @apply .text-red-dark;
+}
+
+.alert-info{
+    @apply .bg-blue-lightest;
+    @apply .border-blue;
+    @apply .text-blue-dark;
+}

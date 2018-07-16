@@ -1,9 +1,10 @@
 module Pages.UserProfileTable exposing (view)
 
+import Css
 import Data exposing (UserProfile)
 import FilteringTable as FT
-import Html exposing (Html, button, td, text, th, thead, tr)
-import Html.Attributes as A exposing (class)
+import Html exposing (Html)
+import Html.Attributes as A
 import Html.Events exposing (onClick)
 import RemoteList as RL
 
@@ -22,36 +23,33 @@ type alias Props msg =
 
 view : Props msg -> Html msg
 view props =
-    FT.table { top = props.tableMsg } "table-bordered" tableHead props.tableModel (userprofileRow props) props.profiles
+    FT.table { top = props.tableMsg } [] tableHead props.tableModel (userprofileRow props) props.profiles
 
 
-tableHead : Html msg
+tableHead : FT.Head
 tableHead =
-    thead [ class "text-left" ]
-        [ tr []
-            [ th [] [ text "User" ]
-            , th [] [ text "Approved" ]
-            , th [] [ text "Keywords" ]
-            , th [] [ text "Send SMS" ]
-            , th [] [ text "Contacts" ]
-            , th [] [ text "Groups" ]
-            , th [] [ text "Incoming" ]
-            , th [] [ text "Outgoing" ]
-            , th [] [ text "Archiving" ]
-            ]
+    FT.Head
+        [ "User"
+        , "Approved"
+        , "Keywords"
+        , "Send SMS"
+        , "Contacts"
+        , "Groups"
+        , "Incoming"
+        , "Outgoing"
+        , "Archiving"
         ]
 
 
-userprofileRow : Props msg -> UserProfile -> ( String, Html msg )
+userprofileRow : Props msg -> UserProfile -> FT.Row msg
 userprofileRow props userprofile =
     let
         toggleCell_ =
             toggleCell props
     in
-    ( toString userprofile.pk
-    , tr [ class "text-center" ]
-        [ td []
-            [ props.userProfileLink userprofile ]
+    FT.Row
+        []
+        [ FT.Cell [] [ props.userProfileLink userprofile ]
         , toggleCell_ userprofile Approved
         , toggleCell_ userprofile Keywords
         , toggleCell_ userprofile SendSMS
@@ -61,25 +59,14 @@ userprofileRow props userprofile =
         , toggleCell_ userprofile Outgoing
         , toggleCell_ userprofile Archiving
         ]
-    )
+        (toString userprofile.pk)
 
 
-toggleCell : Props msg -> UserProfile -> Field -> Html msg
+toggleCell : Props msg -> UserProfile -> Field -> FT.Cell msg
 toggleCell props userprofile field =
     let
         fieldVal =
             lookupField field userprofile
-
-        buttonType =
-            case fieldVal of
-                True ->
-                    "button-success"
-
-                False ->
-                    "button-danger"
-
-        className =
-            "button button-sm " ++ buttonType
 
         iconType =
             case fieldVal of
@@ -89,13 +76,18 @@ toggleCell props userprofile field =
                 False ->
                     " ✖ "
     in
-    td []
-        [ button
-            [ class className
-            , onClick (props.toggleField (toggleField field userprofile))
+    FT.Cell
+        []
+        [ Html.button
+            [ onClick (props.toggleField (toggleField field userprofile))
             , A.attribute "data-test-id" (toggleDataAttr field userprofile)
+            , Css.btn
+            , if fieldVal then
+                Css.btn_green
+              else
+                Css.btn_red
             ]
-            [ text iconType ]
+            [ Html.text iconType ]
         ]
 
 

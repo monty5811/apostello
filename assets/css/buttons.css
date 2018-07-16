@@ -1,0 +1,38 @@
+.btn {
+  @apply .font-bold .py-2 .px-4;
+}
+
+.btn-grey {
+  @apply .bg-grey-light .text-grey-darkest;
+}
+.btn-grey:hover {
+  @apply .bg-grey;
+}
+
+.btn-purple {
+  @apply .bg-purple-light .text-white;
+}
+.btn-purple:hover {
+  @apply .bg-purple .text-white;
+}
+
+.btn-green {
+  @apply .bg-green .text-white;
+}
+.btn-green:hover {
+  @apply .bg-green-dark .text-white;
+}
+
+.btn-blue {
+  @apply .bg-blue .text-white;
+}
+.btn-blue:hover {
+  @apply .bg-blue-dark .text-white;
+}
+
+.btn-red {
+  @apply .bg-red .text-white;
+}
+.btn-red:hover {
+  @apply .bg-red-dark .text-white;
+}

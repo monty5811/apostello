@@ -1,5 +1,6 @@
 module Forms.View exposing (..)
 
+import Css
 import Date
 import DateFormat
 import DateTimePicker
@@ -7,9 +8,10 @@ import DateTimePicker.Config
 import Dict
 import FilteringTable exposing (filterInput, filterRecord)
 import Forms.Model exposing (..)
-import Html exposing (Html, button, div, i, input, label)
+import Html exposing (Html)
 import Html.Attributes as A
-import Html.Events as E exposing (onInput)
+import Html.Events as E
+import Html.Keyed
 import Pages.Fragments.Loader exposing (loader)
 import Regex
 import RemoteList as RL
@@ -23,7 +25,7 @@ form formStatus items submitMsg button_ =
             loader
 
         _ ->
-            Html.form [ E.onSubmit submitMsg ] <|
+            Html.form [ E.onSubmit submitMsg, Css.max_w_md, Css.mx_auto ] <|
                 renderFormError formStatus
                     ++ List.map (renderItem <| formErrors formStatus) items
                     ++ [ button_ ]
@@ -51,7 +53,7 @@ renderItem errorDict item =
             renderField errorDict field
 
         FormHeader header ->
-            Html.h4 [ A.class "" ] [ Html.text header ]
+            Html.h3 [] [ Html.text header ]
 
         FieldGroup config fields ->
             fieldGroupHelp config <|
@@ -71,14 +73,18 @@ addSideBySide : Maybe Int -> List (Html msg) -> List (Html msg)
 addSideBySide config fields =
     case config of
         Just num ->
-            [ div
-                [ A.style
-                    [ ( "display", "grid" )
-                    , ( "grid-template-columns", "repeat(" ++ toString num ++ ", auto)" )
-                    , ( "grid-column-gap", "1rem" )
-                    ]
+            let
+                maxWidth =
+                    A.style [ ( "max-width", (toString <| 100 // num) ++ "%" ) ]
+
+                minWidth =
+                    A.style [ ( "min-width", (toString <| 100 // num) ++ "%" ) ]
+            in
+            [ Html.div
+                [ Css.flex
+                , Css.flex_wrap
                 ]
-                fields
+                (List.map (Html.div [ Css.flex_1, minWidth, maxWidth ] << List.singleton) fields)
             ]
 
         Nothing ->
@@ -102,12 +108,25 @@ addHeader header fields =
             fields
 
         Just h ->
-            Html.legend [] [ Html.text h ] :: fields
+            Html.h4 [] [ Html.text h ] :: fields
 
 
 addSegment : List (Html msg) -> Html msg
 addSegment fields =
-    Html.fieldset [] fields
+    Html.div [ Css.mt_4 ] fields
+
+
+requiredClass : FieldMeta -> Html.Attribute msg
+requiredClass { required } =
+    if required then
+        A.class "required"
+    else
+        A.class ""
+
+
+label : FieldMeta -> Html msg
+label meta =
+    Html.label [ A.for meta.id, Css.label, requiredClass meta ] [ Html.text meta.label ]
 
 
 renderField : FormErrors -> Field msg -> Html msg
@@ -116,16 +135,8 @@ renderField errorDict field =
         errors =
             Dict.get field.meta.name errorDict
                 |> Maybe.withDefault []
-
-        className =
-            case field.meta.required of
-                False ->
-                    "input-field"
-
-                True ->
-                    "required input-field"
     in
-    div [ A.class (errorFieldClass className errors) ]
+    Html.div [ Css.px_1, A.required field.meta.required ]
         (List.append
             (field.view field.meta)
             (List.map fieldMessage errors)
@@ -141,7 +152,7 @@ dateTimeField msg datePickerState date meta =
         i18nConfig =
             DateTimePicker.Config.defaultDateTimeI18n
     in
-    [ label [ A.for meta.id ] [ Html.text meta.label ]
+    [ label meta
     , DateTimePicker.dateTimePickerWithConfig
         { config
             | timePickerType = DateTimePicker.Config.Digital
@@ -169,6 +180,7 @@ dateTimeField msg datePickerState date meta =
         , A.id meta.id
         , A.name meta.name
         , A.type_ "text"
+        , Css.formInput
         ]
         datePickerState
         date
@@ -185,7 +197,7 @@ dateField msg datePickerState date meta =
         i18nConfig =
             DateTimePicker.Config.defaultDateI18n
     in
-    [ label [ A.for meta.id ] [ Html.text meta.label ]
+    [ label meta
     , DateTimePicker.datePickerWithConfig
         { config
             | autoClose = True
@@ -208,6 +220,7 @@ dateField msg datePickerState date meta =
         , A.id meta.id
         , A.name meta.name
         , A.type_ "text"
+        , Css.formInput
         ]
         datePickerState
         date
@@ -217,13 +230,14 @@ dateField msg datePickerState date meta =
 
 simpleTextField : Maybe String -> (String -> msg) -> FieldMeta -> List (Html msg)
 simpleTextField defaultValue inputMsg meta =
-    [ label [ A.for meta.id ] [ Html.text meta.label ]
-    , input
+    [ label meta
+    , Html.input
         [ A.id meta.id
         , A.name meta.name
         , A.type_ "text"
         , E.onInput inputMsg
         , A.defaultValue <| Maybe.withDefault "" defaultValue
+        , Css.formInput
         ]
         []
     , helpLabel meta
@@ -232,13 +246,14 @@ simpleTextField defaultValue inputMsg meta =
 
 longTextField : Int -> Maybe String -> (String -> msg) -> FieldMeta -> List (Html msg)
 longTextField rows defaultValue inputMsg meta =
-    [ label [ A.for meta.id ] [ Html.text meta.label ]
+    [ label meta
     , Html.textarea
         [ A.id meta.id
         , A.name meta.name
         , E.onInput inputMsg
         , A.rows rows
         , A.defaultValue <| Maybe.withDefault "" defaultValue
+        , Css.formInput
         ]
         []
     , helpLabel meta
@@ -247,14 +262,15 @@ longTextField rows defaultValue inputMsg meta =
 
 simpleIntField : Maybe Int -> (String -> msg) -> FieldMeta -> List (Html msg)
 simpleIntField defaultValue inputMsg meta =
-    [ label [ A.for meta.id ] [ Html.text meta.label ]
-    , input
+    [ label meta
+    , Html.input
         (addDefaultInt defaultValue
             [ A.id meta.id
             , A.name meta.name
             , E.onInput inputMsg
             , A.type_ "number"
             , A.min "0"
+            , Css.formInput
             ]
         )
         []
@@ -274,8 +290,8 @@ addDefaultInt defaultValue attrs =
 
 simpleFloatField : Maybe Float -> (String -> msg) -> FieldMeta -> List (Html msg)
 simpleFloatField defaultValue inputMsg meta =
-    [ label [ A.for meta.id ] [ Html.text meta.label ]
-    , input
+    [ label meta
+    , Html.input
         (addDefaultFloat defaultValue
             [ A.id meta.id
             , A.name meta.name
@@ -283,6 +299,7 @@ simpleFloatField defaultValue inputMsg meta =
             , A.type_ "number"
             , A.step "0.0001"
             , A.min "0"
+            , Css.formInput
             ]
         )
         []
@@ -306,31 +323,38 @@ checkboxField maybeRec getter toggleMsg meta =
         checked =
             Maybe.map getter maybeRec |> Maybe.withDefault False
     in
-    [ div []
-        [ label []
-            [ input
-                [ A.id meta.id
-                , A.name meta.name
-                , A.type_ "checkbox"
-                , A.checked checked
-                , E.onClick <| toggleMsg maybeRec
-                ]
-                []
-            , Html.text <| " " ++ meta.label
+    [ Html.div [ Css.flex ]
+        [ Html.input
+            [ A.id meta.id
+            , A.name meta.name
+            , A.type_ "checkbox"
+            , A.checked checked
+            , E.onClick <| toggleMsg maybeRec
+            , Css.label
             ]
-        , helpLabel meta
+            []
+        , Html.label [ Css.label, Css.mx_1 ] [ Html.text <| " " ++ meta.label ]
         ]
+    , Html.div [ A.style [ ( "margin-top", "-.25rem" ) ] ] [ helpLabel meta ]
     ]
 
 
-helpLabel : FieldMeta -> Html msg
-helpLabel meta =
-    case meta.help of
+helpLabel : { a | help : Maybe String } -> Html msg
+helpLabel { help } =
+    case help of
         Nothing ->
             Html.text ""
 
-        Just help ->
-            Html.p [ A.class "input-hint" ] [ Html.text help ]
+        Just h ->
+            Html.p
+                [ Css.text_grey_darker
+                , Css.text_xs
+                , Css.font_light
+                , Css.pb_2
+                , Css.pt_1
+                , Css.pl_2
+                ]
+                [ Html.text h ]
 
 
 submitButton : Maybe a -> Bool -> Html msg
@@ -343,16 +367,14 @@ submitButton maybeItem showAN =
 
                 Just _ ->
                     "Update"
-
-        colour =
-            case showAN of
-                True ->
-                    "button-lg button-secondary"
-
-                False ->
-                    "button-lg button-primary"
     in
-    button [ A.class <| "button button-block" ++ colour, A.id "formSubmitButton" ] [ Html.text txt ]
+    Html.button
+        [ A.id "formSubmitButton"
+        , Css.btn
+        , Css.btn_purple
+        , Css.mt_4
+        ]
+        [ Html.text txt ]
 
 
 type alias MultiSelectField msg a =
@@ -377,28 +399,66 @@ multiSelectField props meta =
                 Just pks_ ->
                     Just pks_
     in
-    [ label [ A.for meta.id ] [ Html.text meta.label ]
+    [ label meta
     , helpLabel meta
-    , div [ A.class "segment" ]
-        [ loadingMessage props.items
-        , div [] <| selectedItemsView pks props.selectedView props.items
-        , Html.br [] []
-        , filterInput props.filterMsg
-        , div
-            [ A.class "list"
-            , A.style
-                [ ( "min-height", "25vh" )
-                , ( "max-height", "50vh" )
-                , ( "overflow-y", "auto" )
-                ]
-            ]
-            (props.items
-                |> RL.toList
-                |> List.filter (filterRecord props.filter)
-                |> List.map (props.itemView pks)
-            )
-        ]
+    , loadingMessage props.items
+    , Html.div [ Css.flex, Css.mb_2 ] <| selectedItemsView pks props.selectedView props.items
+    , filterInput props.filterMsg
+    , Html.div [ Css.max_w_md, Css.twoColGrid ]
+        (props.items
+            |> RL.toList
+            |> List.filter (filterRecord props.filter)
+            |> List.map (props.itemView pks)
+        )
     ]
+
+
+type alias MultiSelectItemProps msg a =
+    { itemToStr : { a | pk : Int } -> String
+    , maybeSelectedPks : Maybe (List Int)
+    , itemToKey : { a | pk : Int } -> String
+    , toggleMsg : Int -> msg
+    , itemToId : { a | pk : Int } -> String
+    }
+
+
+multiSelectItemHelper : MultiSelectItemProps msg { a | pk : Int } -> { a | pk : Int } -> Html msg
+multiSelectItemHelper props item =
+    let
+        selectedPks =
+            case props.maybeSelectedPks of
+                Nothing ->
+                    []
+
+                Just pks ->
+                    pks
+    in
+    Html.Keyed.node "div"
+        [ E.onClick <| props.toggleMsg item.pk
+        , A.id <| props.itemToId item
+        , Css.border_b_2
+        , Css.cursor_pointer
+        ]
+        [ ( props.itemToKey item
+          , Html.div []
+                [ selectedIcon selectedPks item
+                , Html.text <| props.itemToStr item
+                ]
+          )
+        ]
+
+
+multiSelectItemLabelHelper : ({ a | pk : Int } -> String) -> msg -> { a | pk : Int } -> Html msg
+multiSelectItemLabelHelper itemToStr toggleMsg item =
+    Html.div
+        [ E.onClick toggleMsg
+        , Css.pill_sm
+        , Css.pill_purple
+        , Css.mr_1
+        , Css.cursor_pointer
+        , Css.p_1
+        ]
+        [ Html.text <| itemToStr item ]
 
 
 selectedItemsView : Maybe (List Int) -> (Maybe (List Int) -> { a | pk : Int } -> Html msg) -> RL.RemoteList { a | pk : Int } -> List (Html msg)
@@ -437,32 +497,12 @@ selectedIcon selectedPks item =
             Html.text ""
 
         True ->
-            i [ A.class "fa fa-check", A.style [ ( "color", "var(--state-primary)" ) ] ] []
+            Html.i [ A.class "fa fa-check" ] []
 
 
 fieldMessage : String -> Html msg
 fieldMessage message =
-    div [ A.class "alert alert-danger" ] [ Html.text message ]
-
-
-errorFieldClass : String -> List String -> String
-errorFieldClass base errors =
-    case List.isEmpty errors of
-        True ->
-            base
-
-        False ->
-            "input-invalid " ++ base
-
-
-formClass : FormStatus -> String
-formClass status =
-    case status of
-        InProgress ->
-            "loading"
-
-        _ ->
-            ""
+    Html.div [ Css.fieldError ] [ Html.text message ]
 
 
 
@@ -471,14 +511,15 @@ formClass status =
 
 contentField : Int -> (String -> msg) -> String -> FieldMeta -> List (Html msg)
 contentField smsCharLimit msg content meta =
-    [ label [ A.for meta.id ] [ Html.text meta.label ]
+    [ label meta
     , Html.textarea
         [ A.id meta.id
         , A.name meta.name
         , A.rows (smsCharLimit |> toFloat |> (/) 160 |> ceiling)
         , A.cols 40
-        , onInput msg
+        , E.onInput msg
         , A.value content
+        , Css.formInput
         ]
         []
     ]
@@ -515,6 +556,6 @@ sendButtonText cost =
 
 sendButton : Maybe Float -> Html msg
 sendButton cost =
-    button
-        [ isDisabled cost, A.id "send_button", A.class "button" ]
+    Html.button
+        [ isDisabled cost, A.id "send_button", Css.btn_purple, Css.btn ]
         [ Html.text ("Send ($" ++ sendButtonText cost ++ ")") ]

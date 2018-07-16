@@ -1,5 +1,6 @@
 module View exposing (view)
 
+import Css
 import Html exposing (Html)
 import Html.Attributes as A
 import Messages as M exposing (Msg(FormMsg))
@@ -22,8 +23,8 @@ import Pages.Forms.SendAdhoc as SAF
 import Pages.Forms.SendGroup as SGF
 import Pages.Forms.SiteConfig as SCF
 import Pages.Forms.UserProfile as UPF
+import Pages.Fragments.ActionsPanel as ActionsPanel
 import Pages.Fragments.Shell as Shell
-import Pages.Fragments.SidePanel as SidePanel
 import Pages.GroupComposer as GC
 import Pages.GroupTable as GT
 import Pages.Help as Help
@@ -47,17 +48,14 @@ view : Model -> Html Msg
 view model =
     let
         sidePanel =
-            SidePanel.view model.dataStore
+            ActionsPanel.view model.dataStore
                 model.page
                 (model.settings.userPerms.can_archive || model.settings.userPerms.user.is_staff)
-
-        shell =
-            Shell.view model
 
         mainContent =
             content model
     in
-    shell mainContent sidePanel
+    Shell.view model mainContent sidePanel
 
 
 content : Model -> Html Msg
@@ -94,8 +92,7 @@ content model =
         GroupComposer composerModel ->
             GC.view
                 { form = M.GroupComposerMsg
-                , loadData = M.StoreMsg S.LoadData
-                , groupLink = \x -> spaLink Html.a [ A.class "float-right button" ] [ Html.text "Send a Message" ] <| initSendAdhoc Nothing x
+                , groupLink = \x -> spaLink Html.a [ Css.float_right ] [ Html.text "Send a Message" ] <| initSendAdhoc Nothing x
                 }
                 composerModel
                 (filterArchived False model.dataStore.groups)
@@ -193,7 +190,7 @@ content model =
                 { form = FormMsg << M.SendAdhocMsg
                 , postForm = M.FormMsg M.PostSendAdhocForm
                 , smsCharLimit = model.settings.smsCharLimit
-                , newContactButton = spaLink Html.a [ A.class "button" ] [ Html.text "Add a New Contact" ] <| ContactForm CF.initialModel Nothing
+                , newContactButton = spaLink Html.a [] [ Html.text "Add a New Contact" ] <| ContactForm CF.initialModel Nothing
                 }
                 saModel
                 (filterArchived False model.dataStore.recipients)
@@ -204,7 +201,7 @@ content model =
                 { form = M.FormMsg << M.SendGroupMsg
                 , postForm = M.FormMsg M.PostSendGroupForm
                 , smsCharLimit = model.settings.smsCharLimit
-                , newGroupButton = spaLink Html.a [ A.class "button" ] [ Html.text "Create a New Group" ] <| GroupForm GF.initialModel Nothing
+                , newGroupButton = spaLink Html.a [] [ Html.text "Create a New Group" ] <| GroupForm GF.initialModel Nothing
                 }
                 sgModel
                 (filterArchived False model.dataStore.groups |> RL.filter (\x -> x.cost > 0))
@@ -219,15 +216,15 @@ content model =
         Help ->
             Help.view
 
-        ContactImport _ ->
+        ContactImport ciModel ->
             CI.view
                 { post = FormMsg M.PostContactImportForm, form = FormMsg << M.ContactImportMsg }
                 model.formStatus
 
         GroupForm gfModel maybePk ->
             GF.view
-                { form = M.FormMsg << M.GroupFormMsg
-                , postForm = M.FormMsg M.PostGroupForm
+                { form = FormMsg << M.GroupFormMsg
+                , postForm = FormMsg M.PostGroupForm
                 , noop = M.Nope
                 , toggleGroupMembership = \x y -> M.StoreMsg <| S.ToggleGroupMembership x y
                 , restoreGroupLink = \x -> spaLink Html.a [] [ Html.text "Archived Group" ] <| GroupForm GF.initialModel x
@@ -350,7 +347,7 @@ smsToReplyLink sms =
 smsToContactLink : { a | sender_name : String, sender_pk : Maybe Int } -> Html Msg
 smsToContactLink sms =
     spaLink Html.a
-        [ A.style [ ( "color", "var(--color-black)" ) ] ]
+        []
         [ Html.text sms.sender_name ]
         (ContactForm CF.initialModel sms.sender_pk)
 
@@ -358,7 +355,7 @@ smsToContactLink sms =
 smsToKeywordLink : { a | matched_keyword : String } -> Html Msg
 smsToKeywordLink sms =
     spaLink Html.a
-        [ A.style [ ( "color", "#212121" ) ] ]
+        []
         [ Html.text sms.matched_keyword ]
         (KeywordForm KF.initialModel <| Just sms.matched_keyword)
 
@@ -383,4 +380,4 @@ keywordToKeywordRespLink fn keyword =
 
 keywordToKeywordLink : { a | keyword : String } -> Html Msg
 keywordToKeywordLink keyword =
-    spaLink Html.a [ A.class "button" ] [ Html.text "Edit" ] (KeywordForm KF.initialModel <| Just keyword.keyword)
+    spaLink Html.a [ Css.btn, Css.btn_purple ] [ Html.text "Edit" ] (KeywordForm KF.initialModel <| Just keyword.keyword)

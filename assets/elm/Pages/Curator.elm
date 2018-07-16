@@ -1,10 +1,10 @@
 module Pages.Curator exposing (view)
 
+import Css
 import Data exposing (SmsInbound)
 import FilteringTable as FT
 import Helpers exposing (formatDate)
-import Html exposing (Html, a, td, text, th, thead, tr)
-import Html.Attributes exposing (class)
+import Html exposing (Html)
 import Html.Events exposing (onClick)
 import RemoteList as RL
 
@@ -22,57 +22,46 @@ type alias Props msg =
 
 view : Props msg -> Html msg
 view { tableMsg, tableModel, sms, toggleWallDisplay } =
-    let
-        head =
-            thead []
-                [ tr []
-                    [ th [] [ text "Message" ]
-                    , th [] [ text "Time" ]
-                    , th [] [ text "Display?" ]
-                    ]
-                ]
-    in
     FT.defaultTable { top = tableMsg } head tableModel (smsRow toggleWallDisplay) sms
 
 
-smsRow : (Bool -> Int -> msg) -> SmsInbound -> ( String, Html msg )
+head : FT.Head
+head =
+    FT.Head
+        [ "Message"
+        , "Time"
+        , "Display?"
+        ]
+
+
+smsRow : (Bool -> Int -> msg) -> SmsInbound -> FT.Row msg
 smsRow toggleWallDisplay sms =
-    ( toString sms.pk
-    , tr
+    FT.Row
         []
-        [ td [] [ text sms.content ]
-        , td [] [ text (formatDate sms.time_received) ]
+        [ FT.Cell [] [ Html.text sms.content ]
+        , FT.Cell [] [ Html.text <| formatDate sms.time_received ]
         , curateToggleCell toggleWallDisplay sms
         ]
-    )
+        (toString sms.pk)
 
 
-curateToggleCell : (Bool -> Int -> msg) -> SmsInbound -> Html msg
+curateToggleCell : (Bool -> Int -> msg) -> SmsInbound -> FT.Cell msg
 curateToggleCell toggleWallDisplay sms =
     let
-        text_ =
+        ( text_, colour ) =
             case sms.display_on_wall of
                 True ->
-                    "Showing"
+                    ( "Showing", Css.btn_green )
 
                 False ->
-                    "Hidden"
-
-        colour =
-            case sms.display_on_wall of
-                True ->
-                    "button-success"
-
-                False ->
-                    "button-danger"
-
-        className =
-            "button " ++ colour
+                    ( "Hidden", Css.btn_red )
     in
-    td []
-        [ a
-            [ class className
-            , onClick (toggleWallDisplay sms.display_on_wall sms.pk)
+    FT.Cell
+        [ Css.collapsing ]
+        [ Html.a
+            [ onClick (toggleWallDisplay sms.display_on_wall sms.pk)
+            , Css.btn
+            , colour
             ]
-            [ text text_ ]
+            [ Html.text text_ ]
         ]

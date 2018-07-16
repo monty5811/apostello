@@ -1,9 +1,10 @@
 module Pages.InboundTable exposing (view)
 
+import Css
 import Data exposing (SmsInbound)
 import FilteringTable as FT
 import Helpers exposing (formatDate)
-import Html exposing (Html, a, b, td, text, th, thead, tr)
+import Html exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
 import RemoteList as RL
@@ -25,65 +26,58 @@ type alias Props msg =
 
 view : Props msg -> Html msg
 view props =
-    let
-        head =
-            thead []
-                [ tr []
-                    [ th [] [ text "From" ]
-                    , th [] [ text "Keyword" ]
-                    , th [] [ text "Message" ]
-                    , th [] [ text "Time" ]
-                    , th [] []
-                    ]
-                ]
-    in
     FT.defaultTable { top = props.tableMsg } head props.tableModel (smsRow props) props.sms
 
 
-smsRow : Props msg -> SmsInbound -> ( String, Html msg )
+head : FT.Head
+head =
+    FT.Head [ "From", "Keyword", "Message", "Time", "" ]
+
+
+smsRow : Props msg -> SmsInbound -> FT.Row msg
 smsRow props sms =
-    ( toString sms.pk
-    , tr [ A.style [ ( "backgroundColor", sms.matched_colour ) ] ]
+    FT.Row
+        []
         [ recipientCell props sms
         , keywordCell props sms
-        , td [] [ text sms.content ]
-        , td [] [ text (formatDate sms.time_received) ]
+        , FT.Cell [] [ Html.text sms.content ]
+        , FT.Cell [ Css.collapsing ] [ Html.text <| formatDate sms.time_received ]
         , reprocessCell props sms
         ]
-    )
+        (toString sms.pk)
 
 
-recipientCell : Props msg -> SmsInbound -> Html msg
+recipientCell : Props msg -> SmsInbound -> FT.Cell msg
 recipientCell props sms =
-    td []
+    FT.Cell
+        [ Css.collapsing ]
         [ props.replyPageLink sms
         , props.contactPageLink sms
         ]
 
 
-keywordCell : Props msg -> SmsInbound -> Html msg
+keywordCell : Props msg -> SmsInbound -> FT.Cell msg
 keywordCell props sms =
     case sms.matched_keyword of
         "#" ->
-            td [] [ b [] [ text sms.matched_keyword ] ]
+            FT.Cell [ Css.collapsing ] [ Html.b [] [ Html.text sms.matched_keyword ] ]
 
         "No Match" ->
-            td [] [ b [] [ text sms.matched_keyword ] ]
+            FT.Cell [ Css.collapsing ] [ Html.b [] [ Html.text sms.matched_keyword ] ]
 
         _ ->
-            td []
-                [ b []
-                    [ props.keywordFormLink sms ]
-                ]
+            FT.Cell [ Css.collapsing ] [ Html.b [] [ props.keywordFormLink sms ] ]
 
 
-reprocessCell : Props msg -> SmsInbound -> Html msg
+reprocessCell : Props msg -> SmsInbound -> FT.Cell msg
 reprocessCell props sms =
-    td []
-        [ a
-            [ A.class "button button-info"
-            , A.id "reingestButton"
+    FT.Cell
+        [ Css.collapsing ]
+        [ Html.a
+            [ A.id "reingestButton"
             , E.onClick (props.reprocessSms sms.pk)
+            , Css.btn
+            , Css.btn_blue
             ]
-            [ text "Reprocess" ]
+            [ Html.text "Reprocess" ]
         ]

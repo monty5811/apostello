@@ -50,6 +50,7 @@ class ConfigView(APIView):
         return Response(serializer.data)
 
     def post(self, request, format=None, **kwargs):
+        print(request)
         return handle_form(self, request)
 
 

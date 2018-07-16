@@ -7,19 +7,19 @@
     {% block morehead %}
     {% endblock %}
   </head>
-  <body>
+  <body class="bg-grey-lighter">
     <div class="spinner" id="elmLoader">
       <div class="dot1"></div>
       <div class="dot2"></div>
     </div>
-    <div id="elmContainer"></div>
+    <div id="elmContainer" class="min-w-full min-h-screen py-2 sm:p-2 md:p-4 lg:p-6"></div>
     <script>
       var elmSettings = {% elm_settings request.user %};
     </script>
     {% include 'apostello/includes/js.html' %}
     {% block morejs %}{% endblock %}
     <noscript>
-      <div class="alert alert-warning" style="margin:5rem;">
+      <div>
         <p>apostello cannot function without javascript...</p>
       </div>
     </noscript>

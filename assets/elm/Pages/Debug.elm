@@ -1,5 +1,6 @@
 module Pages.Debug exposing (Model, Msg, decodeDebuggerResp, initialModel, update, view)
 
+import Css
 import DjangoSend exposing (CSRFToken, post)
 import Html exposing (Html)
 import Html.Attributes as A
@@ -153,7 +154,7 @@ sendTestEmail csrf model =
 view : Model -> Html Msg
 view model =
     Html.div []
-        [ Html.p [] [ Html.text "Use these forms to test your Email and Twilio settings." ]
+        [ Html.p [ Css.mb_4 ] [ Html.text "Use these forms to test your Email and Twilio settings." ]
         , testEmailView model
         , testSmsView model
         ]
@@ -162,33 +163,41 @@ view model =
 testEmailView : Model -> Html Msg
 testEmailView model =
     Html.div [ A.id "sent_test_email" ]
-        [ Html.div [ A.class "segment" ]
+        [ Html.div []
             [ Html.h3 [] [ Html.text "Send Test Email" ]
             , Html.form [ onSubmit SendTestEmail ]
                 [ formMsg model.testEmailFormStatus emailSuccessMsg
-                , Html.div [ A.class "input-field" ]
-                    [ Html.label [] [ Html.text "Email Address" ]
+                , Html.div []
+                    [ Html.label [ Css.label ] [ Html.text "Email Address" ]
                     , Html.input
                         [ A.type_ "email"
                         , A.name "email-to"
                         , A.placeholder "test@example.com"
                         , A.id "email_to"
                         , onInput UpdateTestEmailToField
+                        , Css.formInput
                         ]
                         []
                     ]
-                , Html.div [ A.class "input-field" ]
-                    [ Html.label [] [ Html.text "Email Body" ]
+                , Html.div []
+                    [ Html.label [ Css.label ] [ Html.text "Email Body" ]
                     , Html.input
                         [ A.type_ "text"
                         , A.name "email-body"
                         , A.placeholder "This is a test"
                         , A.id "email_body"
                         , onInput UpdateTestEmailBodyField
+                        , Css.formInput
                         ]
                         []
                     ]
-                , Html.button [ A.class "button", A.id "email_send_button" ] [ Html.text "Send" ]
+                , Html.button
+                    [ A.id "email_send_button"
+                    , Css.btn
+                    , Css.btn_purple
+                    , Css.my_4
+                    ]
+                    [ Html.text "Send" ]
                 ]
             ]
         ]
@@ -197,11 +206,11 @@ testEmailView model =
 testSmsView : Model -> Html Msg
 testSmsView model =
     Html.div [ A.id "sent_test_sms" ]
-        [ Html.div [ A.class "segment" ]
+        [ Html.div []
             [ Html.h3 [] [ Html.text "Send Test SMS" ]
             , Html.form [ onSubmit SendTestSms ]
                 [ formMsg model.testSmsFormStatus smsSuccessMsg
-                , Html.div [ A.class "input-field" ]
+                , Html.div [ Css.label ]
                     [ Html.label [] [ Html.text "Phone Number" ]
                     , Html.input
                         [ A.type_ "text"
@@ -209,21 +218,29 @@ testSmsView model =
                         , A.placeholder "+447095320967"
                         , A.id "sms_to"
                         , onInput UpdateTestSmsToField
+                        , Css.formInput
                         ]
                         []
                     ]
-                , Html.div [ A.class "input-field" ]
-                    [ Html.label [] [ Html.text "SMS Body" ]
+                , Html.div []
+                    [ Html.label [ Css.label ] [ Html.text "SMS Body" ]
                     , Html.input
                         [ A.type_ "text"
                         , A.name "sms-body"
                         , A.placeholder "This is a test"
                         , A.id "sms_body"
                         , onInput UpdateTestSmsBodyField
+                        , Css.formInput
                         ]
                         []
                     ]
-                , Html.button [ A.class "button", A.id "sms_send_button" ] [ Html.text "Send" ]
+                , Html.button
+                    [ A.id "sms_send_button"
+                    , Css.btn
+                    , Css.btn_purple
+                    , Css.my_4
+                    ]
+                    [ Html.text "Send" ]
                 ]
             ]
         ]
@@ -242,7 +259,7 @@ formMsg status successDiv =
             successDiv
 
         Failed e ->
-            Html.div [ A.class "alert alert-danger" ]
+            Html.div []
                 [ Html.h4 [] [ Html.text "Uh oh, something went wrong!" ]
                 , Html.p [] [ Html.text "Check your settings and try again." ]
                 , Html.p [] [ Html.text "Error:" ]
@@ -252,7 +269,7 @@ formMsg status successDiv =
 
 emailSuccessMsg : Html Msg
 emailSuccessMsg =
-    Html.div [ A.class "alert alert-success" ]
+    Html.div []
         [ Html.h4 [] [ Html.text "Email sent!" ]
         , Html.p [] [ Html.text "Check your inbox to confirm!" ]
         ]
@@ -260,7 +277,7 @@ emailSuccessMsg =
 
 smsSuccessMsg : Html Msg
 smsSuccessMsg =
-    Html.div [ A.class "alert alert-success" ]
+    Html.div []
         [ Html.h4 [] [ Html.text "SMS Sending!" ]
         , Html.p [] [ Html.text "Check your phone to confirm!" ]
         ]

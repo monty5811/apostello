@@ -1,8 +1,8 @@
 module Pages.Wall exposing (view)
 
+import Css
 import Data exposing (SmsInbound)
-import Html exposing (Html, div, p, span, text)
-import Html.Attributes exposing (class, style)
+import Html exposing (Html)
 import RemoteList as RL
 
 
@@ -11,36 +11,20 @@ import RemoteList as RL
 
 view : RL.RemoteList SmsInbound -> Html msg
 view sms =
-    div
-        [ class "text-center"
-        , style
-            [ ( "background-color", "#5c569c" )
-            , ( "height", "100vh" )
-            , ( "width", "100vw" )
-            ]
-        ]
-        [ div [ style [ ( "padding", "2rem" ) ] ]
-            (sms
-                |> RL.toList
-                |> List.filter (\s -> s.display_on_wall)
-                |> List.map smsCard
-            )
-        ]
+    Html.div []
+        (sms
+            |> RL.toList
+            |> List.filter (\s -> s.display_on_wall)
+            |> List.map smsCard
+        )
 
 
 smsCard : SmsInbound -> Html msg
 smsCard sms =
-    div
-        [ style
-            [ ( "backgroundColor", "#ffffff" )
-            , ( "fontSize", "200%" )
-            , ( "padding", ".5rem" )
-            , ( "margin", ".5rem" )
-            ]
-        ]
-        [ p []
-            [ span [ style [ ( "color", "#d3d3d3" ) ] ] [ text <| firstWord sms ]
-            , text <| restOfMessage sms
+    Html.div [ Css.wallSms ]
+        [ Html.p []
+            [ Html.span [ Css.text_grey ] [ Html.text <| firstWord sms ]
+            , Html.text <| restOfMessage sms
             ]
         ]
 

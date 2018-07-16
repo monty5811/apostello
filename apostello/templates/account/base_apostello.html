@@ -1,0 +1,19 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% include 'apostello/includes/head.html' %}
+</head>
+<body>
+  <div class="w-screen h-screen bg-grey-lighter py-8">
+    <div class ="max-w-xs mx-auto">
+      <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+          {% block content %}
+          {% endblock %}
+        </div>
+    </div>
+    {% block cookie_banner %}
+    {% endblock %}
+  </div>
+  {% include 'apostello/includes/js.html' %}
+</body>

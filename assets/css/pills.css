@@ -1,0 +1,24 @@
+.pill {
+  @apply .font-bold .py-1 .px-2 .rounded align-middle text-center;
+}
+
+.pill-sm {
+  @apply .font-light .py-1 .px-1 .rounded .align-middle text-center;
+  @apply text-sm;
+}
+
+.pill-green {
+  @apply .bg-green .text-white;
+}
+
+.pill-orange{
+  @apply .bg-orange .text-white;
+}
+
+.pill-purple{
+  @apply .bg-purple .text-white;
+}
+
+.pill-red{
+  @apply .bg-red .text-white;
+}

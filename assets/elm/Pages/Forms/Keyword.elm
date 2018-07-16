@@ -5,12 +5,9 @@ import Date
 import DateTimePicker
 import FilteringTable exposing (textToRegex)
 import Forms.Model exposing (Field, FieldMeta, FormItem(FieldGroup, FormField), FormStatus, defaultFieldGroupConfig)
-import Forms.View exposing (..)
+import Forms.View as FV exposing (..)
 import Helpers exposing (toggleSelectedPk)
 import Html exposing (Html)
-import Html.Attributes as A
-import Html.Events as E
-import Html.Keyed
 import Pages.Error404 as E404
 import Pages.Forms.Meta.Keyword exposing (meta)
 import Pages.Fragments.Loader exposing (loader)
@@ -364,39 +361,22 @@ linkedGroupsField msgs model groups maybeKeyword =
 
 groupLabelView : Messages msg -> Maybe (List Int) -> RecipientGroup -> Html msg
 groupLabelView msgs maybePks group =
-    Html.div
-        [ A.class "badge"
-        , A.style [ ( "user-select", "none" ) ]
-        , E.onClick <| msgs.k <| UpdateSelectedLinkedGroup (Maybe.withDefault [] maybePks) group.pk
-        ]
-        [ Html.text group.name ]
+    multiSelectItemLabelHelper
+        .name
+        (msgs.k <| UpdateSelectedLinkedGroup (Maybe.withDefault [] maybePks) group.pk)
+        group
 
 
 groupView : Messages msg -> Maybe (List Int) -> RecipientGroup -> Html msg
 groupView msgs maybeSelectedPks group =
-    let
-        selectedPks =
-            case maybeSelectedPks of
-                Nothing ->
-                    []
-
-                Just pks ->
-                    pks
-    in
-    Html.Keyed.node "div"
-        [ A.class "item"
-        , A.style [ ( "user-select", "none" ) ]
-        , E.onClick <| msgs.k <| UpdateSelectedLinkedGroup selectedPks group.pk
-        ]
-        [ ( toString group.pk, groupViewHelper selectedPks group ) ]
-
-
-groupViewHelper : List Int -> RecipientGroup -> Html msg
-groupViewHelper selectedPks group =
-    Html.div [ A.style [ ( "color", "#000" ) ] ]
-        [ selectedIcon selectedPks group
-        , Html.text group.name
-        ]
+    FV.multiSelectItemHelper
+        { itemToStr = .name
+        , maybeSelectedPks = maybeSelectedPks
+        , itemToKey = .pk >> toString
+        , toggleMsg = msgs.k << UpdateSelectedLinkedGroup (Maybe.withDefault [] maybeSelectedPks)
+        , itemToId = .pk >> toString >> (++) "linkedGroup"
+        }
+        group
 
 
 ownersField : Messages msg -> Model -> RL.RemoteList User -> Maybe Keyword -> FieldMeta -> List (Html msg)
@@ -408,7 +388,7 @@ ownersField msgs model users maybeKeyword =
             (Maybe.map .owners maybeKeyword)
             model.ownersFilter
             (msgs.k << UpdateKeywordOwnersFilter)
-            (userView msgs UpdateSelectedOwner)
+            (ownerUserView msgs)
             (userLabelView msgs UpdateSelectedOwner)
         )
 
@@ -422,61 +402,41 @@ digestField msgs model users maybeKeyword =
             (Maybe.map .subscribed_to_digest maybeKeyword)
             model.subscribersFilter
             (msgs.k << UpdateKeywordSubscribersFilter)
-            (userView msgs UpdateSelectedSubscriber)
+            (digestUserView msgs)
             (userLabelView msgs UpdateSelectedSubscriber)
         )
 
 
 userLabelView : Messages msg -> (List Int -> Int -> Msg) -> Maybe (List Int) -> User -> Html msg
 userLabelView msgs msg selectedPks user =
-    Html.div
-        [ A.class "badge"
-        , A.style [ ( "user-select", "none" ) ]
-        , E.onClick <| msgs.k <| msg (Maybe.withDefault [] selectedPks) user.pk
-        ]
-        [ Html.text user.email ]
+    multiSelectItemLabelHelper
+        .email
+        (msgs.k <| msg (Maybe.withDefault [] selectedPks) user.pk)
+        user
 
 
-userView : Messages msg -> (List Int -> Int -> Msg) -> Maybe (List Int) -> User -> Html msg
-userView msgs toMsg maybeSelectedPks owner =
-    let
-        selectedPks =
-            case maybeSelectedPks of
-                Nothing ->
-                    []
-
-                Just pks ->
-                    pks
-
-        msg =
-            toMsg selectedPks owner.pk
-
-        id =
-            case msg of
-                UpdateSelectedOwner _ _ ->
-                    "UpdateSelectedOwner"
-
-                UpdateSelectedSubscriber _ _ ->
-                    "UpdateSelectedSubscriber"
-
-                _ ->
-                    "_err"
-    in
-    Html.Keyed.node "div"
-        [ A.class "item"
-        , A.style [ ( "user-select", "none" ) ]
-        , E.onClick <| msgs.k <| msg
-        , A.id <| "user" ++ id
-        ]
-        [ ( toString owner.pk, userViewHelper selectedPks owner ) ]
+digestUserView : Messages msg -> Maybe (List Int) -> User -> Html msg
+digestUserView msgs maybeSelectedPks user =
+    FV.multiSelectItemHelper
+        { itemToStr = .email
+        , maybeSelectedPks = maybeSelectedPks
+        , itemToKey = .pk >> toString
+        , toggleMsg = msgs.k << UpdateSelectedSubscriber (Maybe.withDefault [] maybeSelectedPks)
+        , itemToId = .pk >> toString >> (++) "userUpdateSelectedSubscriber"
+        }
+        user
 
 
-userViewHelper : List Int -> User -> Html msg
-userViewHelper selectedPks owner =
-    Html.div [ A.style [ ( "color", "#000" ) ] ]
-        [ selectedIcon selectedPks owner
-        , Html.text owner.email
-        ]
+ownerUserView : Messages msg -> Maybe (List Int) -> User -> Html msg
+ownerUserView msgs maybeSelectedPks owner =
+    FV.multiSelectItemHelper
+        { itemToStr = .email
+        , maybeSelectedPks = maybeSelectedPks
+        , itemToKey = .pk >> toString
+        , toggleMsg = msgs.k << UpdateSelectedOwner (Maybe.withDefault [] maybeSelectedPks)
+        , itemToId = .pk >> toString >> (++) "userUpdateSelectedOwner"
+        }
+        owner
 
 
 showArchiveNotice : List Keyword -> Maybe Keyword -> Model -> Bool
@@ -517,7 +477,7 @@ archiveNotice msgs show keywords name =
             Html.text ""
 
         True ->
-            Html.div [ A.class "alert" ]
+            Html.div []
                 [ Html.p [] [ Html.text "There is already a Keyword that with that name in the archive" ]
                 , Html.p [] [ Html.text "You can chose a different name." ]
                 , Html.p []

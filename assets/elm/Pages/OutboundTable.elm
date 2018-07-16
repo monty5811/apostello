@@ -1,9 +1,10 @@
 module Pages.OutboundTable exposing (view)
 
+import Css
 import Data exposing (SmsOutbound, stringFromMDStatus)
 import FilteringTable as FT
 import Helpers exposing (formatDate)
-import Html exposing (Html, td, text, th, thead, tr)
+import Html exposing (Html)
 import RemoteList as RL
 
 
@@ -20,19 +21,17 @@ view props =
     FT.defaultTable { top = props.tableMsg } tableHead props.tableModel (smsRow props) props.sms
 
 
-tableHead : Html msg
+tableHead : FT.Head
 tableHead =
-    thead []
-        [ tr []
-            [ th [] [ text "To" ]
-            , th [] [ text "Message" ]
-            , th [] [ text "Sent" ]
-            , th [] [ text "Status from Twilio" ]
-            ]
+    FT.Head
+        [ "To"
+        , "Message"
+        , "Sent"
+        , "Status from Twilio"
         ]
 
 
-smsRow : Props msg -> SmsOutbound -> ( String, Html msg )
+smsRow : Props msg -> SmsOutbound -> FT.Row msg
 smsRow props sms =
     let
         recipient =
@@ -43,11 +42,11 @@ smsRow props sms =
                 Nothing ->
                     { full_name = "", pk = 0 }
     in
-    ( toString sms.pk
-    , tr []
-        [ td [] [ props.contactLink recipient ]
-        , td [] [ text sms.content ]
-        , td [] [ text (formatDate sms.time_sent) ]
-        , td [] [ text (stringFromMDStatus sms.status) ]
+    FT.Row
+        []
+        [ FT.Cell [] [ props.contactLink recipient ]
+        , FT.Cell [] [ Html.text sms.content ]
+        , FT.Cell [ Css.collapsing ] [ Html.text <| formatDate sms.time_sent ]
+        , FT.Cell [ Css.collapsing ] [ Html.text <| stringFromMDStatus sms.status ]
         ]
-    )
+        (toString sms.pk)

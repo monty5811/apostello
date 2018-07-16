@@ -22,6 +22,7 @@ import Pages exposing (Page(..), initSendAdhoc, initSendGroup)
 import Pages.Debug as DG
 import Pages.FirstRun as FR
 import Pages.Forms.Contact as CF
+import Pages.Forms.ContactImport as CI
 import Pages.Forms.DefaultResponses
 import Pages.Forms.Group as GF
 import Pages.Forms.Keyword as KF
@@ -69,7 +70,7 @@ route =
         , Url.map (DefaultResponsesForm Nothing) (s "config" </> s "responses")
         , Url.map (CreateAllGroup "") (s "group" </> s "create_all")
         , Url.map (UserProfileForm UP.initialModel) (s "users" </> s "profiles" </> int)
-        , Url.map (ContactImport "") (s "recipient" </> s "import")
+        , Url.map (ContactImport CI.initialModel) (s "recipient" </> s "import")
         , Url.map (ApiSetup Nothing) (s "api-setup")
         , Url.map Help (s "help")
 

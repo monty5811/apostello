@@ -1,7 +1,6 @@
 module Main exposing (main)
 
 import Html exposing (Html)
-import Html.Attributes as A
 import Json.Decode as Decode
 import Messages exposing (Msg(UrlChange))
 import Models exposing (Model, decodeFlags, initialModel)
@@ -74,15 +73,7 @@ subscriptionsResult result =
 viewError : String -> Html Msg
 viewError err =
     Html.div
-        [ A.style
-            [ ( "width", "100vw" )
-            , ( "height", "100vh" )
-            , ( "background", "#5a589b" )
-            , ( "color", "#fff" )
-            , ( "text-align", "center" )
-            , ( "padding-top", "10rem" )
-            ]
-        ]
+        []
         [ Html.h1 [] [ Html.text "Something broke there, please try reloading the page..." ]
-        , Html.p [ A.style [ ( "padding-top", "10rem" ) ] ] [ Html.text <| "Detailed error: " ++ err ]
+        , Html.p [] [ Html.text <| "Detailed error: " ++ err ]
         ]

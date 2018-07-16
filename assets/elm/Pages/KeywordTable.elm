@@ -1,10 +1,10 @@
 module Pages.KeywordTable exposing (view)
 
+import Css
 import Data exposing (Keyword)
 import FilteringTable as FT
 import Helpers exposing (archiveCell)
-import Html exposing (Html, div, td, text, th, thead, tr)
-import Html.Attributes exposing (class)
+import Html exposing (Html)
 import RemoteList as RL
 
 
@@ -20,44 +20,42 @@ type alias Props msg =
 
 view : Props msg -> Html msg
 view props =
-    FT.table { top = props.tableMsg } "table-striped" tableHead props.tableModel (keywordRow props) props.keywords
+    FT.defaultTable { top = props.tableMsg } tableHead props.tableModel (keywordRow props) props.keywords
 
 
-tableHead : Html msg
+tableHead : FT.Head
 tableHead =
-    thead []
-        [ tr []
-            [ th [] []
-            , th [] [ text "Matches" ]
-            , th [ class "hide-sm-down" ] [ text "Description" ]
-            , th [ class "hide-sm-down" ] [ text "Auto Reply" ]
-            , th [] [ text "Status" ]
-            , th [] []
-            , th [ class "hide-sm-down" ] []
-            ]
+    FT.Head
+        [ ""
+        , "Matches"
+        , "Description"
+        , "Auto Reply"
+        , "Status"
+        , ""
+        , ""
         ]
 
 
-keywordRow : Props msg -> Keyword -> ( String, Html msg )
+keywordRow : Props msg -> Keyword -> FT.Row msg
 keywordRow props keyword =
-    ( toString keyword.pk
-    , tr []
-        [ td [] [ props.keywordRespLink .keyword keyword ]
-        , td [ class "text-center" ] [ props.keywordRespLink .num_replies keyword ]
-        , td [ class "hide-sm-down" ] [ text keyword.description ]
-        , td [ class "hide-sm-down" ] [ text keyword.current_response ]
+    FT.Row
+        []
+        [ FT.Cell [ Css.collapsing ] [ props.keywordRespLink .keyword keyword ]
+        , FT.Cell [] [ props.keywordRespLink .num_replies keyword ]
+        , FT.Cell [] [ Html.text keyword.description ]
+        , FT.Cell [] [ Html.text keyword.current_response ]
         , keywordStatusCell keyword.is_live
-        , td [] [ props.keywordLink keyword ]
-        , archiveCell keyword.is_archived (props.toggleKeywordArchive keyword.is_archived keyword.keyword)
+        , FT.Cell [ Css.collapsing ] [ props.keywordLink keyword ]
+        , FT.Cell [ Css.collapsing ] [ archiveCell keyword.is_archived (props.toggleKeywordArchive keyword.is_archived keyword.keyword) ]
         ]
-    )
+        (toString keyword.pk)
 
 
-keywordStatusCell : Bool -> Html msg
+keywordStatusCell : Bool -> FT.Cell msg
 keywordStatusCell isLive =
     case isLive of
         True ->
-            td [] [ div [ class "badge badge-success" ] [ text "Active" ] ]
+            FT.Cell [ Css.collapsing ] [ Html.div [ Css.pill, Css.pill_green, Css.text_center ] [ Html.text "Active" ] ]
 
         False ->
-            td [] [ div [ class "badge badge-warning" ] [ text "Inactive" ] ]
+            FT.Cell [ Css.collapsing ] [ Html.div [ Css.pill, Css.pill_orange, Css.text_center ] [ Html.text "Inactive" ] ]

@@ -40,18 +40,17 @@ type Msg
     | KeyRespTableMsg KRT.Msg
     | FirstRunMsg FR.Msg
     | DebugMsg DG.Msg
-    | SidePanelMsg SidePanelMsg
+    | ActionsPanelMsg ActionsPanelMsg
     | ApiSetupMsg AS.Msg
     | WebPushMsg WebPush.Msg
     | NotificationMsg Notif.Msg
     | CurrentTime Time.Time
     | Nope
-    | ToggleMenu
-    | KeyPressed Int
+    | ScrollToId String
     | VisibilityChange PageVisibility.Visibility
 
 
-type SidePanelMsg
+type ActionsPanelMsg
     = ArchiveItem String String Bool
     | ReceiveArchiveResp String (Result Http.Error Bool)
 

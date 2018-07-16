@@ -1,8 +1,9 @@
-{% extends "account/base_apsotello.html" %}
+{% extends "account/base_apostello.html" %}
 {% block content %}
 
-<h3>Account Not Approved</h3>
-{{ msg|linebreaks }}
+<h3 class="mb-4">Account Not Approved</h3>
 
-<a class="button button-danger" href="/accounts/logout/">Logout</a>
+<div class="mb-4">{{ msg|linebreaks }}</div>
+
+<a class="btn btn-purple" href="/accounts/logout/">Logout</a>
 {% endblock %}

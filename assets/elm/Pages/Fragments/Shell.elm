@@ -1,18 +1,19 @@
 module Pages.Fragments.Shell exposing (view)
 
-import Html exposing (Html, div, h3, text)
-import Html.Attributes exposing (class, id)
+import Css
+import Html exposing (Html)
+import Html.Attributes as A
 import Html.Events as E
-import Messages exposing (Msg(NotificationMsg, ToggleMenu))
-import Models exposing (MenuModel(MenuHidden, MenuVisible), Model)
+import Messages exposing (Msg(NotificationMsg, ScrollToId))
+import Models exposing (Model)
 import Notification as Notif
 import Pages exposing (Page(..))
 import Pages.Fragments.Menu as Menu
 import Route exposing (spaLink)
 
 
-view : Model -> Html Msg -> Html Msg -> Html Msg
-view model mainContent fab =
+view : Model -> Html Msg -> List (Html Msg) -> Html Msg
+view model mainContent actionsList =
     case model.page of
         Wall ->
             mainContent
@@ -24,52 +25,62 @@ view model mainContent fab =
             mainContent
 
         _ ->
-            commonShell model mainContent fab
+            commonShell model mainContent actionsList
 
 
-commonShell : Model -> Html Msg -> Html Msg -> Html Msg
-commonShell model mainContent fab =
-    Html.div
-        [ id "elmShell" ]
-        [ Html.header [ id "head", class "text-center" ]
-            [ case model.page of
+commonShell : Model -> Html Msg -> List (Html Msg) -> Html Msg
+commonShell model mainContent actionsList =
+    let
+        bigHeading =
+            case model.page of
                 Home ->
-                    Html.h2 [] [ text "apostello" ]
+                    apostelloHeading
 
                 _ ->
-                    spaLink Html.a [] [ Html.h2 [] [ text "apostello" ] ] Home
-            , Html.a [ class "button bounce", E.onClick ToggleMenu ] [ text "Menu" ]
+                    spaLink Html.a [] [ apostelloHeading ] Home
+    in
+    Html.div
+        [ A.id "elmShell"
+        ]
+        [ Html.header [ A.id "head" ]
+            [ bigHeading
+            , Html.h3 [ Css.mt_2, Css.mb_4, Css.text_center ] [ Html.text <| title model.page ]
+            , scrollToMenuButton
             ]
-        , Html.main_ [ id "wrap" ]
-            [ fab
-            , div [ id "content" ] <|
+        , Html.aside [ A.id "actionsWrapper", Css.raisedSegment ] actionsList
+        , Html.main_ [ A.id "wrap", Css.raisedSegment, Css.py_4, A.class "overflow-x-auto" ]
+            [ Html.div [ A.id "content" ] <|
                 List.concat
-                    [ [ h3 [] [ text <| title model.page ] ]
-                    , List.map (Html.map NotificationMsg) (Notif.view model.notifications)
+                    [ List.map (Html.map NotificationMsg) (Notif.view model.notifications)
                     , [ mainContent ]
                     ]
             ]
-        , div [ id "menuWrapper", class <| menuClass model.menuState ] <|
-            div [ class "text-right" ]
-                [ Html.a
-                    [ class "button button-lg"
-                    , id "close"
-                    , E.onClick ToggleMenu
-                    ]
-                    [ Html.i [ class "fa fa-close" ] [] ]
-                ]
-                :: Menu.menu model.settings model.webPush
+        , Html.aside [ A.id "menuWrapper", Css.raisedSegment, Css.pb_4 ] <| Menu.menu model.settings model.webPush
         ]
 
 
-menuClass : MenuModel -> String
-menuClass menuState =
-    case menuState of
-        MenuVisible ->
-            "menuVisible"
+scrollToMenuButton : Html Msg
+scrollToMenuButton =
+    Html.div
+        [ E.onClick <| ScrollToId "menuWrapper"
+        , Css.text_sm
+        , Css.select_none
+        , Css.cursor_pointer
+        , Css.lg__hidden
+        , Css.btn
+        , Css.btn_purple
+        , Css.pin_r
+        , Css.pin_t
+        , Css.absolute
+        , Css.mt_4
+        , Css.mr_4
+        ]
+        [ Html.text "Menu " ]
 
-        MenuHidden ->
-            "menuHidden"
+
+apostelloHeading : Html msg
+apostelloHeading =
+    Html.h2 [ Css.text_center ] [ Html.text "apostello" ]
 
 
 title : Page -> String
@@ -154,10 +165,10 @@ title page =
             "Scheduled"
 
         SendAdhoc _ ->
-            "Send"
+            "Send to individuals"
 
         SendGroup _ ->
-            "Send"
+            "Send to a group"
 
         UserProfileTable ->
             "Permissions"

@@ -1,0 +1,18 @@
+table {
+    border-collapse: collapse;
+    @apply w-full;
+}
+
+td {
+   @apply px-2 py-3 border-b-2 text-left;
+}
+
+
+thead {
+    @apply text-left;
+}
+
+.collapsing {
+    width: 1px;
+    white-space: nowrap;
+}

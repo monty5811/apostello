@@ -1,10 +1,10 @@
 module Pages.Forms.Contact exposing (Model, Msg, initialModel, update, view)
 
+import Css
 import Data exposing (Recipient)
 import Forms.Model exposing (Field, FieldMeta, FormItem(FieldGroup, FormField), FormStatus, defaultFieldGroupConfig)
 import Forms.View exposing (checkboxField, form, longTextField, simpleTextField, submitButton)
-import Html exposing (Html, div, p, text)
-import Html.Attributes as A
+import Html exposing (Html)
 import Pages.Error404 as E404
 import Pages.Forms.Meta.Contact exposing (meta)
 import Pages.Fragments.Loader exposing (loader)
@@ -147,7 +147,7 @@ viewHelp props maybeTable currentContact contacts_ model status =
 
         fields =
             [ Just <|
-                FieldGroup { defaultFieldGroupConfig | sideBySide = Just 2, header = Just "Name" }
+                FieldGroup { defaultFieldGroupConfig | sideBySide = Just 2, header = Nothing }
                     [ Field meta.first_name <| firstNameField props currentContact
                     , Field meta.last_name <| lastNameField props currentContact
                     ]
@@ -163,10 +163,15 @@ viewHelp props maybeTable currentContact contacts_ model status =
             ]
                 |> List.filterMap identity
     in
-    div []
+    Html.div []
         [ archiveNotice props showAN contacts model.number
         , form status fields (submitMsg props showAN) (submitButton currentContact showAN)
-        , Maybe.withDefault (text "") maybeTable
+        , case maybeTable of
+            Just table ->
+                Html.div [ Css.mt_4 ] [ table ]
+
+            Nothing ->
+                Html.text ""
         ]
 
 
@@ -250,13 +255,13 @@ archiveNotice props show contacts num =
     in
     case show of
         False ->
-            text ""
+            Html.text ""
 
         True ->
-            div [ A.class "alert" ]
-                [ p [] [ text "There is already a Contact that with that number in the archive" ]
-                , p []
-                    [ text "Or you can restore the contact here: "
+            Html.div []
+                [ Html.p [] [ Html.text "There is already a Contact that with that number in the archive" ]
+                , Html.p []
+                    [ Html.text "Or you can restore the contact here: "
                     , props.spa matchedContact
                     ]
                 ]

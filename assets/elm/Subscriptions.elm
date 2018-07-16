@@ -1,11 +1,10 @@
 module Subscriptions exposing (subscriptions)
 
-import Keyboard
 import Messages as M
-import Models exposing (MenuModel(MenuHidden, MenuVisible), Model)
+import Models exposing (Model)
 import PageVisibility
 import Pages exposing (Page(Curator, SendAdhoc, SendGroup, Wall))
-import Store.Messages exposing (StoreMsg(LoadData, LoadDataStore))
+import Store.Messages exposing (StoreMsg(LoadData))
 import Store.Model as Store
 import Time exposing (second)
 import WebPush
@@ -18,23 +17,12 @@ subscriptions model =
         , getCurrentTime
         , Sub.map M.WebPushMsg <| WebPush.subscriptions model.webPush
         , PageVisibility.visibilityChanges M.VisibilityChange
-        , keyUps model
         ]
 
 
 getCurrentTime : Sub M.Msg
 getCurrentTime =
     Time.every (60 * second) (\t -> M.CurrentTime t)
-
-
-keyUps : Model -> Sub M.Msg
-keyUps model =
-    case model.menuState of
-        MenuHidden ->
-            Sub.none
-
-        MenuVisible ->
-            Keyboard.ups M.KeyPressed
 
 
 reloadData : PageVisibility.Visibility -> Page -> Store.DataStore -> Sub M.Msg

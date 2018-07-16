@@ -3,6 +3,7 @@ module Pages exposing (Page(..), initSendAdhoc, initSendGroup)
 import Pages.Debug as DG
 import Pages.FirstRun as FR
 import Pages.Forms.Contact as CF
+import Pages.Forms.ContactImport as CI
 import Pages.Forms.DefaultResponses as DRF
 import Pages.Forms.Group as GF
 import Pages.Forms.Keyword as KF
@@ -42,7 +43,7 @@ type Page
     | Usage
     | UserProfileForm UP.Model Int
     | Help
-    | ContactImport String
+    | ContactImport CI.Model
     | ApiSetup (Maybe String)
 
 

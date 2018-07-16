@@ -1,10 +1,11 @@
 module Pages.KeyRespTable exposing (Msg, update, view)
 
+import Css
 import Data exposing (SmsInbound)
 import DjangoSend exposing (CSRFToken, post)
 import FilteringTable as FT
 import Helpers exposing (..)
-import Html exposing (Html, br, button, div, i, input, td, text, th, thead, tr)
+import Html exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
 import Http
@@ -71,23 +72,21 @@ type alias Props msg =
 
 view : Props msg -> Bool -> FT.Model -> RL.RemoteList SmsInbound -> Bool -> String -> Html msg
 view props viewingArchive tableModel sms ticked keyword =
-    div []
+    Html.div []
         [ FT.defaultTable { top = props.tableMsg } tableHead tableModel (smsRow props) sms
-        , br [] []
+        , Html.br [] []
         , archiveAllForm props viewingArchive ticked keyword
         ]
 
 
-tableHead : Html msg
+tableHead : FT.Head
 tableHead =
-    thead []
-        [ tr []
-            [ th [] [ text "From" ]
-            , th [] [ text "Time Received" ]
-            , th [] [ text "Message" ]
-            , th [] [ text "Requires Action?" ]
-            , th [ A.class "hide-sm-down" ] []
-            ]
+    FT.Head
+        [ "From"
+        , "Time Received"
+        , "Message"
+        , "Requires Action?"
+        , ""
         ]
 
 
@@ -95,13 +94,13 @@ archiveAllForm : Props msg -> Bool -> Bool -> String -> Html msg
 archiveAllForm props viewingArchive ticked k =
     case viewingArchive of
         True ->
-            text ""
+            Html.text ""
 
         False ->
             Html.form [ E.onSubmit (props.form <| ArchiveAllButtonClick k) ]
-                [ div [ A.class "input-field" ]
-                    [ Html.label []
-                        [ input
+                [ Html.div []
+                    [ Html.label [ Css.label ]
+                        [ Html.input
                             [ A.id "id_tick_to_archive_all_responses"
                             , A.name "tick_to_archive_all_responses"
                             , A.attribute "required" ""
@@ -110,7 +109,7 @@ archiveAllForm props viewingArchive ticked k =
                             , E.onClick (props.form ArchiveAllCheckBoxClick)
                             ]
                             []
-                        , text " Tick to archive all responses"
+                        , Html.text " Tick to archive all responses"
                         ]
                     ]
                 , archiveAllButton ticked
@@ -121,48 +120,49 @@ archiveAllButton : Bool -> Html msg
 archiveAllButton ticked =
     case ticked of
         True ->
-            button [ A.class "button button-danger", A.id "archiveAllSmsButton" ] [ text "Archive all!" ]
+            Html.button [ A.id "archiveAllSmsButton", Css.btn, Css.btn_purple ] [ Html.text "Archive all!" ]
 
         False ->
-            button [ A.class "button button-danger", A.disabled True ] [ text "Archive all!" ]
+            Html.button [ A.disabled True, Css.btn, Css.btn_grey ] [ Html.text "Archive all!" ]
 
 
-smsRow : Props msg -> SmsInbound -> ( String, Html msg )
+smsRow : Props msg -> SmsInbound -> FT.Row msg
 smsRow props sms =
-    ( toString sms.pk
-    , tr []
-        [ recipientCell props sms
-        , td [] [ text (formatDate sms.time_received) ]
-        , td [] [ text sms.content ]
-        , td [] [ dealtWithButton props sms ]
-        , archiveCell sms.is_archived (props.toggleInboundSmsArchive sms.is_archived sms.pk)
+    FT.Row
+        []
+        [ FT.Cell [] <| recipientCell props sms
+        , FT.Cell [] [ Html.text <| formatDate sms.time_received ]
+        , FT.Cell [] [ Html.text sms.content ]
+        , FT.Cell [ Css.collapsing ] [ dealtWithButton props sms ]
+        , FT.Cell [ Css.collapsing ] [ archiveCell sms.is_archived (props.toggleInboundSmsArchive sms.is_archived sms.pk) ]
         ]
-    )
+        (toString sms.pk)
 
 
-recipientCell : Props msg -> SmsInbound -> Html msg
+recipientCell : Props msg -> SmsInbound -> List (Html msg)
 recipientCell props sms =
-    td []
-        [ props.pkToReplyLink sms
-        , props.pkToContactLink sms
-        ]
+    [ props.pkToReplyLink sms
+    , props.pkToContactLink sms
+    ]
 
 
 dealtWithButton : Props msg -> SmsInbound -> Html msg
 dealtWithButton props sms =
     case sms.dealt_with of
         True ->
-            button
-                [ A.class "button button-success"
-                , onClick (props.toggleDealtWith sms.dealt_with sms.pk)
+            Html.button
+                [ onClick (props.toggleDealtWith sms.dealt_with sms.pk)
                 , A.id "unDealWithButton"
+                , Css.pill
+                , Css.pill_green
                 ]
-                [ i [ A.class "fa fa-check" ] [], text " Dealt With" ]
+                [ Html.i [ A.class "fa fa-check" ] [], Html.text " Dealt With" ]
 
         False ->
-            button
-                [ A.class "button button-warning"
-                , onClick (props.toggleDealtWith sms.dealt_with sms.pk)
+            Html.button
+                [ onClick (props.toggleDealtWith sms.dealt_with sms.pk)
                 , A.id "dealWithButton"
+                , Css.pill
+                , Css.pill_orange
                 ]
-                [ i [ A.class "fa fa-exclamation" ] [], text " Requires Action" ]
+                [ Html.i [ A.class "fa fa-exclamation" ] [], Html.text " Requires Action" ]

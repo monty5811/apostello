@@ -1,13 +1,12 @@
 module TestRoute exposing (suite)
 
 import Expect
-import Fuzz as F
 import List.Extra exposing (uncons)
-import Models exposing (Model)
 import Navigation
 import Pages exposing (Page(..), initSendAdhoc, initSendGroup)
 import Pages.FirstRun as FR
 import Pages.Forms.Contact as CF
+import Pages.Forms.ContactImport as CI
 import Pages.Forms.Group as GF
 import Pages.Forms.Keyword as KF
 import Pages.Forms.UserProfile as UPF
@@ -74,7 +73,7 @@ pages =
     , ContactForm CF.initialModel <| Just 1
     , KeywordForm KF.initialModel Nothing
     , KeywordForm KF.initialModel <| Just "test"
-    , ContactImport ""
+    , ContactImport CI.initialModel
     , ApiSetup Nothing
     , DefaultResponsesForm Nothing
     , UserProfileForm UPF.initialModel 1

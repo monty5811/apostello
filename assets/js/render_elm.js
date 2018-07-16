@@ -24,6 +24,10 @@ function renderElm() {
       }
     });
 
+    app.ports.scrollIntoView.subscribe(function(id) {
+      document.getElementById(id).scrollIntoView({behavior: "auto", block: "start"});
+    });
+
     const loader = document.getElementById('elmLoader');
     if (loader !== null) {
       loader.remove();

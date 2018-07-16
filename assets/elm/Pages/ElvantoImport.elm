@@ -1,15 +1,16 @@
 module Pages.ElvantoImport exposing (Msg, update, view)
 
+import Css
 import Data exposing (ElvantoGroup)
 import DjangoSend exposing (CSRFToken, post)
 import FilteringTable as FT
 import Helpers exposing (formatDate, handleNotSaved)
-import Html exposing (Html, a, br, div, td, text, th, thead, tr)
+import Html exposing (Html)
 import Html.Attributes as A
 import Html.Events exposing (onClick)
 import Http
 import Json.Decode as Decode
-import Notification exposing (Notifications, createInfo, createSuccess)
+import Notification as N
 import RemoteList as RL
 import Urls
 
@@ -29,13 +30,13 @@ type alias UpdateProps msg =
     }
 
 
-update : UpdateProps msg -> Msg -> { a | notifications : Notifications } -> ( { a | notifications : Notifications }, List (Cmd msg) )
+update : UpdateProps msg -> Msg -> { a | notifications : N.Notifications } -> ( { a | notifications : N.Notifications }, List (Cmd msg) )
 update props msg model =
     case msg of
         PullGroups ->
             ( { model
                 | notifications =
-                    createInfo model.notifications "Groups are being imported, it may take a couple of minutes"
+                    N.addInfo model.notifications "Groups are being imported, it may take a couple of minutes"
               }
             , [ buttonReq props Urls.api_act_pull_elvanto_groups ]
             )
@@ -43,7 +44,7 @@ update props msg model =
         FetchGroups ->
             ( { model
                 | notifications =
-                    createSuccess model.notifications "Groups are being fetched, it may take a couple of minutes"
+                    N.addSuccess model.notifications "Groups are being fetched, it may take a couple of minutes"
               }
             , [ buttonReq props Urls.api_act_fetch_elvanto_groups ]
             )
@@ -74,55 +75,55 @@ type alias Props msg =
 
 view : Props msg -> FT.Model -> RL.RemoteList ElvantoGroup -> Html msg
 view props tableModel groups =
-    div []
-        [ div [] [ fetchButton props, pullButton props ]
-        , br [] []
-        , FT.table { top = props.tableMsg } "table-striped" tableHead tableModel (groupRow props) groups
+    Html.div []
+        [ Html.div [ Css.w_full, Css.flex ] [ fetchButton props, pullButton props ]
+        , Html.br [] []
+        , FT.table { top = props.tableMsg } [] tableHead tableModel (groupRow props) groups
         ]
 
 
-tableHead : Html msg
+tableHead : FT.Head
 tableHead =
-    thead []
-        [ tr []
-            [ th [] []
-            , th [] [ text "Last Synced" ]
-            , th [] [ text "Sync?" ]
-            ]
+    FT.Head
+        [ ""
+        , "Last Synced"
+        , "Sync?"
         ]
 
 
 fetchButton : Props msg -> Html msg
 fetchButton props =
-    a
-        [ A.class "button button-success"
-        , onClick (props.topMsg FetchGroups)
+    Html.button
+        [ onClick (props.topMsg FetchGroups)
         , A.id "fetch_button"
-        , A.style [ ( "width", "50%" ) ]
+        , Css.btn
+        , Css.btn_green
+        , Css.flex_1
         ]
-        [ text "Fetch Groups" ]
+        [ Html.text "Fetch Groups" ]
 
 
 pullButton : Props msg -> Html msg
 pullButton props =
-    a
-        [ A.class "button button-info"
-        , onClick (props.topMsg PullGroups)
+    Html.button
+        [ onClick (props.topMsg PullGroups)
         , A.id "pull_button"
-        , A.style [ ( "width", "50%" ) ]
+        , Css.btn
+        , Css.btn_blue
+        , Css.flex_1
         ]
-        [ text "Pull Groups" ]
+        [ Html.text "Pull Groups" ]
 
 
-groupRow : Props msg -> ElvantoGroup -> ( String, Html msg )
+groupRow : Props msg -> ElvantoGroup -> FT.Row msg
 groupRow props group =
-    ( toString group.pk
-    , tr []
-        [ td [] [ text group.name ]
-        , td [] [ text (formatDate group.last_synced) ]
-        , td [] [ toggleSyncButton props group ]
+    FT.Row
+        []
+        [ FT.Cell [] [ Html.text group.name ]
+        , FT.Cell [] [ Html.text (formatDate group.last_synced) ]
+        , FT.Cell [] [ toggleSyncButton props group ]
         ]
-    )
+        (toString group.pk)
 
 
 toggleSyncButton : Props msg -> ElvantoGroup -> Html msg
@@ -137,19 +138,20 @@ toggleSyncButton props group =
 
 syncingButton : Props msg -> ElvantoGroup -> Html msg
 syncingButton props group =
-    button_ props "button button-success" "Syncing" group
+    button_ props [ Css.btn, Css.btn_green ] "Syncing" group
 
 
 notSyncingButton : Props msg -> ElvantoGroup -> Html msg
 notSyncingButton props group =
-    button_ props "button button-secondary" "Disabled" group
+    button_ props [ Css.btn, Css.btn_grey ] "Disabled" group
 
 
-button_ : Props msg -> String -> String -> ElvantoGroup -> Html msg
+button_ : Props msg -> List (Html.Attribute msg) -> String -> ElvantoGroup -> Html msg
 button_ props styling label group =
-    a
-        [ A.class styling
-        , A.id "elvantoGroupButton"
-        , onClick (props.toggleElvantoGroupSync group)
-        ]
-        [ text label ]
+    Html.button
+        ([ A.id "elvantoGroupButton"
+         , onClick (props.toggleElvantoGroupSync group)
+         ]
+            ++ styling
+        )
+        [ Html.text label ]

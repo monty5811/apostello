@@ -62,14 +62,14 @@ def add_linked_groups(b, wt):
     return b
 
 
-def add_owner(b, wt):
-    user = b.find_elements_by_id('userUpdateSelectedOwner')[0]
+def add_owner(b, wt, pk):
+    user = b.find_elements_by_id(f'userUpdateSelectedOwner{pk}')[0]
     user.click()
     return b
 
 
-def add_subscriber(b, wt):
-    user = b.find_elements_by_id('userUpdateSelectedSubscriber')[0]
+def add_subscriber(b, wt, pk):
+    user = b.find_elements_by_id(f'userUpdateSelectedSubscriber{pk}')[0]
     user.click()
     return b
 
@@ -89,8 +89,8 @@ class TestKeywordForm:
         b = add_activate_time(b, driver_wait_time)
         b = add_deactivate_time(b, driver_wait_time)
         b = add_linked_groups(b, driver_wait_time)
-        b = add_owner(b, driver_wait_time)
-        b = add_subscriber(b, driver_wait_time)
+        b = add_owner(b, driver_wait_time, users['staff'].pk)
+        b = add_subscriber(b, driver_wait_time, users['staff'].pk)
         b = send_form(b, driver_wait_time)
 
         def _test():

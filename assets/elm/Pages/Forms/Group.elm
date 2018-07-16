@@ -1,8 +1,9 @@
 module Pages.Forms.Group exposing (Model, Msg(..), initialModel, update, view)
 
+import Css
 import Data exposing (RecipientGroup, RecipientSimple)
 import FilteringTable exposing (filterInput, filterRecord, textToRegex)
-import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus)
+import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus(NoAction))
 import Forms.View exposing (..)
 import Helpers exposing (onClick)
 import Html exposing (Html)
@@ -174,7 +175,7 @@ archiveNotice props show groups name =
             Html.text ""
 
         True ->
-            Html.div [ A.class "alert" ]
+            Html.div [ Css.alert, Css.alert_info ]
                 [ Html.p [] [ Html.text "There is already a Group that with that name in the archive" ]
                 , Html.p [] [ Html.text "You can chose a different name." ]
                 , Html.p []
@@ -215,24 +216,19 @@ membershipToggles props maybeGroup model =
             Html.div [] []
 
         Just group ->
-            Html.div []
+            Html.div [ Css.max_w_md, Css.mx_auto ]
                 [ Html.br [] []
-                , Html.h3 [] [ Html.text "Group Members" ]
-                , Html.p [] [ Html.text "Click a person to toggle their membership." ]
-                , Html.div
-                    [ A.style
-                        [ ( "display", "grid" )
-                        , ( "grid-template-columns", "50% 50%" )
-                        ]
-                    ]
-                    [ Html.div []
+                , Html.h3 [ Css.mb_2 ] [ Html.text "Group Members" ]
+                , Html.p [ Css.mb_2 ] [ Html.text "Click a person to toggle their membership." ]
+                , Html.div [ Css.flex ]
+                    [ Html.div [ Css.flex_1 ]
                         [ Html.h4 [] [ Html.text "Non-Members" ]
                         , Html.div []
                             [ filterInput (props.form << UpdateNonMemberFilter)
                             , cardContainer props "nonmembers" model.nonmembersFilterRegex group.nonmembers group
                             ]
                         ]
-                    , Html.div []
+                    , Html.div [ Css.flex_1 ]
                         [ Html.h4 [] [ Html.text "Members" ]
                         , Html.div []
                             [ filterInput (props.form << UpdateMemberFilter)
@@ -245,9 +241,9 @@ membershipToggles props maybeGroup model =
 
 cardContainer : Props msg -> String -> Regex.Regex -> List RecipientSimple -> RecipientGroup -> Html msg
 cardContainer props id_ filterRegex contacts group =
-    Html.div []
+    Html.div [ Css.px_2 ]
         [ Html.br [] []
-        , Html.div [ A.class "list", A.id <| id_ ++ "_list" ]
+        , Html.div [ A.id <| id_ ++ "_list" ]
             (contacts
                 |> List.filter (filterRecord filterRegex)
                 |> List.map (card props id_ group)
@@ -257,7 +253,7 @@ cardContainer props id_ filterRegex contacts group =
 
 card : Props msg -> String -> RecipientGroup -> RecipientSimple -> Html msg
 card props id_ group contact =
-    Html.div [ A.class "item", A.id <| id_ ++ "_item" ]
+    Html.div [ A.id <| id_ ++ "_item", Css.border_b_2, Css.select_none, Css.cursor_pointer ]
         [ Html.div [ onClick (props.toggleGroupMembership group contact) ]
             [ Html.text contact.full_name ]
         ]

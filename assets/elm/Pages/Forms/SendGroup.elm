@@ -1,5 +1,6 @@
 module Pages.Forms.SendGroup exposing (Model, Msg(UpdateSGDate), init, initialModel, update, view)
 
+import Css
 import Data exposing (RecipientGroup, nullGroup)
 import Date
 import DateTimePicker
@@ -7,8 +8,8 @@ import FilteringTable exposing (filterInput, filterRecord, textToRegex)
 import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus)
 import Forms.View exposing (contentField, form, sendButton, timeField)
 import Helpers exposing (calculateSmsCost, onClick)
-import Html exposing (Html, div, i, label, p, text)
-import Html.Attributes as A exposing (class, for, style)
+import Html exposing (Html)
+import Html.Attributes as A
 import Html.Keyed
 import Pages.Forms.Meta.SendGroup exposing (meta)
 import Regex
@@ -123,7 +124,7 @@ type alias Props msg =
 
 view : Props msg -> Model -> RL.RemoteList RecipientGroup -> FormStatus -> Html msg
 view props model groups status =
-    div []
+    Html.div []
         [ case groups of
             RL.FinalPageReceived groups_ ->
                 if List.length groups_ == 0 then
@@ -138,8 +139,8 @@ view props model groups status =
 
 noGroups : Props msg -> Html msg
 noGroups props =
-    div [ class "segment" ]
-        [ p [] [ text "Looks like you don't have any (non-empty) groups yet." ]
+    Html.div []
+        [ Html.p [] [ Html.text "Looks like you don't have any (non-empty) groups yet." ]
         , props.newGroupButton
         ]
 
@@ -149,15 +150,12 @@ sendForm props model groups status =
     let
         fields =
             [ Field meta.content <| contentField props.smsCharLimit (props.form << UpdateSGContent) model.content
-            , Field meta.recipient_group <| groupField props model groups
             , Field meta.scheduled_time <| timeField (updateSGDate props) model.datePickerState model.date
+            , Field meta.recipient_group <| groupField props model groups
             ]
                 |> List.map FormField
     in
-    div []
-        [ p [] [ text "Send a message to a single person or to an ad-hoc group of people:" ]
-        , form status fields props.postForm (sendButton model.cost)
-        ]
+    form status fields props.postForm (sendButton model.cost)
 
 
 updateSGDate : Props msg -> DateTimePicker.State -> Maybe Date.Date -> msg
@@ -167,65 +165,61 @@ updateSGDate props state maybeDate =
 
 groupField : Props msg -> Model -> RL.RemoteList RecipientGroup -> FieldMeta -> List (Html msg)
 groupField props model groups meta_ =
-    [ label [ for meta_.id ] [ text meta_.label ]
-    , div [ class "segment" ]
-        [ loadingMessage groups
-        , filterInput (props.form << UpdateGroupFilter)
-        , div
-            [ class "list"
-            , style
-                [ ( "min-height", "25vh" )
-                , ( "max-height", "50vh" )
-                , ( "overflow-y", "auto" )
-                ]
-            ]
+    [ Html.label [ A.for meta_.id, Css.label ] [ Html.text meta_.label ]
+    , Html.div []
+        [ loadingMessageOrFilter props groups
+        , Html.div []
             (groups
                 |> RL.toList
                 |> List.filter (filterRecord model.groupFilter)
                 |> List.map (groupItem props model.selectedPk)
             )
         ]
-    , Html.p [ class "input-hint" ] [ p [] [ text "Note that empty groups are not shown here." ] ]
+    , Forms.View.helpLabel { help = Just "Note that empty groups are not shown here." }
     ]
 
 
-loadingMessage : RL.RemoteList a -> Html msg
-loadingMessage rl =
+loadingMessageOrFilter : Props msg -> RL.RemoteList a -> Html msg
+loadingMessageOrFilter props rl =
     case rl of
         RL.NotAsked _ ->
-            text ""
+            Html.text ""
 
         RL.FinalPageReceived _ ->
-            text ""
+            filterInput (props.form << UpdateGroupFilter)
 
         RL.RespFailed err _ ->
-            div [ class "alert" ] [ text err ]
+            Html.div [] [ Html.text err ]
 
         RL.WaitingForFirstResp _ ->
-            div [ class "alert" ] [ text "We are fetching your groups now..." ]
+            Html.div [] [ Html.text "We are fetching your groups now..." ]
 
         RL.WaitingForPage _ ->
-            div [ class "alert" ] [ text "We are fetching your groups now..." ]
+            Html.div [] [ Html.text "We are fetching your groups now..." ]
 
         RL.WaitingOnRefresh _ ->
-            text ""
+            Html.text ""
 
 
 groupItem : Props msg -> Maybe Int -> RecipientGroup -> Html msg
 groupItem props selectedPk group =
     Html.Keyed.node "div"
-        [ class "item", onClick <| props.form <| SelectGroup group.pk, A.id "groupItem" ]
+        [ onClick <| props.form <| SelectGroup group.pk
+        , A.id "groupItem"
+        , Css.cursor_pointer
+        ]
         [ ( toString group.pk, groupItemHelper selectedPk group ) ]
 
 
 groupItemHelper : Maybe Int -> RecipientGroup -> Html msg
 groupItemHelper selectedPk group =
-    div [ style [ ( "color", "#000" ) ] ]
-        [ Html.span [ class "float-right" ] [ text <| "($" ++ toString group.cost ++ ")" ]
-        , Html.span []
+    Html.div
+        [ Css.border_b_2 ]
+        [ Html.span []
             [ selectedIcon selectedPk group
-            , text <| group.name ++ " - " ++ group.description
+            , Html.text <| group.name ++ " - " ++ group.description
             ]
+        , Html.span [ A.class "float-right" ] [ Html.text <| "($" ++ toString group.cost ++ ")" ]
         ]
 
 
@@ -233,16 +227,12 @@ selectedIcon : Maybe Int -> RecipientGroup -> Html msg
 selectedIcon selectedPk group =
     case selectedPk of
         Nothing ->
-            text ""
+            Html.text ""
 
         Just pk ->
             case pk == group.pk of
                 True ->
-                    i
-                        [ class "fa fa-check"
-                        , style [ ( "color", "var(--color-purple)" ) ]
-                        ]
-                        []
+                    Html.i [ A.class "fa fa-check" ] []
 
                 False ->
-                    text ""
+                    Html.text ""

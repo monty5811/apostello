@@ -1,7 +1,6 @@
 import os
 import subprocess
 
-import ipdb
 from django.core.management.base import BaseCommand
 
 from apostello import forms as ap_forms
