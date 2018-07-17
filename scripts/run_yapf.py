@@ -1,15 +1,16 @@
 #!/usr/bin/env python
-from os import scandir
+from os import path, scandir
 
 from yapf.yapflib.yapf_api import FormatFile
 
 IGNORE_DIRS = ['migrations', 'node_modules', 'venv', '__pycache__', '.git', '.tox']
+ROOT_DIR = path.dirname(path.dirname(path.abspath(__file__)))
 
 
 def yapf_file(f):
     """Run yapf on file."""
     print(f.path)
-    FormatFile(f.path, in_place=True, style_config='scripts/.style.yapf')
+    FormatFile(f.path, in_place=True, style_config=f'{ROOT_DIR}/.style.yapf')
 
 
 def yapf_or_recr(f):
