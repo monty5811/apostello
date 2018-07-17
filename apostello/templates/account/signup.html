@@ -6,14 +6,7 @@
 <p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p>
 <form id="signup_form" method="post" action="{% url 'account_signup' %}">
   {% csrf_token %}
-  {% for field in form %}
-     <label class="{{ form.label_class }}"
-            for="{{ field.name }}">{{ field.label }}</label>
-     {{ field }}
-  {% endfor %}
-  {% if redirect_field_value %}
-  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-  {% endif %}
+  {% include 'apostello/includes/form.html' %}
   <div class="flex items-center justify-between my-4">
     <button class="btn btn-purple" type="submit" id="signupButton">{% trans "Sign Up" %} &raquo;</button>
   </div>

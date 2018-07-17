@@ -1,0 +1,19 @@
+{% if form.non_field_errors %}
+<div class="alert alert-danger" role="alert">
+{% for error in form.non_field_errors %}
+  <p class="border-l-2 pl-2 ml-2 mb-2">{{ error|escape }}</p>
+{% endfor %}
+</div>
+{% endif %}
+
+{% for field in form %}
+<label class="{{ form.label_class }}"
+       for="{{ field.name }}">{{ field.label }}</label>
+  {{ field }}
+  {% for error in field.errors %}
+    <div class="fieldError"><p>{{ error }}</p></div>
+  {% endfor %}
+{% endfor %}
+{% if redirect_field_value %}
+<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+{% endif %}
