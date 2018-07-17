@@ -105,6 +105,7 @@ recipient =
         |> Fuzz.andMap Fuzz.bool
         |> Fuzz.andMap Fuzz.bool
         |> Fuzz.andMap Fuzz.bool
+        |> Fuzz.andMap Fuzz.bool
         |> Fuzz.andMap Fuzz.string
         |> Fuzz.andMap (Fuzz.maybe smsInbound)
 

@@ -193,7 +193,7 @@ content model =
                 , newContactButton = spaLink Html.a [] [ Html.text "Add a New Contact" ] <| ContactForm CF.initialModel Nothing
                 }
                 saModel
-                (filterArchived False model.dataStore.recipients)
+                (filterArchived False model.dataStore.recipients |> RL.filter (.never_contact >> not))
                 model.formStatus
 
         SendGroup sgModel ->

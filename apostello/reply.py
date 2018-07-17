@@ -102,7 +102,7 @@ class InboundSms:
     def construct_reply(self):
         """Construct appropriate reply."""
 
-        if self.contact.do_not_reply:
+        if self.contact.do_not_reply or self.contact.never_contact:
             return ''
 
         if self.keyword == "start":

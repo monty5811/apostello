@@ -328,6 +328,7 @@ postContactFormCmd csrf model canSeeContactNum canSeeContactNotes maybeContact =
             [ ( "first_name", Encode.string <| extractField .first_name model.first_name maybeContact )
             , ( "last_name", Encode.string <| extractField .last_name model.last_name maybeContact )
             , ( "do_not_reply", Encode.bool <| extractBool .do_not_reply model.do_not_reply maybeContact )
+            , ( "never_contact", Encode.bool <| extractBool .never_contact model.never_contact maybeContact )
             ]
                 |> addPk maybeContact
                 |> addContactNumber model canSeeContactNum maybeContact

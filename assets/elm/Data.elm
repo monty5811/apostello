@@ -199,6 +199,7 @@ type alias Recipient =
     , is_archived : Bool
     , is_blocking : Bool
     , do_not_reply : Bool
+    , never_contact : Bool
     , notes : String
     , last_sms : Maybe SmsInbound
     }
@@ -215,6 +216,7 @@ decodeRecipient =
         |> required "is_archived" Decode.bool
         |> required "is_blocking" Decode.bool
         |> required "do_not_reply" Decode.bool
+        |> required "never_contact" Decode.bool
         |> optional "notes" Decode.string ""
         |> required "last_sms" (Decode.maybe decodeSmsInbound)
 
@@ -230,6 +232,7 @@ encodeRecipient contact =
         , ( "is_archived", Encode.bool contact.is_archived )
         , ( "is_blocking", Encode.bool contact.is_blocking )
         , ( "do_not_reply", Encode.bool contact.do_not_reply )
+        , ( "never_contact", Encode.bool contact.never_contact )
         , ( "notes", Encode.string contact.notes )
         , ( "last_sms", encodeMaybe encodeSmsInbound contact.last_sms )
         ]

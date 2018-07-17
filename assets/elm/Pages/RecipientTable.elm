@@ -52,6 +52,7 @@ recipientRow props recipient =
             [ props.contactLink recipient
             , doNotReplyIndicator recipient.do_not_reply
             , blockingIndicator recipient.is_blocking
+            , neverContactIndicator recipient.never_contact
             ]
         , FT.Cell [] [ Html.text content ]
         , FT.Cell [] [ Html.text <| formatDate timeReceived ]
@@ -75,6 +76,16 @@ blockingIndicator blocking =
     case blocking of
         True ->
             Html.span [ Css.pill_sm, Css.pill_red, Css.displayInline ] [ Html.text "Blocked Us" ]
+
+        False ->
+            Html.text ""
+
+
+neverContactIndicator : Bool -> Html msg
+neverContactIndicator bool =
+    case bool of
+        True ->
+            Html.span [ Css.pill_sm, Css.pill_red, Css.displayInline ] [ Html.text "Never Contact" ]
 
         False ->
             Html.text ""

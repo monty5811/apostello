@@ -26,6 +26,13 @@ class TestConstructReply:
         reply = msg.construct_reply()
         assert "John" in str(reply)
 
+    def test_name_never_contact(self, recipients):
+        recipients['beza'].never_contact = True
+        recipients['beza'].save()
+        msg = InboundSms({'From': str(recipients['beza'].number), 'Body': 'name'})
+        reply = msg.construct_reply()
+        assert len(reply) == 0
+
     @twilio_vcr
     def test_only_one_name(self, recipients):
         msg = InboundSms({'From': str(recipients['calvin'].number), 'Body': 'name JohnCalvin'})
@@ -62,6 +69,13 @@ class TestConstructReply:
         assert len(reply) == 0
 
     def test_do_not_reply(self, recipients):
+        msg = InboundSms({'From': str(recipients['beza'].number), 'Body': 'test'})
+        reply = msg.construct_reply()
+        assert len(reply) == 0
+
+    def test_never_contact(self, recipients):
+        recipients['beza'].never_contact = True
+        recipients['beza'].save()
         msg = InboundSms({'From': str(recipients['beza'].number), 'Body': 'test'})
         reply = msg.construct_reply()
         assert len(reply) == 0

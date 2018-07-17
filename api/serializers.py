@@ -108,6 +108,7 @@ class RecipientSerializer(BaseModelSerializer):
             'is_archived',
             'is_blocking',
             'do_not_reply',
+            'never_contact',
             'last_sms',
         )
 

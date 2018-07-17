@@ -122,6 +122,9 @@ class Recipient(models.Model):
         default=False,
         help_text="Tick this box to disable automated replies for this person.",
     )
+    never_contact = models.BooleanField(
+        "Never Contact", default=False, help_text="Tick this box to prevent any messages being sent to this person."
+    )
     notes = models.TextField(
         "Notes",
         max_length=2000,
@@ -149,7 +152,7 @@ class Recipient(models.Model):
             # No content, skip sending a message
             logger.info('Message content empty, skip api call')
             return
-        if self.is_blocking:
+        if self.is_blocking or self.never_contact:
             return
         elif eta is None:
             async('apostello.tasks.recipient_send_message_task', self.pk, content, group, sent_by)

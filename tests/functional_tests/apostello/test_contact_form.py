@@ -46,6 +46,13 @@ def add_number(b, wt, num=DEFAULT_NUM):
     return b
 
 
+def tick_never_contact(b, wt):
+    field = b.find_element_by_name('never_contact')
+    field.click()
+    sleep(wt)
+    return b
+
+
 @pytest.mark.slow
 @pytest.mark.selenium
 class TestContactForm:
@@ -69,6 +76,7 @@ class TestContactForm:
         b = load_page(browser_in, driver_wait_time, live_server + '/recipient/edit/{}/'.format(recipients['calvin'].pk))
         b = add_first_name(b, driver_wait_time)
         b = add_last_name(b, driver_wait_time)
+        b = tick_never_contact(b, driver_wait_time)
         b = send_form(b, driver_wait_time)
 
         def _test():
@@ -76,9 +84,9 @@ class TestContactForm:
             assert '/recipient/all/' in b.current_url
             assert 'first' in b.page_source
             assert 'last' in b.page_source
-            assert str(models.Recipient.objects.get(pk=recipients['calvin'].pk).number) == str(
-                recipients['calvin'].number
-            )
+            r = models.Recipient.objects.get(pk=recipients['calvin'].pk)
+            assert str(r.number) == str(recipients['calvin'].number)
+            assert (r.never_contact)
 
         assert_with_timeout(_test, 10 * driver_wait_time)
 

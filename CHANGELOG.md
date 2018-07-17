@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+ - Visual refresh
+
+### Added
+
+ - New option to never contact to a person (i.e. blocks replies and prevents sending)
+ - Experimental support for deploying to Ubuntu 18.04
+
 ## [v2.8.0]
 
 ### Changed

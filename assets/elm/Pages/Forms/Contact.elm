@@ -19,6 +19,7 @@ type alias Model =
     , last_name : Maybe String
     , number : Maybe String
     , do_not_reply : Maybe Bool
+    , never_contact : Maybe Bool
     , notes : Maybe String
     }
 
@@ -29,6 +30,7 @@ initialModel =
     , last_name = Nothing
     , number = Nothing
     , do_not_reply = Nothing
+    , never_contact = Nothing
     , notes = Nothing
     }
 
@@ -39,6 +41,7 @@ initialModel =
 
 type Msg
     = UpdateDoNotReplyField (Maybe Recipient)
+    | UpdateNeverContactField (Maybe Recipient)
     | UpdateFirstNameField String
     | UpdateLastNameField String
     | UpdateNumberField String
@@ -70,6 +73,23 @@ update msg model =
                                     not c.do_not_reply
             in
             { model | do_not_reply = Just b }
+
+        UpdateNeverContactField maybeContact ->
+            let
+                b =
+                    case model.never_contact of
+                        Just curVal ->
+                            not curVal
+
+                        Nothing ->
+                            case maybeContact of
+                                Nothing ->
+                                    False
+
+                                Just c ->
+                                    not c.never_contact
+            in
+            { model | never_contact = Just b }
 
         UpdateNumberField text ->
             { model | number = Just text }
@@ -156,6 +176,7 @@ viewHelp props maybeTable currentContact contacts_ model status =
               else
                 Nothing
             , Just <| FormField <| Field meta.do_not_reply <| doNotReplyField props currentContact
+            , Just <| FormField <| Field meta.never_contact <| neverContactField props currentContact
             , if props.canSeeContactNotes then
                 Just <| FormField <| Field meta.notes <| notesField props currentContact
               else
@@ -219,6 +240,14 @@ doNotReplyField props maybeContact =
         maybeContact
         .do_not_reply
         (props.c << UpdateDoNotReplyField)
+
+
+neverContactField : Props msg -> Maybe Recipient -> (FieldMeta -> List (Html msg))
+neverContactField props maybeContact =
+    checkboxField
+        maybeContact
+        .never_contact
+        (props.c << UpdateNeverContactField)
 
 
 showArchiveNotice : List Recipient -> Maybe Recipient -> Model -> Bool
