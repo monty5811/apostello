@@ -10,7 +10,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 
  - New option to never contact to a person (i.e. blocks replies and prevents sending)
- - Tool for deleting messages on Twilio - now you can purge old messages from Twilio for compliance or any other reason   
+ - Tool for deleting messages on Twilio - now you can purge old messages from Twilio for compliance or any other reason
+ - Control number of rows displayed in tables
  - Experimental support for deploying to Ubuntu 18.04
 
 ## [v2.8.0]

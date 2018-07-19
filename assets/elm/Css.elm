@@ -3599,6 +3599,11 @@ twoColGrid =
     A.class "twoColGrid"
 
 
+noop : Html.Attribute msg
+noop =
+    A.class "noop"
+
+
 sm__appearance_none : Html.Attribute msg
 sm__appearance_none =
     A.class "sm:appearance-none"

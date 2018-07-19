@@ -189,7 +189,7 @@ viewHelp props maybeTable currentContact contacts_ model status =
         , form status fields (submitMsg props showAN) (submitButton currentContact showAN)
         , case maybeTable of
             Just table ->
-                Html.div [ Css.mt_4 ] [ table ]
+                Html.div [ Css.mt_4, Css.max_w_md, Css.mx_auto ] [ table ]
 
             Nothing ->
                 Html.text ""

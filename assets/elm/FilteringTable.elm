@@ -31,6 +31,7 @@ import RemoteList as RL
 type alias Model =
     { filter : Regex.Regex
     , page : Int
+    , numberOfRows : Int
     }
 
 
@@ -38,6 +39,7 @@ initialModel : Model
 initialModel =
     { filter = Regex.regex ""
     , page = 1
+    , numberOfRows = 50
     }
 
 
@@ -64,6 +66,7 @@ type alias Head =
 
 type Msg
     = UpdateFilter String
+    | UpdateNumRows Int
     | GoToPage Int
 
 
@@ -72,6 +75,9 @@ update msg model =
     case msg of
         UpdateFilter filterText ->
             { model | filter = textToRegex filterText }
+
+        UpdateNumRows numberOfRows ->
+            { model | numberOfRows = numberOfRows }
 
         GoToPage page ->
             { model | page = page }
@@ -123,7 +129,7 @@ table msgs tableAttrs tableHead model rowConstructor data =
             List.filter (filterRecord model.filter) items
 
         pages =
-            paginate filteredItems
+            paginate model.numberOfRows filteredItems
 
         numPages =
             List.length pages
@@ -145,7 +151,10 @@ table msgs tableAttrs tableHead model rowConstructor data =
 
         _ ->
             Html.div []
-                [ filterInput (msgs.top << UpdateFilter)
+                [ Html.div [ Css.flex, Css.items_center ]
+                    [ filterInput (msgs.top << UpdateFilter)
+                    , numRowsInput model.numberOfRows (msgs.top << UpdateNumRows)
+                    ]
                 , Html.table tableAttrs
                     [ head tableHead
                     , Html.Keyed.node "tbody" [] (getPage curPage pages |> List.map (rowConstructor >> row))
@@ -181,9 +190,35 @@ filterInput msg =
         []
 
 
-paginate : List a -> List (List a)
-paginate rows =
-    LE.greedyGroupsOf 100 rows
+numRowsInput : Int -> (Int -> msg) -> Html msg
+numRowsInput numberOfRowsSelected tagger =
+    List.map (selectNumRows numberOfRowsSelected tagger) [ 10, 50, 100, 1000 ]
+        |> List.intersperse (Html.text ", ")
+        |> Html.div
+            [ Css.flex
+            , Css.ml_auto
+            , Css.mb_4
+            , Css.text_sm
+            ]
+
+
+selectNumRows : Int -> (Int -> msg) -> Int -> Html msg
+selectNumRows numberOfRowsSelected tagger n =
+    Html.div
+        [ E.onClick <| tagger n
+        , Css.select_none
+        , Css.cursor_pointer
+        , if numberOfRowsSelected == n then
+            Css.font_bold
+          else
+            Css.noop
+        ]
+        [ Html.text <| toString n ]
+
+
+paginate : Int -> List a -> List (List a)
+paginate numRows rows =
+    LE.greedyGroupsOf numRows rows
 
 
 getPage : Int -> List (List a) -> List a
