@@ -253,6 +253,11 @@ urlpatterns = [
         v.RemoveCloudMessageId.as_view(),
         name='act_remove_cm_id',
     ),
+    url(
+        r'^v2/actions/sms/permanent_delete/$',
+        v.TwilioDelete.as_view(),
+        name='act_permanent_delete',
+    ),
     # api setup
     url(r'^v2/setup/$', v.SetupView.as_view(), name='setup'),
 ]

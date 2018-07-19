@@ -159,3 +159,6 @@ dt_from_page p =
 
         ApiSetup _ ->
             []
+
+        DeletePanel _ ->
+            [ OutgoingSms, IncomingSms ]

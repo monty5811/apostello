@@ -1,18 +1,11 @@
 from time import sleep
 
 import pytest
-from tests.functional_tests.utils import assert_with_timeout, click_and_wait
+from tests.functional_tests.utils import assert_with_timeout, click_and_wait, load_page
 
 from apostello import models
 
 NEW_URI = '/keyword/new/'
-
-
-def load_page(b, wt, url):
-    b.get(url)
-    assert url in b.current_url
-    sleep(wt)
-    return b
 
 
 def send_form(b, wt):

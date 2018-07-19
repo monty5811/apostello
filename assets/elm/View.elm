@@ -10,6 +10,7 @@ import Pages.AccessDenied as AD
 import Pages.ApiSetup as ApiSetup
 import Pages.Curator as C
 import Pages.Debug as DG
+import Pages.DeletePanel as DP
 import Pages.ElvantoImport as EI
 import Pages.Error404 as E404
 import Pages.FirstRun as FR
@@ -317,6 +318,14 @@ content model =
 
         ApiSetup maybeKey ->
             Html.map M.ApiSetupMsg <| ApiSetup.view maybeKey
+
+        DeletePanel dpModel ->
+            Html.map M.DeletePanelMsg <|
+                DP.view
+                    { inboundSms = model.dataStore.inboundSms
+                    , outboundSms = model.dataStore.outboundSms
+                    }
+                    dpModel
 
         Usage ->
             Usage.view

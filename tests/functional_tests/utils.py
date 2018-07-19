@@ -1,6 +1,13 @@
 from time import sleep
 
 
+def load_page(b, wt, url):
+    b.get(url)
+    assert url in b.current_url
+    sleep(wt)
+    return b
+
+
 def click_and_wait(elem, t):
     elem.click()
     sleep(t)

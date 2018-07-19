@@ -50,7 +50,6 @@ class ConfigView(APIView):
         return Response(serializer.data)
 
     def post(self, request, format=None, **kwargs):
-        print(request)
         return handle_form(self, request)
 
 
@@ -405,6 +404,25 @@ class ElvantoFetchButton(ProfilePermsMixin, View):
         """Handle post requests."""
         async('apostello.tasks.fetch_elvanto_groups', force=True)
         return JsonResponse({'status': 'fetching'})
+
+
+class TwilioDelete(APIView):
+    """View for deleting messages from here and Twilio."""
+    permission_classes = (IsAuthenticated, IsStaff)
+
+    def post(self, request, format=None, **kwargs):
+        """Handle post requests."""
+        incoming_pks = request.data.get('incoming_pks')
+        outgoing_pks = request.data.get('outgoing_pks')
+        for pk in incoming_pks:
+            sms = get_object_or_404(SmsInbound, pk=pk)
+            sms.delete_from_twilio()
+
+        for pk in outgoing_pks:
+            sms = get_object_or_404(SmsOutbound, pk=pk)
+            sms.delete_from_twilio()
+
+        return JsonResponse({'status': ''})
 
 
 class ArchiveAllResponses(APIView):

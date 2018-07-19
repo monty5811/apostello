@@ -7,6 +7,7 @@ import Html.Events as E
 import Messages exposing (Msg(ScrollToId, WebPushMsg))
 import Models exposing (Settings)
 import Pages exposing (Page(..), initSendAdhoc, initSendGroup)
+import Pages.DeletePanel as DP
 import Pages.Forms.ContactImport as CI
 import Pages.GroupComposer as GC
 import Route exposing (spaLink)
@@ -57,6 +58,7 @@ allUsersMenuItems settings wp =
         [ itemSpa (SiteConfigForm Nothing) "Site Configuration" isStaff
         , itemSpa (DefaultResponsesForm Nothing) "Default Responses" isStaff
         , itemSpa UserProfileTable "User Permissions" isStaff
+        , itemSpa (DeletePanel DP.initialModel) "Twilio Delete" isStaff
         ]
     , menuGroup "Import"
         [ isStaff, userPerms.can_import ]

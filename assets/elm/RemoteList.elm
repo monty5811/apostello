@@ -108,7 +108,7 @@ toList rl =
     map sqrt (WaitingForPage [4, 9, 16]) --> (WaitingForPage [2, 3, 4])
 
 -}
-map : (a -> a) -> RemoteList a -> RemoteList a
+map : (a -> b) -> RemoteList a -> RemoteList b
 map fn rl =
     apply (List.map fn) rl
 
@@ -130,7 +130,7 @@ filter fn rl =
     apply (List.take 2 >> List.reverse) (FinalPageReceived [1, 2, 3]) --> FinalPageReceived [2, 1]
 
 -}
-apply : (List a -> List a) -> RemoteList a -> RemoteList a
+apply : (List a -> List b) -> RemoteList a -> RemoteList b
 apply fn rl =
     case rl of
         NotAsked l ->

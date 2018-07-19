@@ -6,6 +6,62 @@ interactions:
       accept-charset: [utf-8]
       accept-encoding: ['gzip, deflate']
       user-agent: [twilio-python/6.0.0 (Python 3.6.1)]
+    method: DELETE
+    uri: https://api.twilio.com/2010-04-01/Accounts/AC00000000000000000000000000000000/Messages/12345.json
+  response:
+    body: {string: ''}
+    headers:
+      Access-Control-Allow-Credentials: ['true']
+      Access-Control-Allow-Headers: ['Accept, Authorization, Content-Type, If-Match,
+          If-Modified-Since, If-None-Match, If-Unmodified-Since']
+      Access-Control-Allow-Methods: ['GET, POST, DELETE, OPTIONS']
+      Access-Control-Allow-Origin: ['*']
+      Access-Control-Expose-Headers: [ETag]
+      Connection: [keep-alive]
+      Content-Length: ['42318']
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 16 Mar 2016 15:02:56 GMT']
+      Strict-Transport-Security: [max-age=15768000]
+      Twilio-Request-Duration: ['0.211']
+      Twilio-Request-Id: [RQa13085cc423f4de6a1d0d700531bdb40]
+      X-Powered-By: [AT-5000]
+      X-Shenanigans: [none]
+    status: {code: 204, message: OK}
+- request:
+    body: null
+    headers:
+      accept: [application/json]
+      accept-charset: [utf-8]
+      accept-encoding: ['gzip, deflate']
+      user-agent: [twilio-python/6.0.0 (Python 3.6.1)]
+    method: DELETE
+    uri: https://api.twilio.com/2010-04-01/Accounts/AC00000000000000000000000000000000/Messages/123456.json
+  response:
+    body: {string: ''}
+    headers:
+      Access-Control-Allow-Credentials: ['true']
+      Access-Control-Allow-Headers: ['Accept, Authorization, Content-Type, If-Match,
+          If-Modified-Since, If-None-Match, If-Unmodified-Since']
+      Access-Control-Allow-Methods: ['GET, POST, DELETE, OPTIONS']
+      Access-Control-Allow-Origin: ['*']
+      Access-Control-Expose-Headers: [ETag]
+      Connection: [keep-alive]
+      Content-Length: ['42318']
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Wed, 16 Mar 2016 15:02:56 GMT']
+      Strict-Transport-Security: [max-age=15768000]
+      Twilio-Request-Duration: ['0.211']
+      Twilio-Request-Id: [RQa13085cc423f4de6a1d0d700531bdb40]
+      X-Powered-By: [AT-5000]
+      X-Shenanigans: [none]
+    status: {code: 204, message: OK}
+- request:
+    body: null
+    headers:
+      accept: [application/json]
+      accept-charset: [utf-8]
+      accept-encoding: ['gzip, deflate']
+      user-agent: [twilio-python/6.0.0 (Python 3.6.1)]
     method: GET
     uri: https://api.twilio.com/2010-04-01/Accounts/AC00000000000000000000000000000000/IncomingPhoneNumbers.json
   response:

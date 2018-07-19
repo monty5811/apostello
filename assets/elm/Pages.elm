@@ -1,6 +1,7 @@
 module Pages exposing (Page(..), initSendAdhoc, initSendGroup)
 
 import Pages.Debug as DG
+import Pages.DeletePanel as DP
 import Pages.FirstRun as FR
 import Pages.Forms.Contact as CF
 import Pages.Forms.ContactImport as CI
@@ -45,6 +46,7 @@ type Page
     | Help
     | ContactImport CI.Model
     | ApiSetup (Maybe String)
+    | DeletePanel DP.Model
 
 
 type alias IsArchive =

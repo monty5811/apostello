@@ -1,15 +1,9 @@
 from time import sleep
 
 import pytest
+from tests.functional_tests.utils import load_page
 
 URI = '/recipient/new/'
-
-
-def load_page(b, wt, url):
-    b.get(url)
-    assert url in b.current_url
-    sleep(wt)
-    return b
 
 
 @pytest.mark.django_db

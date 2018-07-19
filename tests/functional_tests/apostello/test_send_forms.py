@@ -5,7 +5,7 @@ from flaky import flaky
 from selenium.common.exceptions import ElementNotVisibleException
 from selenium.webdriver.common.keys import Keys
 from tests.conftest import MAX_RUNS, twilio_vcr
-from tests.functional_tests.utils import assert_with_timeout, click_and_wait
+from tests.functional_tests.utils import assert_with_timeout, click_and_wait, load_page
 
 from apostello.models import SmsOutbound
 from site_config.models import SiteConfiguration
@@ -13,13 +13,6 @@ from site_config.models import SiteConfiguration
 ADHOC_URI = '/send/adhoc/'
 GROUP_URI = '/send/group/'
 LOG_URI = '/incoming/'
-
-
-def load_page(b, wt, url):
-    b.get(url)
-    assert url in b.current_url
-    sleep(wt)
-    return b
 
 
 def click_send(b, wt):

@@ -20,6 +20,7 @@ import Models exposing (Settings)
 import Navigation
 import Pages exposing (Page(..), initSendAdhoc, initSendGroup)
 import Pages.Debug as DG
+import Pages.DeletePanel as DP
 import Pages.FirstRun as FR
 import Pages.Forms.Contact as CF
 import Pages.Forms.ContactImport as CI
@@ -72,6 +73,7 @@ route =
         , Url.map (UserProfileForm UP.initialModel) (s "users" </> s "profiles" </> int)
         , Url.map (ContactImport CI.initialModel) (s "recipient" </> s "import")
         , Url.map (ApiSetup Nothing) (s "api-setup")
+        , Url.map (DeletePanel DP.initialModel) (s "config" </> s "twilio" </> s "delete")
         , Url.map Help (s "help")
 
         -- No Shell views:
@@ -284,6 +286,9 @@ page2loc page =
         Error404 ->
             "/"
 
+        DeletePanel _ ->
+            "/config/twilio/delete"
+
 
 addAdhocParams : Maybe String -> Maybe (List Int) -> String -> String
 addAdhocParams maybeContent maybePks url =
@@ -463,6 +468,9 @@ checkPerm blockedKeywords userPerms page =
                     userPerms.can_import
 
                 ApiSetup _ ->
+                    userPerms.user.is_staff
+
+                DeletePanel _ ->
                     userPerms.user.is_staff
 
                 Debug _ ->

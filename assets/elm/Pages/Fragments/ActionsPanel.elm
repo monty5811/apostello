@@ -239,6 +239,9 @@ fabLinks ds page canArchive =
         ApiSetup _ ->
             defaultLinks
 
+        DeletePanel _ ->
+            defaultLinks
+
 
 fabLink : String -> String -> Html Msg
 fabLink uri linkText =

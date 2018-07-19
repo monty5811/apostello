@@ -537,6 +537,15 @@ class SmsInbound(models.Model):
         self.display_on_wall = False
         self.save()
 
+    def delete_from_twilio(self):
+        """
+        Permanently remove this message from Twilio and apostello.
+
+        This cannot be reversed.
+        """
+        async('apostello.tasks.delete_from_twilio', self.sid)
+        self.delete()
+
     def __str__(self):
         """Pretty representation."""
         return self.content
@@ -674,6 +683,15 @@ class SmsOutbound(models.Model):
         help_text='Status of SMS (from Twilio)',
     )
 
+    def delete_from_twilio(self):
+        """
+        Permanently remove this message from Twilio and apostello.
+
+        This cannot be reversed.
+        """
+        async('apostello.tasks.delete_from_twilio', self.sid)
+        self.delete()
+
     def __str__(self):
         """Pretty representation."""
         return self.content
@@ -785,6 +803,3 @@ class UserProfile(models.Model):
                 key = make_template_fragment_key(k, [self.user])
                 cache.delete(key)
         super(UserProfile, self).save(*args, **kwargs)
-
-
-# User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])

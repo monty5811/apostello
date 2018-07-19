@@ -4,6 +4,7 @@ import Expect
 import List.Extra exposing (uncons)
 import Navigation
 import Pages exposing (Page(..), initSendAdhoc, initSendGroup)
+import Pages.DeletePanel as DP
 import Pages.FirstRun as FR
 import Pages.Forms.Contact as CF
 import Pages.Forms.ContactImport as CI
@@ -77,6 +78,7 @@ pages =
     , ApiSetup Nothing
     , DefaultResponsesForm Nothing
     , UserProfileForm UPF.initialModel 1
+    , DeletePanel DP.initialModel
     ]
 
 

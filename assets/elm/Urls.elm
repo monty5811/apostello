@@ -81,6 +81,11 @@ api_act_keyword_archive_all_responses keyword =
     "/api/v2/actions/keywords/" ++ keyword ++ "/archive_resps/"
 
 
+api_act_permanent_delete : String
+api_act_permanent_delete =
+    "/api/v2/actions/sms/permanent_delete/"
+
+
 api_act_pull_elvanto_groups : String
 api_act_pull_elvanto_groups =
     "/api/v2/actions/elvanto/group_pull/"

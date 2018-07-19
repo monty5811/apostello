@@ -196,3 +196,6 @@ title page =
 
         ApiSetup _ ->
             "API Setup"
+
+        DeletePanel _ ->
+            "Delete from Twilio"

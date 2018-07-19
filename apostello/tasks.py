@@ -139,6 +139,15 @@ def cleanup_expired_sms():
     logs.cleanup_expired_sms()
 
 
+def delete_from_twilio(sid):
+    """
+    Permanently delete a message from twilio. This cannot be undone.
+    The message will be gone forever.
+    """
+    message = get_twilio_client().messages(sid)
+    message.delete()
+
+
 # notifications, email, slack etc
 
 

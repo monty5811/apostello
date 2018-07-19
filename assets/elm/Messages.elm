@@ -7,6 +7,7 @@ import Notification as Notif
 import PageVisibility
 import Pages.ApiSetup as AS
 import Pages.Debug as DG
+import Pages.DeletePanel as DP
 import Pages.ElvantoImport as EI
 import Pages.FirstRun as FR
 import Pages.Forms.Contact as CF
@@ -42,6 +43,7 @@ type Msg
     | DebugMsg DG.Msg
     | ActionsPanelMsg ActionsPanelMsg
     | ApiSetupMsg AS.Msg
+    | DeletePanelMsg DP.Msg
     | WebPushMsg WebPush.Msg
     | NotificationMsg Notif.Msg
     | CurrentTime Time.Time

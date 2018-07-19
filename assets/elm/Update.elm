@@ -10,6 +10,7 @@ import PageVisibility
 import Pages as P
 import Pages.ApiSetup as ApiSetup
 import Pages.Debug as DG
+import Pages.DeletePanel as DP
 import Pages.ElvantoImport as ElvImp
 import Pages.FirstRun as FR
 import Pages.Forms.SiteConfig as SCF
@@ -94,6 +95,23 @@ updateHelper msg model =
 
         NotificationMsg subMsg ->
             ( { model | notifications = Notif.update subMsg model.notifications }, [] )
+
+        DeletePanelMsg subMsg ->
+            case model.page of
+                P.DeletePanel dpModel ->
+                    let
+                        ( newdpModel, dpCmd ) =
+                            DP.update
+                                { csrftoken = model.settings.csrftoken }
+                                subMsg
+                                dpModel
+                    in
+                    ( { model | page = P.DeletePanel newdpModel }
+                    , [ Cmd.map DeletePanelMsg dpCmd ]
+                    )
+
+                _ ->
+                    ( model, [] )
 
         FirstRunMsg subMsg ->
             case model.page of

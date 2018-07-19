@@ -112,3 +112,15 @@ class TestTasks:
         assert RecipientGroup.objects.count() == 1
         assert Recipient.objects.count() == 7
         assert RecipientGroup.objects.get(name='[onebody]').recipient_set.count() == 7
+
+    @twilio_vcr
+    def test_twilio_delete_sms_in(self, smsin):
+        n_in = SmsInbound.objects.count()
+        smsin['sms1'].delete_from_twilio()
+        assert n_in - 1 == SmsInbound.objects.count()
+
+    @twilio_vcr
+    def test_twilio_delete_sms_out(self, smsout):
+        n_out = SmsOutbound.objects.count()
+        smsout['smsout'].delete_from_twilio()
+        assert n_out - 1 == SmsOutbound.objects.count()
