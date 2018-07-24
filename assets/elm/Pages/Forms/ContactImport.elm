@@ -8,7 +8,6 @@ module Pages.Forms.ContactImport
         )
 
 import Css
-import DjangoSend exposing (CSRFToken, rawPost)
 import Forms.Model exposing (Field, FormItem(FormField), FormStatus)
 import Forms.View exposing (form, longTextField)
 import Html exposing (Html)
@@ -34,13 +33,6 @@ initialModel =
 
 type Msg
     = UpdateText String
-
-
-type alias Props msg =
-    { parentMsg : Msg -> msg
-    , successCmds : List (Cmd msg)
-    , csrftoken : CSRFToken
-    }
 
 
 update : Msg -> Model

@@ -76,7 +76,7 @@ allUsersMenuItems settings wp =
         [ lockedItem False Urls.account_change_password "Change Password" (not userPerms.user.is_social)
         , item Urls.account_logout "Logout" True
         ]
-    , menuGroup "Push Status" [ isStaff || userPerms.can_see_incoming ] <| pushMenu isStaff wp
+    , menuGroup "Push Status" [ isStaff || userPerms.can_see_incoming ] <| pushMenu wp
     , twilioNumber <| Maybe.map .fromNumber settings.twilio
     , Html.div [] []
     , Html.div [] []
@@ -120,8 +120,8 @@ menuGroup title perms items =
         ]
 
 
-pushMenu : Bool -> WebPush.Model -> List (Html Msg)
-pushMenu isStaff wp =
+pushMenu : WebPush.Model -> List (Html Msg)
+pushMenu wp =
     List.map (Html.map WebPushMsg) (WebPush.view wp)
 
 

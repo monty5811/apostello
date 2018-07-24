@@ -8,7 +8,6 @@ import Store.Model exposing (RawResponse)
 
 type StoreMsg
     = LoadData
-    | LoadDataStore String
     | ReceiveRawResp RemoteDataType Bool (Result Http.Error RawResponse)
     | ToggleGroupMembership RecipientGroup RecipientSimple
     | ReceiveToggleGroupMembership (Result Http.Error RecipientGroup)

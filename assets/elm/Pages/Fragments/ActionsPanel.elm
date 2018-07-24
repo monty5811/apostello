@@ -4,7 +4,7 @@ import Css
 import Data exposing (Keyword)
 import DjangoSend exposing (CSRFToken, archivePost)
 import Helpers exposing (decodeAlwaysTrue)
-import Html exposing (..)
+import Html exposing (Html)
 import Html.Attributes as A exposing (href)
 import Html.Events exposing (onClick)
 import Http
@@ -245,12 +245,12 @@ fabLinks ds page canArchive =
 
 fabLink : String -> String -> Html Msg
 fabLink uri linkText =
-    a [ href uri, Css.flex_1, Css.btn, Css.btn_purple, Css.text_sm, Css.inline_block ] [ text linkText ]
+    Html.a [ href uri, Css.flex_1, Css.btn, Css.btn_purple, Css.text_sm, Css.inline_block ] [ Html.text linkText ]
 
 
 fabSpaLink : Page -> String -> Html Msg
 fabSpaLink page linkText =
-    spaLink Html.button [ Css.flex_1, Css.btn, Css.btn_purple, Css.text_sm ] [ text linkText ] page
+    spaLink Html.button [ Css.flex_1, Css.btn, Css.btn_purple, Css.text_sm ] [ Html.text linkText ] page
 
 
 
@@ -262,12 +262,12 @@ archiveButton page url maybeIsArchived canArchive =
     case canArchive of
         -- only show button if user has permission
         False ->
-            div [] []
+            Html.div [] []
 
         True ->
             case maybeIsArchived of
                 Nothing ->
-                    div [ Css.flex_1 ] [ text "..." ]
+                    Html.div [ Css.flex_1 ] [ Html.text "..." ]
 
                 Just isArchived ->
                     let
@@ -285,7 +285,7 @@ archiveButton page url maybeIsArchived canArchive =
                                 , Css.text_sm
                                 , Css.flex_1
                                 ]
-                                [ text "Restore" ]
+                                [ Html.text "Restore" ]
 
                         False ->
                             Html.button
@@ -297,7 +297,7 @@ archiveButton page url maybeIsArchived canArchive =
                                 , Css.text_sm
                                 , Css.flex_1
                                 ]
-                                [ text "Remove" ]
+                                [ Html.text "Remove" ]
 
 
 

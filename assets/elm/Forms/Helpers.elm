@@ -1,4 +1,13 @@
-module Forms.Helpers exposing (..)
+module Forms.Helpers
+    exposing
+        ( addPk
+        , extractBool
+        , extractField
+        , extractFloat
+        , handleBadFormResp
+        , handleGoodFormResp
+        , setInProgress
+        )
 
 import Forms.Model exposing (FormStatus(..), decodeFormResp, formDecodeError, noErrors)
 import Http
@@ -43,38 +52,6 @@ handleBadFormResp err =
         _ ->
             ( Failed noErrors
             , [ Notif.refreshNotifMessage ]
-            )
-
-
-newHandleFormResp :
-    { a | successCmds : List (Cmd msg) }
-    -> Result Http.Error { body : String, code : Int }
-    -> { c | formStatus : b }
-    -> ( { c | formStatus : FormStatus }, Notif.Notifications, List (Cmd msg) )
-newHandleFormResp props r model =
-    case r of
-        Ok resp ->
-            let
-                ( formStatus, newNotifs, cmds ) =
-                    handleGoodFormResp props.successCmds resp
-            in
-            ( { model
-                | formStatus = formStatus
-              }
-            , newNotifs
-            , cmds
-            )
-
-        Err err ->
-            let
-                ( formStatus, newNotifs ) =
-                    handleBadFormResp err
-            in
-            ( { model
-                | formStatus = formStatus
-              }
-            , newNotifs
-            , []
             )
 
 

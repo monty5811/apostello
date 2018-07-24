@@ -18,7 +18,7 @@ import Pages.Fragments.ActionsPanel as ActionsPanel
 import Pages.GroupComposer as GC
 import Pages.KeyRespTable as KRT
 import Ports
-import Route exposing (loc2Page, page2loc)
+import Route exposing (loc2Page)
 import Store.Model as Store
 import Store.Optimistic
 import Store.Request exposing (maybeFetchData)

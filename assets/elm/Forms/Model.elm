@@ -1,4 +1,17 @@
-module Forms.Model exposing (..)
+module Forms.Model
+    exposing
+        ( Field
+        , FieldGroupConfig
+        , FieldMeta
+        , FormErrors
+        , FormItem(..)
+        , FormStatus(..)
+        , decodeFormResp
+        , defaultFieldGroupConfig
+        , formDecodeError
+        , formErrors
+        , noErrors
+        )
 
 import Dict
 import Html exposing (Html)
@@ -53,7 +66,6 @@ formErrors formStatus =
 
 type FormItem msg
     = FormField (Field msg)
-    | FormHeader String
     | FieldGroup (FieldGroupConfig msg) (List (Field msg))
 
 

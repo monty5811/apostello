@@ -3,7 +3,7 @@ module Pages.Forms.Group exposing (Model, Msg(..), initialModel, update, view)
 import Css
 import Data exposing (RecipientGroup, RecipientSimple)
 import FilteringTable exposing (filterInput, filterRecord, textToRegex)
-import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus(NoAction))
+import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus)
 import Forms.View exposing (..)
 import Helpers exposing (onClick)
 import Html exposing (Html)
@@ -132,7 +132,7 @@ viewHelp props currentGroup groups_ model status =
     in
     Html.div []
         [ archiveNotice props showAN groups model.name
-        , form status fields (submitMsg props showAN) (submitButton currentGroup showAN)
+        , form status fields (submitMsg props showAN) (submitButton currentGroup)
         , membershipToggles props currentGroup model
         ]
 

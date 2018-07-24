@@ -40,13 +40,6 @@ dataFromResp decoder rawResp =
         |> Result.withDefault []
 
 
-itemFromResp : a -> Decode.Decoder a -> RawResponse -> a
-itemFromResp defaultCallback decoder rawResp =
-    rawResp.body
-        |> Decode.decodeString decoder
-        |> Result.withDefault defaultCallback
-
-
 makeRequest : String -> Http.Request RawResponse
 makeRequest dataUrl =
     Http.request

@@ -217,7 +217,7 @@ content model =
         Help ->
             Help.view
 
-        ContactImport ciModel ->
+        ContactImport _ ->
             CI.view
                 { post = FormMsg M.PostContactImportForm, form = FormMsg << M.ContactImportMsg }
                 model.formStatus
@@ -252,7 +252,7 @@ content model =
                             Just <|
                                 IT.view
                                     { sms = model.dataStore.inboundSms |> RL.filter (filterBySenderPk pk)
-                                    , reprocessSms = \pk -> M.StoreMsg <| S.ReprocessSms pk
+                                    , reprocessSms = M.StoreMsg << S.ReprocessSms
                                     , tableModel = model.table
                                     , tableMsg = M.TableMsg
                                     , contactPageLink = smsToContactLink

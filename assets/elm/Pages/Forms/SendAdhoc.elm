@@ -174,7 +174,7 @@ contactsField props model contacts meta_ =
 
 
 contactLabelView : Props msg -> Maybe (List Int) -> Recipient -> Html msg
-contactLabelView props maybePks contact =
+contactLabelView props _ contact =
     FV.multiSelectItemLabelHelper
         .full_name
         (props.form <| ToggleSelectedContact contact.pk)

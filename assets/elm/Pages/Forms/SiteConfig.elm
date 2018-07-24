@@ -124,7 +124,7 @@ update msg maybeModel =
 
 
 initSmsExpireDate : Model -> DateTimePicker.State -> Maybe Date.Date -> Msg
-initSmsExpireDate model datePickerSmsExpiredState maybeDate =
+initSmsExpireDate model datePickerSmsExpiredState _ =
     UpdateSmsExpiredDate datePickerSmsExpiredState model.sms_expiration_date
 
 
@@ -245,7 +245,7 @@ view msgs groups maybeModel status =
             FV.form status
                 (fieldsHelp msgs groups model)
                 msgs.postForm
-                (FV.submitButton maybeModel False)
+                (FV.submitButton maybeModel)
 
 
 debugHelpText : Html msg
@@ -411,7 +411,7 @@ updateExpDate msgs state maybeDate =
 
 
 groupLabelView : Messages msg -> Maybe (List Int) -> RecipientGroup -> Html msg
-groupLabelView msgs maybePks group =
+groupLabelView msgs _ group =
     FV.multiSelectItemLabelHelper
         .name
         (msgs.form <| UpdateAutoAddGroupsField group.pk)

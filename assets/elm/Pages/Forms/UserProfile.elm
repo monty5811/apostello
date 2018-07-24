@@ -145,11 +145,11 @@ view msgs pk profiles_ model status =
             loader
 
         Just prof ->
-            viewHelp msgs model status prof
+            viewHelp msgs status prof
 
 
-viewHelp : Messages msg -> Model -> FormStatus -> UserProfile -> Html msg
-viewHelp msgs model status profile =
+viewHelp : Messages msg -> FormStatus -> UserProfile -> Html msg
+viewHelp msgs status profile =
     let
         fields =
             [ Field meta.approved (approvedField msgs profile)
@@ -172,7 +172,7 @@ viewHelp msgs model status profile =
         , form status
             fields
             msgs.postForm
-            (submitButton (Just profile) False)
+            (submitButton (Just profile))
         ]
 
 

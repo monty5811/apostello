@@ -52,9 +52,6 @@ renderItem errorDict item =
         FormField field ->
             renderField errorDict field
 
-        FormHeader header ->
-            Html.h3 [] [ Html.text header ]
-
         FieldGroup config fields ->
             fieldGroupHelp config <|
                 List.map (renderField errorDict) fields
@@ -357,8 +354,8 @@ helpLabel { help } =
                 [ Html.text h ]
 
 
-submitButton : Maybe a -> Bool -> Html msg
-submitButton maybeItem showAN =
+submitButton : Maybe a -> Html msg
+submitButton maybeItem =
     let
         txt =
             case maybeItem of

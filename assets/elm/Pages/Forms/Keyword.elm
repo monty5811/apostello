@@ -251,7 +251,7 @@ viewHelp msgs keywords_ groups users currentKeyword model status =
     in
     Html.div []
         [ archiveNotice msgs showAN keywords model.keyword
-        , form status fields (submitMsg msgs showAN) (submitButton currentKeyword showAN)
+        , form status fields (submitMsg msgs showAN) (submitButton currentKeyword)
         ]
 
 

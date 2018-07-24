@@ -37,7 +37,7 @@ view msgs model status =
                 |> FormField
 
         button =
-            submitButton Nothing (String.length model < 1)
+            submitButton Nothing
     in
     Html.div []
         [ Html.p [] [ Html.text "You can use this form to create a new group that contains all currently active contacts." ]

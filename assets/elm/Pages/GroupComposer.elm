@@ -150,15 +150,17 @@ dataView props groups people activeGroupPks =
         [ Css.flex
         , Css.notRaisedSegment
         ]
-        [ groupsList props groups activeGroupPks, groupPreview props people ]
+        [ groupsList groups activeGroupPks
+        , groupPreview props people
+        ]
 
 
 
 -- Group List
 
 
-groupsList : Props msg -> List RecipientGroup -> List Int -> Html msg
-groupsList props groups activeGroupPks =
+groupsList : List RecipientGroup -> List Int -> Html msg
+groupsList groups activeGroupPks =
     Html.div [ Css.w_full, Css.px_2 ]
         [ h4 [] [ text "Groups" ]
         , br [] []

@@ -11,7 +11,6 @@ import Models exposing (Model)
 import Notification as Notif
 import RemoteList as RL
 import Store.DataTypes exposing (RemoteDataType(..))
-import Store.Decode exposing (decodeDataStore)
 import Store.Messages exposing (StoreMsg(..))
 import Store.Model exposing (..)
 import Store.Optimistic as O
@@ -29,14 +28,6 @@ update msg model =
                     maybeFetchData model.page model.dataStore
             in
             ( { model | dataStore = ds }, cmds )
-
-        LoadDataStore str ->
-            let
-                ds =
-                    Decode.decodeString (Decode.at [ "data" ] decodeDataStore) str
-                        |> Result.withDefault model.dataStore
-            in
-            ( { model | dataStore = ds }, [] )
 
         ReceiveRawResp dt ignorePageInfo (Ok resp) ->
             let

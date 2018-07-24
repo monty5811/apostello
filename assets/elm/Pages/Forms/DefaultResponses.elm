@@ -126,7 +126,7 @@ view msgs maybeModel status =
                 , FV.form status
                     fields
                     msgs.postForm
-                    (FV.submitButton (Just model) False)
+                    (FV.submitButton (Just model))
                 ]
 
 
