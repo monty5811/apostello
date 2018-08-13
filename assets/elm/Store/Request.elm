@@ -21,8 +21,7 @@ maybeFetchData page dataStore =
 
         fetchCmds =
             dataTypes
-                |> List.map (\dt -> ( dt, dt2Url dt ))
-                |> List.map fetchData
+                |> List.map (\dt -> fetchData ( dt, dt2Url dt ))
     in
     ( newDs, fetchCmds )
 

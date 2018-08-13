@@ -40,7 +40,7 @@ updateGroupMembers existingList contact =
 
 memberInList : List { a | pk : Int } -> { a | pk : Int } -> Bool
 memberInList existingList contact =
-    List.map (\x -> x.pk) existingList
+    List.map .pk existingList
         |> List.member contact.pk
 
 
