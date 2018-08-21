@@ -294,7 +294,7 @@ deactivatedRespField msgs maybeKeyword =
 
 tooEarlyRespField : Messages msg -> Maybe Keyword -> FieldMeta -> List (Html msg)
 tooEarlyRespField msgs maybeKeyword =
-    simpleTextField (Maybe.map .custom_response maybeKeyword) (msgs.k << UpdateKeywordTooEarlyRespField)
+    simpleTextField (Maybe.map .too_early_response maybeKeyword) (msgs.k << UpdateKeywordTooEarlyRespField)
 
 
 activateTimeField : Messages msg -> Model -> Maybe Keyword -> FieldMeta -> List (Html msg)
