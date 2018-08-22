@@ -13,7 +13,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django_q.models import Schedule
-from django_q.tasks import async, schedule
+from django_q.tasks import async_task, schedule
 from phonenumber_field.modelfields import PhoneNumberField
 
 from apostello.exceptions import NoKeywordMatchException
@@ -46,7 +46,7 @@ class RecipientGroup(models.Model):
 
     def send_message(self, content, sent_by, eta=None):
         """Send message to group."""
-        async('apostello.tasks.group_send_message_task', content, self.name, sent_by, eta)
+        async_task('apostello.tasks.group_send_message_task', content, self.name, sent_by, eta)
 
     def archive(self):
         """Archive the group."""
@@ -155,7 +155,7 @@ class Recipient(models.Model):
         if self.is_blocking or self.never_contact:
             return
         elif eta is None:
-            async('apostello.tasks.recipient_send_message_task', self.pk, content, group, sent_by)
+            async_task('apostello.tasks.recipient_send_message_task', self.pk, content, group, sent_by)
         else:
             try:
                 groupObj = RecipientGroup.objects.get(name=group)
@@ -211,10 +211,10 @@ class Recipient(models.Model):
         """Override save method to back date name change to SMS."""
         add_to_group_flag = self.pk is None
         super(Recipient, self).save(*args, **kwargs)
-        async('apostello.tasks.update_msgs_name', self.pk)
+        async_task('apostello.tasks.update_msgs_name', self.pk)
         if add_to_group_flag:
             from apostello.tasks import add_new_contact_to_groups
-            async('apostello.tasks.add_new_contact_to_groups', self.pk)
+            async_task('apostello.tasks.add_new_contact_to_groups', self.pk)
 
     def __str__(self):
         """Pretty representation."""
@@ -457,7 +457,7 @@ class Keyword(models.Model):
         """Force lower case keywords."""
         self.keyword = self.keyword.lower()
         super(Keyword, self).save(force_insert, force_update, *args, **kwargs)
-        async('apostello.tasks.populate_keyword_response_count', pk=self.pk)
+        async_task('apostello.tasks.populate_keyword_response_count', pk=self.pk)
 
     @staticmethod
     def _match(sms):
@@ -543,7 +543,7 @@ class SmsInbound(models.Model):
 
         This cannot be reversed.
         """
-        async('apostello.tasks.delete_from_twilio', self.sid)
+        async_task('apostello.tasks.delete_from_twilio', self.sid)
         self.delete()
 
     def __str__(self):
@@ -575,7 +575,7 @@ class SmsInbound(models.Model):
         # invalidate per person last sms cache
         cache.set('last_msg__{0}'.format(self.sender_num), None, 0)
         # update number of matched responses caches
-        async('apostello.tasks.populate_keyword_response_count')
+        async_task('apostello.tasks.populate_keyword_response_count')
 
     class Meta:
         ordering = ['-time_received']
@@ -689,7 +689,7 @@ class SmsOutbound(models.Model):
 
         This cannot be reversed.
         """
-        async('apostello.tasks.delete_from_twilio', self.sid)
+        async_task('apostello.tasks.delete_from_twilio', self.sid)
         self.delete()
 
     def __str__(self):

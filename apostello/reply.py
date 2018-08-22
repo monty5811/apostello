@@ -4,7 +4,7 @@ from datetime import timedelta
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django_q.models import Schedule
-from django_q.tasks import async, schedule
+from django_q.tasks import async_task, schedule
 
 from apostello.models import Keyword, Recipient
 from apostello.utils import fetch_default_reply
@@ -40,10 +40,10 @@ class InboundSms:
             * Ask the contact for their name if we don't have it
             * Schedules a task to check the outgoing log one minute from now
         """
-        async('apostello.tasks.log_msg_in', self.msg_params, timezone.now(), self.contact.pk)
-        async('apostello.tasks.sms_to_slack', self.sms_body, str(self.contact), str(self.keyword))
-        async('apostello.tasks.blacklist_notify', self.contact.pk, self.sms_body, self.keyword)
-        async('apostello.tasks.ask_for_name', self.contact.pk, self.sms_body, self.send_name_sms)
+        async_task('apostello.tasks.log_msg_in', self.msg_params, timezone.now(), self.contact.pk)
+        async_task('apostello.tasks.sms_to_slack', self.sms_body, str(self.contact), str(self.keyword))
+        async_task('apostello.tasks.blacklist_notify', self.contact.pk, self.sms_body, self.keyword)
+        async_task('apostello.tasks.ask_for_name', self.contact.pk, self.sms_body, self.send_name_sms)
         # update outgoing log 1 minute from now:
         schedule(
             'apostello.tasks.check_outgoing_log',
@@ -77,9 +77,9 @@ class InboundSms:
             self.contact.last_name = last_name
             self.contact.save()
             # update old messages with this person's name
-            async('apostello.tasks.update_msgs_name', self.contact.pk)
+            async_task('apostello.tasks.update_msgs_name', self.contact.pk)
             # thank person
-            async(
+            async_task(
                 'apostello.tasks.notify_office_mail',
                 '[Apostello] New Signup!',
                 'SMS:\n\t{0}\nFrom:\n\t{1} ({2})\n'.format(
@@ -91,7 +91,7 @@ class InboundSms:
             # TODO update to use .format() and add help text to model
             return fetch_default_reply('name_update_reply') % self.contact.first_name
         except (ValidationError, IndexError):
-            async(
+            async_task(
                 'apostello.tasks.notify_office_mail',
                 '[Apostello] New Signup - FAILED!',
                 'SMS:\n\t{0}\nFrom:\n\t{1}\n'.format(self.sms_body, self.contact_number),

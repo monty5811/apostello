@@ -7,7 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.generic import View
-from django_q.tasks import async
+from django_q.tasks import async_task
 from phonenumber_field.validators import validate_international_phonenumber
 from rest_framework import generics, status
 from rest_framework.authtoken.models import Token
@@ -351,7 +351,7 @@ class ElvantoPullButton(ProfilePermsMixin, View):
 
     def post(self, request, format=None, **kwargs):
         """Handle post requests."""
-        async('apostello.tasks.pull_elvanto_groups', force=True)
+        async_task('apostello.tasks.pull_elvanto_groups', force=True)
         return JsonResponse({'status': 'pulling'})
 
 
@@ -361,7 +361,7 @@ class ElvantoFetchButton(ProfilePermsMixin, View):
 
     def post(self, request, format=None, **kwargs):
         """Handle post requests."""
-        async('apostello.tasks.fetch_elvanto_groups', force=True)
+        async_task('apostello.tasks.fetch_elvanto_groups', force=True)
         return JsonResponse({'status': 'fetching'})
 
 

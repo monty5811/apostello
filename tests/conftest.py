@@ -39,7 +39,7 @@ def short_circuit_q(monkeypatch):
 
         return result
 
-    monkeypatch.setattr('django_q.tasks.async.__code__', new_async.__code__)
+    monkeypatch.setattr('django_q.tasks.async_task.__code__', new_async.__code__)
     monkeypatch.setattr('django_q.tasks.schedule.__code__', new_async.__code__)
 
 

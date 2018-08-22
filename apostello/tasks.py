@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.mail import get_connection, send_mail
 from django.utils import timezone
-from django_q.tasks import async
+from django_q.tasks import async_task
 from twilio.base.exceptions import TwilioRestException
 
 from apostello.twilio import get_twilio_client
@@ -52,7 +52,7 @@ def recipient_send_message_task(recipient_pk, body, group, sent_by):
         if e.code == 21610:
             recipient.is_blocking = True
             recipient.save()
-            async('apostello.tasks.blacklist_notify', recipient.pk, '', 'stop')
+            async_task('apostello.tasks.blacklist_notify', recipient.pk, '', 'stop')
         else:
             raise e
 
@@ -82,7 +82,7 @@ def ask_for_name(person_from_pk, sms_body, ask_for_name):
         else:
             email_content = 'SMS: {0}\nFrom: {1}\n\n\nThis person is unknown...'.format(sms_body, str(contact)),
 
-        async(
+        async_task(
             'apostello.tasks.notify_office_mail',
             '[Apostello] Unknown Contact!',
             email_content,
@@ -119,7 +119,7 @@ def log_msg_in(p, t, from_pk):
         matched_colour=Keyword.lookup_colour(p['Body'].strip())
     )
     # check log is consistent:
-    async('apostello.tasks.check_incoming_log')
+    async_task('apostello.tasks.check_incoming_log')
 
 
 def update_msgs_name(person_pk):
@@ -174,7 +174,7 @@ def blacklist_notify(recipient_pk, sms_body, keyword):
     if keyword == 'start':
         return
     if keyword == 'stop':
-        async(
+        async_task(
             'apostello.tasks.notify_office_mail',
             '[Apostello] Blacklist Update',
             "{0} ({1}) is now blocking us".format(
@@ -188,7 +188,7 @@ def blacklist_notify(recipient_pk, sms_body, keyword):
             "this message:\n\n\t{1}\n\n" \
             "You may need to email them as we cannot currently reply to them."
         email_body.format(str(recipient), sms_body)
-        async(
+        async_task(
             'apostello.tasks.notify_office_mail',
             '[Apostello] Blacklist Receipt Notice',
             email_body,
@@ -209,7 +209,7 @@ def send_keyword_digest():
             subject = 'Daily update for "{0}" responses'.format(str(keyword))
             body = digest.create_email_body(keyword, new_responses)
             for subscriber in keyword.subscribed_to_digest.all():
-                async('apostello.tasks.send_async_mail', subject, body, [subscriber.email])
+                async_task('apostello.tasks.send_async_mail', subject, body, [subscriber.email])
 
         keyword.last_email_sent_time = checked_time
         keyword.save()
