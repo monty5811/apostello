@@ -14,6 +14,14 @@ All notable changes to this project will be documented in this file.
  - Control number of rows displayed in tables
  - Experimental support for deploying to Ubuntu 18.04
 
+### Fixed
+
+ - Bug in keyword form that put the wrong reply in one of the fields
+
+### Removed
+
+ - Web push notifcation support - just use the slack integration and point it at zapier if you want something more flexible
+
 ## [v2.8.0]
 
 ### Changed

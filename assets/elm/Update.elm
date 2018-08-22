@@ -23,7 +23,6 @@ import Store.Model as Store
 import Store.Optimistic
 import Store.Request exposing (maybeFetchData)
 import Store.Update as SU
-import WebPush
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -223,13 +222,6 @@ updateHelper msg model =
                       }
                     , List.map (Cmd.map StoreMsg) storeCmds
                     )
-
-        WebPushMsg subMsg ->
-            let
-                ( wpModel, wpCmd ) =
-                    WebPush.update model.settings.csrftoken subMsg model.webPush
-            in
-            ( { model | webPush = wpModel }, [ Cmd.map WebPushMsg wpCmd ] )
 
 
 maybeAddTwilioWarning : Model -> Model

@@ -19,7 +19,6 @@ import PageVisibility
 import Pages exposing (Page)
 import Store.Model exposing (DataStore, emptyDataStore)
 import Time
-import WebPush
 
 
 -- Main Model
@@ -33,7 +32,6 @@ type alias Model =
     , notifications : Notif.Notifications
     , currentTime : Time.Time
     , formStatus : FormStatus
-    , webPush : WebPush.Model
     , pageVisibility : PageVisibility.Visibility
     }
 
@@ -47,7 +45,6 @@ initialModel settings page =
     , notifications = Notif.empty
     , currentTime = 0
     , formStatus = NoAction
-    , webPush = WebPush.initial
     , pageVisibility = PageVisibility.Visible -- default to visible, perhaps, should do something more sophisticated on init
     }
 

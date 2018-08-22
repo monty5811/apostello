@@ -17,6 +17,3 @@ country_code: 44
 # Rollbar
 rollbar_access_token: ''
 rollbar_access_token_client: ''
-# Cloud messaging
-cm_server_key: ''
-cm_sender_id: ''

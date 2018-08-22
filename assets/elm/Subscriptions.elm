@@ -7,7 +7,6 @@ import Pages exposing (Page(Curator, SendAdhoc, SendGroup, Wall))
 import Store.Messages exposing (StoreMsg(LoadData))
 import Store.Model as Store
 import Time exposing (second)
-import WebPush
 
 
 subscriptions : Model -> Sub M.Msg
@@ -15,7 +14,6 @@ subscriptions model =
     Sub.batch
         [ reloadData model.pageVisibility model.page model.dataStore
         , getCurrentTime
-        , Sub.map M.WebPushMsg <| WebPush.subscriptions model.webPush
         , PageVisibility.visibilityChanges M.VisibilityChange
         ]
 

@@ -55,7 +55,7 @@ commonShell model mainContent actionsList =
                     , [ mainContent ]
                     ]
             ]
-        , Html.aside [ A.id "menuWrapper", Css.raisedSegment, Css.pb_4 ] <| Menu.menu model.settings model.webPush
+        , Html.aside [ A.id "menuWrapper", Css.raisedSegment, Css.pb_4 ] <| Menu.menu model.settings 
         ]
 
 

@@ -24,7 +24,6 @@ import Pages.GroupComposer as GC
 import Pages.KeyRespTable as KRT
 import Store.Messages exposing (StoreMsg)
 import Time
-import WebPush
 
 
 -- MESSAGES
@@ -44,7 +43,6 @@ type Msg
     | ActionsPanelMsg ActionsPanelMsg
     | ApiSetupMsg AS.Msg
     | DeletePanelMsg DP.Msg
-    | WebPushMsg WebPush.Msg
     | NotificationMsg Notif.Msg
     | CurrentTime Time.Time
     | Nope

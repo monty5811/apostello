@@ -242,17 +242,6 @@ urlpatterns = [
         v.CreateAllGroup.as_view(),
         name='act_create_all_group',
     ),
-    # cloud messaging api
-    url(
-        r'^v2/actions/user/add_cm_id/$',
-        v.AddCloudMessageId.as_view(),
-        name='act_add_cm_id',
-    ),
-    url(
-        r'^v2/actions/user/remove_cm_id/$',
-        v.RemoveCloudMessageId.as_view(),
-        name='act_remove_cm_id',
-    ),
     url(
         r'^v2/actions/sms/permanent_delete/$',
         v.TwilioDelete.as_view(),

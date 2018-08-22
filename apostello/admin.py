@@ -89,16 +89,10 @@ class UserProfileInline(admin.StackedInline):
     model = models.UserProfile
 
 
-class CloudMessageIdInline(admin.StackedInline):
-    """Inline for apostello.models.CloudMessageId."""
-    model = models.CloudMessageId
-
-
 class UserProfileAdmin(UserAdmin):
     """Admin class for apostello.models.UserProfile."""
     inlines = [
         UserProfileInline,
-        CloudMessageIdInline,
     ]
 
 

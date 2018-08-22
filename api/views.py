@@ -21,7 +21,7 @@ from api.drf_permissions import CanImport, CanSeeKeywords, CanSendSms, IsStaff
 from api.forms import handle_form
 from apostello.forms import (CsvImport, GroupAllCreateForm, SendAdhocRecipientsForm, SendRecipientGroupForm)
 from apostello.mixins import ProfilePermsMixin
-from apostello.models import (Keyword, Recipient, RecipientGroup, SmsInbound, SmsOutbound, CloudMessageId)
+from apostello.models import (Keyword, Recipient, RecipientGroup, SmsInbound, SmsOutbound)
 from elvanto.models import ElvantoGroup
 from site_config.forms import DefaultResponsesForm, SiteConfigurationForm
 from site_config.models import DefaultResponses, SiteConfiguration
@@ -328,47 +328,6 @@ class UpdateUserProfile(ActionObj):
                 setattr(obj, x, user_profile[x])
             obj.save()
         return obj
-
-
-class CloudMessageView(APIView):
-    permission_classes = (IsAuthenticated, )
-
-    def _post(self, endpoint, user):
-        raise NotImplementedError
-
-    def post(self, request):
-        try:
-            endpoint = request.data.get('endpoint')
-            user = request.user
-            obj = self._post(endpoint, user)
-        except ActionForbidden:
-            return Response({}, status=status.HTTP_403_FORBIDDEN)
-
-        return JsonResponse(obj)
-
-
-class AddCloudMessageId(CloudMessageView):
-    def _post(self, endpoint, user):
-        if endpoint is None:
-            return {}
-        new_id, _ = CloudMessageId.objects.get_or_create(
-            url=endpoint,
-            user=user,
-        )
-        return {}
-
-
-class RemoveCloudMessageId(CloudMessageView):
-    def _post(self, endpoint, user):
-        if endpoint is None:
-            return {}
-        ids = CloudMessageId.objects.filter(
-            url=endpoint,
-            user=user,
-        )
-        for id_ in ids:
-            id_.delete()
-        return {}
 
 
 class UpdateGroupMembers(ActionObj):

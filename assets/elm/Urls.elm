@@ -36,11 +36,6 @@ account_signup =
     "/accounts/signup/"
 
 
-api_act_add_cm_id : String
-api_act_add_cm_id =
-    "/api/v2/actions/user/add_cm_id/"
-
-
 api_act_archive_group : Int -> String
 api_act_archive_group pk =
     "/api/v2/actions/group/archive/" ++ toString pk ++ "/"
@@ -94,11 +89,6 @@ api_act_pull_elvanto_groups =
 api_act_reingest_sms : Int -> String
 api_act_reingest_sms pk =
     "/api/v2/actions/sms/in/reingest/" ++ toString pk ++ "/"
-
-
-api_act_remove_cm_id : String
-api_act_remove_cm_id =
-    "/api/v2/actions/user/remove_cm_id/"
 
 
 api_act_send_adhoc : String

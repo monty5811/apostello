@@ -4,7 +4,7 @@ import Css
 import Html exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
-import Messages exposing (Msg(ScrollToId, WebPushMsg))
+import Messages exposing (Msg(ScrollToId))
 import Models exposing (Settings)
 import Pages exposing (Page(..), initSendAdhoc, initSendGroup)
 import Pages.DeletePanel as DP
@@ -12,16 +12,15 @@ import Pages.Forms.ContactImport as CI
 import Pages.GroupComposer as GC
 import Route exposing (spaLink)
 import Urls
-import WebPush
 
 
-menu : Settings -> WebPush.Model -> List (Html Msg)
-menu settings wp =
-    allUsersMenuItems settings wp
+menu : Settings-> List (Html Msg)
+menu settings  =
+    allUsersMenuItems settings 
 
 
-allUsersMenuItems : Settings -> WebPush.Model -> List (Html Msg)
-allUsersMenuItems settings wp =
+allUsersMenuItems : Settings -> List (Html Msg)
+allUsersMenuItems settings  =
     let
         userPerms =
             settings.userPerms
@@ -76,7 +75,6 @@ allUsersMenuItems settings wp =
         [ lockedItem False Urls.account_change_password "Change Password" (not userPerms.user.is_social)
         , item Urls.account_logout "Logout" True
         ]
-    , menuGroup "Push Status" [ isStaff || userPerms.can_see_incoming ] <| pushMenu wp
     , twilioNumber <| Maybe.map .fromNumber settings.twilio
     , Html.div [] []
     , Html.div [] []
@@ -120,9 +118,6 @@ menuGroup title perms items =
         ]
 
 
-pushMenu : WebPush.Model -> List (Html Msg)
-pushMenu wp =
-    List.map (Html.map WebPushMsg) (WebPush.view wp)
 
 
 header : String -> List Bool -> Html Msg

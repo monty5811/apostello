@@ -253,36 +253,6 @@ def sms_to_slack(sms_body, person_name, keyword_name):
     post_to_slack(attachments)
 
 
-def send_cloud_messages():
-    """Send messages to all registere cloud messaging IDs."""
-    server_key = settings.CM_SERVER_KEY
-    if not server_key:
-        return
-    from apostello.models import CloudMessageId
-    cmids = CloudMessageId.objects.all()
-    for cmid in cmids:
-        if not (cmid.user.is_staff or cmid.user.profile.can_see_incoming):
-            # only send messages to people with permission
-            continue
-        headers = {
-            'Content-Length': '0',
-            'TTL': '60',
-        }
-        if 'mozilla' not in cmid.url:
-            headers['Authorization'] = f'key={server_key}'
-        try:
-            r = requests.post(
-                cmid.url,
-                headers=headers,
-            )
-            if r.status_code == 401:
-                cmid.delete()
-                logger.info('Deleting %s', str(cmid))
-        except Exception as e:
-            print(e)
-            logger.info('Unable to push to %s', str(cmid))
-
-
 # Elvanto import
 def fetch_elvanto_groups(force=False):
     """Fetch all Elvanto groups."""

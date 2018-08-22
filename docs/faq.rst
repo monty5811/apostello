@@ -46,17 +46,3 @@ Open the Site Configuration page (``Menu --> Site Configuration``), scroll down 
 You can set a hard cut off date: any messages before this date will be purged from the system.
 Or you can choose the number of days to hold on to messages: any messages older than this number of days will be purged.
 The purge is run daily. You can use this to hide old messages you no longer care about or to make sure you stay within the limits of the Heroku hobby database.
-
-How can I get notified of new messages?
----------------------------------------
-
-You can use the Slack integration (see above), or if you use Chrome or Firefox you can get push notifications when any new message arrives.
-
-There are a few steps to get this working:
-
-* Sign up for a `Firebase <https://firebase.google.com/>`_ account
-* Login and create a new Firebase project
-* Open you project, then go to ``Settings -> Cloud Messaging``
-* You need two bits of information from this page - the Sender ID and the Server Key. You need to provide these to apostello so we can send notifications. Do this by setting the environment variables ``CM_SENDER_ID`` and ``CM_SERVER_KEY``.
-
-Once you are all setup, open apostello, open the menu and subscribe to notifications - you will be notified everytime a new SMS is received. You can turn it off at any time.
