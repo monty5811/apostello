@@ -12,9 +12,14 @@ import Messages exposing (..)
 import Models exposing (Model)
 import Navigation
 import Pages exposing (Page(..))
+import Pages.Curator as C
 import Pages.Forms.Contact as CF
 import Pages.Forms.Group as GF
 import Pages.Forms.Keyword as KF
+import Pages.GroupTable as GT
+import Pages.KeyRespTable as KRT
+import Pages.KeywordTable as KT
+import Pages.RecipientTable as RT
 import RemoteList as RL
 import Route exposing (page2loc, spaLink)
 import Store.Model exposing (DataStore)
@@ -55,13 +60,13 @@ view ds page canArchive =
 fabLinks : DataStore -> Page -> Bool -> List (Html Msg)
 fabLinks ds page canArchive =
     case page of
-        OutboundTable ->
+        OutboundTable _ ->
             defaultLinks
 
-        InboundTable ->
+        InboundTable _ ->
             [ incomingWall, wallCurator ]
 
-        GroupTable viewingArchive ->
+        GroupTable _ viewingArchive ->
             let
                 otherLink =
                     case viewingArchive of
@@ -76,7 +81,7 @@ fabLinks ds page canArchive =
         GroupComposer _ ->
             [ newGroupSpa, groupsSpa, groupsArchiveSpa ]
 
-        RecipientTable viewingArchive ->
+        RecipientTable _ viewingArchive ->
             let
                 otherLink =
                     case viewingArchive of
@@ -88,7 +93,7 @@ fabLinks ds page canArchive =
             in
             [ newContactSpa, otherLink ]
 
-        KeywordTable viewingArchive ->
+        KeywordTable _ viewingArchive ->
             let
                 otherLink =
                     case viewingArchive of
@@ -100,19 +105,19 @@ fabLinks ds page canArchive =
             in
             [ newKeywordSpa, otherLink ]
 
-        ElvantoImport ->
+        ElvantoImport _ ->
             defaultLinks
 
         Wall ->
             []
 
-        Curator ->
+        Curator _ ->
             [ incomingWall ]
 
-        UserProfileTable ->
+        UserProfileTable _ ->
             [ fabLink "/admin/auth/user/" "Admin: Users" ]
 
-        ScheduledSmsTable ->
+        ScheduledSmsTable _ ->
             defaultLinks
 
         KeyRespTable _ _ k ->
@@ -164,7 +169,7 @@ fabLinks ds page canArchive =
                                 |> List.head
                                 |> Maybe.map .is_archived
                     in
-                    [ archiveButton (GroupTable False)
+                    [ archiveButton (GroupTable GT.initialModel False)
                         (U.api_act_archive_group pk)
                         isArchived
                         canArchive
@@ -184,7 +189,7 @@ fabLinks ds page canArchive =
                                 |> List.head
                                 |> Maybe.map .is_archived
                     in
-                    [ archiveButton (RecipientTable False)
+                    [ archiveButton (RecipientTable RT.initialModel False)
                         (U.api_act_archive_recipient pk)
                         isArchived
                         canArchive
@@ -209,7 +214,7 @@ fabLinks ds page canArchive =
                     in
                     [ keywordResponses keyword
                     , keywordArchiveResponses keyword
-                    , archiveButton (KeywordTable False)
+                    , archiveButton (KeywordTable KT.initialModel False)
                         (U.api_act_archive_keyword k)
                         isArchived
                         canArchive
@@ -319,12 +324,12 @@ newKeywordSpa =
 
 keywords : Html Msg
 keywords =
-    fabSpaLink (KeywordTable False) "Keywords"
+    fabSpaLink (KeywordTable KT.initialModel False) "Keywords"
 
 
 keywordArchive : Html Msg
 keywordArchive =
-    fabSpaLink (KeywordTable True) "Archived Keywords"
+    fabSpaLink (KeywordTable KT.initialModel True) "Archived Keywords"
 
 
 keywordCsv : String -> Html Msg
@@ -344,7 +349,7 @@ keywordResponsesSpa maybeK =
             fabLink "#" "..."
 
         Just k ->
-            fabSpaLink (KeyRespTable False False k.keyword) ("Replies (" ++ k.num_replies ++ ")")
+            fabSpaLink (KeyRespTable KRT.initialModel False k.keyword) ("Replies (" ++ k.num_replies ++ ")")
 
 
 keywordArchiveResponsesSpa : Maybe Keyword -> Html Msg
@@ -354,7 +359,7 @@ keywordArchiveResponsesSpa k =
             fabLink "#" "..."
 
         Just keyword ->
-            fabSpaLink (KeyRespTable False True keyword.keyword) ("Archived Replies (" ++ keyword.num_archived_replies ++ ")")
+            fabSpaLink (KeyRespTable KRT.initialModel True keyword.keyword) ("Archived Replies (" ++ keyword.num_archived_replies ++ ")")
 
 
 keywordResponses : Maybe Keyword -> Html Msg
@@ -364,7 +369,7 @@ keywordResponses maybeK =
             fabLink "#" "..."
 
         Just k ->
-            fabSpaLink (KeyRespTable False False k.keyword) ("Replies (" ++ k.num_replies ++ ")")
+            fabSpaLink (KeyRespTable KRT.initialModel False k.keyword) ("Replies (" ++ k.num_replies ++ ")")
 
 
 keywordArchiveResponses : Maybe Keyword -> Html Msg
@@ -374,7 +379,7 @@ keywordArchiveResponses k =
             fabLink "#" "..."
 
         Just keyword ->
-            fabSpaLink (KeyRespTable False True keyword.keyword) ("Archived Replies (" ++ keyword.num_archived_replies ++ ")")
+            fabSpaLink (KeyRespTable KRT.initialModel True keyword.keyword) ("Archived Replies (" ++ keyword.num_archived_replies ++ ")")
 
 
 newContactSpa : Html Msg
@@ -384,22 +389,22 @@ newContactSpa =
 
 contactsSpa : Html Msg
 contactsSpa =
-    fabSpaLink (RecipientTable False) " Contacts"
+    fabSpaLink (RecipientTable RT.initialModel False) " Contacts"
 
 
 contactArchiveSpa : Html Msg
 contactArchiveSpa =
-    fabSpaLink (RecipientTable True) "Archived Contacts"
+    fabSpaLink (RecipientTable RT.initialModel True) "Archived Contacts"
 
 
 groupsArchiveSpa : Html Msg
 groupsArchiveSpa =
-    fabSpaLink (GroupTable True) "Archived Groups"
+    fabSpaLink (GroupTable GT.initialModel True) "Archived Groups"
 
 
 groupsSpa : Html Msg
 groupsSpa =
-    fabSpaLink (GroupTable False) "Groups"
+    fabSpaLink (GroupTable GT.initialModel False) "Groups"
 
 
 newGroupSpa : Html Msg
@@ -414,4 +419,4 @@ incomingWall =
 
 wallCurator : Html Msg
 wallCurator =
-    fabSpaLink Curator "Live Curator"
+    fabSpaLink (Curator C.initialModel) "Live Curator"

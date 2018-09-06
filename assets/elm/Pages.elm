@@ -1,10 +1,13 @@
 module Pages exposing (Page(..), initSendAdhoc, initSendGroup)
 
+import Pages.Curator as C
 import Pages.Debug as DG
 import Pages.DeletePanel as DP
+import Pages.ElvantoImport as EI
 import Pages.FirstRun as FR
 import Pages.Forms.Contact as CF
 import Pages.Forms.ContactImport as CI
+import Pages.Forms.CreateAllGroup as CAGF
 import Pages.Forms.DefaultResponses as DRF
 import Pages.Forms.Group as GF
 import Pages.Forms.Keyword as KF
@@ -13,34 +16,42 @@ import Pages.Forms.SendGroup as SGF
 import Pages.Forms.SiteConfig as SCF
 import Pages.Forms.UserProfile as UP
 import Pages.GroupComposer as GC
+import Pages.GroupTable as GT
+import Pages.InboundTable as IT
+import Pages.KeyRespTable as KRT
+import Pages.KeywordTable as KT
+import Pages.OutboundTable as OT
+import Pages.RecipientTable as RT
+import Pages.ScheduledSmsTable as SST
+import Pages.UserProfileTable as UPT
 
 
 type Page
     = Home
     | AccessDenied
     | ContactForm CF.Model (Maybe Int)
-    | CreateAllGroup String
-    | Curator
-    | ElvantoImport
+    | CreateAllGroup CAGF.Model
+    | Curator C.Model
+    | ElvantoImport EI.Model
     | Error404
     | FirstRun FR.Model
     | Debug DG.Model
     | GroupComposer GC.Model
     | GroupForm GF.Model (Maybe Int)
-    | GroupTable IsArchive
-    | InboundTable
-    | KeyRespTable Bool IsArchive String
+    | GroupTable GT.Model IsArchive
+    | InboundTable IT.Model
+    | KeyRespTable KRT.Model IsArchive String
     | KeywordForm KF.Model (Maybe String)
-    | KeywordTable IsArchive
-    | OutboundTable
-    | RecipientTable IsArchive
-    | ScheduledSmsTable
+    | KeywordTable KT.Model IsArchive
+    | OutboundTable OT.Model
+    | RecipientTable RT.Model IsArchive
+    | ScheduledSmsTable SST.Model
     | SendAdhoc SAF.Model
     | SendGroup SGF.Model
-    | UserProfileTable
+    | UserProfileTable UPT.Model
     | Wall
-    | SiteConfigForm (Maybe SCF.Model)
-    | DefaultResponsesForm (Maybe DRF.Model)
+    | SiteConfigForm SCF.Model
+    | DefaultResponsesForm DRF.Model
     | Usage
     | UserProfileForm UP.Model Int
     | Help

@@ -1,11 +1,12 @@
-module Pages.Forms.DefaultResponses exposing (Model, Msg(..), decodeModel, init, update, view)
+module Pages.Forms.DefaultResponses exposing (Model, Msg(..), decodeFModel, init, initialModel, update, view)
 
-import Forms.Model exposing (Field, FieldMeta, FormItem(FieldGroup), FormStatus, defaultFieldGroupConfig)
-import Forms.View as FV
+import DjangoSend
+import Form as F exposing (Field, FieldMeta, FormItem(FieldGroup), FormStatus(NoAction), defaultFieldGroupConfig)
 import Html exposing (Html)
 import Http
 import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (decode, required)
+import Json.Encode as Encode
 import Pages.Forms.Meta.DefaultResponses exposing (meta)
 import Pages.Fragments.Loader exposing (loader)
 import Urls
@@ -13,11 +14,24 @@ import Urls
 
 init : Cmd Msg
 init =
-    Http.get Urls.api_default_responses decodeModel
+    Http.get Urls.api_default_responses decodeFModel
         |> Http.send ReceiveInitialData
 
 
 type alias Model =
+    { fModel : Maybe FModel
+    , formStatus : FormStatus
+    }
+
+
+initialModel : Model
+initialModel =
+    { fModel = Nothing
+    , formStatus = NoAction
+    }
+
+
+type alias FModel =
     { keyword_no_match : String
     , default_no_keyword_auto_reply : String
     , default_no_keyword_not_live : String
@@ -28,9 +42,9 @@ type alias Model =
     }
 
 
-decodeModel : Decode.Decoder Model
-decodeModel =
-    decode Model
+decodeFModel : Decode.Decoder FModel
+decodeFModel =
+    decode FModel
         |> required "keyword_no_match" Decode.string
         |> required "default_no_keyword_auto_reply" Decode.string
         |> required "default_no_keyword_not_live" Decode.string
@@ -45,6 +59,13 @@ decodeModel =
 
 
 type Msg
+    = InputMsg InputMsg
+    | PostForm
+    | ReceiveFormResp (Result Http.Error { body : String, code : Int })
+    | ReceiveInitialData (Result Http.Error FModel)
+
+
+type InputMsg
     = UpdateKeywordNoMatch String
     | UpdateNoKeywordAutoReply String
     | UpdateDefaultNoKeywordNotLive String
@@ -52,41 +73,97 @@ type Msg
     | UpdateAutoName String
     | UpdateNameUpdateReply String
     | UpdateNameFailReply String
-    | ReceiveInitialData (Result Http.Error Model)
 
 
-update : Msg -> Maybe Model -> Maybe Model
-update msg maybeModel =
-    case ( msg, maybeModel ) of
-        ( UpdateKeywordNoMatch text, Just model ) ->
-            Just { model | keyword_no_match = text }
+type alias UpdateProps =
+    { csrftoken : DjangoSend.CSRFToken
+    , successPageUrl : String
+    }
 
-        ( UpdateNoKeywordAutoReply text, Just model ) ->
-            Just { model | default_no_keyword_auto_reply = text }
 
-        ( UpdateDefaultNoKeywordNotLive text, Just model ) ->
-            Just { model | default_no_keyword_not_live = text }
+update : UpdateProps -> Msg -> Model -> F.UpdateResp Msg Model
+update props msg model =
+    case msg of
+        ReceiveInitialData (Ok initialModel) ->
+            F.UpdateResp
+                { model | fModel = Just initialModel }
+                Cmd.none
+                []
+                Nothing
 
-        ( UpdateStartReply text, Just model ) ->
-            Just { model | start_reply = text }
+        ReceiveInitialData (Err _) ->
+            F.UpdateResp
+                model
+                Cmd.none
+                []
+                Nothing
 
-        ( UpdateAutoName text, Just model ) ->
-            Just { model | auto_name_request = text }
+        InputMsg inputMsg ->
+            F.UpdateResp
+                { model | fModel = Maybe.map (updateInput inputMsg) model.fModel }
+                Cmd.none
+                []
+                Nothing
 
-        ( UpdateNameUpdateReply text, Just model ) ->
-            Just { model | name_update_reply = text }
+        PostForm ->
+            F.UpdateResp
+                (F.setInProgress model)
+                (postCmd props.csrftoken model.fModel)
+                []
+                Nothing
 
-        ( UpdateNameFailReply text, Just model ) ->
-            Just { model | name_failure_reply = text }
+        ReceiveFormResp (Ok resp) ->
+            F.okFormRespUpdate props resp model
 
-        ( ReceiveInitialData (Ok initialModel), _ ) ->
-            Just initialModel
+        ReceiveFormResp (Err err) ->
+            F.errFormRespUpdate err model
 
-        ( ReceiveInitialData (Err _), _ ) ->
-            Nothing
 
-        ( _, Nothing ) ->
-            Nothing
+updateInput : InputMsg -> FModel -> FModel
+updateInput msg model =
+    case msg of
+        UpdateKeywordNoMatch text ->
+            { model | keyword_no_match = text }
+
+        UpdateNoKeywordAutoReply text ->
+            { model | default_no_keyword_auto_reply = text }
+
+        UpdateDefaultNoKeywordNotLive text ->
+            { model | default_no_keyword_not_live = text }
+
+        UpdateStartReply text ->
+            { model | start_reply = text }
+
+        UpdateAutoName text ->
+            { model | auto_name_request = text }
+
+        UpdateNameUpdateReply text ->
+            { model | name_update_reply = text }
+
+        UpdateNameFailReply text ->
+            { model | name_failure_reply = text }
+
+
+postCmd : DjangoSend.CSRFToken -> Maybe FModel -> Cmd Msg
+postCmd csrf maybeModel =
+    case maybeModel of
+        Nothing ->
+            Cmd.none
+
+        Just model ->
+            let
+                body =
+                    [ ( "keyword_no_match", Encode.string model.keyword_no_match )
+                    , ( "default_no_keyword_auto_reply", Encode.string model.default_no_keyword_auto_reply )
+                    , ( "default_no_keyword_not_live", Encode.string model.default_no_keyword_not_live )
+                    , ( "start_reply", Encode.string model.start_reply )
+                    , ( "auto_name_request", Encode.string model.auto_name_request )
+                    , ( "name_update_reply", Encode.string model.name_update_reply )
+                    , ( "name_failure_reply", Encode.string model.name_failure_reply )
+                    ]
+            in
+            DjangoSend.rawPost csrf Urls.api_default_responses body
+                |> Http.send ReceiveFormResp
 
 
 
@@ -94,14 +171,14 @@ update msg maybeModel =
 
 
 type alias Messages msg =
-    { form : Msg -> msg
+    { form : InputMsg -> msg
     , postForm : msg
     }
 
 
-view : Messages msg -> Maybe Model -> FormStatus -> Html msg
-view msgs maybeModel status =
-    case maybeModel of
+view : Messages msg -> Model -> Html msg
+view msgs { fModel, formStatus } =
+    case fModel of
         Nothing ->
             loader
 
@@ -123,57 +200,58 @@ view msgs maybeModel status =
             in
             Html.div []
                 [ Html.p [] [ Html.text "These are the default replies used in various circumstances." ]
-                , FV.form status
+                , F.form
+                    formStatus
                     fields
                     msgs.postForm
-                    (FV.submitButton (Just model))
+                    (F.submitButton (Just model))
                 ]
 
 
-keywordNoMatchField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+keywordNoMatchField : Messages msg -> FModel -> (FieldMeta -> List (Html msg))
 keywordNoMatchField msgs model =
-    FV.longTextField 10
+    F.longTextField 10
         (Just model.keyword_no_match)
         (msgs.form << UpdateKeywordNoMatch)
 
 
-noKAutoReplyField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+noKAutoReplyField : Messages msg -> FModel -> (FieldMeta -> List (Html msg))
 noKAutoReplyField msgs model =
-    FV.longTextField 10
+    F.longTextField 10
         (Just model.default_no_keyword_auto_reply)
         (msgs.form << UpdateNoKeywordAutoReply)
 
 
-noKNotLiveField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+noKNotLiveField : Messages msg -> FModel -> (FieldMeta -> List (Html msg))
 noKNotLiveField msgs model =
-    FV.longTextField 10
+    F.longTextField 10
         (Just model.default_no_keyword_not_live)
         (msgs.form << UpdateDefaultNoKeywordNotLive)
 
 
-startReplyField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+startReplyField : Messages msg -> FModel -> (FieldMeta -> List (Html msg))
 startReplyField msgs model =
-    FV.longTextField 10
+    F.longTextField 10
         (Just model.start_reply)
         (msgs.form << UpdateStartReply)
 
 
-autoNameField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+autoNameField : Messages msg -> FModel -> (FieldMeta -> List (Html msg))
 autoNameField msgs model =
-    FV.longTextField 10
+    F.longTextField 10
         (Just model.auto_name_request)
         (msgs.form << UpdateAutoName)
 
 
-nameUpdateField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+nameUpdateField : Messages msg -> FModel -> (FieldMeta -> List (Html msg))
 nameUpdateField msgs model =
-    FV.longTextField 10
+    F.longTextField 10
         (Just model.name_update_reply)
         (msgs.form << UpdateNameUpdateReply)
 
 
-nameFailField : Messages msg -> Model -> (FieldMeta -> List (Html msg))
+nameFailField : Messages msg -> FModel -> (FieldMeta -> List (Html msg))
 nameFailField msgs model =
-    FV.longTextField 10
+    F.longTextField 10
         (Just model.name_failure_reply)
         (msgs.form << UpdateNameFailReply)

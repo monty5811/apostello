@@ -15,6 +15,7 @@ import RemoteList as RL
 import Urls
 
 
+
 -- Model
 
 
@@ -88,6 +89,7 @@ update props msg model =
                             model.selectedInbound
                             model.selectedOutbound
                         )
+
                     else
                         ( model, Cmd.none )
 
@@ -200,6 +202,7 @@ incomingMsg selectedPks sms =
         , Css.cursor_pointer
         , if selected then
             Css.bg_red
+
           else
             Css.bg_grey
         , Css.px_2
@@ -222,6 +225,7 @@ outgoingMsg selectedPks sms =
         , Css.cursor_pointer
         , if selected then
             Css.bg_red
+
           else
             Css.bg_grey
         , Css.px_2
@@ -235,6 +239,7 @@ deleteButton : Model -> Html Msg
 deleteButton { selectedOutbound, selectedInbound } =
     if List.all List.isEmpty [ selectedOutbound, selectedInbound ] then
         Html.button [ A.id "deleteButton", Css.w_full, Css.btn, Css.btn_grey ] [ Html.text "Delete Messages!" ]
+
     else
         Html.button [ A.id "deleteButton", Css.w_full, Css.btn, Css.btn_red, E.onClick DeleteClicked ] [ Html.text "Delete Messages!" ]
 
@@ -287,6 +292,7 @@ typeToConfirm str =
                 , A.id "finalConfirmButton"
                 ]
                 [ Html.text "Delete the messages" ]
+
           else
             Html.button
                 [ Css.btn

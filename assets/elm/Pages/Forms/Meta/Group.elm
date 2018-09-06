@@ -1,6 +1,6 @@
 module Pages.Forms.Meta.Group exposing (meta)
 
-import Forms.Model exposing (FieldMeta)
+import Form exposing (FieldMeta)
 
 
 meta : { name : FieldMeta, description : FieldMeta }

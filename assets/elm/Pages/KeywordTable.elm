@@ -1,4 +1,4 @@
-module Pages.KeywordTable exposing (view)
+module Pages.KeywordTable exposing (Model, Msg(..), initialModel, update, view)
 
 import Css
 import Data exposing (Keyword)
@@ -8,9 +8,36 @@ import Html exposing (Html)
 import RemoteList as RL
 
 
+-- Model
+
+
+type alias Model =
+    { tableModel : FT.Model
+    }
+
+
+initialModel : Model
+initialModel =
+    { tableModel = FT.initialModel }
+
+
+
+-- Update
+
+
+type Msg
+    = TableMsg FT.Msg
+
+
+update : Msg -> Model -> Model
+update msg model =
+    case msg of
+        TableMsg tableMsg ->
+            { model | tableModel = FT.update tableMsg model.tableModel }
+
+
 type alias Props msg =
     { tableMsg : FT.Msg -> msg
-    , tableModel : FT.Model
     , keywords : RL.RemoteList Keyword
     , keywordLink : Keyword -> Html msg
     , keywordRespLink : (Keyword -> String) -> Keyword -> Html msg
@@ -18,9 +45,9 @@ type alias Props msg =
     }
 
 
-view : Props msg -> Html msg
-view props =
-    FT.defaultTable { top = props.tableMsg } tableHead props.tableModel (keywordRow props) props.keywords
+view : Props msg -> Model -> Html msg
+view props { tableModel } =
+    FT.defaultTable { top = props.tableMsg } tableHead tableModel (keywordRow props) props.keywords
 
 
 tableHead : FT.Head

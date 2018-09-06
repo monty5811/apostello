@@ -1,4 +1,4 @@
-module Pages.ElvantoImport exposing (Msg, update, view)
+module Pages.ElvantoImport exposing (Model, Msg(..), initialModel, update, view)
 
 import Css
 import Data exposing (ElvantoGroup)
@@ -10,9 +10,20 @@ import Html.Attributes as A
 import Html.Events exposing (onClick)
 import Http
 import Json.Decode as Decode
-import Notification as N
+import Notification
 import RemoteList as RL
 import Urls
+
+
+type alias Model =
+    { tableModel : FT.Model
+    }
+
+
+initialModel : Model
+initialModel =
+    { tableModel = FT.initialModel }
+
 
 
 -- Update
@@ -22,6 +33,7 @@ type Msg
     = PullGroups
     | FetchGroups
     | ReceiveButtonResp (Result Http.Error Bool)
+    | TableMsg FT.Msg
 
 
 type alias UpdateProps msg =
@@ -30,30 +42,32 @@ type alias UpdateProps msg =
     }
 
 
-update : UpdateProps msg -> Msg -> { a | notifications : N.Notifications } -> ( { a | notifications : N.Notifications }, List (Cmd msg) )
+update : UpdateProps msg -> Msg -> Model -> ( Model, Notification.Notifications, List (Cmd msg) )
 update props msg model =
     case msg of
         PullGroups ->
-            ( { model
-                | notifications =
-                    N.addInfo model.notifications "Groups are being imported, it may take a couple of minutes"
-              }
+            ( model
+            , Notification.addInfo [] "Groups are being imported, it may take a couple of minutes"
             , [ buttonReq props Urls.api_act_pull_elvanto_groups ]
             )
 
         FetchGroups ->
-            ( { model
-                | notifications =
-                    N.addSuccess model.notifications "Groups are being fetched, it may take a couple of minutes"
-              }
+            ( model
+            , Notification.addSuccess [] "Groups are being fetched, it may take a couple of minutes"
             , [ buttonReq props Urls.api_act_fetch_elvanto_groups ]
             )
 
         ReceiveButtonResp (Ok _) ->
-            ( model, [] )
+            ( model, [], [] )
 
         ReceiveButtonResp (Err _) ->
-            handleNotSaved model
+            ( model, Notification.addNotSaved [], [] )
+
+        TableMsg tableMsg ->
+            ( { model | tableModel = FT.update tableMsg model.tableModel }
+            , []
+            , []
+            )
 
 
 buttonReq : UpdateProps msg -> String -> Cmd msg
@@ -70,15 +84,16 @@ type alias Props msg =
     { tableMsg : FT.Msg -> msg
     , topMsg : Msg -> msg
     , toggleElvantoGroupSync : ElvantoGroup -> msg
+    , groups : RL.RemoteList ElvantoGroup
     }
 
 
-view : Props msg -> FT.Model -> RL.RemoteList ElvantoGroup -> Html msg
-view props tableModel groups =
+view : Props msg -> Model -> Html msg
+view props { tableModel } =
     Html.div []
         [ Html.div [ Css.w_full, Css.flex ] [ fetchButton props, pullButton props ]
         , Html.br [] []
-        , FT.table { top = props.tableMsg } [] tableHead tableModel (groupRow props) groups
+        , FT.table { top = props.tableMsg } [] tableHead tableModel (groupRow props) props.groups
         ]
 
 

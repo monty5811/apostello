@@ -1,4 +1,4 @@
-module Store.Messages exposing (..)
+module Store.Messages exposing (Msg(..))
 
 import Data exposing (ElvantoGroup, RecipientGroup, RecipientSimple, SmsInbound, UserProfile)
 import Http
@@ -6,7 +6,7 @@ import Store.DataTypes exposing (RemoteDataType)
 import Store.Model exposing (RawResponse)
 
 
-type StoreMsg
+type Msg
     = LoadData
     | ReceiveRawResp RemoteDataType Bool (Result Http.Error RawResponse)
     | ToggleGroupMembership RecipientGroup RecipientSimple

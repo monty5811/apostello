@@ -1,15 +1,15 @@
-module Store.Request exposing (..)
+module Store.Request exposing (dataFromResp, extractRawResponse, fetchData, increasePageSize, makeRequest, maybeFetchData, nextFromBody)
 
 import Http
 import Json.Decode as Decode
 import Pages exposing (Page)
 import Regex
 import Store.DataTypes exposing (RemoteDataType, dt2Url, dt_from_page)
-import Store.Messages exposing (StoreMsg(ReceiveRawResp))
+import Store.Messages exposing (Msg(ReceiveRawResp))
 import Store.Model exposing (DataStore, RawResponse, setLoadDataStatus)
 
 
-maybeFetchData : Page -> DataStore -> ( DataStore, List (Cmd StoreMsg) )
+maybeFetchData : Page -> DataStore -> ( DataStore, List (Cmd Msg) )
 maybeFetchData page dataStore =
     let
         dataTypes =
@@ -26,7 +26,7 @@ maybeFetchData page dataStore =
     ( newDs, fetchCmds )
 
 
-fetchData : ( RemoteDataType, ( Bool, String ) ) -> Cmd StoreMsg
+fetchData : ( RemoteDataType, ( Bool, String ) ) -> Cmd Msg
 fetchData ( dt, ( ignorePageInfo, url ) ) =
     makeRequest url
         |> Http.send (ReceiveRawResp dt ignorePageInfo)

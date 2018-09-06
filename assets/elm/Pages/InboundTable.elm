@@ -1,4 +1,4 @@
-module Pages.InboundTable exposing (view)
+module Pages.InboundTable exposing (Model, Msg(..), initialModel, update, view)
 
 import Css
 import Data exposing (SmsInbound)
@@ -10,12 +10,40 @@ import Html.Events as E
 import RemoteList as RL
 
 
+-- Model
+
+
+type alias Model =
+    { tableModel : FT.Model
+    }
+
+
+initialModel : Model
+initialModel =
+    { tableModel = FT.initialModel }
+
+
+
+-- Update
+
+
+type Msg
+    = TableMsg FT.Msg
+
+
+update : Msg -> Model -> Model
+update msg model =
+    case msg of
+        TableMsg tableMsg ->
+            { model | tableModel = FT.update tableMsg model.tableModel }
+
+
+
 -- Main view
 
 
 type alias Props msg =
-    { tableModel : FT.Model
-    , tableMsg : FT.Msg -> msg
+    { tableMsg : FT.Msg -> msg
     , sms : RL.RemoteList SmsInbound
     , reprocessSms : Int -> msg
     , keywordFormLink : SmsInbound -> Html msg
@@ -24,9 +52,9 @@ type alias Props msg =
     }
 
 
-view : Props msg -> Html msg
-view props =
-    FT.defaultTable { top = props.tableMsg } head props.tableModel (smsRow props) props.sms
+view : Props msg -> Model -> Html msg
+view props { tableModel } =
+    FT.defaultTable { top = props.tableMsg } head tableModel (smsRow props) props.sms
 
 
 head : FT.Head

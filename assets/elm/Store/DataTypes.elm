@@ -65,37 +65,37 @@ dt2Url dt =
 dt_from_page : Page -> List RemoteDataType
 dt_from_page p =
     case p of
-        OutboundTable ->
+        OutboundTable _ ->
             [ OutgoingSms ]
 
-        InboundTable ->
+        InboundTable _ ->
             [ IncomingSms ]
 
-        GroupTable _ ->
+        GroupTable _ _ ->
             [ Groups Nothing ]
 
         GroupComposer _ ->
             [ Groups Nothing ]
 
-        RecipientTable _ ->
+        RecipientTable _ _ ->
             [ Contacts Nothing ]
 
-        KeywordTable _ ->
+        KeywordTable _ _ ->
             [ Keywords Nothing ]
 
-        ElvantoImport ->
+        ElvantoImport _ ->
             [ ElvantoGroups ]
 
         Wall ->
             [ IncomingSms ]
 
-        Curator ->
+        Curator _ ->
             [ IncomingSms ]
 
-        UserProfileTable ->
+        UserProfileTable _ ->
             [ UserProfiles ]
 
-        ScheduledSmsTable ->
+        ScheduledSmsTable _ ->
             [ ScheduledSms ]
 
         KeyRespTable _ _ _ ->

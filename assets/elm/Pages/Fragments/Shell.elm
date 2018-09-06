@@ -55,7 +55,7 @@ commonShell model mainContent actionsList =
                     , [ mainContent ]
                     ]
             ]
-        , Html.aside [ A.id "menuWrapper", Css.raisedSegment, Css.pb_4 ] <| Menu.menu model.settings 
+        , Html.aside [ A.id "menuWrapper", Css.raisedSegment, Css.pb_4 ] <| Menu.menu model.settings
         ]
 
 
@@ -104,10 +104,10 @@ title page =
         CreateAllGroup _ ->
             ""
 
-        Curator ->
+        Curator _ ->
             "Wall Curator"
 
-        ElvantoImport ->
+        ElvantoImport _ ->
             "Elvanto Sync"
 
         Error404 ->
@@ -125,13 +125,13 @@ title page =
         GroupForm _ Nothing ->
             "New Group"
 
-        GroupTable True ->
+        GroupTable _ True ->
             "Groups (archived)"
 
-        GroupTable False ->
+        GroupTable _ False ->
             "Groups"
 
-        InboundTable ->
+        InboundTable _ ->
             "Incoming"
 
         KeyRespTable _ True k ->
@@ -146,22 +146,22 @@ title page =
         KeywordForm _ Nothing ->
             "New Keyword"
 
-        KeywordTable False ->
+        KeywordTable _ False ->
             "Keywords"
 
-        KeywordTable True ->
+        KeywordTable _ True ->
             "Keywords (archived)"
 
-        OutboundTable ->
+        OutboundTable _ ->
             "Outgoing"
 
-        RecipientTable False ->
+        RecipientTable _ False ->
             "Contacts"
 
-        RecipientTable True ->
+        RecipientTable _ True ->
             "Contacts (archived)"
 
-        ScheduledSmsTable ->
+        ScheduledSmsTable _ ->
             "Scheduled"
 
         SendAdhoc _ ->
@@ -170,7 +170,7 @@ title page =
         SendGroup _ ->
             "Send to a group"
 
-        UserProfileTable ->
+        UserProfileTable _ ->
             "Permissions"
 
         Wall ->

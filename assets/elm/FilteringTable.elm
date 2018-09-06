@@ -1,18 +1,17 @@
-module FilteringTable
-    exposing
-        ( Cell
-        , Head
-        , Model
-        , Msg
-        , Row
-        , defaultTable
-        , filterInput
-        , filterRecord
-        , initialModel
-        , table
-        , textToRegex
-        , update
-        )
+module FilteringTable exposing
+    ( Cell
+    , Head
+    , Model
+    , Msg
+    , Row
+    , defaultTable
+    , filterInput
+    , filterRecord
+    , initialModel
+    , table
+    , textToRegex
+    , update
+    )
 
 import Css
 import Html exposing (Html)
@@ -23,6 +22,7 @@ import List.Extra as LE
 import Pages.Fragments.Loader exposing (loader)
 import Regex
 import RemoteList as RL
+
 
 
 -- Model
@@ -210,6 +210,7 @@ selectNumRows numberOfRowsSelected tagger n =
         , Css.cursor_pointer
         , if numberOfRowsSelected == n then
             Css.font_bold
+
           else
             Css.noop
         ]
@@ -248,12 +249,14 @@ buttons msgs curPage numPages =
                     , rightButtons msgs curPage numPages
                     , [ pageButton msgs numPages curPage ]
                     ]
+
             else if curPage == numPages then
                 List.concat
                     [ [ pageButton msgs 1 curPage ]
                     , leftButtons msgs curPage
                     , [ pageButton msgs numPages curPage ]
                     ]
+
             else
                 List.concat
                     [ [ pageButton msgs 1 curPage ]
@@ -274,6 +277,7 @@ leftButtons : Messages msg -> Int -> List (Html msg)
 leftButtons msgs curPage =
     if curPage == 2 then
         [ Html.text "" ]
+
     else
         [ Html.div [ Css.py_2, Css.px_4, A.disabled True ] [ Html.text "..." ]
         , pageButton msgs (curPage - 1) curPage
@@ -284,6 +288,7 @@ rightButtons : Messages msg -> Int -> Int -> List (Html msg)
 rightButtons msgs curPage numPages =
     if curPage == numPages - 1 then
         [ Html.text "" ]
+
     else
         [ pageButton msgs (curPage + 1) curPage
         , Html.div [ Css.py_2, Css.px_4, A.disabled True ] [ Html.text "..." ]

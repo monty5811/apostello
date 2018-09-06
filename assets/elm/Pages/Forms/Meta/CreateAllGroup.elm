@@ -1,6 +1,6 @@
 module Pages.Forms.Meta.CreateAllGroup exposing (meta)
 
-import Forms.Model exposing (FieldMeta)
+import Form exposing (FieldMeta)
 
 
 meta : { group_name : FieldMeta }

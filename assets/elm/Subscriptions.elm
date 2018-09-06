@@ -4,7 +4,7 @@ import Messages as M
 import Models exposing (Model)
 import PageVisibility
 import Pages exposing (Page(Curator, SendAdhoc, SendGroup, Wall))
-import Store.Messages exposing (StoreMsg(LoadData))
+import Store.Messages
 import Store.Model as Store
 import Time exposing (second)
 
@@ -46,7 +46,7 @@ reloadData pageVisibility page dataStore =
                         Wall ->
                             5 * second
 
-                        Curator ->
+                        Curator _ ->
                             20 * second
 
                         _ ->
@@ -55,7 +55,7 @@ reloadData pageVisibility page dataStore =
             case pageVisibility of
                 PageVisibility.Visible ->
                     if allFinished || anyFailed then
-                        Time.every interval (\_ -> M.StoreMsg LoadData)
+                        Time.every interval (\_ -> M.StoreMsg Store.Messages.LoadData)
                     else
                         Sub.none
 

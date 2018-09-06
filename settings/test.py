@@ -36,7 +36,10 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
     ),
 ]
 
-ALLOWED_HOSTS = ['testserver']
+ALLOWED_HOSTS = [
+    'testserver',
+    'localhost',
+]
 
 Q_CLUSTER = {
     'name': 'apostello_test',

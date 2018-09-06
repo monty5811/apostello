@@ -8,19 +8,30 @@ import Messages exposing (Msg(ScrollToId))
 import Models exposing (Settings)
 import Pages exposing (Page(..), initSendAdhoc, initSendGroup)
 import Pages.DeletePanel as DP
+import Pages.ElvantoImport as EI
 import Pages.Forms.ContactImport as CI
+import Pages.Forms.CreateAllGroup as CAGF
+import Pages.Forms.DefaultResponses as DRF
+import Pages.Forms.SiteConfig as SCF
 import Pages.GroupComposer as GC
+import Pages.GroupTable as GT
+import Pages.InboundTable as IT
+import Pages.KeywordTable as KT
+import Pages.OutboundTable as OT
+import Pages.RecipientTable as RT
+import Pages.ScheduledSmsTable as SST
+import Pages.UserProfileTable as UPT
 import Route exposing (spaLink)
 import Urls
 
 
-menu : Settings-> List (Html Msg)
-menu settings  =
-    allUsersMenuItems settings 
+menu : Settings -> List (Html Msg)
+menu settings =
+    allUsersMenuItems settings
 
 
 allUsersMenuItems : Settings -> List (Html Msg)
-allUsersMenuItems settings  =
+allUsersMenuItems settings =
     let
         userPerms =
             settings.userPerms
@@ -36,33 +47,33 @@ allUsersMenuItems settings  =
     in
     [ menuGroup "Keywords"
         [ isStaff, userPerms.can_see_keywords ]
-        [ itemSpa (KeywordTable False) "Keywords" userPerms.can_see_keywords ]
+        [ itemSpa (KeywordTable KT.initialModel False) "Keywords" userPerms.can_see_keywords ]
     , menuGroup "SMS"
         [ isStaff, userPerms.can_send_sms, userPerms.can_see_incoming, userPerms.can_see_outgoing ]
         [ itemSpa (initSendAdhoc Nothing Nothing) "Send to Individuals" userPerms.can_send_sms
         , itemSpa (initSendGroup Nothing Nothing) "Send to a Group" userPerms.can_send_sms
-        , itemSpa InboundTable "Incoming SMS" userPerms.can_see_incoming
-        , itemSpa OutboundTable "Outgoing SMS" userPerms.can_see_outgoing
-        , itemSpa ScheduledSmsTable "Scheduled Messages" isStaff
+        , itemSpa (InboundTable IT.initialModel) "Incoming SMS" userPerms.can_see_incoming
+        , itemSpa (OutboundTable OT.initialModel) "Outgoing SMS" userPerms.can_see_outgoing
+        , itemSpa (ScheduledSmsTable SST.initialModel) "Scheduled Messages" isStaff
         ]
     , menuGroup "Contacts"
         [ isStaff, userPerms.can_see_contact_names, userPerms.can_see_groups ]
-        [ itemSpa (RecipientTable False) "Contacts" userPerms.can_see_contact_names
-        , itemSpa (GroupTable False) "Groups" userPerms.can_see_groups
-        , itemSpa (CreateAllGroup "") "Create \"all\" group" isStaff
+        [ itemSpa (RecipientTable RT.initialModel False) "Contacts" userPerms.can_see_contact_names
+        , itemSpa (GroupTable GT.initialModel False) "Groups" userPerms.can_see_groups
+        , itemSpa (CreateAllGroup CAGF.initialModel) "Create \"all\" group" isStaff
         , itemSpa (GroupComposer GC.initialModel) "Compose group" userPerms.can_see_groups
         ]
     , menuGroup "Settings"
         [ isStaff ]
-        [ itemSpa (SiteConfigForm Nothing) "Site Configuration" isStaff
-        , itemSpa (DefaultResponsesForm Nothing) "Default Responses" isStaff
-        , itemSpa UserProfileTable "User Permissions" isStaff
+        [ itemSpa (SiteConfigForm SCF.initialModel) "Site Configuration" isStaff
+        , itemSpa (DefaultResponsesForm DRF.initialModel) "Default Responses" isStaff
+        , itemSpa (UserProfileTable UPT.initialModel) "User Permissions" isStaff
         , itemSpa (DeletePanel DP.initialModel) "Twilio Delete" isStaff
         ]
     , menuGroup "Import"
         [ isStaff, userPerms.can_import ]
         [ itemSpa (ContactImport CI.initialModel) "CSV" userPerms.can_import
-        , itemSpa ElvantoImport "Elvanto" userPerms.can_import
+        , itemSpa (ElvantoImport EI.initialModel) "Elvanto" userPerms.can_import
         ]
     , menuGroup "Misc"
         [ isStaff ]
@@ -116,8 +127,6 @@ menuGroup title perms items =
         [ header title perms
         , Html.ul [ Css.list_reset ] items
         ]
-
-
 
 
 header : String -> List Bool -> Html Msg

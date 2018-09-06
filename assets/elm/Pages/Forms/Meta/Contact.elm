@@ -1,6 +1,6 @@
 module Pages.Forms.Meta.Contact exposing (meta)
 
-import Forms.Model exposing (FieldMeta)
+import Form exposing (FieldMeta)
 
 
 meta : { first_name : FieldMeta, last_name : FieldMeta, number : FieldMeta, do_not_reply : FieldMeta, never_contact : FieldMeta, notes : FieldMeta, groups : FieldMeta }

@@ -7,31 +7,42 @@ import Html.Events exposing (onWithOptions)
 import Json.Decode as Decode
 import Messages
     exposing
-        ( FormMsg
+        ( Msg
             ( DefaultResponsesFormMsg
             , KeywordFormMsg
+            , NewUrl
             , SendAdhocMsg
             , SendGroupMsg
             , SiteConfigFormMsg
             )
-        , Msg(FormMsg, NewUrl)
         )
 import Models exposing (Settings)
 import Navigation
 import Pages exposing (Page(..), initSendAdhoc, initSendGroup)
+import Pages.Curator as C
 import Pages.Debug as DG
 import Pages.DeletePanel as DP
+import Pages.ElvantoImport as EI
 import Pages.FirstRun as FR
 import Pages.Forms.Contact as CF
 import Pages.Forms.ContactImport as CI
-import Pages.Forms.DefaultResponses
+import Pages.Forms.CreateAllGroup as CAGF
+import Pages.Forms.DefaultResponses as DRF
 import Pages.Forms.Group as GF
 import Pages.Forms.Keyword as KF
 import Pages.Forms.SendAdhoc
 import Pages.Forms.SendGroup
-import Pages.Forms.SiteConfig
+import Pages.Forms.SiteConfig as SCF
 import Pages.Forms.UserProfile as UP
 import Pages.GroupComposer as GC
+import Pages.GroupTable as GT
+import Pages.InboundTable as IT
+import Pages.KeyRespTable as KRT
+import Pages.KeywordTable as KT
+import Pages.OutboundTable as OT
+import Pages.RecipientTable as RT
+import Pages.ScheduledSmsTable as SST
+import Pages.UserProfileTable as UPT
 import Process
 import Task
 import Time
@@ -44,21 +55,21 @@ route =
         [ Url.map Home top
         , Url.map initSendAdhoc (s "send" </> s "adhoc" <?> stringParam "content" <?> intListParam "recipients")
         , Url.map initSendGroup (s "send" </> s "group" <?> stringParam "content" <?> intParam "recipient_group")
-        , Url.map InboundTable (s "incoming")
-        , Url.map Curator (s "incoming" </> s "curate_wall")
-        , Url.map (GroupTable False) (s "group" </> s "all")
-        , Url.map (GroupTable True) (s "group" </> s "archive")
+        , Url.map (InboundTable IT.initialModel) (s "incoming")
+        , Url.map (Curator C.initialModel) (s "incoming" </> s "curate_wall")
+        , Url.map (GroupTable GT.initialModel False) (s "group" </> s "all")
+        , Url.map (GroupTable GT.initialModel True) (s "group" </> s "archive")
         , Url.map (GroupComposer GC.initialModel) (s "group" </> s "composer")
-        , Url.map (RecipientTable False) (s "recipient" </> s "all")
-        , Url.map (RecipientTable True) (s "recipient" </> s "archive")
-        , Url.map (KeywordTable False) (s "keyword" </> s "all")
-        , Url.map (KeywordTable True) (s "keyword" </> s "archive")
-        , Url.map (KeyRespTable False False) (s "keyword" </> s "responses" </> string)
-        , Url.map (KeyRespTable False True) (s "keyword" </> s "responses" </> s "archive" </> string)
-        , Url.map OutboundTable (s "outgoing")
-        , Url.map ScheduledSmsTable (s "scheduled" </> s "sms")
-        , Url.map UserProfileTable (s "users" </> s "profiles")
-        , Url.map ElvantoImport (s "elvanto" </> s "import")
+        , Url.map (RecipientTable RT.initialModel False) (s "recipient" </> s "all")
+        , Url.map (RecipientTable RT.initialModel True) (s "recipient" </> s "archive")
+        , Url.map (KeywordTable KT.initialModel False) (s "keyword" </> s "all")
+        , Url.map (KeywordTable KT.initialModel True) (s "keyword" </> s "archive")
+        , Url.map (KeyRespTable KRT.initialModel False) (s "keyword" </> s "responses" </> string)
+        , Url.map (KeyRespTable KRT.initialModel True) (s "keyword" </> s "responses" </> s "archive" </> string)
+        , Url.map (OutboundTable OT.initialModel) (s "outgoing")
+        , Url.map (ScheduledSmsTable SST.initialModel) (s "scheduled" </> s "sms")
+        , Url.map (UserProfileTable UPT.initialModel) (s "users" </> s "profiles")
+        , Url.map (ElvantoImport EI.initialModel) (s "elvanto" </> s "import")
         , Url.map (FirstRun FR.initialModel) (s "config" </> s "first_run")
         , Url.map (Debug DG.initialModel) (s "config" </> s "debug")
         , Url.map (GroupForm GF.initialModel << Just) (s "group" </> s "edit" </> int)
@@ -67,9 +78,9 @@ route =
         , Url.map (ContactForm CF.initialModel Nothing) (s "recipient" </> s "new")
         , Url.map (KeywordForm KF.initialModel Nothing) (s "keyword" </> s "new")
         , Url.map (KeywordForm KF.initialModel << Just) (s "keyword" </> s "edit" </> string)
-        , Url.map (SiteConfigForm Nothing) (s "config" </> s "site")
-        , Url.map (DefaultResponsesForm Nothing) (s "config" </> s "responses")
-        , Url.map (CreateAllGroup "") (s "group" </> s "create_all")
+        , Url.map (SiteConfigForm SCF.initialModel) (s "config" </> s "site")
+        , Url.map (DefaultResponsesForm DRF.initialModel) (s "config" </> s "responses")
+        , Url.map (CreateAllGroup CAGF.initialModel) (s "group" </> s "create_all")
         , Url.map (UserProfileForm UP.initialModel) (s "users" </> s "profiles" </> int)
         , Url.map (ContactImport CI.initialModel) (s "recipient" </> s "import")
         , Url.map (ApiSetup Nothing) (s "api-setup")
@@ -89,21 +100,21 @@ intListParam name =
 
 parseListInts : Maybe String -> Maybe (List Int)
 parseListInts str =
-    case str of
-        Nothing ->
-            Nothing
+    Maybe.andThen parseListIntsHelp str
 
-        Just value ->
-            if String.startsWith "[" value && String.endsWith "]" value then
-                value
-                    |> String.dropLeft 1
-                    |> String.dropRight 1
-                    |> String.split ","
-                    |> List.map String.toInt
-                    |> List.foldr (Result.map2 (::)) (Ok [])
-                    |> Result.toMaybe
-            else
-                Nothing
+
+parseListIntsHelp : String -> Maybe (List Int)
+parseListIntsHelp value =
+    if String.startsWith "[" value && String.endsWith "]" value then
+        value
+            |> String.dropLeft 1
+            |> String.dropRight 1
+            |> String.split ","
+            |> List.map String.toInt
+            |> List.foldr (Result.map2 (::)) (Ok [])
+            |> Result.toMaybe
+    else
+        Nothing
 
 
 loc2Page : Navigation.Location -> Settings -> ( Page, Cmd Msg )
@@ -118,19 +129,19 @@ withEffects : Page -> ( Page, Cmd Msg )
 withEffects page =
     case page of
         SendAdhoc model ->
-            ( page, Cmd.map (FormMsg << SendAdhocMsg) (Pages.Forms.SendAdhoc.init model) )
+            ( page, Cmd.map SendAdhocMsg (Pages.Forms.SendAdhoc.init model) )
 
         SendGroup model ->
-            ( page, Cmd.map (FormMsg << SendGroupMsg) (Pages.Forms.SendGroup.init model) )
+            ( page, Cmd.map SendGroupMsg (Pages.Forms.SendGroup.init model) )
 
         KeywordForm model _ ->
-            ( page, Cmd.map (FormMsg << KeywordFormMsg) (KF.init model) )
+            ( page, Cmd.map KeywordFormMsg (KF.init model) )
 
         SiteConfigForm _ ->
-            ( page, Cmd.map (FormMsg << SiteConfigFormMsg) Pages.Forms.SiteConfig.init )
+            ( page, Cmd.map SiteConfigFormMsg SCF.init )
 
         DefaultResponsesForm _ ->
-            ( page, Cmd.map (FormMsg << DefaultResponsesFormMsg) Pages.Forms.DefaultResponses.init )
+            ( page, Cmd.map DefaultResponsesFormMsg DRF.init )
 
         _ ->
             ( page, Cmd.none )
@@ -172,46 +183,46 @@ page2loc page =
         Home ->
             "/"
 
-        OutboundTable ->
+        OutboundTable _ ->
             "/outgoing/"
 
-        InboundTable ->
+        InboundTable _ ->
             "/incoming/"
 
-        GroupTable True ->
+        GroupTable _ True ->
             "/group/archive/"
 
-        GroupTable False ->
+        GroupTable _ False ->
             "/group/all/"
 
         GroupComposer _ ->
             "/group/composer/"
 
-        RecipientTable True ->
+        RecipientTable _ True ->
             "/recipient/archive/"
 
-        RecipientTable False ->
+        RecipientTable _ False ->
             "/recipient/all/"
 
-        KeywordTable True ->
+        KeywordTable _ True ->
             "/keyword/archive/"
 
-        KeywordTable False ->
+        KeywordTable _ False ->
             "/keyword/all/"
 
-        ElvantoImport ->
+        ElvantoImport _ ->
             "/elvanto/import/"
 
         Wall ->
             "/incoming/wall/"
 
-        Curator ->
+        Curator _ ->
             "/incoming/curate_wall/"
 
-        UserProfileTable ->
+        UserProfileTable _ ->
             "/users/profiles/"
 
-        ScheduledSmsTable ->
+        ScheduledSmsTable _ ->
             "/scheduled/sms/"
 
         KeyRespTable _ True keyword ->
@@ -369,46 +380,46 @@ checkPerm blockedKeywords userPerms page =
     let
         permBool =
             case page of
-                OutboundTable ->
+                OutboundTable _ ->
                     userPerms.can_see_outgoing
 
-                InboundTable ->
+                InboundTable _ ->
                     userPerms.can_see_incoming
 
-                GroupTable False ->
+                GroupTable _ False ->
                     userPerms.can_see_groups
 
-                GroupTable True ->
+                GroupTable _ True ->
                     userPerms.user.is_staff
 
                 GroupComposer _ ->
                     userPerms.can_see_contact_names && userPerms.can_see_groups
 
-                RecipientTable False ->
+                RecipientTable _ False ->
                     userPerms.can_see_contact_names
 
-                RecipientTable True ->
+                RecipientTable _ True ->
                     userPerms.user.is_staff
 
-                KeywordTable False ->
+                KeywordTable _ False ->
                     userPerms.can_see_keywords
 
-                KeywordTable True ->
+                KeywordTable _ True ->
                     userPerms.user.is_staff
 
-                ElvantoImport ->
+                ElvantoImport _ ->
                     userPerms.can_import
 
                 Wall ->
                     userPerms.can_see_incoming
 
-                Curator ->
+                Curator _ ->
                     userPerms.can_see_incoming
 
-                UserProfileTable ->
+                UserProfileTable _ ->
                     userPerms.user.is_staff
 
-                ScheduledSmsTable ->
+                ScheduledSmsTable _ ->
                     userPerms.user.is_staff
 
                 KeyRespTable _ _ k ->

@@ -8,23 +8,30 @@ module Pages.Forms.ContactImport
         )
 
 import Css
-import Forms.Model exposing (Field, FormItem(FormField), FormStatus)
-import Forms.View exposing (form, longTextField)
+import DjangoSend
+import Form as F exposing (Field, FormItem(FormField), FormStatus(..), form, longTextField)
 import Html exposing (Html)
 import Html.Attributes as A
+import Http
+import Json.Encode as Encode
 import Pages.Forms.Meta.ContactImport exposing (meta)
+import Urls
 
 
 -- Model
 
 
 type alias Model =
-    String
+    { text : String
+    , formStatus : FormStatus
+    }
 
 
 initialModel : Model
 initialModel =
-    ""
+    { text = ""
+    , formStatus = NoAction
+    }
 
 
 
@@ -33,11 +40,48 @@ initialModel =
 
 type Msg
     = UpdateText String
+    | PostForm
+    | ReceiveFormResp (Result Http.Error { body : String, code : Int })
 
 
-update : Msg -> Model
-update (UpdateText text) =
-    text
+type alias UpdateProps =
+    { csrftoken : DjangoSend.CSRFToken
+    , successPageUrl : String
+    }
+
+
+update : UpdateProps -> Msg -> Model -> F.UpdateResp Msg Model
+update props msg model =
+    case msg of
+        UpdateText text ->
+            F.UpdateResp
+                { model | text = text }
+                Cmd.none
+                []
+                Nothing
+
+        PostForm ->
+            F.UpdateResp
+                (F.setInProgress model)
+                (postContactImportCmd props.csrftoken model.text)
+                []
+                Nothing
+
+        ReceiveFormResp (Ok resp) ->
+            F.okFormRespUpdate props resp model
+
+        ReceiveFormResp (Err err) ->
+            F.errFormRespUpdate err model
+
+
+postContactImportCmd : DjangoSend.CSRFToken -> String -> Cmd Msg
+postContactImportCmd csrf csv =
+    let
+        body =
+            [ ( "csv_data", Encode.string csv ) ]
+    in
+    DjangoSend.rawPost csrf Urls.api_recipients_import_csv body
+        |> Http.send ReceiveFormResp
 
 
 
@@ -46,12 +90,11 @@ update (UpdateText text) =
 
 type alias Messages msg =
     { form : Msg -> msg
-    , post : msg
     }
 
 
-view : Messages msg -> FormStatus -> Html msg
-view msgs formStatus =
+view : Messages msg -> Model -> Html msg
+view msgs model =
     let
         fields =
             [ FormField <| Field meta.csv_data <| longTextField 20 (Just "") (msgs.form << UpdateText)
@@ -71,8 +114,8 @@ view msgs formStatus =
             [ Html.text "There should be no header row and there should be three columns: First Name, Last Name, Number"
             ]
         , form
-            formStatus
+            model.formStatus
             fields
-            msgs.post
+            (msgs.form PostForm)
             button
         ]

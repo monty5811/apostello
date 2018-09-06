@@ -2,17 +2,20 @@ module Pages.Forms.Group exposing (Model, Msg(..), initialModel, update, view)
 
 import Css
 import Data exposing (RecipientGroup, RecipientSimple)
+import DjangoSend
 import FilteringTable exposing (filterInput, filterRecord, textToRegex)
-import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus)
-import Forms.View exposing (..)
+import Form as F exposing (..)
 import Helpers exposing (onClick)
 import Html exposing (Html)
 import Html.Attributes as A
+import Http
+import Json.Encode as Encode
 import Pages.Error404 as E404
 import Pages.Forms.Meta.Group exposing (meta)
 import Pages.Fragments.Loader exposing (loader)
 import Regex
 import RemoteList as RL
+import Urls
 
 
 type alias Model =
@@ -20,6 +23,7 @@ type alias Model =
     , nonmembersFilterRegex : Regex.Regex
     , name : Maybe String
     , description : Maybe String
+    , formStatus : FormStatus
     }
 
 
@@ -29,6 +33,7 @@ initialModel =
     , nonmembersFilterRegex = Regex.regex ""
     , name = Nothing
     , description = Nothing
+    , formStatus = NoAction
     }
 
 
@@ -37,14 +42,59 @@ initialModel =
 
 
 type Msg
+    = InputMsg InputMsg
+    | PostForm
+    | ReceiveFormResp (Result Http.Error { body : String, code : Int })
+
+
+type InputMsg
     = UpdateMemberFilter String
     | UpdateNonMemberFilter String
     | UpdateGroupNameField String
     | UpdateGroupDescField String
 
 
-update : Msg -> Model -> Model
-update msg model =
+type alias UpdateProps =
+    { csrftoken : DjangoSend.CSRFToken
+    , successPageUrl : String
+    , maybePk : Maybe Int
+    , groups : RL.RemoteList RecipientGroup
+    }
+
+
+update : UpdateProps -> Msg -> Model -> F.UpdateResp Msg Model
+update props msg model =
+    case msg of
+        InputMsg inputMsg ->
+            F.UpdateResp
+                (updateInput inputMsg model)
+                Cmd.none
+                []
+                Nothing
+
+        PostForm ->
+            F.UpdateResp
+                (F.setInProgress model)
+                (postGroupCmd
+                    props.csrftoken
+                    model
+                    (RL.filter (\x -> Just x.pk == props.maybePk) props.groups
+                        |> RL.toList
+                        |> List.head
+                    )
+                )
+                []
+                Nothing
+
+        ReceiveFormResp (Ok resp) ->
+            F.okFormRespUpdate props resp model
+
+        ReceiveFormResp (Err err) ->
+            F.errFormRespUpdate err model
+
+
+updateInput : InputMsg -> Model -> Model
+updateInput msg model =
     case msg of
         UpdateMemberFilter text ->
             { model | membersFilterRegex = textToRegex text }
@@ -59,41 +109,55 @@ update msg model =
             { model | name = Just text }
 
 
+postGroupCmd : DjangoSend.CSRFToken -> Model -> Maybe RecipientGroup -> Cmd Msg
+postGroupCmd csrf model maybeGroup =
+    let
+        body =
+            [ ( "name", Encode.string <| F.extractField .name model.name maybeGroup )
+            , ( "description", Encode.string <| F.extractField .description model.description maybeGroup )
+            ]
+                |> F.addPk maybeGroup
+    in
+    DjangoSend.rawPost csrf (Urls.api_recipient_groups Nothing) body
+        |> Http.send ReceiveFormResp
+
+
 
 -- View
 
 
 type alias Props msg =
-    { form : Msg -> msg
+    { form : InputMsg -> msg
     , postForm : msg
     , noop : msg
     , toggleGroupMembership : RecipientGroup -> RecipientSimple -> msg
     , restoreGroupLink : Maybe Int -> Html msg
+    , groups : RL.RemoteList RecipientGroup
     }
 
 
-view : Props msg -> Maybe Int -> RL.RemoteList RecipientGroup -> Model -> FormStatus -> Html msg
-view props maybePk groups model status =
+view : Props msg -> Maybe Int -> Model -> Html msg
+view props maybePk model =
     case maybePk of
         Nothing ->
             -- creating a new group
-            creating props groups model status
+            creating props model
 
         Just pk ->
             -- trying to edit an existing group:
-            editing props pk groups model status
+            editing props pk model
 
 
-creating : Props msg -> RL.RemoteList RecipientGroup -> Model -> FormStatus -> Html msg
-creating props groups model status =
-    viewHelp props Nothing groups model status
+creating : Props msg -> Model -> Html msg
+creating props model =
+    viewHelp props Nothing model
 
 
-editing : Props msg -> Int -> RL.RemoteList RecipientGroup -> Model -> FormStatus -> Html msg
-editing props pk groups model status =
+editing : Props msg -> Int -> Model -> Html msg
+editing props pk model =
     let
         currentGroup =
-            groups
+            props.groups
                 |> RL.toList
                 |> List.filter (\x -> x.pk == pk)
                 |> List.head
@@ -101,11 +165,11 @@ editing props pk groups model status =
     case currentGroup of
         Just grp ->
             -- group exists, show the form:
-            viewHelp props (Just grp) groups model status
+            viewHelp props (Just grp) model
 
         Nothing ->
             -- group does not exist:
-            case groups of
+            case props.groups of
                 RL.FinalPageReceived _ ->
                     -- show 404 if we have finished loading
                     E404.view
@@ -115,11 +179,11 @@ editing props pk groups model status =
                     loader
 
 
-viewHelp : Props msg -> Maybe RecipientGroup -> RL.RemoteList RecipientGroup -> Model -> FormStatus -> Html msg
-viewHelp props currentGroup groups_ model status =
+viewHelp : Props msg -> Maybe RecipientGroup -> Model -> Html msg
+viewHelp props currentGroup model =
     let
         groups =
-            RL.toList groups_
+            RL.toList props.groups
 
         showAN =
             showArchiveNotice groups currentGroup model
@@ -132,7 +196,7 @@ viewHelp props currentGroup groups_ model status =
     in
     Html.div []
         [ archiveNotice props showAN groups model.name
-        , form status fields (submitMsg props showAN) (submitButton currentGroup)
+        , form model.formStatus fields (submitMsg props showAN) (submitButton currentGroup)
         , membershipToggles props currentGroup model
         ]
 

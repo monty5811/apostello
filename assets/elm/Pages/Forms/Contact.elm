@@ -1,17 +1,21 @@
-module Pages.Forms.Contact exposing (Model, Msg, initialModel, update, view)
+module Pages.Forms.Contact exposing (Model, Msg(..), initialModel, update, view)
 
 import Css
 import Data exposing (Recipient)
-import Forms.Model exposing (Field, FieldMeta, FormItem(FieldGroup, FormField), FormStatus, defaultFieldGroupConfig)
-import Forms.View exposing (checkboxField, form, longTextField, simpleTextField, submitButton)
+import DjangoSend
+import FilteringTable as FT
+import Form as F exposing (Field, FieldMeta, FormItem(FieldGroup, FormField), FormStatus(NoAction), checkboxField, defaultFieldGroupConfig, form, longTextField, simpleTextField, submitButton)
 import Html exposing (Html)
+import Http
+import Json.Encode as Encode
 import Pages.Error404 as E404
 import Pages.Forms.Meta.Contact exposing (meta)
 import Pages.Fragments.Loader exposing (loader)
 import RemoteList as RL
+import Urls
 
 
--- Model
+--Model
 
 
 type alias Model =
@@ -21,6 +25,8 @@ type alias Model =
     , do_not_reply : Maybe Bool
     , never_contact : Maybe Bool
     , notes : Maybe String
+    , formStatus : FormStatus
+    , tableModel : FT.Model
     }
 
 
@@ -32,6 +38,8 @@ initialModel =
     , do_not_reply = Nothing
     , never_contact = Nothing
     , notes = Nothing
+    , formStatus = NoAction
+    , tableModel = FT.initialModel
     }
 
 
@@ -40,6 +48,13 @@ initialModel =
 
 
 type Msg
+    = PostForm Bool Bool
+    | InputMsg InputMsg
+    | ReceiveFormResp (Result Http.Error { body : String, code : Int })
+    | TableMsg FT.Msg
+
+
+type InputMsg
     = UpdateDoNotReplyField (Maybe Recipient)
     | UpdateNeverContactField (Maybe Recipient)
     | UpdateFirstNameField String
@@ -48,8 +63,58 @@ type Msg
     | UpdateNotesField String
 
 
-update : Msg -> Model -> Model
-update msg model =
+type alias UpdateProps =
+    { csrftoken : DjangoSend.CSRFToken
+    , recipients : RL.RemoteList Recipient
+    , maybePk : Maybe Int
+    , canSeeContactNum : Bool
+    , canSeeContactNotes : Bool
+    , successPageUrl : String
+    }
+
+
+update : UpdateProps -> Msg -> Model -> F.UpdateResp Msg Model
+update props msg model =
+    case msg of
+        InputMsg inputMsg ->
+            F.UpdateResp
+                (updateInput inputMsg model)
+                Cmd.none
+                []
+                Nothing
+
+        TableMsg tableMsg ->
+            F.UpdateResp
+                { model | tableModel = FT.update tableMsg model.tableModel }
+                Cmd.none
+                []
+                Nothing
+
+        PostForm canSeeContactNum canSeeContactNotes ->
+            F.UpdateResp
+                (F.setInProgress model)
+                (postCmd
+                    props.csrftoken
+                    model
+                    props.canSeeContactNum
+                    props.canSeeContactNotes
+                    (RL.filter (\x -> Just x.pk == props.maybePk) props.recipients
+                        |> RL.toList
+                        |> List.head
+                    )
+                )
+                []
+                Nothing
+
+        ReceiveFormResp (Ok resp) ->
+            F.okFormRespUpdate props resp model
+
+        ReceiveFormResp (Err err) ->
+            F.errFormRespUpdate err model
+
+
+updateInput : InputMsg -> Model -> Model
+updateInput msg model =
     case msg of
         UpdateFirstNameField text ->
             { model | first_name = Just text }
@@ -98,13 +163,46 @@ update msg model =
             { model | notes = Just text }
 
 
+postCmd : DjangoSend.CSRFToken -> Model -> Bool -> Bool -> Maybe Recipient -> Cmd Msg
+postCmd csrf model canSeeContactNum canSeeContactNotes maybeContact =
+    let
+        body =
+            [ ( "first_name", Encode.string <| F.extractField .first_name model.first_name maybeContact )
+            , ( "last_name", Encode.string <| F.extractField .last_name model.last_name maybeContact )
+            , ( "do_not_reply", Encode.bool <| F.extractBool .do_not_reply model.do_not_reply maybeContact )
+            , ( "never_contact", Encode.bool <| F.extractBool .never_contact model.never_contact maybeContact )
+            ]
+                |> F.addPk maybeContact
+                |> addContactNumber model canSeeContactNum maybeContact
+                |> addContactNotes model canSeeContactNotes maybeContact
+    in
+    DjangoSend.rawPost csrf (Urls.api_recipients Nothing) body
+        |> Http.send ReceiveFormResp
+
+
+addContactNumber : Model -> Bool -> Maybe Recipient -> List ( String, Encode.Value ) -> List ( String, Encode.Value )
+addContactNumber model canSeeContactNum maybeContact body =
+    if canSeeContactNum then
+        ( "number", Encode.string <| F.extractField (Maybe.withDefault "" << .number) model.number maybeContact ) :: body
+    else
+        body
+
+
+addContactNotes : Model -> Bool -> Maybe Recipient -> List ( String, Encode.Value ) -> List ( String, Encode.Value )
+addContactNotes model canSeeContactNotes maybeContact body =
+    if canSeeContactNotes then
+        ( "notes", Encode.string <| F.extractField .notes model.notes maybeContact ) :: body
+    else
+        body
+
+
 
 -- View
 
 
 type alias Props msg =
     { postForm : msg
-    , c : Msg -> msg
+    , c : InputMsg -> msg
     , noop : msg
     , spa : Maybe Int -> Html msg
     , defaultNumberPrefix : String
@@ -113,25 +211,25 @@ type alias Props msg =
     }
 
 
-view : Props msg -> Maybe (Html msg) -> Maybe Int -> RL.RemoteList Recipient -> Model -> FormStatus -> Html msg
-view props maybeTable maybePk contacts_ model status =
+view : Props msg -> Maybe (Html msg) -> Maybe Int -> RL.RemoteList Recipient -> Model -> Html msg
+view props maybeTable maybePk contacts_ model =
     case maybePk of
         Nothing ->
             -- creating a new contact:
-            creating props contacts_ model status
+            creating props contacts_ model
 
         Just pk ->
             -- trying to edit an existing contact:
-            editing props maybeTable pk contacts_ model status
+            editing props maybeTable pk contacts_ model
 
 
-creating : Props msg -> RL.RemoteList Recipient -> Model -> FormStatus -> Html msg
-creating props contacts model status =
-    viewHelp props Nothing Nothing contacts model status
+creating : Props msg -> RL.RemoteList Recipient -> Model -> Html msg
+creating props contacts model =
+    viewHelp props Nothing Nothing contacts model
 
 
-editing : Props msg -> Maybe (Html msg) -> Int -> RL.RemoteList Recipient -> Model -> FormStatus -> Html msg
-editing props maybeTable pk contacts model status =
+editing : Props msg -> Maybe (Html msg) -> Int -> RL.RemoteList Recipient -> Model -> Html msg
+editing props maybeTable pk contacts model =
     let
         currentContact =
             contacts
@@ -142,7 +240,7 @@ editing props maybeTable pk contacts model status =
     case currentContact of
         Just contact ->
             -- contact exists, show the form:
-            viewHelp props maybeTable (Just contact) contacts model status
+            viewHelp props maybeTable (Just contact) contacts model
 
         Nothing ->
             -- contact does not exist:
@@ -156,8 +254,8 @@ editing props maybeTable pk contacts model status =
                     loader
 
 
-viewHelp : Props msg -> Maybe (Html msg) -> Maybe Recipient -> RL.RemoteList Recipient -> Model -> FormStatus -> Html msg
-viewHelp props maybeTable currentContact contacts_ model status =
+viewHelp : Props msg -> Maybe (Html msg) -> Maybe Recipient -> RL.RemoteList Recipient -> Model -> Html msg
+viewHelp props maybeTable currentContact contacts_ model =
     let
         contacts =
             RL.toList contacts_
@@ -186,7 +284,7 @@ viewHelp props maybeTable currentContact contacts_ model status =
     in
     Html.div []
         [ archiveNotice props showAN contacts model.number
-        , form status fields (submitMsg props showAN) (submitButton currentContact)
+        , form model.formStatus fields (submitMsg props showAN) (submitButton currentContact)
         , case maybeTable of
             Just table ->
                 Html.div [ Css.mt_4, Css.max_w_md, Css.mx_auto ] [ table ]

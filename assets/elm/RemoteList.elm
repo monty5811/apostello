@@ -1,13 +1,7 @@
-module RemoteList
-    exposing
-        ( RemoteList(..)
-        , apply
-        , filter
-        , hasFailed
-        , hasFinished
-        , map
-        , toList
-        )
+module RemoteList exposing
+    ( RemoteList(..)
+    , toList, map, filter, apply, hasFailed, hasFinished
+    )
 
 {-| This library provides helpers for working with lists of remote data.
 
@@ -42,9 +36,9 @@ type RemoteList a
 
 {-| Check if the fetching has failed.
 
-    hasFailed (NotAsked [1, 2]) --> False
+    hasFailed (NotAsked [ 1, 2 ]) --> False
 
-    hasFailed (RespFailed "Server did not respond" [1, 2]) --> True
+    hasFailed (RespFailed "Server did not respond" [ 1, 2 ]) --> True
 
 -}
 hasFailed : RemoteList a -> Bool
@@ -59,11 +53,11 @@ hasFailed ls =
 
 {-| Check if the fetching has finished.
 
-    hasFinished (NotAsked [1, 2]) --> False
+    hasFinished (NotAsked [ 1, 2 ]) --> False
 
-    hasFinished (RespFailed "Server did not respond" [1, 2])  --> False
+    hasFinished (RespFailed "Server did not respond" [ 1, 2 ]) --> False
 
-    hasFinished (FinalPageReceived [1, 2])  --> True
+    hasFinished (FinalPageReceived [ 1, 2 ]) --> True
 
 -}
 hasFinished : RemoteList a -> Bool
@@ -78,7 +72,7 @@ hasFinished ls =
 
 {-| Convert a remote list into a normal list
 
-    toList (FinalPageReceived [1, 2, 3]) --> [1, 2, 3]
+    toList (FinalPageReceived [ 1, 2, 3 ]) --> [1, 2, 3]
 
 -}
 toList : RemoteList a -> List a
@@ -105,7 +99,7 @@ toList rl =
 
 {-| Apply a function to every element of the list.
 
-    map sqrt (WaitingForPage [4, 9, 16]) --> (WaitingForPage [2, 3, 4])
+    map sqrt (WaitingForPage [ 4, 9, 16 ]) --> (WaitingForPage [2, 3, 4])
 
 -}
 map : (a -> b) -> RemoteList a -> RemoteList b
@@ -115,7 +109,7 @@ map fn rl =
 
 {-| Keep only elements that satisfy the predicate.
 
-    filter (\i -> i > 1) (WaitingForPage [1, 2, 3]) --> (WaitingForPage [2, 3])
+    filter (\i -> i > 1) (WaitingForPage [ 1, 2, 3 ]) --> (WaitingForPage [2, 3])
 
 -}
 filter : (a -> Bool) -> RemoteList a -> RemoteList a
@@ -125,9 +119,9 @@ filter fn rl =
 
 {-| Apply a function to the list.
 
-    apply List.sort (WaitingForPage [3, 1, 2]) --> (WaitingForPage [1, 2, 3])
+    apply List.sort (WaitingForPage [ 3, 1, 2 ]) --> (WaitingForPage [1, 2, 3])
 
-    apply (List.take 2 >> List.reverse) (FinalPageReceived [1, 2, 3]) --> FinalPageReceived [2, 1]
+    apply (List.take 2 >> List.reverse) (FinalPageReceived [ 1, 2, 3 ]) --> FinalPageReceived [2, 1]
 
 -}
 apply : (List a -> List b) -> RemoteList a -> RemoteList b

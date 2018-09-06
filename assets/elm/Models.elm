@@ -10,8 +10,6 @@ module Models
 
 import Data exposing (UserProfile, decodeUserProfile)
 import DjangoSend exposing (CSRFToken(CSRFToken))
-import FilteringTable as FT
-import Forms.Model exposing (FormStatus(NoAction))
 import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (decode, required)
 import Notification as Notif
@@ -26,12 +24,10 @@ import Time
 
 type alias Model =
     { page : Page
-    , table : FT.Model
     , settings : Settings
     , dataStore : DataStore
     , notifications : Notif.Notifications
     , currentTime : Time.Time
-    , formStatus : FormStatus
     , pageVisibility : PageVisibility.Visibility
     }
 
@@ -39,12 +35,10 @@ type alias Model =
 initialModel : Settings -> Page -> Model
 initialModel settings page =
     { page = page
-    , table = FT.initialModel
     , settings = settings
     , dataStore = emptyDataStore
     , notifications = Notif.empty
     , currentTime = 0
-    , formStatus = NoAction
     , pageVisibility = PageVisibility.Visible -- default to visible, perhaps, should do something more sophisticated on init
     }
 

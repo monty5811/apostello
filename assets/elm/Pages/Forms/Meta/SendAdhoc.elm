@@ -1,6 +1,6 @@
 module Pages.Forms.Meta.SendAdhoc exposing (meta)
 
-import Forms.Model exposing (FieldMeta)
+import Form exposing (FieldMeta)
 
 
 meta : { content : FieldMeta, recipients : FieldMeta, scheduled_time : FieldMeta }

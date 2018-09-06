@@ -1,15 +1,14 @@
-module Pages.GroupComposer
-    exposing
-        ( Model
-        , Msg
-        , ParenLoc
-        , initialModel
-        , parenPairs
-        , parseQueryString
-        , runQuery
-        , update
-        , view
-        )
+module Pages.GroupComposer exposing
+    ( Model
+    , Msg
+    , ParenLoc
+    , initialModel
+    , parenPairs
+    , parseQueryString
+    , runQuery
+    , update
+    , view
+    )
 
 import Css
 import Data exposing (GroupPk, RecipientGroup, RecipientSimple, nullGroup)
@@ -216,6 +215,7 @@ groupLink : Props msg -> List RecipientSimple -> Html msg
 groupLink props people =
     if List.isEmpty people then
         Html.div [] []
+
     else
         people
             |> List.map .pk
@@ -306,6 +306,7 @@ handleBrackets query =
 
             [] ->
                 query
+
     else
         query
 
@@ -345,6 +346,7 @@ shouldKeepHelp : Int -> Int -> ( Int, a ) -> Maybe a
 shouldKeepHelp left right ( idx, item ) =
     if (idx >= left) && (idx < right) then
         Just item
+
     else
         Nothing
 
@@ -369,6 +371,7 @@ parenPairs maxL query idx depth res =
     in
     if idx > maxL then
         res
+
     else
         case query of
             OpenBracket :: rest ->
@@ -402,6 +405,7 @@ updateMatchedLoc bracketIndex nothingIndex mapIndex t =
         Just idx ->
             if idx == mapIndex then
                 { t | close = Just bracketIndex }
+
             else
                 t
 

@@ -1,17 +1,21 @@
-module Pages.Forms.SendAdhoc exposing (Model, Msg(UpdateDate), init, initialModel, update, view)
+module Pages.Forms.SendAdhoc exposing (Model, Msg(..), init, initialModel, update, view)
 
 import Css
-import Data exposing (Recipient)
+import Data exposing (Recipient, UserProfile)
 import Date
 import DateTimePicker
+import DjangoSend
+import Encode
 import FilteringTable exposing (textToRegex)
-import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus)
-import Forms.View as FV exposing (contentField, form, sendButton, timeField)
+import Form as F exposing (Field, FieldMeta, FormItem(FormField), FormStatus(NoAction), contentField, form, sendButton, timeField)
 import Helpers exposing (calculateSmsCost, toggleSelectedPk)
 import Html exposing (Html)
+import Http
+import Json.Encode as Encode
 import Pages.Forms.Meta.SendAdhoc exposing (meta)
 import Regex
 import RemoteList as RL
+import Urls
 
 
 init : Model -> Cmd Msg
@@ -21,7 +25,7 @@ init model =
 
 initSendAdhocDate : DateTimePicker.State -> Maybe Date.Date -> Msg
 initSendAdhocDate state maybeDate =
-    UpdateDate state maybeDate
+    InputMsg <| UpdateDate state maybeDate
 
 
 type alias Model =
@@ -31,6 +35,7 @@ type alias Model =
     , adhocFilter : Regex.Regex
     , cost : Maybe Float
     , datePickerState : DateTimePicker.State
+    , formStatus : FormStatus
     }
 
 
@@ -42,6 +47,7 @@ initialModel maybeContent maybePks =
     , adhocFilter = Regex.regex ""
     , cost = Nothing
     , datePickerState = DateTimePicker.initialState
+    , formStatus = NoAction
     }
 
 
@@ -50,22 +56,69 @@ initialModel maybeContent maybePks =
 
 
 type Msg
+    = InputMsg InputMsg
+    | PostForm
+    | ReceiveFormResp (Result Http.Error { body : String, code : Int })
+
+
+type InputMsg
     = UpdateContent String
     | UpdateDate DateTimePicker.State (Maybe Date.Date)
     | ToggleSelectedContact Int
     | UpdateAdhocFilter String
 
 
-update : Maybe { a | sendingCost : Float } -> Msg -> Model -> Model
-update twilioSettings msg model =
-    updateHelp msg model
-        |> updateCost twilioSettings
+type alias UpdateProps =
+    { csrftoken : DjangoSend.CSRFToken
+    , twilioCost : Float
+    , outboundUrl : String
+    , scheduledUrl : String
+    , successPageUrl : String
+    , userPerms : UserProfile
+    }
 
 
-updateHelp : Msg -> Model -> Model
-updateHelp msg model =
+update : UpdateProps -> Msg -> Model -> F.UpdateResp Msg Model
+update props msg model =
     case msg of
-        -- form display:
+        InputMsg inputMsg ->
+            F.UpdateResp
+                (updateInput inputMsg model |> updateCost props.twilioCost)
+                Cmd.none
+                []
+                Nothing
+
+        PostForm ->
+            F.UpdateResp
+                (F.setInProgress model)
+                (postCmd props.csrftoken model)
+                []
+                Nothing
+
+        ReceiveFormResp (Ok resp) ->
+            let
+                newLoc =
+                    case model.date of
+                        Nothing ->
+                            props.outboundUrl
+
+                        Just _ ->
+                            case props.userPerms.user.is_staff of
+                                True ->
+                                    props.scheduledUrl
+
+                                False ->
+                                    props.outboundUrl
+            in
+            F.okFormRespUpdate { props | successPageUrl = newLoc } resp model
+
+        ReceiveFormResp (Err err) ->
+            F.errFormRespUpdate err model
+
+
+updateInput : InputMsg -> Model -> Model
+updateInput msg model =
+    case msg of
         UpdateContent text ->
             { model | content = text }
 
@@ -79,26 +132,34 @@ updateHelp msg model =
             { model | adhocFilter = textToRegex text }
 
 
-updateCost : Maybe { a | sendingCost : Float } -> Model -> Model
-updateCost twilioSettings model =
-    case Maybe.map .sendingCost twilioSettings of
-        Nothing ->
+updateCost : Float -> Model -> Model
+updateCost twilioCost model =
+    case model.content of
+        "" ->
             { model | cost = Nothing }
 
-        Just twilioCost ->
-            case model.content of
-                "" ->
+        c ->
+            case model.selectedContacts |> List.length of
+                0 ->
                     { model | cost = Nothing }
 
-                c ->
-                    case model.selectedContacts |> List.length of
-                        0 ->
-                            { model | cost = Nothing }
+                n ->
+                    { model
+                        | cost = Just (calculateSmsCost (twilioCost * toFloat n) c)
+                    }
 
-                        n ->
-                            { model
-                                | cost = Just (calculateSmsCost (twilioCost * toFloat n) c)
-                            }
+
+postCmd : DjangoSend.CSRFToken -> Model -> Cmd Msg
+postCmd csrf model =
+    let
+        body =
+            [ ( "content", Encode.string model.content )
+            , ( "recipients", Encode.list (model.selectedContacts |> List.map Encode.int) )
+            , ( "scheduled_time", Encode.encodeMaybeDate model.date )
+            ]
+    in
+    DjangoSend.rawPost csrf Urls.api_act_send_adhoc body
+        |> Http.send ReceiveFormResp
 
 
 
@@ -106,25 +167,25 @@ updateCost twilioSettings model =
 
 
 type alias Props msg =
-    { form : Msg -> msg
+    { form : InputMsg -> msg
     , postForm : msg
     , newContactButton : Html msg
     , smsCharLimit : Int
     }
 
 
-view : Props msg -> Model -> RL.RemoteList Recipient -> FormStatus -> Html msg
-view props model contacts status =
+view : Props msg -> Model -> RL.RemoteList Recipient -> Html msg
+view props model contacts =
     Html.div []
         [ case contacts of
             RL.FinalPageReceived contacts_ ->
                 if List.length contacts_ == 0 then
                     noContacts props
                 else
-                    sendForm props model contacts status
+                    sendForm props model contacts model.formStatus
 
             _ ->
-                sendForm props model contacts status
+                sendForm props model contacts model.formStatus
         ]
 
 
@@ -160,8 +221,8 @@ updateSADate props state maybeDate =
 
 contactsField : Props msg -> Model -> RL.RemoteList Recipient -> FieldMeta -> List (Html msg)
 contactsField props model contacts meta_ =
-    FV.multiSelectField
-        (FV.MultiSelectField
+    F.multiSelectField
+        (F.MultiSelectField
             contacts
             (Just model.selectedContacts)
             Nothing
@@ -175,7 +236,7 @@ contactsField props model contacts meta_ =
 
 contactLabelView : Props msg -> Maybe (List Int) -> Recipient -> Html msg
 contactLabelView props _ contact =
-    FV.multiSelectItemLabelHelper
+    F.multiSelectItemLabelHelper
         .full_name
         (props.form <| ToggleSelectedContact contact.pk)
         contact
@@ -183,7 +244,7 @@ contactLabelView props _ contact =
 
 contactView : Props msg -> Maybe (List Int) -> Recipient -> Html msg
 contactView props maybeSelectedPks contact =
-    FV.multiSelectItemHelper
+    F.multiSelectItemHelper
         { itemToStr = .full_name
         , maybeSelectedPks = maybeSelectedPks
         , itemToKey = .pk >> toString

@@ -1,6 +1,6 @@
 module Pages.Forms.Meta.SendGroup exposing (meta)
 
-import Forms.Model exposing (FieldMeta)
+import Form exposing (FieldMeta)
 
 
 meta : { content : FieldMeta, recipient_group : FieldMeta, scheduled_time : FieldMeta }

@@ -1,6 +1,6 @@
 module Pages.Forms.Meta.SiteConfig exposing (meta)
 
-import Forms.Model exposing (FieldMeta)
+import Form exposing (FieldMeta)
 
 
 meta : { site_name : FieldMeta, sms_char_limit : FieldMeta, default_number_prefix : FieldMeta, disable_all_replies : FieldMeta, disable_email_login_form : FieldMeta, office_email : FieldMeta, auto_add_new_groups : FieldMeta, sms_expiration_date : FieldMeta, sms_rolling_expiration_days : FieldMeta, slack_url : FieldMeta, sync_elvanto : FieldMeta, not_approved_msg : FieldMeta, email_host : FieldMeta, email_port : FieldMeta, email_username : FieldMeta, email_password : FieldMeta, email_from : FieldMeta, twilio_account_sid : FieldMeta, twilio_auth_token : FieldMeta, twilio_from_num : FieldMeta, twilio_sending_cost : FieldMeta }

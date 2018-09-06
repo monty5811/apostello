@@ -1,4 +1,4 @@
-module Pages.UserProfileTable exposing (view)
+module Pages.UserProfileTable exposing (Model, Msg(..), initialModel, update, view)
 
 import Css
 import Data exposing (UserProfile)
@@ -9,21 +9,49 @@ import Html.Events exposing (onClick)
 import RemoteList as RL
 
 
+-- Model
+
+
+type alias Model =
+    { tableModel : FT.Model
+    }
+
+
+initialModel : Model
+initialModel =
+    { tableModel = FT.initialModel }
+
+
+
+-- Update
+
+
+type Msg
+    = TableMsg FT.Msg
+
+
+update : Msg -> Model -> Model
+update msg model =
+    case msg of
+        TableMsg tableMsg ->
+            { model | tableModel = FT.update tableMsg model.tableModel }
+
+
+
 -- Main view
 
 
 type alias Props msg =
     { tableMsg : FT.Msg -> msg
-    , tableModel : FT.Model
     , profiles : RL.RemoteList UserProfile
     , userProfileLink : UserProfile -> Html msg
     , toggleField : UserProfile -> msg
     }
 
 
-view : Props msg -> Html msg
-view props =
-    FT.table { top = props.tableMsg } [] tableHead props.tableModel (userprofileRow props) props.profiles
+view : Props msg -> Model -> Html msg
+view props { tableModel } =
+    FT.table { top = props.tableMsg } [] tableHead tableModel (userprofileRow props) props.profiles
 
 
 tableHead : FT.Head

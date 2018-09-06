@@ -1,6 +1,6 @@
 module Pages.AccessDenied exposing (view)
 
-import Html exposing (..)
+import Html exposing (Html)
 
 
 -- Main view
@@ -8,8 +8,8 @@ import Html exposing (..)
 
 view : Html msg
 view =
-    div []
-        [ p [] [ text "Uh, oh, you don't have access to this page." ]
-        , p [] []
-        , p [] [ text "You'll need to contact the admin that runs this site to get access." ]
+    Html.div []
+        [ Html.p [] [ Html.text "Uh, oh, you don't have access to this page." ]
+        , Html.p [] []
+        , Html.p [] [ Html.text "You'll need to contact the admin that runs this site to get access." ]
         ]

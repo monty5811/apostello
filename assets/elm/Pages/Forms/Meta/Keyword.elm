@@ -1,6 +1,6 @@
 module Pages.Forms.Meta.Keyword exposing (meta)
 
-import Forms.Model exposing (FieldMeta)
+import Form exposing (FieldMeta)
 
 
 meta : { keyword : FieldMeta, description : FieldMeta, disable_all_replies : FieldMeta, custom_response : FieldMeta, custom_response_new_person : FieldMeta, deactivated_response : FieldMeta, too_early_response : FieldMeta, activate_time : FieldMeta, deactivate_time : FieldMeta, linked_groups : FieldMeta, owners : FieldMeta, subscribed_to_digest : FieldMeta }

@@ -1,19 +1,23 @@
-module Pages.Forms.SendGroup exposing (Model, Msg(UpdateSGDate), init, initialModel, update, view)
+module Pages.Forms.SendGroup exposing (Model, Msg(..), init, initialModel, update, view)
 
 import Css
-import Data exposing (RecipientGroup, nullGroup)
+import Data exposing (RecipientGroup, UserProfile, nullGroup)
 import Date
 import DateTimePicker
+import DjangoSend
+import Encode
 import FilteringTable exposing (filterInput, filterRecord, textToRegex)
-import Forms.Model exposing (Field, FieldMeta, FormItem(FormField), FormStatus)
-import Forms.View exposing (contentField, form, sendButton, timeField)
+import Form as F exposing (Field, FieldMeta, FormItem(FormField), FormStatus(NoAction), contentField, form, sendButton, timeField)
 import Helpers exposing (calculateSmsCost, onClick)
 import Html exposing (Html)
 import Html.Attributes as A
 import Html.Keyed
+import Http
+import Json.Encode as Encode
 import Pages.Forms.Meta.SendGroup exposing (meta)
 import Regex
 import RemoteList as RL
+import Urls
 
 
 -- Init
@@ -26,7 +30,7 @@ init model =
 
 initSendGroupDate : DateTimePicker.State -> Maybe Date.Date -> Msg
 initSendGroupDate state maybeDate =
-    UpdateSGDate state maybeDate
+    InputMsg <| UpdateSGDate state maybeDate
 
 
 
@@ -40,6 +44,7 @@ type alias Model =
     , cost : Maybe Float
     , groupFilter : Regex.Regex
     , datePickerState : DateTimePicker.State
+    , formStatus : FormStatus
     }
 
 
@@ -51,6 +56,7 @@ initialModel initialContent initialSelectedGroup =
     , cost = Nothing
     , groupFilter = Regex.regex ""
     , datePickerState = DateTimePicker.initialState
+    , formStatus = NoAction
     }
 
 
@@ -59,20 +65,64 @@ initialModel initialContent initialSelectedGroup =
 
 
 type Msg
+    = InputMsg InputMsg
+    | PostForm
+    | ReceiveFormResp (Result Http.Error { body : String, code : Int })
+
+
+type InputMsg
     = UpdateSGContent String
     | UpdateSGDate DateTimePicker.State (Maybe Date.Date)
     | SelectGroup Int
     | UpdateGroupFilter String
 
 
-update : List RecipientGroup -> Msg -> Model -> Model
-update groups msg model =
-    updateHelp msg model
-        |> updateCost groups
+type alias UpdateProps =
+    { csrftoken : DjangoSend.CSRFToken
+    , successPageUrl : String
+    , outboundUrl : String
+    , scheduledUrl : String
+    , groups : List RecipientGroup
+    , userPerms : UserProfile
+    }
 
 
-updateHelp : Msg -> Model -> Model
-updateHelp msg model =
+update : UpdateProps -> Msg -> Model -> F.UpdateResp Msg Model
+update props msg model =
+    case msg of
+        InputMsg inputMsg ->
+            F.UpdateResp
+                (updateInput inputMsg model |> updateCost props.groups)
+                Cmd.none
+                []
+                Nothing
+
+        PostForm ->
+            F.UpdateResp
+                (F.setInProgress model)
+                (postCmd props.csrftoken model)
+                []
+                Nothing
+
+        ReceiveFormResp (Ok resp) ->
+            case model.date of
+                Nothing ->
+                    F.okFormRespUpdate { props | successPageUrl = props.outboundUrl } resp model
+
+                Just _ ->
+                    case props.userPerms.user.is_staff of
+                        True ->
+                            F.okFormRespUpdate { props | successPageUrl = props.scheduledUrl } resp model
+
+                        False ->
+                            F.okFormRespUpdate { props | successPageUrl = props.outboundUrl } resp model
+
+        ReceiveFormResp (Err err) ->
+            F.errFormRespUpdate err model
+
+
+updateInput : InputMsg -> Model -> Model
+updateInput msg model =
     case msg of
         UpdateSGContent text ->
             { model | content = text }
@@ -110,30 +160,44 @@ updateCost groups model =
                     { model | cost = Just (calculateSmsCost groupCost c) }
 
 
+postCmd : DjangoSend.CSRFToken -> Model -> Cmd Msg
+postCmd csrf model =
+    let
+        body =
+            [ ( "content", Encode.string model.content )
+            , ( "recipient_group", Encode.int (Maybe.withDefault 0 model.selectedPk) )
+            , ( "scheduled_time", Encode.encodeMaybeDate model.date )
+            ]
+    in
+    DjangoSend.rawPost csrf Urls.api_act_send_group body
+        |> Http.send ReceiveFormResp
+
+
 
 -- View
 
 
 type alias Props msg =
-    { form : Msg -> msg
+    { form : InputMsg -> msg
     , postForm : msg
     , newGroupButton : Html msg
     , smsCharLimit : Int
+    , groups : RL.RemoteList RecipientGroup
     }
 
 
-view : Props msg -> Model -> RL.RemoteList RecipientGroup -> FormStatus -> Html msg
-view props model groups status =
+view : Props msg -> Model -> Html msg
+view props model =
     Html.div []
-        [ case groups of
+        [ case props.groups of
             RL.FinalPageReceived groups_ ->
                 if List.length groups_ == 0 then
                     noGroups props
                 else
-                    sendForm props model groups status
+                    sendForm props model model.formStatus
 
             _ ->
-                sendForm props model groups status
+                sendForm props model model.formStatus
         ]
 
 
@@ -145,13 +209,13 @@ noGroups props =
         ]
 
 
-sendForm : Props msg -> Model -> RL.RemoteList RecipientGroup -> FormStatus -> Html msg
-sendForm props model groups status =
+sendForm : Props msg -> Model -> FormStatus -> Html msg
+sendForm props model status =
     let
         fields =
             [ Field meta.content <| contentField props.smsCharLimit (props.form << UpdateSGContent) model.content
             , Field meta.scheduled_time <| timeField (updateSGDate props) model.datePickerState model.date
-            , Field meta.recipient_group <| groupField props model groups
+            , Field meta.recipient_group <| groupField props model props.groups
             ]
                 |> List.map FormField
     in
@@ -175,7 +239,7 @@ groupField props model groups meta_ =
                 |> List.map (groupItem props model.selectedPk)
             )
         ]
-    , Forms.View.helpLabel { help = Just "Note that empty groups are not shown here." }
+    , F.helpLabel { help = Just "Note that empty groups are not shown here." }
     ]
 
 

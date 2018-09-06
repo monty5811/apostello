@@ -1,4 +1,60 @@
-module Forms.View exposing (..)
+module Form exposing
+    ( Field
+    , FieldGroupConfig
+    , FieldMeta
+    , FormErrors
+    , FormItem(..)
+    , FormStatus(..)
+    , MultiSelectField
+    , MultiSelectItemProps
+    , UpdateResp
+    , addDefaultFloat
+    , addDefaultInt
+    , addGroupHelpText
+    , addHeader
+    , addPk
+    , addSegment
+    , addSideBySide
+    , checkboxField
+    , contentField
+    , dateField
+    , dateTimeField
+    , decodeFormResp
+    , defaultFieldGroupConfig
+    , errFormRespUpdate
+    , extractBool
+    , extractField
+    , extractFloat
+    , fieldGroupHelp
+    , fieldMessage
+    , form
+    , formDecodeError
+    , formErrors
+    , helpLabel
+    , isDisabled
+    , label
+    , loadingMessage
+    , longTextField
+    , multiSelectField
+    , multiSelectItemHelper
+    , multiSelectItemLabelHelper
+    , noErrors
+    , okFormRespUpdate
+    , renderField
+    , renderFormError
+    , renderItem
+    , requiredClass
+    , selectedIcon
+    , selectedItemsView
+    , sendButton
+    , sendButtonText
+    , setInProgress
+    , simpleFloatField
+    , simpleIntField
+    , simpleTextField
+    , submitButton
+    , timeField
+    )
 
 import Css
 import Date
@@ -7,15 +63,230 @@ import DateTimePicker
 import DateTimePicker.Config
 import Dict
 import FilteringTable exposing (filterInput, filterRecord)
-import Forms.Model exposing (..)
 import Html exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
 import Html.Keyed
+import Http
+import Json.Decode as Decode
+import Json.Decode.Pipeline exposing (decode, required)
+import Json.Encode as Encode
+import Notification as Notif exposing (DjangoMessage, decodeDjangoMessage)
 import Pages.Fragments.Loader exposing (loader)
 import Regex
 import RemoteList as RL
 import Round
+
+
+
+-- Model
+
+
+type FormStatus
+    = NoAction
+    | InProgress
+    | Success
+    | Failed FormErrors
+
+
+type alias FormResp =
+    { messages : List DjangoMessage
+    , errors : FormErrors
+    }
+
+
+decodeFormResp : Decode.Decoder FormResp
+decodeFormResp =
+    decode FormResp
+        |> required "messages" (Decode.list decodeDjangoMessage)
+        |> required "errors" (Decode.dict (Decode.list Decode.string))
+
+
+type alias FormErrors =
+    Dict.Dict String (List String)
+
+
+noErrors : FormErrors
+noErrors =
+    Dict.empty
+
+
+formDecodeError : String -> FormErrors
+formDecodeError err =
+    Dict.insert "__all__" [ "Something strange happend there. (" ++ err ++ ")" ] noErrors
+
+
+formErrors : FormStatus -> FormErrors
+formErrors formStatus =
+    case formStatus of
+        Failed errors ->
+            errors
+
+        _ ->
+            noErrors
+
+
+type FormItem msg
+    = FormField (Field msg)
+    | FieldGroup (FieldGroupConfig msg) (List (Field msg))
+
+
+type alias FieldGroupConfig msg =
+    { header : Maybe String
+    , helpText : Maybe (Html msg)
+    , sideBySide : Maybe Int
+    }
+
+
+defaultFieldGroupConfig : FieldGroupConfig msg
+defaultFieldGroupConfig =
+    FieldGroupConfig Nothing Nothing Nothing
+
+
+type alias Field msg =
+    { meta : FieldMeta
+    , view : FieldMeta -> List (Html msg)
+    }
+
+
+type alias FieldMeta =
+    { required : Bool
+    , id : String
+    , name : String
+    , label : String
+    , help : Maybe String
+    }
+
+
+type alias Resp =
+    { body : String
+    , code : Int
+    }
+
+
+
+-- Helpers
+
+
+setInProgress : { model | formStatus : FormStatus } -> { model | formStatus : FormStatus }
+setInProgress model =
+    { model | formStatus = InProgress }
+
+
+handleGoodFormResp : Resp -> ( FormStatus, Notif.Notifications )
+handleGoodFormResp resp =
+    case Decode.decodeString decodeFormResp resp.body of
+        Ok data ->
+            ( Success
+            , Notif.createListOfDjangoMessages data.messages
+            )
+
+        Err err ->
+            ( Failed <| formDecodeError err, [] )
+
+
+handleBadFormResp : Http.Error -> ( FormStatus, Notif.Notifications )
+handleBadFormResp err =
+    case err of
+        Http.BadStatus resp ->
+            case Decode.decodeString decodeFormResp resp.body of
+                Ok data ->
+                    ( Failed data.errors
+                    , Notif.createListOfDjangoMessages data.messages
+                    )
+
+                Err e ->
+                    ( Failed <| formDecodeError e
+                    , [ Notif.refreshNotifMessage ]
+                    )
+
+        _ ->
+            ( Failed noErrors
+            , [ Notif.refreshNotifMessage ]
+            )
+
+
+type alias UpdateResp msg model =
+    { pageModel : model
+    , cmd : Cmd msg
+    , notifications : Notif.Notifications
+    , maybeNewUrl : Maybe String
+    }
+
+
+okFormRespUpdate : { props | successPageUrl : String } -> Resp -> { model | formStatus : FormStatus } -> UpdateResp msg { model | formStatus : FormStatus }
+okFormRespUpdate props resp model =
+    let
+        ( formStatus, newNotifs ) =
+            handleGoodFormResp resp
+    in
+    UpdateResp
+        { model | formStatus = formStatus }
+        Cmd.none
+        newNotifs
+        (Just props.successPageUrl)
+
+
+errFormRespUpdate : Http.Error -> { model | formStatus : FormStatus } -> UpdateResp msg { model | formStatus : FormStatus }
+errFormRespUpdate err model =
+    let
+        ( formStatus, newNotifs ) =
+            handleBadFormResp err
+    in
+    UpdateResp
+        { model | formStatus = formStatus }
+        Cmd.none
+        newNotifs
+        Nothing
+
+
+addPk : Maybe { a | pk : Int } -> List ( String, Encode.Value ) -> List ( String, Encode.Value )
+addPk maybeRecord body =
+    case maybeRecord of
+        Nothing ->
+            body
+
+        Just rec ->
+            ( "pk", Encode.int rec.pk ) :: body
+
+
+extractBool : (a -> Bool) -> Maybe Bool -> Maybe a -> Bool
+extractBool fn field maybeRec =
+    case field of
+        Nothing ->
+            Maybe.map fn maybeRec
+                |> Maybe.withDefault False
+
+        Just b ->
+            b
+
+
+extractField : (a -> String) -> Maybe String -> Maybe a -> String
+extractField fn field maybeRec =
+    case field of
+        Nothing ->
+            -- never edited the field, use existing or default to ""
+            Maybe.map fn maybeRec
+                |> Maybe.withDefault ""
+
+        Just s ->
+            s
+
+
+extractFloat : (a -> Float) -> Maybe Float -> Maybe a -> Float
+extractFloat fn field maybeRec =
+    case field of
+        Nothing ->
+            -- never edited the field, use existing or default to 0
+            Maybe.map fn maybeRec
+                |> Maybe.withDefault 0
+
+        Just s ->
+            s
+
+
+
+-- View
 
 
 form : FormStatus -> List (FormItem msg) -> msg -> Html msg -> Html msg
@@ -117,6 +388,7 @@ requiredClass : FieldMeta -> Html.Attribute msg
 requiredClass { required } =
     if required then
         A.class "required"
+
     else
         A.class ""
 

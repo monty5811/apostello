@@ -1,4 +1,4 @@
-module Pages.OutboundTable exposing (view)
+module Pages.OutboundTable exposing (Model, Msg(..), initialModel, update, view)
 
 import Css
 import Data exposing (SmsOutbound, stringFromMDStatus)
@@ -8,17 +8,44 @@ import Html exposing (Html)
 import RemoteList as RL
 
 
+-- Model
+
+
+type alias Model =
+    { tableModel : FT.Model
+    }
+
+
+initialModel : Model
+initialModel =
+    { tableModel = FT.initialModel }
+
+
+
+-- Update
+
+
+type Msg
+    = TableMsg FT.Msg
+
+
+update : Msg -> Model -> Model
+update msg model =
+    case msg of
+        TableMsg tableMsg ->
+            { model | tableModel = FT.update tableMsg model.tableModel }
+
+
 type alias Props msg =
     { tableMsg : FT.Msg -> msg
-    , tableModel : FT.Model
     , sms : RL.RemoteList SmsOutbound
     , contactLink : { full_name : String, pk : Int } -> Html msg
     }
 
 
-view : Props msg -> Html msg
-view props =
-    FT.defaultTable { top = props.tableMsg } tableHead props.tableModel (smsRow props) props.sms
+view : Props msg -> Model -> Html msg
+view props { tableModel } =
+    FT.defaultTable { top = props.tableMsg } tableHead tableModel (smsRow props) props.sms
 
 
 tableHead : FT.Head

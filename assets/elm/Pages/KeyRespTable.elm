@@ -1,4 +1,4 @@
-module Pages.KeyRespTable exposing (Msg, update, view)
+module Pages.KeyRespTable exposing (Model, Msg(..), initialModel, update, view)
 
 import Css
 import Data exposing (SmsInbound)
@@ -14,6 +14,20 @@ import RemoteList as RL
 import Urls
 
 
+type alias Model =
+    { tableModel : FT.Model
+    , checkboxTicked : Bool
+    }
+
+
+initialModel : Model
+initialModel =
+    { tableModel = FT.initialModel
+    , checkboxTicked = False
+    }
+
+
+
 -- Update
 
 
@@ -21,11 +35,11 @@ type Msg
     = ArchiveAllButtonClick String
     | ArchiveAllCheckBoxClick
     | ReceiveArchiveAllResp (Result Http.Error Bool)
+    | TableMsg FT.Msg
 
 
 type alias UpdateProps a =
     { csrftoken : CSRFToken
-    , keyRespModel : Bool
     , isArchive : Bool
     , keyword : String
     , store : { a | inboundSms : RL.RemoteList SmsInbound }
@@ -33,17 +47,49 @@ type alias UpdateProps a =
     }
 
 
-update : Msg -> UpdateProps a -> ( Bool, Bool, String, { a | inboundSms : RL.RemoteList SmsInbound }, List (Cmd Msg) )
-update msg props =
+type alias UpdateReturn a =
+    { model : Model
+    , isArchive : Bool
+    , keyword : String
+    , store : { a | inboundSms : RL.RemoteList SmsInbound }
+    , cmds : List (Cmd Msg)
+    }
+
+
+update : UpdateProps a -> Msg -> Model -> UpdateReturn a
+update props msg model =
     case msg of
         ArchiveAllCheckBoxClick ->
-            ( not props.keyRespModel, props.isArchive, props.keyword, props.store, [] )
+            UpdateReturn
+                { model | checkboxTicked = not model.checkboxTicked }
+                props.isArchive
+                props.keyword
+                props.store
+                []
 
         ArchiveAllButtonClick k ->
-            ( False, props.isArchive, k, props.optArchiveMatchingSms props.keyword props.store, [ archiveAll props.csrftoken k ] )
+            UpdateReturn
+                { model | checkboxTicked = False }
+                props.isArchive
+                k
+                (props.optArchiveMatchingSms props.keyword props.store)
+                [ archiveAll props.csrftoken k ]
 
         ReceiveArchiveAllResp _ ->
-            ( props.keyRespModel, props.isArchive, props.keyword, props.store, [] )
+            UpdateReturn
+                model
+                props.isArchive
+                props.keyword
+                props.store
+                []
+
+        TableMsg tableMsg ->
+            UpdateReturn
+                { model | tableModel = FT.update tableMsg model.tableModel }
+                props.isArchive
+                props.keyword
+                props.store
+                []
 
 
 archiveAll : CSRFToken -> String -> Cmd Msg
@@ -70,12 +116,12 @@ type alias Props msg =
     }
 
 
-view : Props msg -> Bool -> FT.Model -> RL.RemoteList SmsInbound -> Bool -> String -> Html msg
-view props viewingArchive tableModel sms ticked keyword =
+view : Props msg -> Bool -> RL.RemoteList SmsInbound -> String -> Model -> Html msg
+view props viewingArchive sms keyword { tableModel, checkboxTicked } =
     Html.div []
         [ FT.defaultTable { top = props.tableMsg } tableHead tableModel (smsRow props) sms
         , Html.br [] []
-        , archiveAllForm props viewingArchive ticked keyword
+        , archiveAllForm props viewingArchive checkboxTicked keyword
         ]
 
 

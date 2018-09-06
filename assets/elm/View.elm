@@ -3,7 +3,7 @@ module View exposing (view)
 import Css
 import Html exposing (Html)
 import Html.Attributes as A
-import Messages as M exposing (Msg(FormMsg))
+import Messages as M exposing (Msg)
 import Models exposing (Model)
 import Pages exposing (Page(..), initSendAdhoc)
 import Pages.AccessDenied as AD
@@ -62,33 +62,33 @@ view model =
 content : Model -> Html Msg
 content model =
     case model.page of
-        OutboundTable ->
+        OutboundTable otModel ->
             OT.view
-                { tableMsg = M.TableMsg
-                , tableModel = model.table
+                { tableMsg = OT.TableMsg >> M.OutboundTableMsg
                 , sms = model.dataStore.outboundSms
                 , contactLink = contactToContactLink
                 }
+                otModel
 
-        InboundTable ->
+        InboundTable itModel ->
             IT.view
-                { sms = model.dataStore.inboundSms
+                { tableMsg = IT.TableMsg >> M.InboundTableMsg
+                , sms = model.dataStore.inboundSms
                 , reprocessSms = \pk -> M.StoreMsg <| S.ReprocessSms pk
-                , tableModel = model.table
-                , tableMsg = M.TableMsg
                 , contactPageLink = smsToContactLink
                 , replyPageLink = smsToReplyLink
                 , keywordFormLink = smsToKeywordLink
                 }
+                itModel
 
-        GroupTable viewingArchive ->
+        GroupTable gtModel viewingArchive ->
             GT.view
-                { tableModel = model.table
-                , tableMsg = M.TableMsg
+                { tableMsg = GT.TableMsg >> M.GroupTableMsg
                 , groups = filterArchived viewingArchive model.dataStore.groups
                 , toggleArchiveGroup = \b pk -> M.StoreMsg <| S.ToggleGroupArchive b pk
                 , groupFormLink = \grp -> spaLink Html.a [] [ Html.text grp.name ] <| GroupForm GF.initialModel <| Just grp.pk
                 }
+                gtModel
 
         GroupComposer composerModel ->
             GC.view
@@ -98,49 +98,48 @@ content model =
                 composerModel
                 (filterArchived False model.dataStore.groups)
 
-        RecipientTable viewingArchive ->
+        RecipientTable rtModel viewingArchive ->
             RT.view
-                { tableMsg = M.TableMsg
-                , tableModel = model.table
+                { tableMsg = RT.TableMsg >> M.RecipientTableMsg
                 , recipients = filterArchived viewingArchive model.dataStore.recipients
                 , toggleRecipientArchive = \b pk -> M.StoreMsg <| S.ToggleRecipientArchive b pk
                 , contactLink = contactToContactLink
                 }
+                rtModel
 
-        KeywordTable viewingArchive ->
+        KeywordTable ktModel viewingArchive ->
             KT.view
-                { tableMsg = M.TableMsg
-                , tableModel = model.table
+                { tableMsg = KT.TableMsg >> M.KeywordTableMsg
                 , keywords = filterArchived viewingArchive model.dataStore.keywords
                 , toggleKeywordArchive = \b pk -> M.StoreMsg <| S.ToggleKeywordArchive b pk
                 , keywordLink = keywordToKeywordLink
                 , keywordRespLink = keywordToKeywordRespLink
                 }
+                ktModel
 
-        ElvantoImport ->
+        ElvantoImport eiModel ->
             EI.view
-                { tableMsg = M.TableMsg
-                , topMsg = M.ElvantoMsg
+                { topMsg = M.ElvantoMsg
+                , tableMsg = EI.TableMsg >> M.ElvantoMsg
                 , toggleElvantoGroupSync = M.StoreMsg << S.ToggleElvantoGroupSync
+                , groups = model.dataStore.elvantoGroups
                 }
-                model.table
-                model.dataStore.elvantoGroups
+                eiModel
 
         Wall ->
             W.view (model.dataStore.inboundSms |> filterArchived False |> RL.filter (\s -> s.display_on_wall))
 
-        Curator ->
+        Curator cModel ->
             C.view
-                { tableMsg = M.TableMsg
+                { tableMsg = C.TableMsg >> M.CuratorMsg
                 , sms = model.dataStore.inboundSms |> filterArchived False
-                , tableModel = model.table
                 , toggleWallDisplay = \b p -> M.StoreMsg <| S.ToggleWallDisplay b p
                 }
+                cModel
 
-        UserProfileTable ->
+        UserProfileTable uptModel ->
             UPT.view
-                { tableMsg = M.TableMsg
-                , tableModel = model.table
+                { tableMsg = UPT.TableMsg >> M.UserProfileTableMsg
                 , profiles = model.dataStore.userprofiles
                 , userProfileLink =
                     \up ->
@@ -150,32 +149,32 @@ content model =
                             (UserProfileForm UPF.initialModel up.user.pk)
                 , toggleField = M.StoreMsg << S.ToggleProfileField
                 }
+                uptModel
 
-        ScheduledSmsTable ->
+        ScheduledSmsTable sstModel ->
             SST.view
-                { tableMsg = M.TableMsg
-                , tableModel = model.table
+                { tableMsg = SST.TableMsg >> M.ScheduledSmsTableMsg
                 , currentTime = model.currentTime
                 , sms = model.dataStore.queuedSms
                 , contactLink = contactToContactLink
                 , groupLink = groupToGroupLink
                 , cancelSms = M.StoreMsg << S.CancelSms
                 }
+                sstModel
 
         KeyRespTable keyRespModel viewingArchive currentKeyword ->
             KRT.view
-                { form = M.KeyRespTableMsg
-                , tableMsg = M.TableMsg
+                { tableMsg = KRT.TableMsg >> M.KeyRespTableMsg
+                , form = M.KeyRespTableMsg
                 , toggleDealtWith = \x y -> M.StoreMsg <| S.ToggleInboundSmsDealtWith x y
                 , toggleInboundSmsArchive = \x y -> M.StoreMsg <| S.ToggleInboundSmsArchive x y
                 , pkToReplyLink = smsToReplyLink
                 , pkToContactLink = smsToContactLink
                 }
                 viewingArchive
-                model.table
                 (model.dataStore.inboundSms |> filterArchived viewingArchive |> RL.filter (filterByMatchedKeyword currentKeyword))
-                keyRespModel
                 currentKeyword
+                keyRespModel
 
         FirstRun m ->
             Html.map M.FirstRunMsg <| FR.view m
@@ -188,25 +187,23 @@ content model =
 
         SendAdhoc saModel ->
             SAF.view
-                { form = FormMsg << M.SendAdhocMsg
-                , postForm = M.FormMsg M.PostSendAdhocForm
+                { form = M.SendAdhocMsg << SAF.InputMsg
+                , postForm = M.SendAdhocMsg SAF.PostForm
                 , smsCharLimit = model.settings.smsCharLimit
                 , newContactButton = spaLink Html.a [] [ Html.text "Add a New Contact" ] <| ContactForm CF.initialModel Nothing
                 }
                 saModel
                 (filterArchived False model.dataStore.recipients |> RL.filter (.never_contact >> not))
-                model.formStatus
 
         SendGroup sgModel ->
             SGF.view
-                { form = M.FormMsg << M.SendGroupMsg
-                , postForm = M.FormMsg M.PostSendGroupForm
+                { form = M.SendGroupMsg << SGF.InputMsg
+                , postForm = M.SendGroupMsg SGF.PostForm
                 , smsCharLimit = model.settings.smsCharLimit
                 , newGroupButton = spaLink Html.a [] [ Html.text "Create a New Group" ] <| GroupForm GF.initialModel Nothing
+                , groups = filterArchived False model.dataStore.groups |> RL.filter (\x -> x.cost > 0)
                 }
                 sgModel
-                (filterArchived False model.dataStore.groups |> RL.filter (\x -> x.cost > 0))
-                model.formStatus
 
         Error404 ->
             E404.view
@@ -217,23 +214,22 @@ content model =
         Help ->
             Help.view
 
-        ContactImport _ ->
+        ContactImport ciModel ->
             CI.view
-                { post = FormMsg M.PostContactImportForm, form = FormMsg << M.ContactImportMsg }
-                model.formStatus
+                { form = M.ContactImportMsg }
+                ciModel
 
         GroupForm gfModel maybePk ->
             GF.view
-                { form = FormMsg << M.GroupFormMsg
-                , postForm = FormMsg M.PostGroupForm
+                { form = M.GroupFormMsg << GF.InputMsg
+                , postForm = M.GroupFormMsg GF.PostForm
                 , noop = M.Nope
                 , toggleGroupMembership = \x y -> M.StoreMsg <| S.ToggleGroupMembership x y
                 , restoreGroupLink = \x -> spaLink Html.a [] [ Html.text "Archived Group" ] <| GroupForm GF.initialModel x
+                , groups = model.dataStore.groups
                 }
                 maybePk
-                model.dataStore.groups
                 gfModel
-                model.formStatus
 
         ContactForm cfModel maybePk ->
             let
@@ -251,18 +247,18 @@ content model =
                         Just pk ->
                             Just <|
                                 IT.view
-                                    { sms = model.dataStore.inboundSms |> RL.filter (filterBySenderPk pk)
+                                    { tableMsg = CF.TableMsg >> M.ContactFormMsg
+                                    , sms = model.dataStore.inboundSms |> RL.filter (filterBySenderPk pk)
                                     , reprocessSms = M.StoreMsg << S.ReprocessSms
-                                    , tableModel = model.table
-                                    , tableMsg = M.TableMsg
                                     , contactPageLink = smsToContactLink
                                     , replyPageLink = smsToReplyLink
                                     , keywordFormLink = smsToKeywordLink
                                     }
+                                    { tableModel = cfModel.tableModel }
             in
             CF.view
-                { postForm = FormMsg <| M.PostContactForm canSeeContactNum canSeeContactNotes
-                , c = FormMsg << M.ContactFormMsg
+                { postForm = M.ContactFormMsg <| CF.PostForm canSeeContactNum canSeeContactNotes
+                , c = M.ContactFormMsg << CF.InputMsg
                 , noop = M.Nope
                 , spa = \x -> spaLink Html.a [] [ Html.text "Archived Contact" ] <| ContactForm CF.initialModel x
                 , defaultNumberPrefix = model.settings.defaultNumberPrefix
@@ -273,12 +269,11 @@ content model =
                 maybePk
                 model.dataStore.recipients
                 cfModel
-                model.formStatus
 
         KeywordForm kfModel maybeK ->
             KF.view
-                { postForm = FormMsg M.PostKeywordForm
-                , k = FormMsg << M.KeywordFormMsg
+                { postForm = M.KeywordFormMsg KF.PostForm
+                , inputChange = M.KeywordFormMsg << KF.InputMsg
                 , noop = M.Nope
                 , spa = \x -> spaLink Html.a [] [ Html.text "Archived Keyword" ] <| KeywordForm KF.initialModel x
                 }
@@ -287,34 +282,35 @@ content model =
                 model.dataStore.users
                 maybeK
                 kfModel
-                model.formStatus
 
         SiteConfigForm scModel ->
             SCF.view
-                { postForm = FormMsg M.PostSiteConfigForm, form = FormMsg << M.SiteConfigFormMsg }
+                { postForm = M.SiteConfigFormMsg SCF.PostForm
+                , form = M.SiteConfigFormMsg << SCF.InputMsg
+                }
                 (filterArchived False model.dataStore.groups)
                 scModel
-                model.formStatus
 
         DefaultResponsesForm drModel ->
             DRF.view
-                { postForm = FormMsg M.PostDefaultRespForm, form = FormMsg << M.DefaultResponsesFormMsg }
+                { postForm = M.DefaultResponsesFormMsg DRF.PostForm
+                , form = M.DefaultResponsesFormMsg << DRF.InputMsg
+                }
                 drModel
-                model.formStatus
 
         CreateAllGroup cagModel ->
             CAG.view
-                { postForm = FormMsg M.PostCreateAllGroupForm, form = FormMsg << M.CreateAllGroupMsg }
+                { form = M.CreateAllGroupMsg }
                 cagModel
-                model.formStatus
 
         UserProfileForm upfModel pk ->
             UPF.view
-                { postForm = FormMsg M.PostUserProfileForm, form = FormMsg << M.UserProfileFormMsg }
+                { postForm = M.UserProfileFormMsg UPF.PostForm
+                , inputChange = M.UserProfileFormMsg << UPF.InputMsg
+                }
                 pk
                 model.dataStore.userprofiles
                 upfModel
-                model.formStatus
 
         ApiSetup maybeKey ->
             Html.map M.ApiSetupMsg <| ApiSetup.view maybeKey
@@ -384,7 +380,7 @@ keywordToKeywordRespLink :
     -> { a | is_archived : Bool, keyword : String }
     -> Html Msg
 keywordToKeywordRespLink fn keyword =
-    spaLink Html.a [] [ Html.text <| fn keyword ] <| KeyRespTable False keyword.is_archived keyword.keyword
+    spaLink Html.a [] [ Html.text <| fn keyword ] <| KeyRespTable KRT.initialModel keyword.is_archived keyword.keyword
 
 
 keywordToKeywordLink : { a | keyword : String } -> Html Msg

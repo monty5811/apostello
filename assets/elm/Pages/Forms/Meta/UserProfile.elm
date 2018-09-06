@@ -1,6 +1,6 @@
 module Pages.Forms.Meta.UserProfile exposing (meta)
 
-import Forms.Model exposing (FieldMeta)
+import Form exposing (FieldMeta)
 
 
 meta : { approved : FieldMeta, message_cost_limit : FieldMeta, can_see_groups : FieldMeta, can_see_contact_names : FieldMeta, can_see_keywords : FieldMeta, can_see_outgoing : FieldMeta, can_see_incoming : FieldMeta, can_send_sms : FieldMeta, can_see_contact_nums : FieldMeta, can_see_contact_notes : FieldMeta, can_import : FieldMeta, can_archive : FieldMeta }

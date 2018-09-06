@@ -1,8 +1,0 @@
-{
-  "checks" : {
-    "ExposeAll": false,
-    "ImportAll": false,
-    "NonStaticRegex": false,
-    "LineLengthExceeded": false
-  }
-}

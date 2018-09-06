@@ -1,6 +1,6 @@
 module Pages.Forms.Meta.DefaultResponses exposing (meta)
 
-import Forms.Model exposing (FieldMeta)
+import Form exposing (FieldMeta)
 
 
 meta : { keyword_no_match : FieldMeta, default_no_keyword_auto_reply : FieldMeta, default_no_keyword_not_live : FieldMeta, start_reply : FieldMeta, auto_name_request : FieldMeta, name_update_reply : FieldMeta, name_failure_reply : FieldMeta }

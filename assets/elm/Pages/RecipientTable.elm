@@ -1,4 +1,4 @@
-module Pages.RecipientTable exposing (view)
+module Pages.RecipientTable exposing (Model, Msg(..), initialModel, update, view)
 
 import Css
 import Data exposing (Recipient)
@@ -8,18 +8,45 @@ import Html exposing (Html)
 import RemoteList as RL
 
 
+-- Model
+
+
+type alias Model =
+    { tableModel : FT.Model
+    }
+
+
+initialModel : Model
+initialModel =
+    { tableModel = FT.initialModel }
+
+
+
+-- Update
+
+
+type Msg
+    = TableMsg FT.Msg
+
+
+update : Msg -> Model -> Model
+update msg model =
+    case msg of
+        TableMsg tableMsg ->
+            { model | tableModel = FT.update tableMsg model.tableModel }
+
+
 type alias Props msg =
     { tableMsg : FT.Msg -> msg
-    , tableModel : FT.Model
     , recipients : RL.RemoteList Recipient
     , toggleRecipientArchive : Bool -> Int -> msg
     , contactLink : Recipient -> Html msg
     }
 
 
-view : Props msg -> Html msg
-view props =
-    FT.defaultTable { top = props.tableMsg } head props.tableModel (recipientRow props) props.recipients
+view : Props msg -> Model -> Html msg
+view props { tableModel } =
+    FT.defaultTable { top = props.tableMsg } head tableModel (recipientRow props) props.recipients
 
 
 head : FT.Head

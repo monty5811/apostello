@@ -1,4 +1,4 @@
-module Pages.ScheduledSmsTable exposing (view)
+module Pages.ScheduledSmsTable exposing (Model, Msg(..), initialModel, update, view)
 
 import Css
 import Data exposing (QueuedSms, Recipient, RecipientGroup)
@@ -11,12 +11,40 @@ import RemoteList as RL
 import Time
 
 
+-- Model
+
+
+type alias Model =
+    { tableModel : FT.Model
+    }
+
+
+initialModel : Model
+initialModel =
+    { tableModel = FT.initialModel }
+
+
+
+-- Update
+
+
+type Msg
+    = TableMsg FT.Msg
+
+
+update : Msg -> Model -> Model
+update msg model =
+    case msg of
+        TableMsg tableMsg ->
+            { model | tableModel = FT.update tableMsg model.tableModel }
+
+
+
 -- Main view
 
 
 type alias Props msg =
     { currentTime : Time.Time
-    , tableModel : FT.Model
     , tableMsg : FT.Msg -> msg
     , sms : RL.RemoteList QueuedSms
     , cancelSms : Int -> msg
@@ -25,11 +53,11 @@ type alias Props msg =
     }
 
 
-view : Props msg -> Html msg
-view props =
+view : Props msg -> Model -> Html msg
+view props { tableModel } =
     props.sms
         |> RL.filter (onlyFuture props.currentTime)
-        |> FT.defaultTable { top = props.tableMsg } tableHead props.tableModel (smsRow props)
+        |> FT.defaultTable { top = props.tableMsg } tableHead tableModel (smsRow props)
 
 
 tableHead : FT.Head

@@ -1,4 +1,4 @@
-module Pages.GroupTable exposing (view)
+module Pages.GroupTable exposing (Model, Msg(..), initialModel, update, view)
 
 import Css
 import Data exposing (RecipientGroup)
@@ -9,21 +9,49 @@ import RemoteList as RL
 import Round
 
 
+-- Model
+
+
+type alias Model =
+    { tableModel : FT.Model
+    }
+
+
+initialModel : Model
+initialModel =
+    { tableModel = FT.initialModel }
+
+
+
+-- Update
+
+
+type Msg
+    = TableMsg FT.Msg
+
+
+update : Msg -> Model -> Model
+update msg model =
+    case msg of
+        TableMsg tableMsg ->
+            { model | tableModel = FT.update tableMsg model.tableModel }
+
+
+
 -- Main view
 
 
 type alias Props msg =
     { tableMsg : FT.Msg -> msg
-    , tableModel : FT.Model
     , groups : RL.RemoteList RecipientGroup
     , toggleArchiveGroup : Bool -> Int -> msg
     , groupFormLink : RecipientGroup -> Html msg
     }
 
 
-view : Props msg -> Html msg
-view props =
-    FT.defaultTable { top = props.tableMsg } tableHead props.tableModel (groupRow props) props.groups
+view : Props msg -> Model -> Html msg
+view props { tableModel } =
+    FT.defaultTable { top = props.tableMsg } tableHead tableModel (groupRow props) props.groups
 
 
 tableHead : FT.Head

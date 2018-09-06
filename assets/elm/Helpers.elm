@@ -1,13 +1,12 @@
-module Helpers
-    exposing
-        ( archiveCell
-        , calculateSmsCost
-        , decodeAlwaysTrue
-        , formatDate
-        , handleNotSaved
-        , onClick
-        , toggleSelectedPk
-        )
+module Helpers exposing
+    ( archiveCell
+    , calculateSmsCost
+    , decodeAlwaysTrue
+    , formatDate
+    , handleNotSaved
+    , onClick
+    , toggleSelectedPk
+    )
 
 import Css
 import Date

@@ -1,4 +1,4 @@
-module Store.Update exposing (..)
+module Store.Update exposing (ErrResp, addItemToDic, addNewItems, compareByT2S, compareByTS, compareTR, decodeErrResp, handleLoadingFailed, mergeItems, sortByTimeReceived, update, updateElvantoGroups, updateGroups, updateKeywords, updateNewData, updateQueuedSms, updateRecipients, updateSmsInbounds, updateSmsOutbounds, updateStatus, updateUserProfiles, updateUsers, userFacingErrorMessage)
 
 import Data exposing (ElvantoGroup, Keyword, QueuedSms, Recipient, RecipientGroup, SmsInbound, SmsOutbound, User, UserProfile, decodeElvantoGroup, decodeKeyword, decodeQueuedSms, decodeRecipient, decodeRecipientGroup, decodeSmsInbound, decodeSmsOutbound, decodeUser, decodeUserProfile)
 import Date
@@ -11,14 +11,14 @@ import Models exposing (Model)
 import Notification as Notif
 import RemoteList as RL
 import Store.DataTypes exposing (RemoteDataType(..))
-import Store.Messages exposing (StoreMsg(..))
+import Store.Messages exposing (Msg(..))
 import Store.Model exposing (..)
 import Store.Optimistic as O
 import Store.Request exposing (dataFromResp, fetchData, increasePageSize, maybeFetchData)
 import Store.Toggle as T
 
 
-update : StoreMsg -> Model -> ( Model, List (Cmd StoreMsg) )
+update : Msg -> Model -> ( Model, List (Cmd Msg) )
 update msg model =
     case msg of
         -- apostello list data
@@ -177,7 +177,7 @@ update msg model =
             handleNotSaved model
 
 
-handleLoadingFailed : RemoteDataType -> Http.Error -> Model -> ( Model, List (Cmd StoreMsg) )
+handleLoadingFailed : RemoteDataType -> Http.Error -> Model -> ( Model, List (Cmd Msg) )
 handleLoadingFailed dt err model =
     let
         niceMsg =

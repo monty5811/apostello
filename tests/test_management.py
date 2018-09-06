@@ -36,6 +36,9 @@ class TestManagementCommands():
             current_urls = f.read()
 
         new_urls = generate_urls()
+        # remove module declaration:
+        new_urls = new_urls[new_urls.find('\n'):]
+        current_urls = current_urls[current_urls.find('\n'):]
         assert new_urls == current_urls
 
     def test_write_elm_form_meta(self):

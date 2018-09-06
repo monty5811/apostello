@@ -2,7 +2,7 @@ module Pages.FirstRun exposing (Model, Msg, decodeFirstRunResp, initialModel, up
 
 import Css
 import DjangoSend exposing (CSRFToken, post)
-import Forms.View as FV
+import Form as F
 import Html exposing (Html)
 import Html.Attributes as A
 import Html.Events exposing (onInput, onSubmit)
@@ -139,7 +139,7 @@ createAdminView model =
             , Html.form [ onSubmit CreateAdminUser ]
                 [ formMsg model.adminFormStatus adminSuccessMsg
                 , Html.div []
-                    [ FV.label <| makeMeta "admin_email" "Admin Email"
+                    [ F.label <| makeMeta "admin_email" "Admin Email"
                     , Html.input
                         [ A.type_ "email"
                         , A.name "email"
@@ -152,7 +152,7 @@ createAdminView model =
                     ]
                 , Html.div []
                     [ Html.div []
-                        [ FV.label <| makeMeta "admin_pass1" "Password"
+                        [ F.label <| makeMeta "admin_pass1" "Password"
                         , Html.input
                             [ A.type_ "password"
                             , A.name "password"
@@ -163,7 +163,7 @@ createAdminView model =
                             []
                         ]
                     , Html.div []
-                        [ FV.label <| makeMeta "admin_pass2" "Password Again"
+                        [ F.label <| makeMeta "admin_pass2" "Password Again"
                         , Html.input
                             [ A.type_ "password"
                             , A.name "password"

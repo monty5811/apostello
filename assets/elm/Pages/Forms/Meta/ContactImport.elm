@@ -1,6 +1,6 @@
 module Pages.Forms.Meta.ContactImport exposing (meta)
 
-import Forms.Model exposing (FieldMeta)
+import Form exposing (FieldMeta)
 
 
 meta : { csv_data : FieldMeta }
