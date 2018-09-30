@@ -4,9 +4,7 @@
 
 apostello is free SMS communication software for your church.
 
-Visit our [website](https://church.io) or view some [screenshots](https://apostello.readthedocs.org/en/latest/screenshots.html) to find out more.
-
-[![Chat with us](https://img.shields.io/badge/chat-slack-e01563.svg)](http://chat.church.io/)[![Stories in Ready](https://badge.waffle.io/monty5811/apostello.png?label=ready&title=Ready)](https://waffle.io/monty5811/apostello)
+Visit our [documentation](https://apostello.readthedocs.org) or view some [screenshots](https://apostello.readthedocs.org/en/latest/screenshots.html) to find out more.
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)[![Install with Ansible](https://img.shields.io/badge/install-ansible-blue.svg)](https://apostello.readthedocs.io/en/latest/deploy_ansible.html)[![Install on DigitalOcean](https://img.shields.io/badge/install-Digital%20Ocean-blue.svg)](http://apostello.readthedocs.io/en/latest/deploy_do.html)
 
