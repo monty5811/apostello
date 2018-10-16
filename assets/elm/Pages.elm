@@ -29,7 +29,7 @@ import Pages.UserProfileTable as UPT
 type Page
     = Home
     | AccessDenied
-    | ContactForm CF.Model (Maybe Int)
+    | ContactForm CF.Model
     | CreateAllGroup CAGF.Model
     | Curator C.Model
     | ElvantoImport EI.Model
@@ -37,11 +37,11 @@ type Page
     | FirstRun FR.Model
     | Debug DG.Model
     | GroupComposer GC.Model
-    | GroupForm GF.Model (Maybe Int)
+    | GroupForm GF.Model
     | GroupTable GT.Model IsArchive
     | InboundTable IT.Model
     | KeyRespTable KRT.Model IsArchive String
-    | KeywordForm KF.Model (Maybe String)
+    | KeywordForm KF.Model
     | KeywordTable KT.Model IsArchive
     | OutboundTable OT.Model
     | RecipientTable RT.Model IsArchive
@@ -53,7 +53,7 @@ type Page
     | SiteConfigForm SCF.Model
     | DefaultResponsesForm DRF.Model
     | Usage
-    | UserProfileForm UP.Model Int
+    | UserProfileForm UP.Model
     | Help
     | ContactImport CI.Model
     | ApiSetup (Maybe String)

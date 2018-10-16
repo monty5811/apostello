@@ -6,6 +6,7 @@ module Helpers exposing
     , handleNotSaved
     , onClick
     , toggleSelectedPk
+    , userFacingErrorMessage
     )
 
 import Css
@@ -14,7 +15,9 @@ import DateFormat
 import Html exposing (Attribute, Html, a, text)
 import Html.Attributes exposing (id)
 import Html.Events exposing (onWithOptions)
+import Http
 import Json.Decode as Decode
+import Json.Decode.Pipeline exposing (decode, optional, required)
 import List.Extra as LE
 import Notification as Notif
 
@@ -32,6 +35,41 @@ toggleSelectedPk pk pks =
 decodeAlwaysTrue : Decode.Decoder Bool
 decodeAlwaysTrue =
     Decode.succeed True
+
+
+userFacingErrorMessage : Http.Error -> String
+userFacingErrorMessage err =
+    case err of
+        Http.BadUrl _ ->
+            "That's a bad URL. Sorry."
+
+        Http.NetworkError ->
+            "Looks like there may be something wrong with your internet connection :("
+
+        Http.BadStatus r ->
+            r.body
+                |> Decode.decodeString decodeErrResp
+                |> Result.withDefault { status = "", error = "Something went wrong there. Sorry. (" ++ r.body ++ ")" }
+                |> .error
+
+        Http.BadPayload msg _ ->
+            "Something went wrong there. Sorry. (" ++ msg ++ ")"
+
+        Http.Timeout ->
+            "It took too long to reach the server..."
+
+
+type alias ErrResp =
+    { status : String
+    , error : String
+    }
+
+
+decodeErrResp : Decode.Decoder ErrResp
+decodeErrResp =
+    decode ErrResp
+        |> required "status" Decode.string
+        |> optional "error" Decode.string ""
 
 
 

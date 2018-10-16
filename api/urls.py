@@ -99,6 +99,16 @@ urlpatterns = [
         name='user_profiles'
     ),
     url(
+        r'^v2/users/profiles/(?P<pk>[0-9]+)/$',
+        v.Collection.as_view(
+            model_class=m.UserProfile,
+            form_class=f.UserProfileForm,
+            serializer_class=s.UserProfileSerializer,
+            permission_classes=(IsAuthenticated, p.IsStaff),
+        ),
+        name='user_profile'
+    ),
+    url(
         r'^v2/users/$',
         v.UserCollection.as_view(
             model_class=User,

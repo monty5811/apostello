@@ -305,20 +305,19 @@ updateHelper msg model =
 
         UserProfileFormMsg subMsg ->
             case model.page of
-                P.UserProfileForm upfModel pk ->
+                P.UserProfileForm upfModel ->
                     let
                         pageData =
                             UPF.update
                                 { csrftoken = model.settings.csrftoken
                                 , successPageUrl = page2loc <| P.UserProfileTable UPT.initialModel
                                 , userprofiles = model.dataStore.userprofiles
-                                , userPk = pk
                                 }
                                 subMsg
                                 upfModel
                     in
                     formUpdate
-                        (\um -> P.UserProfileForm um pk)
+                        P.UserProfileForm
                         UserProfileFormMsg
                         model
                         pageData
@@ -328,20 +327,19 @@ updateHelper msg model =
 
         GroupFormMsg subMsg ->
             case model.page of
-                P.GroupForm gfModel maybePk ->
+                P.GroupForm gfModel ->
                     let
                         pageData =
                             GF.update
                                 { csrftoken = model.settings.csrftoken
                                 , successPageUrl = page2loc <| P.GroupTable GT.initialModel False
-                                , maybePk = maybePk
                                 , groups = model.dataStore.groups
                                 }
                                 subMsg
                                 gfModel
                     in
                     formUpdate
-                        (\gm -> P.GroupForm gm maybePk)
+                        P.GroupForm
                         GroupFormMsg
                         model
                         pageData
@@ -351,22 +349,25 @@ updateHelper msg model =
 
         ContactFormMsg subMsg ->
             case model.page of
-                P.ContactForm cfModel maybePk ->
+                P.ContactForm cfModel ->
                     let
                         pageData =
                             CF.update
                                 { csrftoken = model.settings.csrftoken
                                 , successPageUrl = page2loc <| P.RecipientTable RT.initialModel False
                                 , recipients = model.dataStore.recipients
-                                , maybePk = maybePk
-                                , canSeeContactNum = model.settings.userPerms.can_see_contact_nums
-                                , canSeeContactNotes = model.settings.userPerms.can_see_contact_notes
+                                , canSeeContactNum =
+                                    model.settings.userPerms.can_see_contact_nums
+                                        || model.settings.userPerms.user.is_staff
+                                , canSeeContactNotes =
+                                    model.settings.userPerms.can_see_contact_notes
+                                        || model.settings.userPerms.user.is_staff
                                 }
                                 subMsg
                                 cfModel
                     in
                     formUpdate
-                        (\cm -> P.ContactForm cm maybePk)
+                        P.ContactForm
                         ContactFormMsg
                         model
                         pageData
@@ -376,21 +377,20 @@ updateHelper msg model =
 
         KeywordFormMsg subMsg ->
             case model.page of
-                P.KeywordForm kfModel maybeK ->
+                P.KeywordForm kfModel ->
                     let
                         pageData =
                             KF.update
                                 { csrftoken = model.settings.csrftoken
                                 , currentTime = model.currentTime
                                 , keywords = model.dataStore.keywords
-                                , maybeKeywordName = maybeK
                                 , successPageUrl = page2loc <| P.KeywordTable KT.initialModel False
                                 }
                                 subMsg
                                 kfModel
                     in
                     formUpdate
-                        (\km -> P.KeywordForm km maybeK)
+                        P.KeywordForm
                         KeywordFormMsg
                         model
                         pageData
@@ -456,10 +456,6 @@ updateHelper msg model =
                         pageData =
                             SAF.update
                                 { csrftoken = model.settings.csrftoken
-                                , twilioCost =
-                                    model.settings.twilio
-                                        |> Maybe.map .sendingCost
-                                        |> Maybe.withDefault 0.0
                                 , outboundUrl = page2loc <| P.OutboundTable OT.initialModel
                                 , scheduledUrl = page2loc <| P.ScheduledSmsTable SST.initialModel
                                 , successPageUrl = page2loc <| P.OutboundTable OT.initialModel
@@ -571,6 +567,7 @@ maybeAddTwilioWarning model =
         Nothing ->
             if List.member notif model.notifications then
                 model
+
             else
                 { model | notifications = notif :: model.notifications }
 
@@ -591,6 +588,7 @@ maybeAddEmailWarning model =
         False ->
             if List.member notif model.notifications then
                 model
+
             else
                 { model | notifications = notif :: model.notifications }
 
@@ -598,7 +596,7 @@ maybeAddEmailWarning model =
             { model | notifications = Notif.remove notif model.notifications }
 
 
-updateSettings : SCF.FModel -> Settings -> Settings
+updateSettings : SCF.SiteConfigModel -> Settings -> Settings
 updateSettings newSCModel settings =
     let
         newTwilio =

@@ -1,15 +1,14 @@
-module Pages.Forms.ContactImport
-    exposing
-        ( Model
-        , Msg
-        , initialModel
-        , update
-        , view
-        )
+module Pages.Forms.ContactImport exposing
+    ( Model
+    , Msg
+    , initialModel
+    , update
+    , view
+    )
 
 import Css
 import DjangoSend
-import Form as F exposing (Field, FormItem(FormField), FormStatus(..), form, longTextField)
+import Form as F
 import Html exposing (Html)
 import Html.Attributes as A
 import Http
@@ -18,19 +17,18 @@ import Pages.Forms.Meta.ContactImport exposing (meta)
 import Urls
 
 
+
 -- Model
 
 
 type alias Model =
-    { text : String
-    , formStatus : FormStatus
+    { form : F.Form String ()
     }
 
 
 initialModel : Model
 initialModel =
-    { text = ""
-    , formStatus = NoAction
+    { form = F.startCreating "" ()
     }
 
 
@@ -55,7 +53,7 @@ update props msg model =
     case msg of
         UpdateText text ->
             F.UpdateResp
-                { model | text = text }
+                { model | form = F.updateField (updateText text) model.form }
                 Cmd.none
                 []
                 Nothing
@@ -63,7 +61,7 @@ update props msg model =
         PostForm ->
             F.UpdateResp
                 (F.setInProgress model)
-                (postContactImportCmd props.csrftoken model.text)
+                (postCmd props.csrftoken model)
                 []
                 Nothing
 
@@ -74,14 +72,24 @@ update props msg model =
             F.errFormRespUpdate err model
 
 
-postContactImportCmd : DjangoSend.CSRFToken -> String -> Cmd Msg
-postContactImportCmd csrf csv =
-    let
-        body =
-            [ ( "csv_data", Encode.string csv ) ]
-    in
-    DjangoSend.rawPost csrf Urls.api_recipients_import_csv body
-        |> Http.send ReceiveFormResp
+updateText : String -> String -> () -> ( String, () )
+updateText text _ _ =
+    ( text, () )
+
+
+postCmd : DjangoSend.CSRFToken -> Model -> Cmd Msg
+postCmd csrf model =
+    case F.getCurrent model.form of
+        Just text ->
+            let
+                body =
+                    [ ( "csv_data", Encode.string text ) ]
+            in
+            DjangoSend.rawPost csrf Urls.api_recipients_import_csv body
+                |> Http.send ReceiveFormResp
+
+        Nothing ->
+            Cmd.none
 
 
 
@@ -96,12 +104,8 @@ type alias Messages msg =
 view : Messages msg -> Model -> Html msg
 view msgs model =
     let
-        fields =
-            [ FormField <| Field meta.csv_data <| longTextField 20 (Just "") (msgs.form << UpdateText)
-            ]
-
         button =
-            Html.button [ A.id "formSubmitButton", Css.btn, Css.btn_purple ] [ Html.text "Import" ]
+            \_ -> Html.button [ A.id "formSubmitButton", Css.btn, Css.btn_purple ] [ Html.text "Import" ]
     in
     Html.div [ Css.max_w_md, Css.mx_auto ]
         [ Html.p []
@@ -113,9 +117,22 @@ view msgs model =
         , Html.p []
             [ Html.text "There should be no header row and there should be three columns: First Name, Last Name, Number"
             ]
-        , form
-            model.formStatus
-            fields
+        , F.form
+            model.form
+            (fieldsHelp msgs)
             (msgs.form PostForm)
             button
         ]
+
+
+fieldsHelp : Messages msg -> F.Item String -> () -> List (F.FormItem msg)
+fieldsHelp msgs item _ =
+    [ F.longTextField
+        20
+        { getValue = \n -> n
+        , item = item
+        , onInput = msgs.form << UpdateText
+        }
+        |> F.Field meta.csv_data
+        |> F.FormField
+    ]

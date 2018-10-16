@@ -1,4 +1,4 @@
-module Pages.Forms.SendGroup exposing (Model, Msg(..), init, initialModel, update, view)
+module Pages.Forms.SendGroup exposing (Model, Msg(..), getParams, init, initialModel, update, view)
 
 import Css
 import Data exposing (RecipientGroup, UserProfile, nullGroup)
@@ -7,7 +7,7 @@ import DateTimePicker
 import DjangoSend
 import Encode
 import FilteringTable exposing (filterInput, filterRecord, textToRegex)
-import Form as F exposing (Field, FieldMeta, FormItem(FormField), FormStatus(NoAction), contentField, form, sendButton, timeField)
+import Form as F
 import Helpers exposing (calculateSmsCost, onClick)
 import Html exposing (Html)
 import Html.Attributes as A
@@ -20,12 +20,18 @@ import RemoteList as RL
 import Urls
 
 
+
 -- Init
 
 
 init : Model -> Cmd Msg
 init model =
-    DateTimePicker.initialCmd initSendGroupDate model.datePickerState
+    case F.getDirty model.form of
+        Just sg ->
+            DateTimePicker.initialCmd initSendGroupDate sg.datePickerState
+
+        Nothing ->
+            Cmd.none
 
 
 initSendGroupDate : DateTimePicker.State -> Maybe Date.Date -> Msg
@@ -33,30 +39,60 @@ initSendGroupDate state maybeDate =
     InputMsg <| UpdateSGDate state maybeDate
 
 
+getParams : Model -> ( Maybe String, Maybe Int )
+getParams { form } =
+    case F.getCurrent form of
+        Nothing ->
+            ( Nothing, Nothing )
+
+        Just sg ->
+            ( Just sg.content, sg.selectedPk )
+
+
 
 -- Model
 
 
 type alias Model =
-    { content : String
-    , date : Maybe Date.Date
-    , selectedPk : Maybe Int
-    , cost : Maybe Float
-    , groupFilter : Regex.Regex
-    , datePickerState : DateTimePicker.State
-    , formStatus : FormStatus
+    { form : F.Form SendGroupModel DirtyState
     }
 
 
 initialModel : Maybe String -> Maybe Int -> Model
 initialModel initialContent initialSelectedGroup =
+    let
+        sgm =
+            initialSendGroupModel initialContent initialSelectedGroup
+    in
+    { form = F.startCreating sgm initialDirtyState
+    }
+
+
+type alias SendGroupModel =
+    { content : String
+    , date : Maybe Date.Date
+    , selectedPk : Maybe Int
+    }
+
+
+initialSendGroupModel : Maybe String -> Maybe Int -> SendGroupModel
+initialSendGroupModel initialContent initialSelectedGroup =
     { content = Maybe.withDefault "" initialContent
     , selectedPk = initialSelectedGroup
     , date = Nothing
-    , cost = Nothing
-    , groupFilter = Regex.regex ""
+    }
+
+
+type alias DirtyState =
+    { groupFilter : Regex.Regex
+    , datePickerState : DateTimePicker.State
+    }
+
+
+initialDirtyState : DirtyState
+initialDirtyState =
+    { groupFilter = Regex.regex ""
     , datePickerState = DateTimePicker.initialState
-    , formStatus = NoAction
     }
 
 
@@ -92,7 +128,7 @@ update props msg model =
     case msg of
         InputMsg inputMsg ->
             F.UpdateResp
-                (updateInput inputMsg model |> updateCost props.groups)
+                { model | form = F.updateField (updateInput inputMsg) model.form }
                 Cmd.none
                 []
                 Nothing
@@ -105,7 +141,7 @@ update props msg model =
                 Nothing
 
         ReceiveFormResp (Ok resp) ->
-            case model.date of
+            case F.getCurrent model.form |> Maybe.andThen .date of
                 Nothing ->
                     F.okFormRespUpdate { props | successPageUrl = props.outboundUrl } resp model
 
@@ -121,32 +157,36 @@ update props msg model =
             F.errFormRespUpdate err model
 
 
-updateInput : InputMsg -> Model -> Model
-updateInput msg model =
+updateInput : InputMsg -> SendGroupModel -> DirtyState -> ( SendGroupModel, DirtyState )
+updateInput msg model dirty =
     case msg of
         UpdateSGContent text ->
-            { model | content = text }
+            ( { model | content = text }, dirty )
 
         UpdateSGDate state maybeDate ->
-            { model | date = maybeDate, datePickerState = state }
+            ( { model | date = maybeDate }, { dirty | datePickerState = state } )
 
         SelectGroup pk ->
-            { model | selectedPk = Just pk }
+            ( { model | selectedPk = Just pk }, dirty )
 
         UpdateGroupFilter text ->
-            { model | groupFilter = textToRegex text }
+            ( model, { dirty | groupFilter = textToRegex text } )
 
 
-updateCost : List RecipientGroup -> Model -> Model
-updateCost groups model =
-    case model.content of
+calculateCost : List RecipientGroup -> F.Item SendGroupModel -> Maybe Float
+calculateCost groups itemState =
+    let
+        sgm =
+            F.itemGetCurrent itemState
+    in
+    case sgm.content of
         "" ->
-            { model | cost = Nothing }
+            Nothing
 
         c ->
-            case model.selectedPk of
+            case sgm.selectedPk of
                 Nothing ->
-                    { model | cost = Nothing }
+                    Nothing
 
                 Just pk ->
                     let
@@ -157,20 +197,25 @@ updateCost groups model =
                                 |> Maybe.withDefault nullGroup
                                 |> .cost
                     in
-                    { model | cost = Just (calculateSmsCost groupCost c) }
+                    Just (calculateSmsCost groupCost c)
 
 
 postCmd : DjangoSend.CSRFToken -> Model -> Cmd Msg
 postCmd csrf model =
-    let
-        body =
-            [ ( "content", Encode.string model.content )
-            , ( "recipient_group", Encode.int (Maybe.withDefault 0 model.selectedPk) )
-            , ( "scheduled_time", Encode.encodeMaybeDate model.date )
-            ]
-    in
-    DjangoSend.rawPost csrf Urls.api_act_send_group body
-        |> Http.send ReceiveFormResp
+    case F.getCurrent model.form of
+        Just sg ->
+            let
+                body =
+                    [ ( "content", Encode.string sg.content )
+                    , ( "recipient_group", Encode.int (Maybe.withDefault 0 sg.selectedPk) )
+                    , ( "scheduled_time", Encode.encodeMaybeDate sg.date )
+                    ]
+            in
+            DjangoSend.rawPost csrf Urls.api_act_send_group body
+                |> Http.send ReceiveFormResp
+
+        Nothing ->
+            Cmd.none
 
 
 
@@ -193,11 +238,12 @@ view props model =
             RL.FinalPageReceived groups_ ->
                 if List.length groups_ == 0 then
                     noGroups props
+
                 else
-                    sendForm props model model.formStatus
+                    sendForm props model
 
             _ ->
-                sendForm props model model.formStatus
+                sendForm props model
         ]
 
 
@@ -209,17 +255,27 @@ noGroups props =
         ]
 
 
-sendForm : Props msg -> Model -> FormStatus -> Html msg
-sendForm props model status =
-    let
-        fields =
-            [ Field meta.content <| contentField props.smsCharLimit (props.form << UpdateSGContent) model.content
-            , Field meta.scheduled_time <| timeField (updateSGDate props) model.datePickerState model.date
-            , Field meta.recipient_group <| groupField props model props.groups
-            ]
-                |> List.map FormField
-    in
-    form status fields props.postForm (sendButton model.cost)
+sendForm : Props msg -> Model -> Html msg
+sendForm props { form } =
+    F.form
+        form
+        (fieldsHelp props)
+        props.postForm
+        (\sgm -> F.sendButton <| calculateCost (RL.toList props.groups) sgm)
+
+
+fieldsHelp : Props msg -> F.Item SendGroupModel -> DirtyState -> List (F.FormItem msg)
+fieldsHelp props item tmpState =
+    [ F.Field meta.content <|
+        F.contentField props.smsCharLimit
+            { getValue = .content
+            , item = item
+            , onInput = props.form << UpdateSGContent
+            }
+    , F.Field meta.scheduled_time <| F.dateTimeField (updateSGDate props) tmpState.datePickerState .date item
+    , F.Field meta.recipient_group <| groupField props (F.itemGetCurrent item) tmpState
+    ]
+        |> List.map F.FormField
 
 
 updateSGDate : Props msg -> DateTimePicker.State -> Maybe Date.Date -> msg
@@ -227,25 +283,25 @@ updateSGDate props state maybeDate =
     props.form <| UpdateSGDate state maybeDate
 
 
-groupField : Props msg -> Model -> RL.RemoteList RecipientGroup -> FieldMeta -> List (Html msg)
-groupField props model groups meta_ =
+groupField : Props msg -> SendGroupModel -> DirtyState -> F.FieldMeta -> List (Html msg)
+groupField props local dirty meta_ =
     [ Html.label [ A.for meta_.id, Css.label ] [ Html.text meta_.label ]
     , Html.div []
-        [ loadingMessageOrFilter props groups
+        [ loadingMessageOrFilter props
         , Html.div []
-            (groups
+            (props.groups
                 |> RL.toList
-                |> List.filter (filterRecord model.groupFilter)
-                |> List.map (groupItem props model.selectedPk)
+                |> List.filter (filterRecord dirty.groupFilter)
+                |> List.map (groupItem props local.selectedPk)
             )
         ]
     , F.helpLabel { help = Just "Note that empty groups are not shown here." }
     ]
 
 
-loadingMessageOrFilter : Props msg -> RL.RemoteList a -> Html msg
-loadingMessageOrFilter props rl =
-    case rl of
+loadingMessageOrFilter : Props msg -> Html msg
+loadingMessageOrFilter props =
+    case props.groups of
         RL.NotAsked _ ->
             Html.text ""
 

@@ -1,50 +1,53 @@
-module Pages.Forms.UserProfile exposing (Model, Msg(..), initialModel, update, view)
+module Pages.Forms.UserProfile exposing (Model, Msg(..), init, initialModel, update, view)
 
 import Css
-import Data exposing (UserProfile)
+import Data exposing (UserProfile, decodeUserProfile)
 import DjangoSend
-import Form as F exposing (..)
+import Form as F
+import Helpers exposing (userFacingErrorMessage)
 import Html exposing (Html)
 import Http
+import Json.Decode as Decode
 import Json.Encode as Encode
 import Pages.Forms.Meta.UserProfile exposing (meta)
-import Pages.Fragments.Loader exposing (loader)
 import RemoteList as RL
 import Urls
 
 
+init : Int -> Cmd Msg
+init pk =
+    Http.get (Urls.api_user_profile pk) (decodeSingleItem decodeUserProfile)
+        |> Http.send ReceiveInitialData
+
+
+decodeSingleItem : Decode.Decoder a -> Decode.Decoder a
+decodeSingleItem decoder =
+    Decode.field "results" (Decode.list decoder)
+        |> Decode.andThen
+            (\l ->
+                case l of
+                    [ item ] ->
+                        Decode.succeed item
+
+                    _ ->
+                        Decode.fail "Bad payload"
+            )
+
+
 type alias Model =
-    { approved : Maybe Bool
-    , message_cost_limit : Maybe Float
-    , can_see_groups : Maybe Bool
-    , can_see_contact_names : Maybe Bool
-    , can_see_keywords : Maybe Bool
-    , can_see_outgoing : Maybe Bool
-    , can_see_incoming : Maybe Bool
-    , can_send_sms : Maybe Bool
-    , can_see_contact_nums : Maybe Bool
-    , can_see_contact_notes : Maybe Bool
-    , can_import : Maybe Bool
-    , can_archive : Maybe Bool
-    , formStatus : FormStatus
+    { pk : Int
+    , form : F.Form UserProfile DirtyState
     }
 
 
-initialModel : Model
-initialModel =
-    { approved = Nothing
-    , message_cost_limit = Nothing
-    , can_see_groups = Nothing
-    , can_see_contact_names = Nothing
-    , can_see_keywords = Nothing
-    , can_see_outgoing = Nothing
-    , can_see_incoming = Nothing
-    , can_send_sms = Nothing
-    , can_see_contact_nums = Nothing
-    , can_see_contact_notes = Nothing
-    , can_import = Nothing
-    , can_archive = Nothing
-    , formStatus = NoAction
+type alias DirtyState =
+    { message_cost_limit : Maybe String }
+
+
+initialModel : Int -> Model
+initialModel pk =
+    { pk = pk
+    , form = F.formLoading
     }
 
 
@@ -55,38 +58,52 @@ initialModel =
 type Msg
     = InputMsg InputMsg
     | PostForm
+    | ReceiveInitialData (Result Http.Error UserProfile)
     | ReceiveFormResp (Result Http.Error { body : String, code : Int })
 
 
 type InputMsg
-    = UpdateApproved (Maybe UserProfile)
+    = UpdateApproved
     | UpdateMessageCostLimit String
-    | UpdateCanSeeGroups (Maybe UserProfile)
-    | UpdateCanSeeContactNames (Maybe UserProfile)
-    | UpdateCanSeeKeywords (Maybe UserProfile)
-    | UpdateCanSeeOutgoing (Maybe UserProfile)
-    | UpdateCanSeeIncoming (Maybe UserProfile)
-    | UpdateCanSendSms (Maybe UserProfile)
-    | UpdateCanSeeContactNums (Maybe UserProfile)
-    | UpdateCanSeeContactNotes (Maybe UserProfile)
-    | UpdateCanImport (Maybe UserProfile)
-    | UpdateCanArchive (Maybe UserProfile)
+    | UpdateCanSeeGroups
+    | UpdateCanSeeContactNames
+    | UpdateCanSeeKeywords
+    | UpdateCanSeeOutgoing
+    | UpdateCanSeeIncoming
+    | UpdateCanSendSms
+    | UpdateCanSeeContactNums
+    | UpdateCanSeeContactNotes
+    | UpdateCanImport
+    | UpdateCanArchive
 
 
 type alias UpdateProps =
     { csrftoken : DjangoSend.CSRFToken
     , successPageUrl : String
     , userprofiles : RL.RemoteList UserProfile
-    , userPk : Int
     }
 
 
 update : UpdateProps -> Msg -> Model -> F.UpdateResp Msg Model
 update props msg model =
     case msg of
+        ReceiveInitialData (Ok profile) ->
+            F.UpdateResp
+                { model | form = F.startUpdating profile (DirtyState Nothing) }
+                Cmd.none
+                []
+                Nothing
+
+        ReceiveInitialData (Err err) ->
+            F.UpdateResp
+                { model | form = F.toError <| userFacingErrorMessage err }
+                Cmd.none
+                []
+                Nothing
+
         InputMsg inputMsg ->
             F.UpdateResp
-                (updateInput inputMsg model)
+                { model | form = F.updateField (updateInput inputMsg) model.form }
                 Cmd.none
                 []
                 Nothing
@@ -97,10 +114,6 @@ update props msg model =
                 (postCmd
                     props.csrftoken
                     model
-                    (RL.filter (\x -> x.user.pk == props.userPk) props.userprofiles
-                        |> RL.toList
-                        |> List.head
-                    )
                 )
                 []
                 Nothing
@@ -112,77 +125,78 @@ update props msg model =
             F.errFormRespUpdate err model
 
 
-updateInput : InputMsg -> Model -> Model
-updateInput msg model =
+updateInput : InputMsg -> UserProfile -> DirtyState -> ( UserProfile, DirtyState )
+updateInput msg profile raw =
     case msg of
-        UpdateApproved maybeProfile ->
-            { model | approved = getNewBool model.approved (Maybe.map .approved maybeProfile) }
+        UpdateApproved ->
+            ( { profile | approved = not profile.approved }, raw )
 
-        UpdateCanSeeGroups maybeProfile ->
-            { model | can_see_groups = getNewBool model.can_see_groups (Maybe.map .can_see_groups maybeProfile) }
+        UpdateCanSeeGroups ->
+            ( { profile | can_see_groups = not profile.can_see_groups }, raw )
 
-        UpdateCanSeeContactNames maybeProfile ->
-            { model | can_see_contact_names = getNewBool model.can_see_contact_names (Maybe.map .can_see_contact_names maybeProfile) }
+        UpdateCanSeeContactNames ->
+            ( { profile | can_see_contact_names = not profile.can_see_contact_names }, raw )
 
-        UpdateCanSeeKeywords maybeProfile ->
-            { model | can_see_keywords = getNewBool model.can_see_keywords (Maybe.map .can_see_keywords maybeProfile) }
+        UpdateCanSeeKeywords ->
+            ( { profile | can_see_keywords = not profile.can_see_keywords }, raw )
 
-        UpdateCanSeeOutgoing maybeProfile ->
-            { model | can_see_outgoing = getNewBool model.can_see_outgoing (Maybe.map .can_see_outgoing maybeProfile) }
+        UpdateCanSeeOutgoing ->
+            ( { profile | can_see_outgoing = not profile.can_see_outgoing }, raw )
 
-        UpdateCanSeeIncoming maybeProfile ->
-            { model | can_see_incoming = getNewBool model.can_see_incoming (Maybe.map .can_see_incoming maybeProfile) }
+        UpdateCanSeeIncoming ->
+            ( { profile | can_see_incoming = not profile.can_see_incoming }, raw )
 
-        UpdateCanSendSms maybeProfile ->
-            { model | can_send_sms = getNewBool model.can_send_sms (Maybe.map .can_send_sms maybeProfile) }
+        UpdateCanSendSms ->
+            ( { profile | can_send_sms = not profile.can_send_sms }, raw )
 
-        UpdateCanSeeContactNums maybeProfile ->
-            { model | can_see_contact_nums = getNewBool model.can_see_contact_nums (Maybe.map .can_see_contact_nums maybeProfile) }
+        UpdateCanSeeContactNums ->
+            ( { profile | can_see_contact_nums = not profile.can_see_contact_nums }, raw )
 
-        UpdateCanSeeContactNotes maybeProfile ->
-            { model | can_see_contact_notes = getNewBool model.can_see_contact_notes (Maybe.map .can_see_contact_nums maybeProfile) }
+        UpdateCanSeeContactNotes ->
+            ( { profile | can_see_contact_notes = not profile.can_see_contact_notes }, raw )
 
-        UpdateCanImport maybeProfile ->
-            { model | can_import = getNewBool model.can_import (Maybe.map .can_import maybeProfile) }
+        UpdateCanImport ->
+            ( { profile | can_import = not profile.can_import }, raw )
 
-        UpdateCanArchive maybeProfile ->
-            { model | can_archive = getNewBool model.can_archive (Maybe.map .can_archive maybeProfile) }
+        UpdateCanArchive ->
+            ( { profile | can_archive = not profile.can_archive }, raw )
 
         UpdateMessageCostLimit text ->
             case String.toFloat text of
                 Ok num ->
-                    { model | message_cost_limit = Just num }
+                    ( { profile | message_cost_limit = num }, { raw | message_cost_limit = Just text } )
 
                 Err _ ->
-                    model
+                    ( profile, { raw | message_cost_limit = Just text } )
 
 
-postCmd : DjangoSend.CSRFToken -> Model -> Maybe UserProfile -> Cmd Msg
-postCmd csrf model maybeProfile =
-    let
-        body =
-            [ ( "approved", Encode.bool <| F.extractBool .approved model.approved maybeProfile )
-            , ( "message_cost_limit", Encode.float <| F.extractFloat .message_cost_limit model.message_cost_limit maybeProfile )
-            , ( "can_see_groups", Encode.bool <| F.extractBool .can_see_groups model.can_see_groups maybeProfile )
-            , ( "can_see_contact_names", Encode.bool <| F.extractBool .can_see_contact_names model.can_see_contact_names maybeProfile )
-            , ( "can_see_keywords", Encode.bool <| F.extractBool .can_see_keywords model.can_see_keywords maybeProfile )
-            , ( "can_see_outgoing", Encode.bool <| F.extractBool .can_see_outgoing model.can_see_outgoing maybeProfile )
-            , ( "can_see_incoming", Encode.bool <| F.extractBool .can_see_incoming model.can_see_incoming maybeProfile )
-            , ( "can_send_sms", Encode.bool <| F.extractBool .can_send_sms model.can_send_sms maybeProfile )
-            , ( "can_see_contact_nums", Encode.bool <| F.extractBool .can_see_contact_nums model.can_see_contact_nums maybeProfile )
-            , ( "can_see_contact_notes", Encode.bool <| F.extractBool .can_see_contact_notes model.can_see_contact_notes maybeProfile )
-            , ( "can_import", Encode.bool <| F.extractBool .can_import model.can_import maybeProfile )
-            , ( "can_archive", Encode.bool <| F.extractBool .can_archive model.can_archive maybeProfile )
-            ]
-                |> F.addPk maybeProfile
-    in
-    case maybeProfile of
+postCmd : DjangoSend.CSRFToken -> Model -> Cmd Msg
+postCmd csrf model =
+    case F.getCurrent model.form of
+        Just user ->
+            DjangoSend.rawPost csrf Urls.api_user_profiles (toBody user)
+                |> Http.send ReceiveFormResp
+
         Nothing ->
             Cmd.none
 
-        Just _ ->
-            DjangoSend.rawPost csrf Urls.api_user_profiles body
-                |> Http.send ReceiveFormResp
+
+toBody : UserProfile -> List ( String, Encode.Value )
+toBody profile =
+    [ ( "approved", Encode.bool profile.approved )
+    , ( "message_cost_limit", Encode.float profile.message_cost_limit )
+    , ( "can_see_groups", Encode.bool profile.can_see_groups )
+    , ( "can_see_contact_names", Encode.bool profile.can_see_contact_names )
+    , ( "can_see_keywords", Encode.bool profile.can_see_keywords )
+    , ( "can_see_outgoing", Encode.bool profile.can_see_outgoing )
+    , ( "can_see_incoming", Encode.bool profile.can_see_incoming )
+    , ( "can_send_sms", Encode.bool profile.can_send_sms )
+    , ( "can_see_contact_nums", Encode.bool profile.can_see_contact_nums )
+    , ( "can_see_contact_notes", Encode.bool profile.can_see_contact_notes )
+    , ( "can_import", Encode.bool profile.can_import )
+    , ( "can_archive", Encode.bool profile.can_archive )
+    , ( "pk", Encode.int profile.pk )
+    ]
 
 
 getNewBool : Maybe Bool -> Maybe Bool -> Maybe Bool
@@ -193,7 +207,7 @@ getNewBool modelVal profileVal =
             Just <| not curVal
 
         Nothing ->
-            -- we have not edited the form yet, toggle if we have a saved profile
+            -- we have not edited the F.form yet, toggle if we have a saved profile
             Maybe.map not profileVal
 
 
@@ -207,57 +221,57 @@ type alias Messages msg =
     }
 
 
-view : Messages msg -> Int -> RL.RemoteList UserProfile -> Model -> Html msg
-view msgs pk profiles_ model =
-    let
-        profiles =
-            RL.toList profiles_
-
-        currentProfile =
-            profiles
-                |> List.filter (\x -> x.user.pk == pk)
-                |> List.head
-    in
-    case currentProfile of
-        Nothing ->
-            loader
-
-        Just prof ->
-            viewHelp msgs model.formStatus prof
-
-
-viewHelp : Messages msg -> FormStatus -> UserProfile -> Html msg
-viewHelp msgs status profile =
-    let
-        fields =
-            [ Field meta.approved (approvedField msgs profile)
-            , Field meta.message_cost_limit (simpleFloatField (Just profile.message_cost_limit) (msgs.inputChange << UpdateMessageCostLimit))
-            , Field meta.can_see_groups (checkboxField (Just profile) .can_see_groups (msgs.inputChange << UpdateCanSeeGroups))
-            , Field meta.can_see_contact_names (checkboxField (Just profile) .can_see_contact_names (msgs.inputChange << UpdateCanSeeContactNames))
-            , Field meta.can_see_keywords (checkboxField (Just profile) .can_see_keywords (msgs.inputChange << UpdateCanSeeKeywords))
-            , Field meta.can_see_outgoing (checkboxField (Just profile) .can_see_outgoing (msgs.inputChange << UpdateCanSeeOutgoing))
-            , Field meta.can_see_incoming (checkboxField (Just profile) .can_see_incoming (msgs.inputChange << UpdateCanSeeIncoming))
-            , Field meta.can_send_sms (checkboxField (Just profile) .can_send_sms (msgs.inputChange << UpdateCanSendSms))
-            , Field meta.can_see_contact_nums (checkboxField (Just profile) .can_see_contact_nums (msgs.inputChange << UpdateCanSeeContactNums))
-            , Field meta.can_see_contact_notes (checkboxField (Just profile) .can_see_contact_notes (msgs.inputChange << UpdateCanSeeContactNotes))
-            , Field meta.can_import (checkboxField (Just profile) .can_import (msgs.inputChange << UpdateCanImport))
-            , Field meta.can_archive (checkboxField (Just profile) .can_archive (msgs.inputChange << UpdateCanArchive))
-            ]
-                |> List.map FormField
-    in
+view : Messages msg -> Model -> Html msg
+view msgs model =
     Html.div []
-        [ Html.h3 [ Css.max_w_md, Css.mx_auto ] [ Html.text <| "User Profile: " ++ profile.user.email ]
-        , form status
-            fields
+        [ heading model.form
+        , F.form
+            model.form
+            (fieldsHelp msgs)
             msgs.postForm
-            (submitButton (Just profile))
+            F.submitButton
         ]
 
 
-approvedField : Messages msg -> UserProfile -> FieldMeta -> List (Html msg)
-approvedField msgs profile fieldMeta =
-    checkboxField
-        (Just profile)
-        .approved
-        (msgs.inputChange << UpdateApproved)
-        fieldMeta
+heading : F.Form UserProfile DirtyState -> Html msg
+heading form =
+    case F.getCurrent form of
+        Just profile ->
+            Html.h3 [ Css.max_w_md, Css.mx_auto ] [ Html.text <| "User Profile: " ++ profile.user.email ]
+
+        Nothing ->
+            Html.text ""
+
+
+fieldsHelp : Messages msg -> F.Item UserProfile -> DirtyState -> List (F.FormItem msg)
+fieldsHelp msgs item tmpState =
+    [ F.Field meta.approved (checkboxField_ item .approved (msgs.inputChange UpdateApproved))
+    , F.Field meta.message_cost_limit
+        (F.simpleFloatField
+            { getValue = .message_cost_limit >> Just
+            , item = item
+            , tmpState = tmpState.message_cost_limit
+            , onInput = msgs.inputChange << UpdateMessageCostLimit
+            }
+        )
+    , F.Field meta.can_see_groups (checkboxField_ item .can_see_groups (msgs.inputChange UpdateCanSeeGroups))
+    , F.Field meta.can_see_contact_names (checkboxField_ item .can_see_contact_names (msgs.inputChange UpdateCanSeeContactNames))
+    , F.Field meta.can_see_keywords (checkboxField_ item .can_see_keywords (msgs.inputChange UpdateCanSeeKeywords))
+    , F.Field meta.can_see_outgoing (checkboxField_ item .can_see_outgoing (msgs.inputChange UpdateCanSeeOutgoing))
+    , F.Field meta.can_see_incoming (checkboxField_ item .can_see_incoming (msgs.inputChange UpdateCanSeeIncoming))
+    , F.Field meta.can_send_sms (checkboxField_ item .can_send_sms (msgs.inputChange UpdateCanSendSms))
+    , F.Field meta.can_see_contact_nums (checkboxField_ item .can_see_contact_nums (msgs.inputChange UpdateCanSeeContactNums))
+    , F.Field meta.can_see_contact_notes (checkboxField_ item .can_see_contact_notes (msgs.inputChange UpdateCanSeeContactNotes))
+    , F.Field meta.can_import (checkboxField_ item .can_import (msgs.inputChange UpdateCanImport))
+    , F.Field meta.can_archive (checkboxField_ item .can_archive (msgs.inputChange UpdateCanArchive))
+    ]
+        |> List.map F.FormField
+
+
+checkboxField_ : F.Item UserProfile -> (UserProfile -> Bool) -> msg -> F.FieldMeta -> List (Html msg)
+checkboxField_ item fn toggleMsg meta =
+    F.checkboxField
+        fn
+        item
+        toggleMsg
+        meta

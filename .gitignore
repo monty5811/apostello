@@ -23,6 +23,8 @@ test-report.html
 __pycache__/
 *.py[cod]
 
+tags
+
 # C extensions
 *.so
 

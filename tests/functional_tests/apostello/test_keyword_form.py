@@ -1,6 +1,7 @@
 from time import sleep
 
 import pytest
+from selenium.webdriver.common.keys import Keys
 from tests.functional_tests.utils import assert_with_timeout, click_and_wait, load_page
 
 from apostello import models
@@ -18,6 +19,7 @@ def update_field(b, wt, name, val):
     field = b.find_element_by_name(name)
     field.clear()
     field.send_keys(val)
+    field.send_keys(Keys.TAB)
     sleep(wt)
     return b
 
@@ -87,8 +89,8 @@ class TestKeywordForm:
         b = send_form(b, driver_wait_time)
 
         def _test():
-            assert len(keywords) + 1 == models.Keyword.objects.count()
             assert '/keyword/all/' in b.current_url
+            assert len(keywords) + 1 == models.Keyword.objects.count()
             k = models.Keyword.objects.get(keyword='form')
             assert k.is_live
             assert k.subscribed_to_digest.count() == 1

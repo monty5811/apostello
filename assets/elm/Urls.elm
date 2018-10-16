@@ -1,4 +1,6 @@
-module Urls exposing (account_change_password, account_email, account_inactive, account_login, account_logout, account_set_password, account_signup, api_act_archive_group, api_act_archive_keyword, api_act_archive_recipient, api_act_archive_sms, api_act_cancel_queued_sms, api_act_create_all_group, api_act_fetch_elvanto_groups, api_act_keyword_archive_all_responses, api_act_permanent_delete, api_act_pull_elvanto_groups, api_act_reingest_sms, api_act_send_adhoc, api_act_send_group, api_act_update_group_members, api_default_responses, api_docs_docs_index, api_docs_schema_js, api_elvanto_groups, api_in_log, api_keywords, api_out_log, api_queued_smss, api_recipient_groups, api_recipients, api_recipients_import_csv, api_setup, api_site_config, api_toggle_deal_with_sms, api_toggle_display_on_wall, api_toggle_elvanto_group_sync, api_user_profile_update, api_user_profiles, api_users, google_callback, google_login, keyword_csv, not_approved, offline, site_config_create_super_user, site_config_first_run, site_config_test_email, site_config_test_sms, socialaccount_connections, socialaccount_login_cancelled, socialaccount_login_error, socialaccount_signup, spa_)
+module Urls exposing (account_change_password, account_email, account_inactive, account_login, account_logout, account_set_password, account_signup, api_act_archive_group, api_act_archive_keyword, api_act_archive_recipient, api_act_archive_sms, api_act_cancel_queued_sms, api_act_create_all_group, api_act_fetch_elvanto_groups, api_act_keyword_archive_all_responses, api_act_permanent_delete, api_act_pull_elvanto_groups, api_act_reingest_sms, api_act_send_adhoc, api_act_send_group, api_act_update_group_members, api_default_responses, api_docs_docs_index, api_docs_schema_js, api_elvanto_groups, api_in_log, api_keywords, api_out_log, api_queued_smss, api_recipient_groups, api_recipients, api_recipients_import_csv, api_setup, api_site_config, api_toggle_deal_with_sms, api_toggle_display_on_wall, api_toggle_elvanto_group_sync, api_user_profile, api_user_profile_update, api_user_profiles, api_users, google_callback, google_login, keyword_csv, not_approved, offline, site_config_create_super_user, site_config_first_run, site_config_test_email, site_config_test_sms, socialaccount_connections, socialaccount_login_cancelled, socialaccount_login_error, socialaccount_signup, spa_)
+
+import Future.String
 
 
 account_change_password : String
@@ -38,7 +40,7 @@ account_signup =
 
 api_act_archive_group : Int -> String
 api_act_archive_group pk =
-    "/api/v2/actions/group/archive/" ++ toString pk ++ "/"
+    "/api/v2/actions/group/archive/" ++ Future.String.fromInt pk ++ "/"
 
 
 api_act_archive_keyword : String -> String
@@ -48,17 +50,17 @@ api_act_archive_keyword keyword =
 
 api_act_archive_recipient : Int -> String
 api_act_archive_recipient pk =
-    "/api/v2/actions/recipient/archive/" ++ toString pk ++ "/"
+    "/api/v2/actions/recipient/archive/" ++ Future.String.fromInt pk ++ "/"
 
 
 api_act_archive_sms : Int -> String
 api_act_archive_sms pk =
-    "/api/v2/actions/sms/in/archive/" ++ toString pk ++ "/"
+    "/api/v2/actions/sms/in/archive/" ++ Future.String.fromInt pk ++ "/"
 
 
 api_act_cancel_queued_sms : Int -> String
 api_act_cancel_queued_sms pk =
-    "/api/v2/actions/queued/sms/" ++ toString pk ++ "/"
+    "/api/v2/actions/queued/sms/" ++ Future.String.fromInt pk ++ "/"
 
 
 api_act_create_all_group : String
@@ -88,7 +90,7 @@ api_act_pull_elvanto_groups =
 
 api_act_reingest_sms : Int -> String
 api_act_reingest_sms pk =
-    "/api/v2/actions/sms/in/reingest/" ++ toString pk ++ "/"
+    "/api/v2/actions/sms/in/reingest/" ++ Future.String.fromInt pk ++ "/"
 
 
 api_act_send_adhoc : String
@@ -103,7 +105,7 @@ api_act_send_group =
 
 api_act_update_group_members : Int -> String
 api_act_update_group_members pk =
-    "/api/v2/actions/group/update_members/" ++ toString pk ++ "/"
+    "/api/v2/actions/group/update_members/" ++ Future.String.fromInt pk ++ "/"
 
 
 api_default_responses : String
@@ -136,7 +138,7 @@ api_keywords keyword =
     "/api/v2/keywords/"
         ++ (case keyword of
                 Just b ->
-                    toString b ++ "/"
+                    b ++ "/"
 
                 Nothing ->
                     ""
@@ -158,7 +160,7 @@ api_recipient_groups pk =
     "/api/v2/groups/"
         ++ (case pk of
                 Just b ->
-                    toString b ++ "/"
+                    Future.String.fromInt b ++ "/"
 
                 Nothing ->
                     ""
@@ -170,7 +172,7 @@ api_recipients pk =
     "/api/v2/recipients/"
         ++ (case pk of
                 Just b ->
-                    toString b ++ "/"
+                    Future.String.fromInt b ++ "/"
 
                 Nothing ->
                     ""
@@ -194,22 +196,27 @@ api_site_config =
 
 api_toggle_deal_with_sms : Int -> String
 api_toggle_deal_with_sms pk =
-    "/api/v2/toggle/sms/in/deal_with/" ++ toString pk ++ "/"
+    "/api/v2/toggle/sms/in/deal_with/" ++ Future.String.fromInt pk ++ "/"
 
 
 api_toggle_display_on_wall : Int -> String
 api_toggle_display_on_wall pk =
-    "/api/v2/toggle/sms/in/display_on_wall/" ++ toString pk ++ "/"
+    "/api/v2/toggle/sms/in/display_on_wall/" ++ Future.String.fromInt pk ++ "/"
 
 
 api_toggle_elvanto_group_sync : Int -> String
 api_toggle_elvanto_group_sync pk =
-    "/api/v2/toggle/elvanto/group/sync/" ++ toString pk ++ "/"
+    "/api/v2/toggle/elvanto/group/sync/" ++ Future.String.fromInt pk ++ "/"
+
+
+api_user_profile : Int -> String
+api_user_profile pk =
+    "/api/v2/users/profiles/" ++ Future.String.fromInt pk ++ "/"
 
 
 api_user_profile_update : Int -> String
 api_user_profile_update pk =
-    "/api/v2/actions/users/profiles/update/" ++ toString pk ++ "/"
+    "/api/v2/actions/users/profiles/update/" ++ Future.String.fromInt pk ++ "/"
 
 
 api_user_profiles : String

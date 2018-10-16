@@ -1,4 +1,4 @@
-module Pages.Forms.SendAdhoc exposing (Model, Msg(..), init, initialModel, update, view)
+module Pages.Forms.SendAdhoc exposing (Model, Msg(..), getParams, init, initialModel, update, view)
 
 import Css
 import Data exposing (Recipient, UserProfile)
@@ -7,7 +7,7 @@ import DateTimePicker
 import DjangoSend
 import Encode
 import FilteringTable exposing (textToRegex)
-import Form as F exposing (Field, FieldMeta, FormItem(FormField), FormStatus(NoAction), contentField, form, sendButton, timeField)
+import Form as F
 import Helpers exposing (calculateSmsCost, toggleSelectedPk)
 import Html exposing (Html)
 import Http
@@ -20,7 +20,12 @@ import Urls
 
 init : Model -> Cmd Msg
 init model =
-    DateTimePicker.initialCmd initSendAdhocDate model.datePickerState
+    case F.getDirty model.form of
+        Just sa ->
+            DateTimePicker.initialCmd initSendAdhocDate sa.datePickerState
+
+        Nothing ->
+            Cmd.none
 
 
 initSendAdhocDate : DateTimePicker.State -> Maybe Date.Date -> Msg
@@ -29,26 +34,56 @@ initSendAdhocDate state maybeDate =
 
 
 type alias Model =
+    { form : F.Form SendAdhocModel DirtyState
+    }
+
+
+type alias SendAdhocModel =
     { content : String
     , selectedContacts : List Int
     , date : Maybe Date.Date
+    }
+
+
+type alias DirtyState =
+    { datePickerState : DateTimePicker.State
     , adhocFilter : Regex.Regex
-    , cost : Maybe Float
-    , datePickerState : DateTimePicker.State
-    , formStatus : FormStatus
     }
 
 
 initialModel : Maybe String -> Maybe (List Int) -> Model
 initialModel maybeContent maybePks =
+    let
+        sam =
+            initialSendAdhocModel maybeContent maybePks
+    in
+    { form = F.startCreating sam initialDirtyState
+    }
+
+
+initialSendAdhocModel : Maybe String -> Maybe (List Int) -> SendAdhocModel
+initialSendAdhocModel maybeContent maybePks =
     { content = Maybe.withDefault "" maybeContent
     , selectedContacts = Maybe.withDefault [] maybePks
     , date = Nothing
-    , adhocFilter = Regex.regex ""
-    , cost = Nothing
-    , datePickerState = DateTimePicker.initialState
-    , formStatus = NoAction
     }
+
+
+initialDirtyState : DirtyState
+initialDirtyState =
+    { adhocFilter = Regex.regex ""
+    , datePickerState = DateTimePicker.initialState
+    }
+
+
+getParams : Model -> ( Maybe String, Maybe (List Int) )
+getParams { form } =
+    case F.getCurrent form of
+        Nothing ->
+            ( Nothing, Nothing )
+
+        Just sam ->
+            ( Just <| sam.content, Just <| sam.selectedContacts )
 
 
 
@@ -70,7 +105,6 @@ type InputMsg
 
 type alias UpdateProps =
     { csrftoken : DjangoSend.CSRFToken
-    , twilioCost : Float
     , outboundUrl : String
     , scheduledUrl : String
     , successPageUrl : String
@@ -83,7 +117,7 @@ update props msg model =
     case msg of
         InputMsg inputMsg ->
             F.UpdateResp
-                (updateInput inputMsg model |> updateCost props.twilioCost)
+                { model | form = F.updateField (updateInput inputMsg) model.form }
                 Cmd.none
                 []
                 Nothing
@@ -98,7 +132,7 @@ update props msg model =
         ReceiveFormResp (Ok resp) ->
             let
                 newLoc =
-                    case model.date of
+                    case F.getCurrent model.form |> Maybe.andThen .date of
                         Nothing ->
                             props.outboundUrl
 
@@ -116,50 +150,57 @@ update props msg model =
             F.errFormRespUpdate err model
 
 
-updateInput : InputMsg -> Model -> Model
-updateInput msg model =
+updateInput : InputMsg -> SendAdhocModel -> DirtyState -> ( SendAdhocModel, DirtyState )
+updateInput msg model dirty =
     case msg of
         UpdateContent text ->
-            { model | content = text }
+            ( { model | content = text }, dirty )
 
         UpdateDate state maybeDate ->
-            { model | date = maybeDate, datePickerState = state }
+            ( { model | date = maybeDate }, { dirty | datePickerState = state } )
 
         ToggleSelectedContact pk ->
-            { model | selectedContacts = toggleSelectedPk pk model.selectedContacts }
+            ( { model | selectedContacts = toggleSelectedPk pk model.selectedContacts }, dirty )
 
         UpdateAdhocFilter text ->
-            { model | adhocFilter = textToRegex text }
+            ( model, { dirty | adhocFilter = textToRegex text } )
 
 
-updateCost : Float -> Model -> Model
-updateCost twilioCost model =
+calculateCost : Float -> F.Item SendAdhocModel -> Maybe Float
+calculateCost twilioCost itemState =
+    let
+        model =
+            F.itemGetCurrent itemState
+    in
     case model.content of
         "" ->
-            { model | cost = Nothing }
+            Nothing
 
         c ->
-            case model.selectedContacts |> List.length of
+            case List.length model.selectedContacts of
                 0 ->
-                    { model | cost = Nothing }
+                    Nothing
 
                 n ->
-                    { model
-                        | cost = Just (calculateSmsCost (twilioCost * toFloat n) c)
-                    }
+                    Just (calculateSmsCost (twilioCost * toFloat n) c)
 
 
 postCmd : DjangoSend.CSRFToken -> Model -> Cmd Msg
 postCmd csrf model =
-    let
-        body =
-            [ ( "content", Encode.string model.content )
-            , ( "recipients", Encode.list (model.selectedContacts |> List.map Encode.int) )
-            , ( "scheduled_time", Encode.encodeMaybeDate model.date )
-            ]
-    in
-    DjangoSend.rawPost csrf Urls.api_act_send_adhoc body
-        |> Http.send ReceiveFormResp
+    case F.getCurrent model.form of
+        Just sam ->
+            let
+                body =
+                    [ ( "content", Encode.string sam.content )
+                    , ( "recipients", Encode.list (sam.selectedContacts |> List.map Encode.int) )
+                    , ( "scheduled_time", Encode.encodeMaybeDate sam.date )
+                    ]
+            in
+            DjangoSend.rawPost csrf Urls.api_act_send_adhoc body
+                |> Http.send ReceiveFormResp
+
+        Nothing ->
+            Cmd.none
 
 
 
@@ -171,21 +212,24 @@ type alias Props msg =
     , postForm : msg
     , newContactButton : Html msg
     , smsCharLimit : Int
+    , twilioCost : Float
+    , contacts : RL.RemoteList Recipient
     }
 
 
-view : Props msg -> Model -> RL.RemoteList Recipient -> Html msg
-view props model contacts =
+view : Props msg -> Model -> Html msg
+view props model =
     Html.div []
-        [ case contacts of
+        [ case props.contacts of
             RL.FinalPageReceived contacts_ ->
                 if List.length contacts_ == 0 then
                     noContacts props
+
                 else
-                    sendForm props model contacts model.formStatus
+                    sendForm props model
 
             _ ->
-                sendForm props model contacts model.formStatus
+                sendForm props model
         ]
 
 
@@ -197,17 +241,37 @@ noContacts props =
         ]
 
 
-sendForm : Props msg -> Model -> RL.RemoteList Recipient -> FormStatus -> Html msg
-sendForm props model contacts status =
-    let
-        fields =
-            [ Field meta.content <| contentField props.smsCharLimit (props.form << UpdateContent) model.content
-            , Field meta.scheduled_time <| timeField (updateSADate props) model.datePickerState model.date
-            , Field meta.recipients <| contactsField props model contacts
-            ]
-                |> List.map FormField
-    in
-    form status fields props.postForm (sendButton model.cost)
+sendForm : Props msg -> Model -> Html msg
+sendForm props { form } =
+    F.form
+        form
+        (fieldsHelp props)
+        props.postForm
+        (\sam -> F.sendButton <| calculateCost props.twilioCost sam)
+
+
+fieldsHelp : Props msg -> F.Item SendAdhocModel -> DirtyState -> List (F.FormItem msg)
+fieldsHelp props item tmpState =
+    [ F.Field meta.content <|
+        F.contentField
+            props.smsCharLimit
+            { getValue = .content
+            , item = item
+            , onInput = props.form << UpdateContent
+            }
+    , F.Field meta.scheduled_time <|
+        F.dateTimeField
+            (updateSADate props)
+            tmpState.datePickerState
+            .date
+            item
+    , F.Field meta.recipients <|
+        contactsField
+            props
+            item
+            tmpState
+    ]
+        |> List.map F.FormField
 
 
 updateSADate : Props msg -> DateTimePicker.State -> Maybe Date.Date -> msg
@@ -219,22 +283,21 @@ updateSADate props state maybeDate =
 -- Contacts Multi Select
 
 
-contactsField : Props msg -> Model -> RL.RemoteList Recipient -> FieldMeta -> List (Html msg)
-contactsField props model contacts meta_ =
+contactsField : Props msg -> F.Item SendAdhocModel -> DirtyState -> F.FieldMeta -> List (Html msg)
+contactsField props item tmpState meta_ =
     F.multiSelectField
-        (F.MultiSelectField
-            contacts
-            (Just model.selectedContacts)
-            Nothing
-            model.adhocFilter
-            (props.form << UpdateAdhocFilter)
-            (contactView props)
-            (contactLabelView props)
-        )
+        { items = props.contacts
+        , getPks = .selectedContacts
+        , item = item
+        , filter = tmpState.adhocFilter
+        , filterMsg = props.form << UpdateAdhocFilter
+        , itemView = contactView props
+        , selectedView = contactLabelView props
+        }
         meta_
 
 
-contactLabelView : Props msg -> Maybe (List Int) -> Recipient -> Html msg
+contactLabelView : Props msg -> List Int -> Recipient -> Html msg
 contactLabelView props _ contact =
     F.multiSelectItemLabelHelper
         .full_name
@@ -242,11 +305,11 @@ contactLabelView props _ contact =
         contact
 
 
-contactView : Props msg -> Maybe (List Int) -> Recipient -> Html msg
-contactView props maybeSelectedPks contact =
+contactView : Props msg -> List Int -> Recipient -> Html msg
+contactView props selectedPks contact =
     F.multiSelectItemHelper
         { itemToStr = .full_name
-        , maybeSelectedPks = maybeSelectedPks
+        , selectedPks = selectedPks
         , itemToKey = .pk >> toString
         , toggleMsg = props.form << ToggleSelectedContact
         , itemToId = .pk >> toString >> (++) "contact"

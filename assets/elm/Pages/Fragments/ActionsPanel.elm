@@ -155,7 +155,7 @@ fabLinks ds page canArchive =
         Home ->
             defaultLinks
 
-        GroupForm _ maybePk ->
+        GroupForm { maybePk } ->
             case maybePk of
                 Nothing ->
                     defaultLinks
@@ -175,8 +175,8 @@ fabLinks ds page canArchive =
                         canArchive
                     ]
 
-        ContactForm _ maybePk ->
-            case maybePk of
+        ContactForm cfModel ->
+            case cfModel.maybePk of
                 Nothing ->
                     defaultLinks
 
@@ -195,8 +195,8 @@ fabLinks ds page canArchive =
                         canArchive
                     ]
 
-        KeywordForm _ maybeK ->
-            case maybeK of
+        KeywordForm { maybeId } ->
+            case maybeId of
                 Nothing ->
                     defaultLinks
 
@@ -235,7 +235,7 @@ fabLinks ds page canArchive =
         Help ->
             defaultLinks
 
-        UserProfileForm _ _ ->
+        UserProfileForm _ ->
             defaultLinks
 
         ContactImport _ ->
@@ -319,7 +319,7 @@ defaultLinks =
 
 newKeywordSpa : Html Msg
 newKeywordSpa =
-    fabSpaLink (KeywordForm KF.initialModel Nothing) "New Keyword"
+    fabSpaLink (KeywordForm <| KF.initialModel Nothing) "New Keyword"
 
 
 keywords : Html Msg
@@ -339,7 +339,7 @@ keywordCsv k =
 
 keywordEdit : String -> Html Msg
 keywordEdit k =
-    fabSpaLink (KeywordForm KF.initialModel <| Just k) "Edit"
+    fabSpaLink (KeywordForm <| KF.initialModel <| Just k) "Edit"
 
 
 keywordResponsesSpa : Maybe Keyword -> Html Msg
@@ -384,7 +384,7 @@ keywordArchiveResponses k =
 
 newContactSpa : Html Msg
 newContactSpa =
-    fabSpaLink (ContactForm CF.initialModel Nothing) "New Contact"
+    fabSpaLink (ContactForm <| CF.initialModel Nothing) "New Contact"
 
 
 contactsSpa : Html Msg
@@ -409,7 +409,7 @@ groupsSpa =
 
 newGroupSpa : Html Msg
 newGroupSpa =
-    fabSpaLink (GroupForm GF.initialModel Nothing) "New Group"
+    fabSpaLink (GroupForm <| GF.initialModel Nothing) "New Group"
 
 
 incomingWall : Html Msg

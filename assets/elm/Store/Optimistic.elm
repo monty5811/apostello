@@ -18,7 +18,6 @@ switchDealtWith : Int -> { a | dealt_with : Bool, pk : Int } -> { a | dealt_with
 switchDealtWith pk sms =
     if pk == sms.pk then
         { sms | dealt_with = not sms.dealt_with }
-
     else
         sms
 
@@ -54,7 +53,6 @@ toggleGroupSync : Int -> { a | sync : Bool, pk : Int } -> { a | sync : Bool, pk 
 toggleGroupSync pk group =
     if pk == group.pk then
         { group | sync = not group.sync }
-
     else
         group
 

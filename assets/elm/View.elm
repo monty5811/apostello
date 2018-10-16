@@ -86,7 +86,7 @@ content model =
                 { tableMsg = GT.TableMsg >> M.GroupTableMsg
                 , groups = filterArchived viewingArchive model.dataStore.groups
                 , toggleArchiveGroup = \b pk -> M.StoreMsg <| S.ToggleGroupArchive b pk
-                , groupFormLink = \grp -> spaLink Html.a [] [ Html.text grp.name ] <| GroupForm GF.initialModel <| Just grp.pk
+                , groupFormLink = groupToGroupLink
                 }
                 gtModel
 
@@ -146,7 +146,7 @@ content model =
                         spaLink Html.a
                             []
                             [ Html.text up.user.email ]
-                            (UserProfileForm UPF.initialModel up.user.pk)
+                            (UserProfileForm <| UPF.initialModel up.user.pk)
                 , toggleField = M.StoreMsg << S.ToggleProfileField
                 }
                 uptModel
@@ -190,17 +190,21 @@ content model =
                 { form = M.SendAdhocMsg << SAF.InputMsg
                 , postForm = M.SendAdhocMsg SAF.PostForm
                 , smsCharLimit = model.settings.smsCharLimit
-                , newContactButton = spaLink Html.a [] [ Html.text "Add a New Contact" ] <| ContactForm CF.initialModel Nothing
+                , twilioCost =
+                    model.settings.twilio
+                        |> Maybe.map .sendingCost
+                        |> Maybe.withDefault 0.0
+                , newContactButton = spaLink Html.a [] [ Html.text "Add a New Contact" ] <| ContactForm <| CF.initialModel Nothing
+                , contacts = filterArchived False model.dataStore.recipients |> RL.filter (.never_contact >> not)
                 }
                 saModel
-                (filterArchived False model.dataStore.recipients |> RL.filter (.never_contact >> not))
 
         SendGroup sgModel ->
             SGF.view
                 { form = M.SendGroupMsg << SGF.InputMsg
                 , postForm = M.SendGroupMsg SGF.PostForm
                 , smsCharLimit = model.settings.smsCharLimit
-                , newGroupButton = spaLink Html.a [] [ Html.text "Create a New Group" ] <| GroupForm GF.initialModel Nothing
+                , newGroupButton = spaLink Html.a [] [ Html.text "Create a New Group" ] <| GroupForm <| GF.initialModel Nothing
                 , groups = filterArchived False model.dataStore.groups |> RL.filter (\x -> x.cost > 0)
                 }
                 sgModel
@@ -219,19 +223,18 @@ content model =
                 { form = M.ContactImportMsg }
                 ciModel
 
-        GroupForm gfModel maybePk ->
+        GroupForm gfModel ->
             GF.view
                 { form = M.GroupFormMsg << GF.InputMsg
                 , postForm = M.GroupFormMsg GF.PostForm
                 , noop = M.Nope
                 , toggleGroupMembership = \x y -> M.StoreMsg <| S.ToggleGroupMembership x y
-                , restoreGroupLink = \x -> spaLink Html.a [] [ Html.text "Archived Group" ] <| GroupForm GF.initialModel x
+                , restoreGroupLink = \x -> spaLink Html.a [] [ Html.text "Archived Group" ] <| GroupForm <| GF.initialModel x
                 , groups = model.dataStore.groups
                 }
-                maybePk
                 gfModel
 
-        ContactForm cfModel maybePk ->
+        ContactForm cfModel ->
             let
                 canSeeContactNum =
                     model.settings.userPerms.can_see_contact_nums || model.settings.userPerms.user.is_staff
@@ -240,7 +243,7 @@ content model =
                     model.settings.userPerms.can_see_contact_notes || model.settings.userPerms.user.is_staff
 
                 incomingTable =
-                    case maybePk of
+                    case cfModel.maybePk of
                         Nothing ->
                             Nothing
 
@@ -260,27 +263,25 @@ content model =
                 { postForm = M.ContactFormMsg <| CF.PostForm canSeeContactNum canSeeContactNotes
                 , c = M.ContactFormMsg << CF.InputMsg
                 , noop = M.Nope
-                , spa = \x -> spaLink Html.a [] [ Html.text "Archived Contact" ] <| ContactForm CF.initialModel x
+                , spa = \x -> spaLink Html.a [] [ Html.text "Archived Contact" ] <| ContactForm <| CF.initialModel x
                 , defaultNumberPrefix = model.settings.defaultNumberPrefix
                 , canSeeContactNum = canSeeContactNum
                 , canSeeContactNotes = canSeeContactNotes
                 }
                 incomingTable
-                maybePk
                 model.dataStore.recipients
                 cfModel
 
-        KeywordForm kfModel maybeK ->
+        KeywordForm kfModel ->
             KF.view
                 { postForm = M.KeywordFormMsg KF.PostForm
                 , inputChange = M.KeywordFormMsg << KF.InputMsg
                 , noop = M.Nope
-                , spa = \x -> spaLink Html.a [] [ Html.text "Archived Keyword" ] <| KeywordForm KF.initialModel x
+                , spa = \x -> spaLink Html.a [] [ Html.text "Archived Keyword" ] <| KeywordForm <| KF.initialModel x
                 }
                 model.dataStore.keywords
                 (filterArchived False model.dataStore.groups)
                 model.dataStore.users
-                maybeK
                 kfModel
 
         SiteConfigForm scModel ->
@@ -303,13 +304,11 @@ content model =
                 { form = M.CreateAllGroupMsg }
                 cagModel
 
-        UserProfileForm upfModel pk ->
+        UserProfileForm upfModel ->
             UPF.view
                 { postForm = M.UserProfileFormMsg UPF.PostForm
                 , inputChange = M.UserProfileFormMsg << UPF.InputMsg
                 }
-                pk
-                model.dataStore.userprofiles
                 upfModel
 
         ApiSetup maybeKey ->
@@ -354,7 +353,7 @@ smsToContactLink sms =
     spaLink Html.a
         []
         [ Html.text sms.sender_name ]
-        (ContactForm CF.initialModel sms.sender_pk)
+        (ContactForm <| CF.initialModel sms.sender_pk)
 
 
 smsToKeywordLink : { a | matched_keyword : String } -> Html Msg
@@ -362,17 +361,17 @@ smsToKeywordLink sms =
     spaLink Html.a
         []
         [ Html.text sms.matched_keyword ]
-        (KeywordForm KF.initialModel <| Just sms.matched_keyword)
+        (KeywordForm <| KF.initialModel <| Just sms.matched_keyword)
 
 
 contactToContactLink : { a | full_name : String, pk : Int } -> Html Msg
 contactToContactLink contact =
-    spaLink Html.a [] [ Html.text contact.full_name ] <| ContactForm CF.initialModel <| Just contact.pk
+    spaLink Html.a [] [ Html.text contact.full_name ] <| ContactForm <| CF.initialModel (Just contact.pk)
 
 
 groupToGroupLink : { a | name : String, pk : Int } -> Html Msg
 groupToGroupLink group =
-    spaLink Html.a [] [ Html.text group.name ] <| GroupForm GF.initialModel <| Just group.pk
+    spaLink Html.a [] [ Html.text group.name ] <| GroupForm <| GF.initialModel <| Just group.pk
 
 
 keywordToKeywordRespLink :
@@ -385,4 +384,4 @@ keywordToKeywordRespLink fn keyword =
 
 keywordToKeywordLink : { a | keyword : String } -> Html Msg
 keywordToKeywordLink keyword =
-    spaLink Html.a [ Css.btn, Css.btn_purple ] [ Html.text "Edit" ] (KeywordForm KF.initialModel <| Just keyword.keyword)
+    spaLink Html.a [ Css.btn, Css.btn_purple ] [ Html.text "Edit" ] (KeywordForm <| KF.initialModel <| Just keyword.keyword)

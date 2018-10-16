@@ -1,4 +1,4 @@
-module Data exposing (ElvantoGroup, GroupPk, Keyword, MessageDeliveryStatus(..), QueuedSms, Recipient, RecipientGroup, RecipientSimple, SmsInbound, SmsOutbound, User, UserProfile, decodeElvantoGroup, decodeKeyword, decodeQueuedSms, decodeRecipient, decodeRecipientGroup, decodeRecipientSimple, decodeSmsInbound, decodeSmsOutbound, decodeStatus, decodeUser, decodeUserProfile, encodeElvantoGroup, encodeKeyword, encodeQueuedSms, encodeRecipient, encodeRecipientGroup, encodeRecipientSimple, encodeSmsInbound, encodeSmsOutbound, encodeUser, encodeUserProfile, mdStatusFromString, nullGroup, stringFromMDStatus)
+module Data exposing (ElvantoGroup, GroupPk, Keyword, MessageDeliveryStatus(..), QueuedSms, Recipient, RecipientGroup, RecipientSimple, SmsInbound, SmsOutbound, User, UserProfile, decodeElvantoGroup, decodeKeyword, decodeListToItem, decodeQueuedSms, decodeRecipient, decodeRecipientGroup, decodeRecipientSimple, decodeSmsInbound, decodeSmsOutbound, decodeStatus, decodeUser, decodeUserProfile, encodeElvantoGroup, encodeKeyword, encodeQueuedSms, encodeRecipient, encodeRecipientGroup, encodeRecipientSimple, encodeSmsInbound, encodeSmsOutbound, encodeUser, encodeUserProfile, mdStatusFromString, nullGroup, stringFromMDStatus)
 
 import Date
 import Encode exposing (encodeDate, encodeMaybe, encodeMaybeDate)
@@ -6,6 +6,23 @@ import Json.Decode as Decode
 import Json.Decode.Extra exposing (date)
 import Json.Decode.Pipeline exposing (custom, decode, optional, required)
 import Json.Encode as Encode
+
+
+decodeListToItem : Decode.Decoder a -> Decode.Decoder (Maybe a)
+decodeListToItem decoder =
+    Decode.field "results" (Decode.list decoder)
+        |> Decode.andThen
+            (\l ->
+                case l of
+                    [] ->
+                        Decode.succeed Nothing
+
+                    [ item ] ->
+                        Decode.succeed <| Just item
+
+                    _ ->
+                        Decode.fail "More than one item received"
+            )
 
 
 
@@ -327,7 +344,7 @@ type alias Keyword =
     , custom_response_new_person : String
     , deactivated_response : String
     , too_early_response : String
-    , activate_time : Date.Date
+    , activate_time : Maybe Date.Date
     , deactivate_time : Maybe Date.Date
     , linked_groups : List Int
     , owners : List Int
@@ -351,7 +368,7 @@ decodeKeyword =
         |> required "custom_response_new_person" Decode.string
         |> required "deactivated_response" Decode.string
         |> required "too_early_response" Decode.string
-        |> required "activate_time" date
+        |> required "activate_time" (Decode.maybe date)
         |> required "deactivate_time" (Decode.maybe date)
         |> required "linked_groups" (Decode.list Decode.int)
         |> required "owners" (Decode.list Decode.int)
@@ -374,7 +391,7 @@ encodeKeyword keyword =
         , ( "custom_response_new_person", Encode.string keyword.custom_response_new_person )
         , ( "deactivated_response", Encode.string keyword.deactivated_response )
         , ( "too_early_response", Encode.string keyword.too_early_response )
-        , ( "activate_time", encodeDate keyword.activate_time )
+        , ( "activate_time", encodeMaybeDate keyword.activate_time )
         , ( "deactivate_time", encodeMaybeDate keyword.deactivate_time )
         , ( "linked_groups", Encode.list (List.map Encode.int keyword.linked_groups) )
         , ( "owners", Encode.list (List.map Encode.int keyword.owners) )

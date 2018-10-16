@@ -1,23 +1,32 @@
-module Pages.Forms.Keyword exposing (Messages, Model, Msg(..), activateTimeField, archiveNotice, creating, customRespField, customRespNewPersonField, deactivateTimeField, deactivatedRespField, descField, digestField, digestUserView, disableRepliesField, editing, groupLabelView, groupView, init, initActTime, initDeactTime, initialModel, keywordField, linkedGroupsField, ownerUserView, ownersField, showArchiveNotice, submitMsg, tooEarlyRespField, update, updateActTime, updateDeactTime, userLabelView, view, viewHelp)
+module Pages.Forms.Keyword exposing
+    ( Messages
+    , Model
+    , Msg(..)
+    , init
+    , initialModel
+    , update
+    , view
+    )
 
+import Css
 import Data exposing (Keyword, RecipientGroup, User)
 import Date
 import DateTimePicker
 import DjangoSend
 import Encode
 import FilteringTable exposing (textToRegex)
-import Form as F exposing (..)
-import Helpers exposing (toggleSelectedPk)
+import Form as F exposing (defaultFieldGroupConfig)
+import Future.String
+import Helpers exposing (toggleSelectedPk, userFacingErrorMessage)
 import Html exposing (Html)
 import Http
 import Json.Encode as Encode
-import Pages.Error404 as E404
 import Pages.Forms.Meta.Keyword exposing (meta)
-import Pages.Fragments.Loader exposing (loader)
 import Regex
 import RemoteList as RL
 import Time
 import Urls
+
 
 
 -- Init
@@ -25,10 +34,26 @@ import Urls
 
 init : Model -> Cmd Msg
 init model =
-    Cmd.batch
-        [ DateTimePicker.initialCmd initActTime model.datePickerActState
-        , DateTimePicker.initialCmd initDeactTime model.datePickerDeactState
-        ]
+    case model.maybeId of
+        Just _ ->
+            Http.get (Urls.api_keywords model.maybeId) (Data.decodeListToItem Data.decodeKeyword)
+                |> Http.send ReceiveInitialData
+
+        Nothing ->
+            initDatePickers model
+
+
+initDatePickers : Model -> Cmd Msg
+initDatePickers model =
+    case F.getDirty model.form of
+        Just dirtyState ->
+            Cmd.batch
+                [ DateTimePicker.initialCmd initActTime dirtyState.datePickerActState
+                , DateTimePicker.initialCmd initDeactTime dirtyState.datePickerDeactState
+                ]
+
+        Nothing ->
+            Cmd.none
 
 
 initActTime : DateTimePicker.State -> Maybe Date.Date -> Msg
@@ -46,60 +71,82 @@ initDeactTime state maybeDate =
 
 
 type alias Model =
-    { keyword : Maybe String
-    , description : Maybe String
-    , disable_all_replies : Maybe Bool
-    , custom_response : Maybe String
-    , custom_response_new_person : Maybe String
-    , deactivated_response : Maybe String
-    , too_early_response : Maybe String
-    , activate_time : Maybe Date.Date
-    , datePickerActState : DateTimePicker.State
-    , deactivate_time : Maybe Date.Date
+    { form : F.Form Keyword DirtyState
+    , maybeId : Maybe String
+    }
+
+
+initialModel : Maybe String -> Model
+initialModel maybeId =
+    case maybeId of
+        Just _ ->
+            { form = F.formLoading
+            , maybeId = maybeId
+            }
+
+        Nothing ->
+            { form = F.startCreating defaultKeyword initialDirtyState
+            , maybeId = maybeId
+            }
+
+
+type alias DirtyState =
+    { datePickerActState : DateTimePicker.State
     , datePickerDeactState : DateTimePicker.State
     , linkedGroupsFilter : Regex.Regex
-    , linked_groups : Maybe (List Int)
     , ownersFilter : Regex.Regex
-    , owners : Maybe (List Int)
     , subscribersFilter : Regex.Regex
-    , subscribers : Maybe (List Int)
-    , formStatus : FormStatus
     }
 
 
-initialModel : Model
-initialModel =
-    { keyword = Nothing
-    , description = Nothing
-    , disable_all_replies = Nothing
-    , custom_response = Nothing
-    , custom_response_new_person = Nothing
-    , deactivated_response = Nothing
-    , too_early_response = Nothing
-    , activate_time = Nothing
-    , datePickerActState = DateTimePicker.initialState
-    , deactivate_time = Nothing
+initialDirtyState : DirtyState
+initialDirtyState =
+    { datePickerActState = DateTimePicker.initialState
     , datePickerDeactState = DateTimePicker.initialState
     , linkedGroupsFilter = Regex.regex ""
-    , linked_groups = Nothing
     , ownersFilter = Regex.regex ""
-    , owners = Nothing
     , subscribersFilter = Regex.regex ""
-    , subscribers = Nothing
-    , formStatus = NoAction
     }
+
+
+defaultKeyword : Keyword
+defaultKeyword =
+    { keyword = ""
+    , pk = 0
+    , description = ""
+    , current_response = ""
+    , is_live = False
+    , num_replies = ""
+    , num_archived_replies = ""
+    , is_archived = False
+    , disable_all_replies = False
+    , custom_response = ""
+    , custom_response_new_person = ""
+    , deactivated_response = ""
+    , too_early_response = ""
+    , activate_time = Nothing
+    , deactivate_time = Nothing
+    , linked_groups = []
+    , owners = []
+    , subscribed_to_digest = []
+    }
+
+
+
+-- Update
 
 
 type Msg
     = InputMsg InputMsg
     | PostForm
     | ReceiveFormResp (Result Http.Error { body : String, code : Int })
+    | ReceiveInitialData (Result Http.Error (Maybe Keyword))
 
 
 type InputMsg
     = UpdateKeywordKeywordField String
     | UpdateKeywordDescField String
-    | UpdateKeywordDisableRepliesField (Maybe Keyword)
+    | UpdateKeywordDisableRepliesField
     | UpdateKeywordCustRespField String
     | UpdateKeywordCustNewPersonRespField String
     | UpdateKeywordDeacRespField String
@@ -107,18 +154,17 @@ type InputMsg
     | UpdateActivateTime DateTimePicker.State (Maybe Date.Date)
     | UpdateDeactivateTime DateTimePicker.State (Maybe Date.Date)
     | UpdateKeywordLinkedGroupsFilter String
-    | UpdateSelectedLinkedGroup (List Int) Int
+    | UpdateSelectedLinkedGroup Int
     | UpdateKeywordOwnersFilter String
-    | UpdateSelectedOwner (List Int) Int
+    | UpdateSelectedOwner Int
     | UpdateKeywordSubscribersFilter String
-    | UpdateSelectedSubscriber (List Int) Int
+    | UpdateSelectedSubscriber Int
 
 
 type alias UpdateProps =
     { csrftoken : DjangoSend.CSRFToken
     , currentTime : Time.Time
     , keywords : RL.RemoteList Keyword
-    , maybeKeywordName : Maybe String
     , successPageUrl : String
     }
 
@@ -126,9 +172,34 @@ type alias UpdateProps =
 update : UpdateProps -> Msg -> Model -> F.UpdateResp Msg Model
 update props msg model =
     case msg of
+        ReceiveInitialData (Ok (Just keyword)) ->
+            let
+                newModel =
+                    { model | form = F.startUpdating keyword initialDirtyState }
+            in
+            F.UpdateResp
+                newModel
+                (initDatePickers newModel)
+                []
+                Nothing
+
+        ReceiveInitialData (Ok Nothing) ->
+            F.UpdateResp
+                { model | form = F.to404 }
+                Cmd.none
+                []
+                Nothing
+
+        ReceiveInitialData (Err err) ->
+            F.UpdateResp
+                { model | form = F.toError <| userFacingErrorMessage err }
+                Cmd.none
+                []
+                Nothing
+
         InputMsg inputMsg ->
             F.UpdateResp
-                (updateInput inputMsg model)
+                { model | form = F.updateField (updateInput inputMsg) model.form }
                 Cmd.none
                 []
                 Nothing
@@ -136,15 +207,7 @@ update props msg model =
         PostForm ->
             F.UpdateResp
                 (F.setInProgress model)
-                (postFormCmd
-                    props.csrftoken
-                    props.currentTime
-                    model
-                    (RL.filter (\x -> Just x.keyword == props.maybeKeywordName) props.keywords
-                        |> RL.toList
-                        |> List.head
-                    )
-                )
+                (postFormCmd props.csrftoken model)
                 []
                 Nothing
 
@@ -155,124 +218,95 @@ update props msg model =
             F.errFormRespUpdate err model
 
 
-updateInput : InputMsg -> Model -> Model
-updateInput msg model =
+updateInput : InputMsg -> Keyword -> DirtyState -> ( Keyword, DirtyState )
+updateInput msg model dirty =
     case msg of
         UpdateKeywordKeywordField text ->
-            { model | keyword = Just text }
+            ( { model | keyword = text }, dirty )
 
         UpdateKeywordDescField text ->
-            { model | description = Just text }
+            ( { model | description = text }, dirty )
 
-        UpdateKeywordDisableRepliesField maybeKeyword ->
-            let
-                b =
-                    case model.disable_all_replies of
-                        Just curVal ->
-                            not curVal
-
-                        Nothing ->
-                            case maybeKeyword of
-                                Nothing ->
-                                    False
-
-                                Just c ->
-                                    not c.disable_all_replies
-            in
-            { model | disable_all_replies = Just b }
+        UpdateKeywordDisableRepliesField ->
+            ( { model | disable_all_replies = not model.disable_all_replies }, dirty )
 
         UpdateKeywordCustRespField text ->
-            { model | custom_response = Just text }
+            ( { model | custom_response = text }, dirty )
 
         UpdateKeywordCustNewPersonRespField text ->
-            { model | custom_response_new_person = Just text }
+            ( { model | custom_response_new_person = text }, dirty )
 
         UpdateKeywordDeacRespField text ->
-            { model | deactivated_response = Just text }
+            ( { model | deactivated_response = text }, dirty )
 
         UpdateKeywordTooEarlyRespField text ->
-            { model | too_early_response = Just text }
+            ( { model | too_early_response = text }, dirty )
 
         UpdateActivateTime state maybeDate ->
-            { model | activate_time = maybeDate, datePickerActState = state }
+            case maybeDate of
+                Nothing ->
+                    ( model, { dirty | datePickerActState = state } )
+
+                Just date ->
+                    ( { model | activate_time = Just date }, { dirty | datePickerActState = state } )
 
         UpdateDeactivateTime state maybeDate ->
-            { model | deactivate_time = maybeDate, datePickerDeactState = state }
+            ( { model | deactivate_time = maybeDate }, { dirty | datePickerDeactState = state } )
 
         UpdateKeywordLinkedGroupsFilter text ->
-            { model | linkedGroupsFilter = textToRegex text }
+            ( model, { dirty | linkedGroupsFilter = textToRegex text } )
 
-        UpdateSelectedLinkedGroup pks pk ->
-            { model | linked_groups = Just <| toggleSelectedPk pk pks }
+        UpdateSelectedLinkedGroup pk ->
+            ( { model | linked_groups = toggleSelectedPk pk model.linked_groups }, dirty )
 
         UpdateKeywordOwnersFilter text ->
-            { model | ownersFilter = textToRegex text }
+            ( model, { dirty | ownersFilter = textToRegex text } )
 
-        UpdateSelectedOwner pks pk ->
-            { model | owners = Just <| toggleSelectedPk pk pks }
+        UpdateSelectedOwner pk ->
+            ( { model | owners = toggleSelectedPk pk model.owners }, dirty )
 
         UpdateKeywordSubscribersFilter text ->
-            { model | subscribersFilter = textToRegex text }
+            ( model, { dirty | subscribersFilter = textToRegex text } )
 
-        UpdateSelectedSubscriber pks pk ->
-            { model | subscribers = Just <| toggleSelectedPk pk pks }
-
-
-postFormCmd : DjangoSend.CSRFToken -> Time.Time -> Model -> Maybe Keyword -> Cmd Msg
-postFormCmd csrf now model maybeKeyword =
-    let
-        body =
-            [ ( "keyword", Encode.string <| F.extractField .keyword model.keyword maybeKeyword )
-            , ( "description", Encode.string <| F.extractField .description model.description maybeKeyword )
-            , ( "disable_all_replies", Encode.bool <| F.extractBool .disable_all_replies model.disable_all_replies maybeKeyword )
-            , ( "custom_response", Encode.string <| F.extractField .custom_response model.custom_response maybeKeyword )
-            , ( "custom_response_new_person", Encode.string <| F.extractField .custom_response_new_person model.custom_response_new_person maybeKeyword )
-            , ( "deactivated_response", Encode.string <| F.extractField .deactivated_response model.deactivated_response maybeKeyword )
-            , ( "too_early_response", Encode.string <| F.extractField .too_early_response model.too_early_response maybeKeyword )
-            , ( "activate_time", Encode.encodeDate <| extractDate now .activate_time model.activate_time maybeKeyword )
-            , ( "deactivate_time", Encode.encodeMaybeDate <| extractMaybeDate .deactivate_time model.deactivate_time maybeKeyword )
-            , ( "linked_groups", Encode.list <| List.map Encode.int <| extractPks .linked_groups model.linked_groups maybeKeyword )
-            , ( "owners", Encode.list <| List.map Encode.int <| extractPks .owners model.owners maybeKeyword )
-            , ( "subscribed_to_digest", Encode.list <| List.map Encode.int <| extractPks .subscribed_to_digest model.subscribers maybeKeyword )
-            ]
-                |> F.addPk maybeKeyword
-    in
-    DjangoSend.rawPost csrf (Urls.api_keywords Nothing) body
-        |> Http.send ReceiveFormResp
+        UpdateSelectedSubscriber pk ->
+            ( { model | subscribed_to_digest = toggleSelectedPk pk model.subscribed_to_digest }, dirty )
 
 
-extractPks : (Keyword -> List Int) -> Maybe (List Int) -> Maybe Keyword -> List Int
-extractPks fn field maybeKeyword =
-    case field of
+postFormCmd : DjangoSend.CSRFToken -> Model -> Cmd Msg
+postFormCmd csrf { form } =
+    case F.getCurrent form of
+        Just model ->
+            let
+                body =
+                    [ ( "keyword", Encode.string model.keyword )
+                    , ( "description", Encode.string model.description )
+                    , ( "disable_all_replies", Encode.bool model.disable_all_replies )
+                    , ( "custom_response", Encode.string model.custom_response )
+                    , ( "custom_response_new_person", Encode.string model.custom_response_new_person )
+                    , ( "deactivated_response", Encode.string model.deactivated_response )
+                    , ( "too_early_response", Encode.string model.too_early_response )
+                    , ( "activate_time", Encode.encodeMaybeDate model.activate_time )
+                    , ( "deactivate_time", Encode.encodeMaybeDate model.deactivate_time )
+                    , ( "linked_groups", Encode.list <| List.map Encode.int model.linked_groups )
+                    , ( "owners", Encode.list <| List.map Encode.int model.owners )
+                    , ( "subscribed_to_digest", Encode.list <| List.map Encode.int model.subscribed_to_digest )
+                    ]
+                        |> addPk model
+            in
+            DjangoSend.rawPost csrf (Urls.api_keywords Nothing) body
+                |> Http.send ReceiveFormResp
+
         Nothing ->
-            -- never edited the field, use existing or default to []
-            Maybe.map fn maybeKeyword
-                |> Maybe.withDefault []
-
-        Just pks ->
-            pks
+            Cmd.none
 
 
-extractDate : Time.Time -> (Keyword -> Date.Date) -> Maybe Date.Date -> Maybe Keyword -> Date.Date
-extractDate now fn field maybeKeyword =
-    case field of
-        Nothing ->
-            Maybe.map fn maybeKeyword
-                |> Maybe.withDefault (Date.fromTime now)
+addPk : Keyword -> List ( String, Encode.Value ) -> List ( String, Encode.Value )
+addPk { pk } data =
+    if pk == 0 then
+        data
 
-        Just d ->
-            d
-
-
-extractMaybeDate : (Keyword -> Maybe Date.Date) -> Maybe Date.Date -> Maybe Keyword -> Maybe Date.Date
-extractMaybeDate fn field maybeKeyword =
-    case field of
-        Nothing ->
-            -- never edited the field, use existing or default to ""
-            Maybe.andThen fn maybeKeyword
-
-        Just s ->
-            Just s
+    else
+        [ ( "pk", Encode.int pk ) ] ++ data
 
 
 
@@ -287,144 +321,99 @@ type alias Messages msg =
     }
 
 
-view : Messages msg -> RL.RemoteList Keyword -> RL.RemoteList RecipientGroup -> RL.RemoteList User -> Maybe String -> Model -> Html msg
-view msgs keywords groups users maybeK model =
-    case maybeK of
-        Nothing ->
-            -- creating a new keyword:
-            creating msgs keywords groups users model
-
-        Just k ->
-            -- trying to edit an existing keyword:
-            editing msgs keywords groups users k model
-
-
-creating : Messages msg -> RL.RemoteList Keyword -> RL.RemoteList RecipientGroup -> RL.RemoteList User -> Model -> Html msg
-creating msgs keywords groups users model =
-    viewHelp msgs keywords groups users Nothing model
-
-
-editing : Messages msg -> RL.RemoteList Keyword -> RL.RemoteList RecipientGroup -> RL.RemoteList User -> String -> Model -> Html msg
-editing msgs keywords groups users keyword model =
+view : Messages msg -> RL.RemoteList Keyword -> RL.RemoteList RecipientGroup -> RL.RemoteList User -> Model -> Html msg
+view msgs keywords groups users model =
     let
-        currentKeyword =
-            keywords
-                |> RL.toList
-                |> List.filter (\x -> x.keyword == keyword)
-                |> List.head
-    in
-    case currentKeyword of
-        Just k ->
-            -- keyword exists, show the form:
-            viewHelp msgs keywords groups users (Just k) model
-
-        Nothing ->
-            -- keyword does not exist:
-            case keywords of
-                RL.FinalPageReceived _ ->
-                    -- show 404 if we have finished loading
-                    E404.view
-
-                _ ->
-                    -- show loader while we wait
-                    loader
-
-
-viewHelp : Messages msg -> RL.RemoteList Keyword -> RL.RemoteList RecipientGroup -> RL.RemoteList User -> Maybe Keyword -> Model -> Html msg
-viewHelp msgs keywords_ groups users currentKeyword model =
-    let
-        keywords =
-            RL.toList keywords_
+        keywords_ =
+            RL.toList keywords
 
         showAN =
-            showArchiveNotice keywords currentKeyword model
-
-        fields =
-            [ FormField <| Field meta.keyword (keywordField msgs currentKeyword)
-            , FormField <| Field meta.description (descField msgs currentKeyword)
-            , FormField <| Field meta.disable_all_replies (disableRepliesField msgs currentKeyword)
-            , FieldGroup { defaultFieldGroupConfig | header = Just "Replies" }
-                [ Field meta.custom_response (customRespField msgs currentKeyword)
-                , Field meta.custom_response_new_person (customRespNewPersonField msgs currentKeyword)
-                , Field meta.deactivated_response (deactivatedRespField msgs currentKeyword)
-                , Field meta.too_early_response (tooEarlyRespField msgs currentKeyword)
-                ]
-            , FieldGroup { defaultFieldGroupConfig | header = Just "Scheduling" }
-                [ Field meta.activate_time (activateTimeField msgs model currentKeyword)
-                , Field meta.deactivate_time (deactivateTimeField msgs model currentKeyword)
-                ]
-            , FieldGroup { defaultFieldGroupConfig | header = Just "Other Settings" }
-                [ Field meta.linked_groups (linkedGroupsField msgs model groups currentKeyword)
-                , Field meta.owners (ownersField msgs model users currentKeyword)
-                , Field meta.subscribed_to_digest (digestField msgs model users currentKeyword)
-                ]
-            ]
+            F.showArchiveNotice keywords_ .keyword model.form
     in
     Html.div []
-        [ archiveNotice msgs showAN keywords model.keyword
-        , form model.formStatus fields (submitMsg msgs showAN) (submitButton currentKeyword)
+        [ archiveNotice msgs showAN keywords_ <| Maybe.map .keyword <| F.getCurrent model.form
+        , F.form
+            model.form
+            (fieldsHelp msgs users groups)
+            (submitMsg msgs showAN)
+            F.submitButton
         ]
 
 
-keywordField : Messages msg -> Maybe Keyword -> FieldMeta -> List (Html msg)
-keywordField msgs maybeKeyword =
-    simpleTextField
-        (Maybe.map .keyword maybeKeyword)
-        (msgs.inputChange << UpdateKeywordKeywordField)
+fieldsHelp : Messages msg -> RL.RemoteList User -> RL.RemoteList RecipientGroup -> F.Item Keyword -> DirtyState -> List (F.FormItem msg)
+fieldsHelp msgs users groups item dirty =
+    [ F.FormField <| F.Field meta.keyword (keywordField msgs item)
+    , F.FormField <| F.Field meta.description (descField msgs item)
+    , F.FormField <| F.Field meta.disable_all_replies (disableRepliesField msgs item)
+    , F.FieldGroup { defaultFieldGroupConfig | header = Just "Replies" }
+        [ F.Field meta.custom_response (customRespField msgs item)
+        , F.Field meta.custom_response_new_person (customRespNewPersonField msgs item)
+        , F.Field meta.deactivated_response (deactivatedRespField msgs item)
+        , F.Field meta.too_early_response (tooEarlyRespField msgs item)
+        ]
+    , F.FieldGroup { defaultFieldGroupConfig | header = Just "Scheduling" }
+        [ F.Field meta.activate_time (activateTimeField msgs dirty item)
+        , F.Field meta.deactivate_time (deactivateTimeField msgs dirty item)
+        ]
+    , F.FieldGroup { defaultFieldGroupConfig | header = Just "Other Settings" }
+        [ F.Field meta.linked_groups (linkedGroupsField msgs groups dirty item)
+        , F.Field meta.owners (ownersField msgs users dirty item)
+        , F.Field meta.subscribed_to_digest (digestField msgs users dirty item)
+        ]
+    ]
 
 
-descField : Messages msg -> Maybe Keyword -> FieldMeta -> List (Html msg)
-descField msgs maybeKeyword =
-    simpleTextField
-        (Maybe.map .description maybeKeyword)
-        (msgs.inputChange << UpdateKeywordDescField)
+keywordField : Messages msg -> F.Item Keyword -> F.FieldMeta -> List (Html msg)
+keywordField msgs item =
+    F.simpleTextField
+        { getValue = .keyword, item = item, onInput = msgs.inputChange << UpdateKeywordKeywordField }
 
 
-disableRepliesField : Messages msg -> Maybe Keyword -> FieldMeta -> List (Html msg)
-disableRepliesField msgs maybeKeyword =
-    checkboxField
-        maybeKeyword
+descField : Messages msg -> F.Item Keyword -> F.FieldMeta -> List (Html msg)
+descField msgs item =
+    F.simpleTextField
+        { getValue = .description, item = item, onInput = msgs.inputChange << UpdateKeywordDescField }
+
+
+disableRepliesField : Messages msg -> F.Item Keyword -> F.FieldMeta -> List (Html msg)
+disableRepliesField msgs item =
+    F.checkboxField
         .disable_all_replies
-        (msgs.inputChange << UpdateKeywordDisableRepliesField)
+        item
+        (msgs.inputChange UpdateKeywordDisableRepliesField)
 
 
-customRespField : Messages msg -> Maybe Keyword -> FieldMeta -> List (Html msg)
-customRespField msgs maybeKeyword =
-    simpleTextField (Maybe.map .custom_response maybeKeyword) (msgs.inputChange << UpdateKeywordCustRespField)
+customRespField : Messages msg -> F.Item Keyword -> F.FieldMeta -> List (Html msg)
+customRespField msgs item =
+    F.longTextField 3
+        { getValue = .custom_response, item = item, onInput = msgs.inputChange << UpdateKeywordCustRespField }
 
 
-customRespNewPersonField : Messages msg -> Maybe Keyword -> FieldMeta -> List (Html msg)
-customRespNewPersonField msgs maybeKeyword =
-    simpleTextField (Maybe.map .custom_response_new_person maybeKeyword) (msgs.inputChange << UpdateKeywordCustNewPersonRespField)
+customRespNewPersonField : Messages msg -> F.Item Keyword -> F.FieldMeta -> List (Html msg)
+customRespNewPersonField msgs item =
+    F.longTextField 3
+        { getValue = .custom_response_new_person, item = item, onInput = msgs.inputChange << UpdateKeywordCustNewPersonRespField }
 
 
-deactivatedRespField : Messages msg -> Maybe Keyword -> FieldMeta -> List (Html msg)
-deactivatedRespField msgs maybeKeyword =
-    simpleTextField (Maybe.map .deactivated_response maybeKeyword) (msgs.inputChange << UpdateKeywordDeacRespField)
+deactivatedRespField : Messages msg -> F.Item Keyword -> F.FieldMeta -> List (Html msg)
+deactivatedRespField msgs item =
+    F.longTextField 3
+        { getValue = .deactivated_response, item = item, onInput = msgs.inputChange << UpdateKeywordDeacRespField }
 
 
-tooEarlyRespField : Messages msg -> Maybe Keyword -> FieldMeta -> List (Html msg)
-tooEarlyRespField msgs maybeKeyword =
-    simpleTextField (Maybe.map .too_early_response maybeKeyword) (msgs.inputChange << UpdateKeywordTooEarlyRespField)
+tooEarlyRespField : Messages msg -> F.Item Keyword -> F.FieldMeta -> List (Html msg)
+tooEarlyRespField msgs item =
+    F.longTextField 3
+        { getValue = .too_early_response, item = item, onInput = msgs.inputChange << UpdateKeywordTooEarlyRespField }
 
 
-activateTimeField : Messages msg -> Model -> Maybe Keyword -> FieldMeta -> List (Html msg)
-activateTimeField msgs model maybeKeyword =
-    let
-        time =
-            case model.activate_time of
-                Nothing ->
-                    case maybeKeyword of
-                        Nothing ->
-                            Nothing
-
-                        Just k ->
-                            Just k.activate_time
-
-                Just t ->
-                    Just t
-    in
-    dateTimeField (updateActTime msgs) model.datePickerActState time
+activateTimeField : Messages msg -> DirtyState -> F.Item Keyword -> F.FieldMeta -> List (Html msg)
+activateTimeField msgs dirty item =
+    F.dateTimeField
+        (updateActTime msgs)
+        dirty.datePickerActState
+        .activate_time
+        item
 
 
 updateActTime : Messages msg -> DateTimePicker.State -> Maybe Date.Date -> msg
@@ -432,23 +421,13 @@ updateActTime msgs state maybeDate =
     msgs.inputChange <| UpdateActivateTime state maybeDate
 
 
-deactivateTimeField : Messages msg -> Model -> Maybe Keyword -> FieldMeta -> List (Html msg)
-deactivateTimeField msgs model maybeKeyword =
-    let
-        time =
-            case model.deactivate_time of
-                Nothing ->
-                    case maybeKeyword of
-                        Nothing ->
-                            Nothing
-
-                        Just k ->
-                            k.deactivate_time
-
-                Just t ->
-                    Just t
-    in
-    dateTimeField (updateDeactTime msgs) model.datePickerDeactState time
+deactivateTimeField : Messages msg -> DirtyState -> F.Item Keyword -> F.FieldMeta -> List (Html msg)
+deactivateTimeField msgs dirty item =
+    F.dateTimeField
+        (updateDeactTime msgs)
+        dirty.datePickerDeactState
+        .deactivate_time
+        item
 
 
 updateDeactTime : Messages msg -> DateTimePicker.State -> Maybe Date.Date -> msg
@@ -456,122 +435,95 @@ updateDeactTime msgs state maybeDate =
     msgs.inputChange <| UpdateDeactivateTime state maybeDate
 
 
-linkedGroupsField : Messages msg -> Model -> RL.RemoteList RecipientGroup -> Maybe Keyword -> FieldMeta -> List (Html msg)
-linkedGroupsField msgs model groups maybeKeyword =
-    multiSelectField
-        (MultiSelectField
-            groups
-            model.linked_groups
-            (Maybe.map .linked_groups maybeKeyword)
-            model.linkedGroupsFilter
-            (msgs.inputChange << UpdateKeywordLinkedGroupsFilter)
-            (groupView msgs)
-            (groupLabelView msgs)
-        )
+linkedGroupsField : Messages msg -> RL.RemoteList RecipientGroup -> DirtyState -> F.Item Keyword -> F.FieldMeta -> List (Html msg)
+linkedGroupsField msgs groups dirty item =
+    F.multiSelectField
+        { items = groups
+        , getPks = .linked_groups
+        , item = item
+        , filter = dirty.linkedGroupsFilter
+        , filterMsg = msgs.inputChange << UpdateKeywordLinkedGroupsFilter
+        , itemView = groupView msgs
+        , selectedView = groupLabelView msgs
+        }
 
 
-groupLabelView : Messages msg -> Maybe (List Int) -> RecipientGroup -> Html msg
+groupLabelView : Messages msg -> List Int -> RecipientGroup -> Html msg
 groupLabelView msgs maybePks group =
-    multiSelectItemLabelHelper
+    F.multiSelectItemLabelHelper
         .name
-        (msgs.inputChange <| UpdateSelectedLinkedGroup (Maybe.withDefault [] maybePks) group.pk)
+        (msgs.inputChange <| UpdateSelectedLinkedGroup group.pk)
         group
 
 
-groupView : Messages msg -> Maybe (List Int) -> RecipientGroup -> Html msg
-groupView msgs maybeSelectedPks group =
+groupView : Messages msg -> List Int -> RecipientGroup -> Html msg
+groupView msgs selectedPks group =
     F.multiSelectItemHelper
         { itemToStr = .name
-        , maybeSelectedPks = maybeSelectedPks
-        , itemToKey = .pk >> toString
-        , toggleMsg = msgs.inputChange << UpdateSelectedLinkedGroup (Maybe.withDefault [] maybeSelectedPks)
-        , itemToId = .pk >> toString >> (++) "linkedGroup"
+        , selectedPks = selectedPks
+        , itemToKey = .pk >> Future.String.fromInt
+        , toggleMsg = msgs.inputChange << UpdateSelectedLinkedGroup
+        , itemToId = .pk >> Future.String.fromInt >> (++) "linkedGroup"
         }
         group
 
 
-ownersField : Messages msg -> Model -> RL.RemoteList User -> Maybe Keyword -> FieldMeta -> List (Html msg)
-ownersField msgs model users maybeKeyword =
-    multiSelectField
-        (MultiSelectField
-            users
-            model.owners
-            (Maybe.map .owners maybeKeyword)
-            model.ownersFilter
-            (msgs.inputChange << UpdateKeywordOwnersFilter)
-            (ownerUserView msgs)
-            (userLabelView msgs UpdateSelectedOwner)
-        )
+ownersField : Messages msg -> RL.RemoteList User -> DirtyState -> F.Item Keyword -> F.FieldMeta -> List (Html msg)
+ownersField msgs users dirty item =
+    F.multiSelectField
+        { items = users
+        , getPks = .owners
+        , item = item
+        , filter = dirty.ownersFilter
+        , filterMsg = msgs.inputChange << UpdateKeywordOwnersFilter
+        , itemView = ownerUserView msgs
+        , selectedView = userLabelView msgs UpdateSelectedOwner
+        }
 
 
-digestField : Messages msg -> Model -> RL.RemoteList User -> Maybe Keyword -> FieldMeta -> List (Html msg)
-digestField msgs model users maybeKeyword =
-    multiSelectField
-        (MultiSelectField
-            users
-            model.subscribers
-            (Maybe.map .subscribed_to_digest maybeKeyword)
-            model.subscribersFilter
-            (msgs.inputChange << UpdateKeywordSubscribersFilter)
-            (digestUserView msgs)
-            (userLabelView msgs UpdateSelectedSubscriber)
-        )
+digestField : Messages msg -> RL.RemoteList User -> DirtyState -> F.Item Keyword -> F.FieldMeta -> List (Html msg)
+digestField msgs users dirty item =
+    F.multiSelectField
+        { items = users
+        , getPks = .subscribed_to_digest
+        , item = item
+        , filter = dirty.subscribersFilter
+        , filterMsg = msgs.inputChange << UpdateKeywordSubscribersFilter
+        , itemView = digestUserView msgs
+        , selectedView = userLabelView msgs UpdateSelectedSubscriber
+        }
 
 
-userLabelView : Messages msg -> (List Int -> Int -> InputMsg) -> Maybe (List Int) -> User -> Html msg
+userLabelView : Messages msg -> (Int -> InputMsg) -> List Int -> User -> Html msg
 userLabelView msgs msg selectedPks user =
-    multiSelectItemLabelHelper
+    F.multiSelectItemLabelHelper
         .email
-        (msgs.inputChange <| msg (Maybe.withDefault [] selectedPks) user.pk)
+        (msgs.inputChange <| msg user.pk)
         user
 
 
-digestUserView : Messages msg -> Maybe (List Int) -> User -> Html msg
-digestUserView msgs maybeSelectedPks user =
+digestUserView : Messages msg -> List Int -> User -> Html msg
+digestUserView msgs selectedPks user =
     F.multiSelectItemHelper
         { itemToStr = .email
-        , maybeSelectedPks = maybeSelectedPks
+        , selectedPks = selectedPks
         , itemToKey = .pk >> toString
-        , toggleMsg = msgs.inputChange << UpdateSelectedSubscriber (Maybe.withDefault [] maybeSelectedPks)
+        , toggleMsg = msgs.inputChange << UpdateSelectedSubscriber
         , itemToId = .pk >> toString >> (++) "userUpdateSelectedSubscriber"
         }
         user
 
 
-ownerUserView : Messages msg -> Maybe (List Int) -> User -> Html msg
-ownerUserView msgs maybeSelectedPks owner =
+ownerUserView : Messages msg -> List Int -> User -> Html msg
+ownerUserView msgs selectedPks owner =
     F.multiSelectItemHelper
         { itemToStr = .email
-        , maybeSelectedPks = maybeSelectedPks
+        , selectedPks = selectedPks
         , itemToKey = .pk >> toString
-        , toggleMsg = msgs.inputChange << UpdateSelectedOwner (Maybe.withDefault [] maybeSelectedPks)
+        , toggleMsg = msgs.inputChange << UpdateSelectedOwner
         , itemToId = .pk >> toString >> (++) "userUpdateSelectedOwner"
         }
         owner
-
-
-showArchiveNotice : List Keyword -> Maybe Keyword -> Model -> Bool
-showArchiveNotice keywords maybeKeyword model =
-    let
-        originalName =
-            Maybe.map .keyword maybeKeyword
-                |> Maybe.withDefault ""
-
-        currentProposedName =
-            model.keyword
-                |> Maybe.withDefault ""
-
-        archivedNames =
-            keywords
-                |> List.filter .is_archived
-                |> List.map .keyword
-    in
-    case originalName == currentProposedName of
-        True ->
-            False
-
-        False ->
-            List.member currentProposedName archivedNames
 
 
 archiveNotice : Messages msg -> Bool -> List Keyword -> Maybe String -> Html msg
@@ -588,7 +540,7 @@ archiveNotice msgs show keywords name =
             Html.text ""
 
         True ->
-            Html.div []
+            Html.div [ Css.alert, Css.alert_info ]
                 [ Html.p [] [ Html.text "There is already a Keyword that with that name in the archive" ]
                 , Html.p [] [ Html.text "You can chose a different name." ]
                 , Html.p []

@@ -95,11 +95,13 @@ title page =
         Debug _ ->
             "Debug Configuration"
 
-        ContactForm _ (Just _) ->
-            "Edit Contact"
+        ContactForm cfModel ->
+            case cfModel.maybePk of
+                Just _ ->
+                    "Edit Contact"
 
-        ContactForm _ Nothing ->
-            "New Contact"
+                Nothing ->
+                    "New Contact"
 
         CreateAllGroup _ ->
             ""
@@ -119,11 +121,13 @@ title page =
         GroupComposer _ ->
             ""
 
-        GroupForm _ (Just _) ->
-            "Edit Group"
+        GroupForm { maybePk } ->
+            case maybePk of
+                Just _ ->
+                    "Edit Group"
 
-        GroupForm _ Nothing ->
-            "New Group"
+                Nothing ->
+                    "New Group"
 
         GroupTable _ True ->
             "Groups (archived)"
@@ -140,11 +144,13 @@ title page =
         KeyRespTable _ False k ->
             k ++ " reponses"
 
-        KeywordForm _ (Just _) ->
-            "Edit Keyword"
+        KeywordForm { maybeId } ->
+            case maybeId of
+                Nothing ->
+                    "New Keyword"
 
-        KeywordForm _ Nothing ->
-            "New Keyword"
+                Just _ ->
+                    "Edit Keyword"
 
         KeywordTable _ False ->
             "Keywords"
@@ -185,7 +191,7 @@ title page =
         Usage ->
             ""
 
-        UserProfileForm _ _ ->
+        UserProfileForm _ ->
             ""
 
         Help ->

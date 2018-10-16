@@ -1,12 +1,10 @@
-module Store.Update exposing (ErrResp, addItemToDic, addNewItems, compareByT2S, compareByTS, compareTR, decodeErrResp, handleLoadingFailed, mergeItems, sortByTimeReceived, update, updateElvantoGroups, updateGroups, updateKeywords, updateNewData, updateQueuedSms, updateRecipients, updateSmsInbounds, updateSmsOutbounds, updateStatus, updateUserProfiles, updateUsers, userFacingErrorMessage)
+module Store.Update exposing (update)
 
 import Data exposing (ElvantoGroup, Keyword, QueuedSms, Recipient, RecipientGroup, SmsInbound, SmsOutbound, User, UserProfile, decodeElvantoGroup, decodeKeyword, decodeQueuedSms, decodeRecipient, decodeRecipientGroup, decodeSmsInbound, decodeSmsOutbound, decodeUser, decodeUserProfile)
 import Date
 import Dict
-import Helpers exposing (handleNotSaved)
+import Helpers exposing (handleNotSaved, userFacingErrorMessage)
 import Http
-import Json.Decode as Decode
-import Json.Decode.Pipeline exposing (decode, optional, required)
 import Models exposing (Model)
 import Notification as Notif
 import RemoteList as RL
@@ -385,38 +383,3 @@ compareTR item =
 
         Nothing ->
             toFloat 1
-
-
-type alias ErrResp =
-    { status : String
-    , error : String
-    }
-
-
-decodeErrResp : Decode.Decoder ErrResp
-decodeErrResp =
-    decode ErrResp
-        |> required "status" Decode.string
-        |> optional "error" Decode.string ""
-
-
-userFacingErrorMessage : Http.Error -> String
-userFacingErrorMessage err =
-    case err of
-        Http.BadUrl _ ->
-            "That's a bad URL. Sorry."
-
-        Http.NetworkError ->
-            "Looks like there may be something wrong with your internet connection :("
-
-        Http.BadStatus r ->
-            r.body
-                |> Decode.decodeString decodeErrResp
-                |> Result.withDefault { status = "", error = "Something went wrong there. Sorry. (" ++ r.body ++ ")" }
-                |> .error
-
-        Http.BadPayload msg _ ->
-            "Something went wrong there. Sorry. (" ++ msg ++ ")"
-
-        Http.Timeout ->
-            "It took too long to reach the server..."

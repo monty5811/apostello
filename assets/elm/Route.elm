@@ -1,6 +1,7 @@
 module Route exposing (loc2Page, page2loc, route, spaLink)
 
 import Data exposing (UserProfile)
+import Future.String
 import Html exposing (Attribute, Html)
 import Html.Attributes exposing (href)
 import Html.Events exposing (onWithOptions)
@@ -8,12 +9,15 @@ import Json.Decode as Decode
 import Messages
     exposing
         ( Msg
-            ( DefaultResponsesFormMsg
+            ( ContactFormMsg
+            , DefaultResponsesFormMsg
+            , GroupFormMsg
             , KeywordFormMsg
             , NewUrl
             , SendAdhocMsg
             , SendGroupMsg
             , SiteConfigFormMsg
+            , UserProfileFormMsg
             )
         )
 import Models exposing (Settings)
@@ -30,10 +34,10 @@ import Pages.Forms.CreateAllGroup as CAGF
 import Pages.Forms.DefaultResponses as DRF
 import Pages.Forms.Group as GF
 import Pages.Forms.Keyword as KF
-import Pages.Forms.SendAdhoc
-import Pages.Forms.SendGroup
+import Pages.Forms.SendAdhoc as SAF
+import Pages.Forms.SendGroup as SGF
 import Pages.Forms.SiteConfig as SCF
-import Pages.Forms.UserProfile as UP
+import Pages.Forms.UserProfile as UPF
 import Pages.GroupComposer as GC
 import Pages.GroupTable as GT
 import Pages.InboundTable as IT
@@ -72,16 +76,16 @@ route =
         , Url.map (ElvantoImport EI.initialModel) (s "elvanto" </> s "import")
         , Url.map (FirstRun FR.initialModel) (s "config" </> s "first_run")
         , Url.map (Debug DG.initialModel) (s "config" </> s "debug")
-        , Url.map (GroupForm GF.initialModel << Just) (s "group" </> s "edit" </> int)
-        , Url.map (GroupForm GF.initialModel Nothing) (s "group" </> s "new")
-        , Url.map (ContactForm CF.initialModel << Just) (s "recipient" </> s "edit" </> int)
-        , Url.map (ContactForm CF.initialModel Nothing) (s "recipient" </> s "new")
-        , Url.map (KeywordForm KF.initialModel Nothing) (s "keyword" </> s "new")
-        , Url.map (KeywordForm KF.initialModel << Just) (s "keyword" </> s "edit" </> string)
+        , Url.map (GroupForm << GF.initialModel << Just) (s "group" </> s "edit" </> int)
+        , Url.map (GroupForm <| GF.initialModel Nothing) (s "group" </> s "new")
+        , Url.map (ContactForm << CF.initialModel << Just) (s "recipient" </> s "edit" </> int)
+        , Url.map (ContactForm <| CF.initialModel Nothing) (s "recipient" </> s "new")
+        , Url.map (KeywordForm <| KF.initialModel Nothing) (s "keyword" </> s "new")
+        , Url.map (KeywordForm << KF.initialModel << Just) (s "keyword" </> s "edit" </> string)
         , Url.map (SiteConfigForm SCF.initialModel) (s "config" </> s "site")
         , Url.map (DefaultResponsesForm DRF.initialModel) (s "config" </> s "responses")
         , Url.map (CreateAllGroup CAGF.initialModel) (s "group" </> s "create_all")
-        , Url.map (UserProfileForm UP.initialModel) (s "users" </> s "profiles" </> int)
+        , Url.map (UserProfileForm << UPF.initialModel) (s "users" </> s "profiles" </> int)
         , Url.map (ContactImport CI.initialModel) (s "recipient" </> s "import")
         , Url.map (ApiSetup Nothing) (s "api-setup")
         , Url.map (DeletePanel DP.initialModel) (s "config" </> s "twilio" </> s "delete")
@@ -129,19 +133,28 @@ withEffects : Page -> ( Page, Cmd Msg )
 withEffects page =
     case page of
         SendAdhoc model ->
-            ( page, Cmd.map SendAdhocMsg (Pages.Forms.SendAdhoc.init model) )
+            ( page, Cmd.map SendAdhocMsg (SAF.init model) )
 
         SendGroup model ->
-            ( page, Cmd.map SendGroupMsg (Pages.Forms.SendGroup.init model) )
+            ( page, Cmd.map SendGroupMsg (SGF.init model) )
 
-        KeywordForm model _ ->
+        KeywordForm model ->
             ( page, Cmd.map KeywordFormMsg (KF.init model) )
+
+        ContactForm model ->
+            ( page, Cmd.map ContactFormMsg (CF.init model) )
+
+        GroupForm model ->
+            ( page, Cmd.map GroupFormMsg (GF.init model) )
 
         SiteConfigForm _ ->
             ( page, Cmd.map SiteConfigFormMsg SCF.init )
 
         DefaultResponsesForm _ ->
             ( page, Cmd.map DefaultResponsesFormMsg DRF.init )
+
+        UserProfileForm model ->
+            ( page, Cmd.map UserProfileFormMsg (UPF.init model.pk) )
 
         _ ->
             ( page, Cmd.none )
@@ -235,29 +248,29 @@ page2loc page =
             "/config/first_run/"
 
         SendAdhoc saModel ->
-            "/send/adhoc/" |> addAdhocParams (Just saModel.content) (Just saModel.selectedContacts)
+            addAdhocParams (SAF.getParams saModel) "/send/adhoc/"
 
         SendGroup sgModel ->
-            "/send/group/" |> addGroupParams (Just sgModel.content) sgModel.selectedPk
+            addGroupParams (SGF.getParams sgModel) "/send/group/"
 
-        GroupForm _ maybePk ->
+        GroupForm { maybePk } ->
             case maybePk of
                 Nothing ->
                     "/group/new/"
 
                 Just pk ->
-                    "/group/edit/" ++ toString pk ++ "/"
+                    "/group/edit/" ++ Future.String.fromInt pk ++ "/"
 
-        ContactForm _ maybePk ->
-            case maybePk of
+        ContactForm cfModel ->
+            case cfModel.maybePk of
                 Nothing ->
                     "/recipient/new/"
 
                 Just pk ->
-                    "/recipient/edit/" ++ toString pk ++ "/"
+                    "/recipient/edit/" ++ Future.String.fromInt pk ++ "/"
 
-        KeywordForm _ maybeK ->
-            case maybeK of
+        KeywordForm { maybeId } ->
+            case maybeId of
                 Nothing ->
                     "/keyword/new/"
 
@@ -282,8 +295,8 @@ page2loc page =
         Help ->
             "/help/"
 
-        UserProfileForm _ pk ->
-            "/users/profiles/" ++ toString pk ++ "/"
+        UserProfileForm model ->
+            "/users/profiles/" ++ Future.String.fromInt model.pk ++ "/"
 
         ContactImport _ ->
             "/recipient/import/"
@@ -301,8 +314,8 @@ page2loc page =
             "/config/twilio/delete"
 
 
-addAdhocParams : Maybe String -> Maybe (List Int) -> String -> String
-addAdhocParams maybeContent maybePks url =
+addAdhocParams : ( Maybe String, Maybe (List Int) ) -> String -> String
+addAdhocParams ( maybeContent, maybePks ) url =
     let
         params =
             [ contentParam maybeContent, contactsParam maybePks ]
@@ -313,8 +326,8 @@ addAdhocParams maybeContent maybePks url =
     url ++ "?" ++ params
 
 
-addGroupParams : Maybe String -> Maybe Int -> String -> String
-addGroupParams maybeContent maybePk url =
+addGroupParams : ( Maybe String, Maybe Int ) -> String -> String
+addGroupParams ( maybeContent, maybePk ) url =
     let
         params =
             [ contentParam maybeContent, groupParam maybePk ]
@@ -344,14 +357,14 @@ contactsParam : Maybe (List Int) -> Maybe String
 contactsParam contacts =
     Maybe.map
         (\x ->
-            "recipients=[" ++ (x |> List.map toString |> String.join ",") ++ "]"
+            "recipients=[" ++ (x |> List.map Future.String.fromInt |> String.join ",") ++ "]"
         )
         contacts
 
 
 groupParam : Maybe Int -> Maybe String
 groupParam g =
-    Maybe.map (\x -> "recipient_group=" ++ toString x) g
+    Maybe.map (\x -> "recipient_group=" ++ Future.String.fromInt x) g
 
 
 
@@ -440,14 +453,14 @@ checkPerm blockedKeywords userPerms page =
                 Error404 ->
                     True
 
-                GroupForm _ _ ->
+                GroupForm _ ->
                     userPerms.can_see_groups
 
-                ContactForm _ _ ->
+                ContactForm _ ->
                     userPerms.can_see_contact_names
 
-                KeywordForm _ maybeK ->
-                    case maybeK of
+                KeywordForm { maybeId } ->
+                    case maybeId of
                         Nothing ->
                             userPerms.can_see_keywords
 
@@ -472,7 +485,7 @@ checkPerm blockedKeywords userPerms page =
                 Help ->
                     True
 
-                UserProfileForm _ _ ->
+                UserProfileForm _ ->
                     userPerms.user.is_staff
 
                 ContactImport _ ->

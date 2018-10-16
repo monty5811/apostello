@@ -20,9 +20,11 @@ a:hover {
 }
 
 @keyframes bounce {
-    0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
-  } 50% {
+  }
+  50% {
     transform: translateY(-5px);
   }
 }
@@ -32,8 +34,8 @@ a:hover {
 }
 
 .required:after {
-  content:"*";
-  font-weight:bold;
+  content: "*";
+  font-weight: bold;
   @apply text-red;
 }
 
@@ -81,7 +83,7 @@ a:hover {
       "header  "
       "leftBar "
       "main    "
-      "rightBar"
+      "rightBar";
   }
   #actionsWrapper {
     @apply .flex;
@@ -96,12 +98,17 @@ a:hover {
   }
 }
 
+#elmShell {
+  max-width: 1200px;
+  @apply .mx-auto;
+}
+
 header {
   grid-area: header;
   @apply pb-4;
 }
 
-#menuWrapper{
+#menuWrapper {
   grid-area: rightBar;
 }
 
@@ -109,94 +116,92 @@ main {
   grid-area: main;
 }
 
-#actionsWrapper{
+#actionsWrapper {
   grid-area: leftBar;
   @apply .py-4;
 }
 
 .filterBox {
-    @apply .shadow;
-    @apply .appearance-none;
-    @apply .border;
-    @apply .rounded;
-    @apply .py-2;
-    @apply .px-3;
-    @apply .mb-4;
-    @apply .text-grey-darker;
+  @apply .shadow;
+  @apply .appearance-none;
+  @apply .border;
+  @apply .rounded;
+  @apply .py-2;
+  @apply .px-3;
+  @apply .mb-4;
+  @apply .text-grey-darker;
 }
 
 .raisedSegment {
-    @apply .bg-white;
-    @apply .shadow-md;
-    @apply .rounded;
-    @apply .px-4;
-    /*@apply .pb-8;*/
-    @apply .m-1;
+  @apply .bg-white;
+  @apply .shadow-md;
+  @apply .rounded;
+  @apply .px-4;
+  /*@apply .pb-8;*/
+  @apply .m-1;
 }
 
 .notRaisedSegment {
-    @apply .bg-white;
-    @apply .px-4;
-    @apply .pt-6;
-    @apply .pb-8;
-    @apply .m-1;
+  @apply .bg-white;
+  @apply .px-4;
+  @apply .pt-6;
+  @apply .pb-8;
+  @apply .m-1;
 }
 
 .borderCollapse {
-    border-collapse: collapse;
+  border-collapse: collapse;
 }
 
 .label {
-    @apply .block;
-    @apply .text-grey-darker;
-    @apply .text-sm;
-    @apply .font-bold;
-    @apply .mt-2;
-    @apply .mb-1;
+  @apply .block;
+  @apply .text-grey-darker;
+  @apply .text-sm;
+  @apply .font-bold;
+  @apply .mt-2;
+  @apply .mb-1;
 }
-
 
 .formInput {
-    @apply .shadow;
-    @apply .appearance-none;
-    @apply .border;
-    @apply .rounded;
-    @apply .w-full;
-    @apply .py-2;
-    @apply .px-3;
-    @apply .text-grey-darker;
+  @apply .shadow;
+  @apply .appearance-none;
+  @apply .border;
+  @apply .rounded;
+  @apply .w-full;
+  @apply .py-2;
+  @apply .px-3;
+  @apply .text-grey-darker;
 }
 
-
 .fieldError {
-    @apply .rounded;
-    @apply .text-red-darker;
-    @apply .bg-red-lighter;
-    @apply .py-2;
-    @apply .px-3;
+  @apply .rounded;
+  @apply .text-red-darker;
+  @apply .bg-red-lighter;
+  @apply .py-2;
+  @apply .px-3;
 }
 
 .displayInline {
-    display: inline;
+  display: inline;
 }
 
 .wallSms {
-    @apply .bg-white;
-    @apply .shadow-md;
-    @apply .rounded;
-    @apply .px-4;
-    @apply .pt-6;
-    @apply .pb-8;
-    @apply .mb-4;
-    @apply .text-4xl;
+  @apply .bg-white;
+  @apply .shadow-md;
+  @apply .rounded;
+  @apply .px-4;
+  @apply .pt-6;
+  @apply .pb-8;
+  @apply .mb-4;
+  @apply .text-4xl;
 }
 
 .twoColGrid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-column-gap: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-column-gap: 10px;
 }
 
-.noop{
-    /*! Keep Me */
+.noop {
+  /*! Keep Me */
 }

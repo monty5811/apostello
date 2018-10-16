@@ -6,7 +6,6 @@ import RemoteList as RL
 import Store.DataTypes exposing (..)
 
 
-
 -- Data Store - shared data we pull from the server and re-use in different views/pages
 
 

@@ -1,26 +1,27 @@
-module Notification exposing
-    ( DjangoMessage
-    , Msg
-    , Notification
-    , NotificationType(..)
-    , Notifications
-    , addError
-    , addInfo
-    , addListOfDjangoMessages
-    , addLoadingFailed
-    , addNotSaved
-    , addNs
-    , addRefreshNotif
-    , addSuccess
-    , createListOfDjangoMessages
-    , decodeDjangoMessage
-    , empty
-    , refreshNotifMessage
-    , remove
-    , update
-    , updateNotifications
-    , view
-    )
+module Notification
+    exposing
+        ( DjangoMessage
+        , Msg
+        , Notification
+        , NotificationType(..)
+        , Notifications
+        , addError
+        , addInfo
+        , addListOfDjangoMessages
+        , addLoadingFailed
+        , addNotSaved
+        , addNs
+        , addRefreshNotif
+        , addSuccess
+        , createListOfDjangoMessages
+        , decodeDjangoMessage
+        , empty
+        , refreshNotifMessage
+        , remove
+        , update
+        , updateNotifications
+        , view
+        )
 
 import Css
 import Html exposing (Html)
@@ -88,7 +89,6 @@ tView notification =
                     ]
                     []
                 ]
-
             else
                 []
     in

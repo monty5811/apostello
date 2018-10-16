@@ -1,7 +1,7 @@
 module Pages.Forms.CreateAllGroup exposing (Model, Msg(..), initialModel, update, view)
 
 import DjangoSend
-import Form as F exposing (..)
+import Form as F
 import Html exposing (Html)
 import Http
 import Json.Encode as Encode
@@ -10,15 +10,13 @@ import Urls
 
 
 type alias Model =
-    { name : String
-    , formStatus : FormStatus
+    { form : F.Form String ()
     }
 
 
 initialModel : Model
 initialModel =
-    { name = ""
-    , formStatus = NoAction
+    { form = F.startCreating "" ()
     }
 
 
@@ -43,7 +41,7 @@ update props msg model =
     case msg of
         UpdateGroupName name ->
             F.UpdateResp
-                { model | name = name }
+                { model | form = F.updateField (updateName name) model.form }
                 Cmd.none
                 []
                 Nothing
@@ -51,10 +49,7 @@ update props msg model =
         PostForm ->
             F.UpdateResp
                 (F.setInProgress model)
-                (postFormCmd
-                    props.csrftoken
-                    model.name
-                )
+                (postFormCmd props.csrftoken model)
                 []
                 Nothing
 
@@ -65,14 +60,24 @@ update props msg model =
             F.errFormRespUpdate err model
 
 
-postFormCmd : DjangoSend.CSRFToken -> String -> Cmd Msg
-postFormCmd csrf name =
-    let
-        body =
-            [ ( "group_name", Encode.string name ) ]
-    in
-    DjangoSend.rawPost csrf Urls.api_act_create_all_group body
-        |> Http.send ReceiveFormResp
+updateName : String -> String -> () -> ( String, () )
+updateName name _ _ =
+    ( name, () )
+
+
+postFormCmd : DjangoSend.CSRFToken -> Model -> Cmd Msg
+postFormCmd csrf model =
+    case F.getCurrent model.form of
+        Just name ->
+            let
+                body =
+                    [ ( "group_name", Encode.string name ) ]
+            in
+            DjangoSend.rawPost csrf Urls.api_act_create_all_group body
+                |> Http.send ReceiveFormResp
+
+        Nothing ->
+            Cmd.none
 
 
 
@@ -86,16 +91,23 @@ type alias Messages msg =
 
 view : Messages msg -> Model -> Html msg
 view msgs model =
-    let
-        field =
-            simpleTextField (Just model.name) (msgs.form << UpdateGroupName)
-                |> Field meta.group_name
-                |> FormField
-
-        button =
-            submitButton Nothing
-    in
     Html.div []
-        [ Html.p [] [ Html.text "You can use this form to create a new group that contains all currently active contacts." ]
-        , form model.formStatus [ field ] (msgs.form PostForm) button
+        [ Html.p [] [ Html.text "You can use this F.form to create a new group that contains all currently active contacts." ]
+        , F.form
+            model.form
+            (fieldsHelp msgs)
+            (msgs.form PostForm)
+            F.submitButton
         ]
+
+
+fieldsHelp : Messages msg -> F.Item String -> () -> List (F.FormItem msg)
+fieldsHelp msgs item _ =
+    [ F.simpleTextField
+        { getValue = \n -> n
+        , item = item
+        , onInput = msgs.form << UpdateGroupName
+        }
+        |> F.Field meta.group_name
+        |> F.FormField
+    ]

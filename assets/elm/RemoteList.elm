@@ -1,7 +1,13 @@
-module RemoteList exposing
-    ( RemoteList(..)
-    , toList, map, filter, apply, hasFailed, hasFinished
-    )
+module RemoteList
+    exposing
+        ( RemoteList(..)
+        , apply
+        , filter
+        , hasFailed
+        , hasFinished
+        , map
+        , toList
+        )
 
 {-| This library provides helpers for working with lists of remote data.
 

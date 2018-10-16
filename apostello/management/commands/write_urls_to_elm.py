@@ -59,13 +59,15 @@ def argTypeConv(a, t, optional):
     if optional:
         if t == 'String':
             s = case_template(a, "b")
-        else:
-            s = case_template(a, "toString b")
+        elif t == 'Maybe String':
+            s = case_template(a, "b")
+        elif t == 'Maybe Int':
+            s = case_template(a, "Future.String.fromInt b")
     else:
         if t == 'String':
             s = f'" ++ {a} ++ "/'
         else:
-            s = f'" ++ toString {a} ++ "/'
+            s = f'" ++ Future.String.fromInt {a} ++ "/'
 
     return s
 
@@ -168,7 +170,7 @@ def generate_module():
     funcs = [f for f in funcs if f is not None]
     funcs = sorted(list(set(funcs)))
 
-    module = 'module Urls exposing (..)\n\n\n' + '\n\n\n'.join(funcs) + '\n'
+    module = 'module Urls exposing (..)\n\nimport Future.String\n\n\n' + '\n\n\n'.join(funcs) + '\n'
 
     return module
 

@@ -11,14 +11,14 @@
   @apply .bg-green .text-white;
 }
 
-.pill-orange{
+.pill-orange {
   @apply .bg-orange .text-white;
 }
 
-.pill-purple{
+.pill-purple {
   @apply .bg-purple .text-white;
 }
 
-.pill-red{
+.pill-red {
   @apply .bg-red .text-white;
 }

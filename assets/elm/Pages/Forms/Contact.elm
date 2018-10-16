@@ -1,46 +1,56 @@
-module Pages.Forms.Contact exposing (Model, Msg(..), initialModel, update, view)
+module Pages.Forms.Contact exposing (Model, Msg(..), init, initialModel, update, view)
 
 import Css
 import Data exposing (Recipient)
 import DjangoSend
+import Encode exposing (encodeMaybe)
 import FilteringTable as FT
-import Form as F exposing (Field, FieldMeta, FormItem(FieldGroup, FormField), FormStatus(NoAction), checkboxField, defaultFieldGroupConfig, form, longTextField, simpleTextField, submitButton)
+import Form as F exposing (defaultFieldGroupConfig)
+import Helpers exposing (userFacingErrorMessage)
 import Html exposing (Html)
 import Http
 import Json.Encode as Encode
-import Pages.Error404 as E404
 import Pages.Forms.Meta.Contact exposing (meta)
-import Pages.Fragments.Loader exposing (loader)
 import RemoteList as RL
 import Urls
+
+
+init : Model -> Cmd Msg
+init model =
+    case model.maybePk of
+        Just _ ->
+            Http.get (Urls.api_recipients model.maybePk) (Data.decodeListToItem Data.decodeRecipient)
+                |> Http.send ReceiveInitialData
+
+        Nothing ->
+            Cmd.none
+
 
 
 --Model
 
 
 type alias Model =
-    { first_name : Maybe String
-    , last_name : Maybe String
-    , number : Maybe String
-    , do_not_reply : Maybe Bool
-    , never_contact : Maybe Bool
-    , notes : Maybe String
-    , formStatus : FormStatus
+    { form : F.Form Recipient ()
+    , maybePk : Maybe Int
     , tableModel : FT.Model
     }
 
 
-initialModel : Model
-initialModel =
-    { first_name = Nothing
-    , last_name = Nothing
-    , number = Nothing
-    , do_not_reply = Nothing
-    , never_contact = Nothing
-    , notes = Nothing
-    , formStatus = NoAction
-    , tableModel = FT.initialModel
-    }
+initialModel : Maybe Int -> Model
+initialModel maybePk =
+    case maybePk of
+        Just _ ->
+            { form = F.formLoading
+            , maybePk = maybePk
+            , tableModel = FT.initialModel
+            }
+
+        Nothing ->
+            { form = F.startCreating defaultContact ()
+            , maybePk = maybePk
+            , tableModel = FT.initialModel
+            }
 
 
 
@@ -51,12 +61,13 @@ type Msg
     = PostForm Bool Bool
     | InputMsg InputMsg
     | ReceiveFormResp (Result Http.Error { body : String, code : Int })
+    | ReceiveInitialData (Result Http.Error (Maybe Recipient))
     | TableMsg FT.Msg
 
 
 type InputMsg
-    = UpdateDoNotReplyField (Maybe Recipient)
-    | UpdateNeverContactField (Maybe Recipient)
+    = UpdateDoNotReplyField
+    | UpdateNeverContactField
     | UpdateFirstNameField String
     | UpdateLastNameField String
     | UpdateNumberField String
@@ -66,19 +77,55 @@ type InputMsg
 type alias UpdateProps =
     { csrftoken : DjangoSend.CSRFToken
     , recipients : RL.RemoteList Recipient
-    , maybePk : Maybe Int
     , canSeeContactNum : Bool
     , canSeeContactNotes : Bool
     , successPageUrl : String
     }
 
 
+defaultContact : Recipient
+defaultContact =
+    { first_name = ""
+    , last_name = ""
+    , full_name = ""
+    , is_archived = False
+    , is_blocking = False
+    , last_sms = Nothing
+    , never_contact = False
+    , notes = ""
+    , number = Nothing
+    , pk = 0
+    , do_not_reply = False
+    }
+
+
 update : UpdateProps -> Msg -> Model -> F.UpdateResp Msg Model
 update props msg model =
     case msg of
+        ReceiveInitialData (Ok (Just contact)) ->
+            F.UpdateResp
+                { model | form = F.startUpdating contact () }
+                Cmd.none
+                []
+                Nothing
+
+        ReceiveInitialData (Ok Nothing) ->
+            F.UpdateResp
+                { model | form = F.to404 }
+                Cmd.none
+                []
+                Nothing
+
+        ReceiveInitialData (Err err) ->
+            F.UpdateResp
+                { model | form = F.toError <| userFacingErrorMessage err }
+                Cmd.none
+                []
+                Nothing
+
         InputMsg inputMsg ->
             F.UpdateResp
-                (updateInput inputMsg model)
+                { model | form = F.updateField (updateInput inputMsg) model.form }
                 Cmd.none
                 []
                 Nothing
@@ -98,10 +145,6 @@ update props msg model =
                     model
                     props.canSeeContactNum
                     props.canSeeContactNotes
-                    (RL.filter (\x -> Just x.pk == props.maybePk) props.recipients
-                        |> RL.toList
-                        |> List.head
-                    )
                 )
                 []
                 Nothing
@@ -113,85 +156,69 @@ update props msg model =
             F.errFormRespUpdate err model
 
 
-updateInput : InputMsg -> Model -> Model
-updateInput msg model =
+updateInput : InputMsg -> Recipient -> () -> ( Recipient, () )
+updateInput msg model _ =
+    ( updateInputHelp msg model, () )
+
+
+updateInputHelp : InputMsg -> Recipient -> Recipient
+updateInputHelp msg model =
     case msg of
         UpdateFirstNameField text ->
-            { model | first_name = Just text }
+            { model | first_name = text }
 
         UpdateLastNameField text ->
-            { model | last_name = Just text }
+            { model | last_name = text }
 
-        UpdateDoNotReplyField maybeContact ->
-            let
-                b =
-                    case model.do_not_reply of
-                        Just curVal ->
-                            not curVal
+        UpdateDoNotReplyField ->
+            { model | do_not_reply = not model.do_not_reply }
 
-                        Nothing ->
-                            case maybeContact of
-                                Nothing ->
-                                    False
-
-                                Just c ->
-                                    not c.do_not_reply
-            in
-            { model | do_not_reply = Just b }
-
-        UpdateNeverContactField maybeContact ->
-            let
-                b =
-                    case model.never_contact of
-                        Just curVal ->
-                            not curVal
-
-                        Nothing ->
-                            case maybeContact of
-                                Nothing ->
-                                    False
-
-                                Just c ->
-                                    not c.never_contact
-            in
-            { model | never_contact = Just b }
+        UpdateNeverContactField ->
+            { model | never_contact = not model.never_contact }
 
         UpdateNumberField text ->
             { model | number = Just text }
 
         UpdateNotesField text ->
-            { model | notes = Just text }
+            { model | notes = text }
 
 
-postCmd : DjangoSend.CSRFToken -> Model -> Bool -> Bool -> Maybe Recipient -> Cmd Msg
-postCmd csrf model canSeeContactNum canSeeContactNotes maybeContact =
-    let
-        body =
-            [ ( "first_name", Encode.string <| F.extractField .first_name model.first_name maybeContact )
-            , ( "last_name", Encode.string <| F.extractField .last_name model.last_name maybeContact )
-            , ( "do_not_reply", Encode.bool <| F.extractBool .do_not_reply model.do_not_reply maybeContact )
-            , ( "never_contact", Encode.bool <| F.extractBool .never_contact model.never_contact maybeContact )
-            ]
-                |> F.addPk maybeContact
-                |> addContactNumber model canSeeContactNum maybeContact
-                |> addContactNotes model canSeeContactNotes maybeContact
-    in
-    DjangoSend.rawPost csrf (Urls.api_recipients Nothing) body
-        |> Http.send ReceiveFormResp
+postCmd : DjangoSend.CSRFToken -> Model -> Bool -> Bool -> Cmd Msg
+postCmd csrf { maybePk, form } canSeeContactNum canSeeContactNotes =
+    case F.getCurrent form of
+        Just contact ->
+            let
+                body =
+                    [ ( "first_name", Encode.string <| contact.first_name )
+                    , ( "last_name", Encode.string <| contact.last_name )
+                    , ( "do_not_reply", Encode.bool <| contact.do_not_reply )
+                    , ( "never_contact", Encode.bool <| contact.never_contact )
+                    ]
+                        |> F.addPk maybePk
+                        |> addContactNumber contact canSeeContactNum
+                        |> addContactNotes contact canSeeContactNotes
+            in
+            DjangoSend.rawPost csrf (Urls.api_recipients Nothing) body
+                |> Http.send ReceiveFormResp
+
+        Nothing ->
+            Cmd.none
 
 
-addContactNumber : Model -> Bool -> Maybe Recipient -> List ( String, Encode.Value ) -> List ( String, Encode.Value )
-addContactNumber model canSeeContactNum maybeContact body =
+addContactNumber : Recipient -> Bool -> List ( String, Encode.Value ) -> List ( String, Encode.Value )
+addContactNumber contact canSeeContactNum body =
     if canSeeContactNum then
-        ( "number", Encode.string <| F.extractField (Maybe.withDefault "" << .number) model.number maybeContact ) :: body
+        ( "number", encodeMaybe Encode.string contact.number ) :: body
+
     else
         body
 
 
-addContactNotes : Model -> Bool -> Maybe Recipient -> List ( String, Encode.Value ) -> List ( String, Encode.Value )
-addContactNotes model canSeeContactNotes maybeContact body =
+addContactNotes : Recipient -> Bool -> List ( String, Encode.Value ) -> List ( String, Encode.Value )
+addContactNotes contact canSeeContactNotes body =
     if canSeeContactNotes then
-        ( "notes", Encode.string <| F.extractField .notes model.notes maybeContact ) :: body
+        ( "notes", Encode.string contact.notes ) :: body
+
     else
         body
 
@@ -211,80 +238,25 @@ type alias Props msg =
     }
 
 
-view : Props msg -> Maybe (Html msg) -> Maybe Int -> RL.RemoteList Recipient -> Model -> Html msg
-view props maybeTable maybePk contacts_ model =
-    case maybePk of
-        Nothing ->
-            -- creating a new contact:
-            creating props contacts_ model
-
-        Just pk ->
-            -- trying to edit an existing contact:
-            editing props maybeTable pk contacts_ model
-
-
-creating : Props msg -> RL.RemoteList Recipient -> Model -> Html msg
-creating props contacts model =
-    viewHelp props Nothing Nothing contacts model
-
-
-editing : Props msg -> Maybe (Html msg) -> Int -> RL.RemoteList Recipient -> Model -> Html msg
-editing props maybeTable pk contacts model =
+view : Props msg -> Maybe (Html msg) -> RL.RemoteList Recipient -> Model -> Html msg
+view props maybeTable contacts model =
     let
-        currentContact =
-            contacts
-                |> RL.toList
-                |> List.filter (\x -> x.pk == pk)
-                |> List.head
-    in
-    case currentContact of
-        Just contact ->
-            -- contact exists, show the form:
-            viewHelp props maybeTable (Just contact) contacts model
-
-        Nothing ->
-            -- contact does not exist:
-            case contacts of
-                RL.FinalPageReceived _ ->
-                    -- show 404 if we have finished loading
-                    E404.view
-
-                _ ->
-                    -- show loader while we wait
-                    loader
-
-
-viewHelp : Props msg -> Maybe (Html msg) -> Maybe Recipient -> RL.RemoteList Recipient -> Model -> Html msg
-viewHelp props maybeTable currentContact contacts_ model =
-    let
-        contacts =
-            RL.toList contacts_
-
         showAN =
-            showArchiveNotice contacts currentContact model
-
-        fields =
-            [ Just <|
-                FieldGroup { defaultFieldGroupConfig | sideBySide = Just 2, header = Nothing }
-                    [ Field meta.first_name <| firstNameField props currentContact
-                    , Field meta.last_name <| lastNameField props currentContact
-                    ]
-            , if props.canSeeContactNum then
-                Just <| FormField <| Field meta.number <| numberField props props.defaultNumberPrefix currentContact
-              else
-                Nothing
-            , Just <| FormField <| Field meta.do_not_reply <| doNotReplyField props currentContact
-            , Just <| FormField <| Field meta.never_contact <| neverContactField props currentContact
-            , if props.canSeeContactNotes then
-                Just <| FormField <| Field meta.notes <| notesField props currentContact
-              else
-                Nothing
-            ]
-                |> List.filterMap identity
+            F.showArchiveNotice
+                (RL.toList contacts)
+                .number
+                model.form
     in
     Html.div []
-        [ archiveNotice props showAN contacts model.number
-        , form model.formStatus fields (submitMsg props showAN) (submitButton currentContact)
+        [ archiveNotice props
+            showAN
+            (RL.toList contacts)
+            (Maybe.andThen .number (F.getCurrent model.form))
+        , F.form
+            model.form
+            (fieldsHelp props)
+            (submitMsg props showAN)
+            F.submitButton
         , case maybeTable of
             Just table ->
                 Html.div [ Css.mt_4, Css.max_w_md, Css.mx_auto ] [ table ]
@@ -294,81 +266,89 @@ viewHelp props maybeTable currentContact contacts_ model =
         ]
 
 
-firstNameField : Props msg -> Maybe Recipient -> (FieldMeta -> List (Html msg))
-firstNameField props maybeContact =
-    simpleTextField
-        (Maybe.map .first_name maybeContact)
-        (props.c << UpdateFirstNameField)
+fieldsHelp : Props msg -> F.Item Recipient -> () -> List (F.FormItem msg)
+fieldsHelp props item _ =
+    [ Just <|
+        F.FieldGroup { defaultFieldGroupConfig | sideBySide = Just 2, header = Nothing }
+            [ F.Field meta.first_name <| firstNameField props item
+            , F.Field meta.last_name <| lastNameField props item
+            ]
+    , if props.canSeeContactNum then
+        Just <| F.FormField <| F.Field meta.number <| numberField props item
+
+      else
+        Nothing
+    , Just <| F.FormField <| F.Field meta.do_not_reply <| doNotReplyField props item
+    , Just <| F.FormField <| F.Field meta.never_contact <| neverContactField props item
+    , if props.canSeeContactNotes then
+        Just <| F.FormField <| F.Field meta.notes <| notesField props item
+
+      else
+        Nothing
+    ]
+        |> List.filterMap identity
 
 
-lastNameField : Props msg -> Maybe Recipient -> (FieldMeta -> List (Html msg))
-lastNameField props maybeContact =
-    simpleTextField
-        (Maybe.map .last_name maybeContact)
-        (props.c << UpdateLastNameField)
+firstNameField : Props msg -> F.Item Recipient -> (F.FieldMeta -> List (Html msg))
+firstNameField props item =
+    F.simpleTextField
+        { getValue = .first_name
+        , item = item
+        , onInput = props.c << UpdateFirstNameField
+        }
 
 
-numberField : Props msg -> String -> Maybe Recipient -> (FieldMeta -> List (Html msg))
-numberField props defaultPrefix maybeContact =
+lastNameField : Props msg -> F.Item Recipient -> (F.FieldMeta -> List (Html msg))
+lastNameField props item =
+    F.simpleTextField
+        { getValue = .last_name
+        , item = item
+        , onInput = props.c << UpdateLastNameField
+        }
+
+
+numberField : Props msg -> F.Item Recipient -> (F.FieldMeta -> List (Html msg))
+numberField props item =
     let
-        num =
-            case maybeContact of
+        defaultNum =
+            case F.itemGetOriginal item of
                 Nothing ->
-                    Just defaultPrefix
+                    props.defaultNumberPrefix
 
-                Just contact ->
-                    contact.number
+                Just defaultContact ->
+                    Maybe.withDefault "" defaultContact.number
     in
-    simpleTextField
-        num
-        (props.c << UpdateNumberField)
+    F.simpleTextField
+        { getValue = .number >> Maybe.withDefault defaultNum
+        , item = item
+        , onInput = props.c << UpdateNumberField
+        }
 
 
-notesField : Props msg -> Maybe Recipient -> (FieldMeta -> List (Html msg))
-notesField props maybeContact =
-    longTextField
+notesField : Props msg -> F.Item Recipient -> (F.FieldMeta -> List (Html msg))
+notesField props item =
+    F.longTextField
         5
-        (Maybe.map .notes maybeContact)
-        (props.c << UpdateNotesField)
+        { getValue = .notes
+        , item = item
+        , onInput = props.c << UpdateNotesField
+        }
 
 
-doNotReplyField : Props msg -> Maybe Recipient -> (FieldMeta -> List (Html msg))
-doNotReplyField props maybeContact =
-    checkboxField
-        maybeContact
+doNotReplyField : Props msg -> F.Item Recipient -> (F.FieldMeta -> List (Html msg))
+doNotReplyField props item =
+    F.checkboxField
         .do_not_reply
-        (props.c << UpdateDoNotReplyField)
+        item
+        (props.c UpdateDoNotReplyField)
 
 
-neverContactField : Props msg -> Maybe Recipient -> (FieldMeta -> List (Html msg))
-neverContactField props maybeContact =
-    checkboxField
-        maybeContact
+neverContactField : Props msg -> F.Item Recipient -> (F.FieldMeta -> List (Html msg))
+neverContactField props item =
+    F.checkboxField
         .never_contact
-        (props.c << UpdateNeverContactField)
-
-
-showArchiveNotice : List Recipient -> Maybe Recipient -> Model -> Bool
-showArchiveNotice contacts maybeContact model =
-    let
-        originalNum =
-            Maybe.map .number maybeContact
-                |> Maybe.withDefault Nothing
-
-        currentProposedNum =
-            model.number
-
-        archivedNums =
-            contacts
-                |> List.filter .is_archived
-                |> List.map .number
-    in
-    case originalNum == currentProposedNum of
-        True ->
-            False
-
-        False ->
-            List.member currentProposedNum archivedNums
+        item
+        (props.c UpdateNeverContactField)
 
 
 archiveNotice : Props msg -> Bool -> List Recipient -> Maybe String -> Html msg
@@ -385,10 +365,10 @@ archiveNotice props show contacts num =
             Html.text ""
 
         True ->
-            Html.div []
+            Html.div [ Css.alert, Css.alert_info ]
                 [ Html.p [] [ Html.text "There is already a Contact that with that number in the archive" ]
                 , Html.p []
-                    [ Html.text "Or you can restore the contact here: "
+                    [ Html.text "You can restore the contact here: "
                     , props.spa matchedContact
                     ]
                 ]

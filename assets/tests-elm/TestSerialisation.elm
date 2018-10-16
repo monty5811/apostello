@@ -24,7 +24,7 @@ keyword =
         |> Fuzz.andMap Fuzz.string
         |> Fuzz.andMap Fuzz.string
         |> Fuzz.andMap Fuzz.string
-        |> Fuzz.andMap fuzzDate
+        |> Fuzz.andMap (Fuzz.maybe fuzzDate)
         |> Fuzz.andMap (Fuzz.maybe fuzzDate)
         |> Fuzz.andMap (Fuzz.list Fuzz.int)
         |> Fuzz.andMap (Fuzz.list Fuzz.int)

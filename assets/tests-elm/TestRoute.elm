@@ -78,19 +78,19 @@ pages =
     , initSendGroup Nothing (Just 1)
     , initSendGroup (Just "test") (Just 1)
     , SiteConfigForm SCF.initialModel
-    , GroupForm GF.initialModel Nothing
-    , GroupForm GF.initialModel <| Just 1
+    , GroupForm <| GF.initialModel Nothing
+    , GroupForm <| GF.initialModel <| Just 1
     , Help
     , Usage
     , CreateAllGroup CAG.initialModel
-    , ContactForm CF.initialModel Nothing
-    , ContactForm CF.initialModel <| Just 1
-    , KeywordForm KF.initialModel Nothing
-    , KeywordForm KF.initialModel <| Just "test"
+    , ContactForm <| CF.initialModel Nothing
+    , ContactForm <| CF.initialModel <| Just 1
+    , KeywordForm <| KF.initialModel Nothing
+    , KeywordForm <| KF.initialModel <| Just "test"
     , ContactImport CI.initialModel
     , ApiSetup Nothing
     , DefaultResponsesForm DRF.initialModel
-    , UserProfileForm UPF.initialModel 1
+    , UserProfileForm (UPF.initialModel 1)
     , DeletePanel DP.initialModel
     ]
 

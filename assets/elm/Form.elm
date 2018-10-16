@@ -2,58 +2,48 @@ module Form exposing
     ( Field
     , FieldGroupConfig
     , FieldMeta
+    , Form
     , FormErrors
     , FormItem(..)
-    , FormStatus(..)
+    , Item
     , MultiSelectField
     , MultiSelectItemProps
     , UpdateResp
-    , addDefaultFloat
-    , addDefaultInt
-    , addGroupHelpText
-    , addHeader
     , addPk
-    , addSegment
-    , addSideBySide
     , checkboxField
     , contentField
     , dateField
     , dateTimeField
-    , decodeFormResp
     , defaultFieldGroupConfig
     , errFormRespUpdate
-    , extractBool
-    , extractField
-    , extractFloat
-    , fieldGroupHelp
-    , fieldMessage
     , form
-    , formDecodeError
-    , formErrors
+    , formLoading
+    , getCurrent
+    , getDirty
+    , getOriginal
     , helpLabel
-    , isDisabled
+    , itemGetCurrent
+    , itemGetOriginal
     , label
     , loadingMessage
     , longTextField
     , multiSelectField
     , multiSelectItemHelper
     , multiSelectItemLabelHelper
-    , noErrors
     , okFormRespUpdate
-    , renderField
-    , renderFormError
-    , renderItem
-    , requiredClass
     , selectedIcon
-    , selectedItemsView
     , sendButton
-    , sendButtonText
     , setInProgress
+    , showArchiveNotice
     , simpleFloatField
     , simpleIntField
     , simpleTextField
+    , startCreating
+    , startUpdating
     , submitButton
-    , timeField
+    , to404
+    , toError
+    , updateField
     )
 
 import Css
@@ -63,6 +53,7 @@ import DateTimePicker
 import DateTimePicker.Config
 import Dict
 import FilteringTable exposing (filterInput, filterRecord)
+import Future.String
 import Html exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
@@ -72,6 +63,7 @@ import Json.Decode as Decode
 import Json.Decode.Pipeline exposing (decode, required)
 import Json.Encode as Encode
 import Notification as Notif exposing (DjangoMessage, decodeDjangoMessage)
+import Pages.Error404 as Error404
 import Pages.Fragments.Loader exposing (loader)
 import Regex
 import RemoteList as RL
@@ -82,11 +74,174 @@ import Round
 -- Model
 
 
-type FormStatus
-    = NoAction
-    | InProgress
-    | Success
-    | Failed FormErrors
+type Form item tmpState
+    = Loading
+    | Item404
+    | Error String
+    | Editing (Item item) tmpState FormErrors
+    | Saving (Item item) tmpState
+
+
+type Item item
+    = Creating item
+    | Updating item item
+
+
+itemGetCurrent : Item item -> item
+itemGetCurrent item =
+    case item of
+        Creating current ->
+            current
+
+        Updating _ current ->
+            current
+
+
+itemGetOriginal : Item item -> Maybe item
+itemGetOriginal item =
+    case item of
+        Creating current ->
+            Nothing
+
+        Updating original _ ->
+            Just original
+
+
+formLoading : Form item tmpState
+formLoading =
+    Loading
+
+
+startUpdating : item -> tmpState -> Form item tmpState
+startUpdating original tmpState =
+    Editing (Updating original original) tmpState noErrors
+
+
+startCreating : item -> tmpState -> Form item tmpState
+startCreating default tmpState =
+    Editing (Creating default) tmpState noErrors
+
+
+to404 : Form item tmpState
+to404 =
+    Item404
+
+
+toError : String -> Form item tmpState
+toError err =
+    Error err
+
+
+toSaving : Form item tmpState -> Form item tmpState
+toSaving form =
+    case form of
+        Loading ->
+            Loading
+
+        Item404 ->
+            Item404
+
+        Error err ->
+            Error err
+
+        Editing itemState tmpState errs ->
+            Saving itemState tmpState
+
+        Saving itemState tmpState ->
+            Saving itemState tmpState
+
+
+updateField : (item -> tmpState -> ( item, tmpState )) -> Form item tmpState -> Form item tmpState
+updateField fn form =
+    case form of
+        Loading ->
+            form
+
+        Item404 ->
+            form
+
+        Error _ ->
+            form
+
+        Editing itemState tmpState errs ->
+            case itemState of
+                Creating item ->
+                    let
+                        ( newItem, newTmpState ) =
+                            fn item tmpState
+                    in
+                    Editing (Creating newItem) newTmpState errs
+
+                Updating original item ->
+                    let
+                        ( newItem, newTmpState ) =
+                            fn item tmpState
+                    in
+                    Editing (Updating original newItem) newTmpState errs
+
+        Saving itemState tmpState ->
+            Saving itemState tmpState
+
+
+updateItem : (item -> item) -> Form item tmpState -> Form item tmpState
+updateItem fn form =
+    case form of
+        Loading ->
+            Loading
+
+        Item404 ->
+            Item404
+
+        Error err ->
+            Error err
+
+        Editing itemState tmpState errs ->
+            Editing (updateItemHelp fn itemState) tmpState errs
+
+        Saving itemState tmpState ->
+            Saving (updateItemHelp fn itemState) tmpState
+
+
+updateItemHelp : (item -> item) -> Item item -> Item item
+updateItemHelp fn itemState =
+    case itemState of
+        Creating current ->
+            Creating <| fn current
+
+        Updating original current ->
+            Updating original <| fn current
+
+
+getCurrent : Form item tmpState -> Maybe item
+getCurrent form =
+    case form of
+        Editing itemState _ _ ->
+            Just <| itemGetCurrent itemState
+        Saving itemState  _ ->
+            Just <| itemGetCurrent itemState
+
+        _ ->
+            Nothing
+
+
+getOriginal : Form item tmpState -> Maybe item
+getOriginal form =
+    case form of
+        Editing itemState _ _ ->
+            itemGetOriginal itemState
+
+        _ ->
+            Nothing
+
+
+getDirty : Form item tmpState -> Maybe tmpState
+getDirty form =
+    case form of
+        Editing _ tmpState _ ->
+            Just tmpState
+
+        _ ->
+            Nothing
 
 
 type alias FormResp =
@@ -116,10 +271,10 @@ formDecodeError err =
     Dict.insert "__all__" [ "Something strange happend there. (" ++ err ++ ")" ] noErrors
 
 
-formErrors : FormStatus -> FormErrors
-formErrors formStatus =
-    case formStatus of
-        Failed errors ->
+formErrors : Form item tmpState -> FormErrors
+formErrors form =
+    case form of
+        Editing _ _ errors ->
             errors
 
         _ ->
@@ -168,42 +323,52 @@ type alias Resp =
 -- Helpers
 
 
-setInProgress : { model | formStatus : FormStatus } -> { model | formStatus : FormStatus }
+setInProgress : { model | form : Form item tmpState } -> { model | form : Form item tmpState }
 setInProgress model =
-    { model | formStatus = InProgress }
+    { model | form = toSaving model.form }
 
 
-handleGoodFormResp : Resp -> ( FormStatus, Notif.Notifications )
-handleGoodFormResp resp =
-    case Decode.decodeString decodeFormResp resp.body of
-        Ok data ->
-            ( Success
-            , Notif.createListOfDjangoMessages data.messages
-            )
-
-        Err err ->
-            ( Failed <| formDecodeError err, [] )
-
-
-handleBadFormResp : Http.Error -> ( FormStatus, Notif.Notifications )
-handleBadFormResp err =
-    case err of
-        Http.BadStatus resp ->
+handleGoodFormResp : Form item tmpState -> Resp -> ( Form item tmpState, Notif.Notifications )
+handleGoodFormResp form resp =
+    case form of
+        Saving item tmpState ->
             case Decode.decodeString decodeFormResp resp.body of
                 Ok data ->
-                    ( Failed data.errors
+                    ( Editing item tmpState noErrors
                     , Notif.createListOfDjangoMessages data.messages
                     )
 
-                Err e ->
-                    ( Failed <| formDecodeError e
+                Err err ->
+                    ( Editing item tmpState <| formDecodeError err, [] )
+
+        _ ->
+            ( form, [] )
+
+
+handleBadFormResp : Form item tmpState -> Http.Error -> ( Form item tmpState, Notif.Notifications )
+handleBadFormResp form err =
+    case form of
+        Saving item tmpState ->
+            case err of
+                Http.BadStatus resp ->
+                    case Decode.decodeString decodeFormResp resp.body of
+                        Ok data ->
+                            ( Editing item tmpState data.errors
+                            , Notif.createListOfDjangoMessages data.messages
+                            )
+
+                        Err e ->
+                            ( Editing item tmpState <| formDecodeError e
+                            , [ Notif.refreshNotifMessage ]
+                            )
+
+                _ ->
+                    ( Saving item tmpState
                     , [ Notif.refreshNotifMessage ]
                     )
 
         _ ->
-            ( Failed noErrors
-            , [ Notif.refreshNotifMessage ]
-            )
+            ( form, [] )
 
 
 type alias UpdateResp msg model =
@@ -214,98 +379,75 @@ type alias UpdateResp msg model =
     }
 
 
-okFormRespUpdate : { props | successPageUrl : String } -> Resp -> { model | formStatus : FormStatus } -> UpdateResp msg { model | formStatus : FormStatus }
+okFormRespUpdate : { props | successPageUrl : String } -> Resp -> { model | form : Form item tmpState } -> UpdateResp msg { model | form : Form item tmpState }
 okFormRespUpdate props resp model =
     let
-        ( formStatus, newNotifs ) =
-            handleGoodFormResp resp
+        ( form, newNotifs ) =
+            handleGoodFormResp model.form resp
     in
     UpdateResp
-        { model | formStatus = formStatus }
+        { model | form = form }
         Cmd.none
         newNotifs
         (Just props.successPageUrl)
 
 
-errFormRespUpdate : Http.Error -> { model | formStatus : FormStatus } -> UpdateResp msg { model | formStatus : FormStatus }
+errFormRespUpdate : Http.Error -> { model | form : Form item tmpState } -> UpdateResp msg { model | form : Form item tmpState }
 errFormRespUpdate err model =
     let
-        ( formStatus, newNotifs ) =
-            handleBadFormResp err
+        ( form, newNotifs ) =
+            handleBadFormResp model.form err
     in
     UpdateResp
-        { model | formStatus = formStatus }
+        { model | form = form }
         Cmd.none
         newNotifs
         Nothing
 
 
-addPk : Maybe { a | pk : Int } -> List ( String, Encode.Value ) -> List ( String, Encode.Value )
-addPk maybeRecord body =
-    case maybeRecord of
+addPk : Maybe Int -> List ( String, Encode.Value ) -> List ( String, Encode.Value )
+addPk maybePk body =
+    case maybePk of
         Nothing ->
             body
 
-        Just rec ->
-            ( "pk", Encode.int rec.pk ) :: body
-
-
-extractBool : (a -> Bool) -> Maybe Bool -> Maybe a -> Bool
-extractBool fn field maybeRec =
-    case field of
-        Nothing ->
-            Maybe.map fn maybeRec
-                |> Maybe.withDefault False
-
-        Just b ->
-            b
-
-
-extractField : (a -> String) -> Maybe String -> Maybe a -> String
-extractField fn field maybeRec =
-    case field of
-        Nothing ->
-            -- never edited the field, use existing or default to ""
-            Maybe.map fn maybeRec
-                |> Maybe.withDefault ""
-
-        Just s ->
-            s
-
-
-extractFloat : (a -> Float) -> Maybe Float -> Maybe a -> Float
-extractFloat fn field maybeRec =
-    case field of
-        Nothing ->
-            -- never edited the field, use existing or default to 0
-            Maybe.map fn maybeRec
-                |> Maybe.withDefault 0
-
-        Just s ->
-            s
+        Just pk ->
+            ( "pk", Encode.int pk ) :: body
 
 
 
 -- View
 
 
-form : FormStatus -> List (FormItem msg) -> msg -> Html msg -> Html msg
-form formStatus items submitMsg button_ =
-    case formStatus of
-        InProgress ->
+form : Form item tmpState -> (Item item -> tmpState -> List (FormItem msg)) -> msg -> (Item item -> Html msg) -> Html msg
+form form items submitMsg button_ =
+    case form of
+        Loading ->
             loader
 
-        _ ->
+        Item404 ->
+            Error404.view
+
+        Error err ->
+            Html.div [ Css.alert, Css.alert_danger ]
+                [ Html.p [] [ Html.text "Uh, oh. Something went wrong there. Try refreshing the page. More details:" ]
+                , Html.pre [] [ Html.text err ]
+                ]
+
+        Editing itemState tmpState errors ->
             Html.form [ E.onSubmit submitMsg, Css.max_w_md, Css.mx_auto ] <|
-                renderFormError formStatus
-                    ++ List.map (renderItem <| formErrors formStatus) items
-                    ++ [ button_ ]
+                renderFormError form
+                    ++ List.map (renderItem <| formErrors form) (items itemState tmpState)
+                    ++ [ button_ itemState ]
+
+        Saving _ _ ->
+            loader
 
 
-renderFormError : FormStatus -> List (Html msg)
-renderFormError status =
-    case status of
-        Failed errors ->
+renderFormError : Form item tmpState -> List (Html msg)
+renderFormError form =
+    case form of
+        Editing _ _ errors ->
             case Dict.get "__all__" errors of
                 Nothing ->
                     []
@@ -343,10 +485,10 @@ addSideBySide config fields =
         Just num ->
             let
                 maxWidth =
-                    A.style [ ( "max-width", (toString <| 100 // num) ++ "%" ) ]
+                    A.style [ ( "max-width", (Future.String.fromInt <| 100 // num) ++ "%" ) ]
 
                 minWidth =
-                    A.style [ ( "min-width", (toString <| 100 // num) ++ "%" ) ]
+                    A.style [ ( "min-width", (Future.String.fromInt <| 100 // num) ++ "%" ) ]
             in
             [ Html.div
                 [ Css.flex
@@ -412,14 +554,17 @@ renderField errorDict field =
         )
 
 
-dateTimeField : (DateTimePicker.State -> Maybe Date.Date -> msg) -> DateTimePicker.State -> Maybe Date.Date -> FieldMeta -> List (Html msg)
-dateTimeField msg datePickerState date meta =
+dateTimeField : (DateTimePicker.State -> Maybe Date.Date -> msg) -> DateTimePicker.State -> (a -> Maybe Date.Date) -> Item a -> FieldMeta -> List (Html msg)
+dateTimeField msg datePickerState getDate item meta =
     let
         config =
             DateTimePicker.Config.defaultDateTimePickerConfig msg
 
         i18nConfig =
             DateTimePicker.Config.defaultDateTimeI18n
+
+        date =
+            getDate (itemGetCurrent item)
     in
     [ label meta
     , DateTimePicker.dateTimePickerWithConfig
@@ -457,8 +602,8 @@ dateTimeField msg datePickerState date meta =
     ]
 
 
-dateField : (DateTimePicker.State -> Maybe Date.Date -> msg) -> DateTimePicker.State -> Maybe Date.Date -> FieldMeta -> List (Html msg)
-dateField msg datePickerState date meta =
+dateField : (DateTimePicker.State -> Maybe Date.Date -> msg) -> DateTimePicker.State -> (item -> Maybe Date.Date) -> Item item -> FieldMeta -> List (Html msg)
+dateField msg datePickerState getValue item meta =
     let
         config =
             DateTimePicker.Config.defaultDatePickerConfig msg
@@ -492,105 +637,180 @@ dateField msg datePickerState date meta =
         , Css.formInput
         ]
         datePickerState
-        date
+        (getValue <| itemGetCurrent item)
     , helpLabel meta
     ]
 
 
-simpleTextField : Maybe String -> (String -> msg) -> FieldMeta -> List (Html msg)
-simpleTextField defaultValue inputMsg meta =
+simpleTextField : { getValue : item -> String, item : Item item, onInput : String -> msg } -> FieldMeta -> List (Html msg)
+simpleTextField { getValue, item, onInput } meta =
     [ label meta
     , Html.input
-        [ A.id meta.id
-        , A.name meta.name
-        , A.type_ "text"
-        , E.onInput inputMsg
-        , A.defaultValue <| Maybe.withDefault "" defaultValue
-        , Css.formInput
-        ]
+        ([ A.id meta.id
+         , A.name meta.name
+         , A.type_ "text"
+         , E.onInput onInput
+         , A.value (getValue (itemGetCurrent item))
+         , Css.formInput
+         ]
+            |> addDefaultText getValue item
+        )
         []
     , helpLabel meta
     ]
 
 
-longTextField : Int -> Maybe String -> (String -> msg) -> FieldMeta -> List (Html msg)
-longTextField rows defaultValue inputMsg meta =
+addDefaultText : (item -> String) -> Item item -> List (Html.Attribute msg) -> List (Html.Attribute msg)
+addDefaultText getValue itemState attrs =
+    case itemState of
+        Creating _ ->
+            attrs
+
+        Updating original _ ->
+            A.defaultValue (getValue original) :: attrs
+
+
+longTextField : Int -> { getValue : item -> String, item : Item item, onInput : String -> msg } -> FieldMeta -> List (Html msg)
+longTextField rows { getValue, item, onInput } meta =
     [ label meta
     , Html.textarea
-        [ A.id meta.id
-        , A.name meta.name
-        , E.onInput inputMsg
-        , A.rows rows
-        , A.defaultValue <| Maybe.withDefault "" defaultValue
-        , Css.formInput
-        ]
-        []
-    , helpLabel meta
-    ]
-
-
-simpleIntField : Maybe Int -> (String -> msg) -> FieldMeta -> List (Html msg)
-simpleIntField defaultValue inputMsg meta =
-    [ label meta
-    , Html.input
-        (addDefaultInt defaultValue
-            [ A.id meta.id
-            , A.name meta.name
-            , E.onInput inputMsg
-            , A.type_ "number"
-            , A.min "0"
-            , Css.formInput
-            ]
+        ([ A.id meta.id
+         , A.name meta.name
+         , E.onInput onInput
+         , A.rows rows
+         , A.value (getValue (itemGetCurrent item))
+         , Css.formInput
+         ]
+            |> addDefaultText getValue item
         )
         []
     , helpLabel meta
     ]
 
 
-addDefaultInt : Maybe Int -> List (Html.Attribute msg) -> List (Html.Attribute msg)
-addDefaultInt defaultValue attrs =
-    case defaultValue of
-        Nothing ->
-            attrs
-
-        Just num ->
-            (A.defaultValue <| toString num) :: attrs
-
-
-simpleFloatField : Maybe Float -> (String -> msg) -> FieldMeta -> List (Html msg)
-simpleFloatField defaultValue inputMsg meta =
+{-| Need `Maybe Int` to handle blank field
+-}
+simpleIntField : { getValue : item -> Maybe Int, item : Item item, tmpState : Maybe String, onInput : String -> msg } -> FieldMeta -> List (Html msg)
+simpleIntField { getValue, item, onInput, tmpState } meta =
     [ label meta
     , Html.input
-        (addDefaultFloat defaultValue
-            [ A.id meta.id
-            , A.name meta.name
-            , E.onInput inputMsg
-            , A.type_ "number"
-            , A.step "0.0001"
-            , A.min "0"
-            , Css.formInput
-            ]
+        ([ A.id meta.id
+         , A.name meta.name
+         , E.onInput onInput
+         , A.type_ "number"
+         , A.min "0"
+         , Css.formInput
+         ]
+            |> addDefaultInt getValue item
+            |> addCurrentInt tmpState getValue item
         )
         []
     , helpLabel meta
     ]
 
 
-addDefaultFloat : Maybe Float -> List (Html.Attribute msg) -> List (Html.Attribute msg)
-addDefaultFloat defaultValue attrs =
-    case defaultValue of
-        Nothing ->
+addDefaultInt : (item -> Maybe Int) -> Item item -> List (Html.Attribute msg) -> List (Html.Attribute msg)
+addDefaultInt getValue itemState attrs =
+    case itemState of
+        Creating _ ->
             attrs
 
-        Just num ->
-            (A.defaultValue <| toString num) :: attrs
+        Updating original _ ->
+            case getValue original of
+                Just num ->
+                    (A.defaultValue <| Future.String.fromInt num) :: attrs
+
+                Nothing ->
+                    attrs
 
 
-checkboxField : Maybe a -> (a -> Bool) -> (Maybe a -> msg) -> FieldMeta -> List (Html msg)
-checkboxField maybeRec getter toggleMsg meta =
+addCurrentInt : Maybe String -> (item -> Maybe Int) -> Item item -> List (Html.Attribute msg) -> List (Html.Attribute msg)
+addCurrentInt raw getValue itemState attrs =
+    case raw of
+        Just rawVal ->
+            A.value rawVal :: attrs
+
+        Nothing ->
+            case itemState of
+                Creating _ ->
+                    attrs
+
+                Updating _ current ->
+                    case getValue current of
+                        Just num ->
+                            (A.value <| Future.String.fromInt num) :: attrs
+
+                        Nothing ->
+                            attrs
+
+
+{-| Need `Maybe Int` to handle blank field
+-}
+simpleFloatField : { getValue : item -> Maybe Float, item : Item item, tmpState : Maybe String, onInput : String -> msg } -> FieldMeta -> List (Html msg)
+simpleFloatField { getValue, item, tmpState, onInput } meta =
+    [ label meta
+    , Html.input
+        ([ A.id meta.id
+         , A.name meta.name
+         , E.onInput onInput
+         , A.type_ "number"
+         , A.step "0.0001"
+         , A.min "0"
+         , Css.formInput
+         ]
+            |> addDefaultFloat getValue item
+            |> addCurrentFloat tmpState getValue item
+        )
+        []
+    , helpLabel meta
+    ]
+
+
+addCurrentFloat : Maybe String -> (item -> Maybe Float) -> Item item -> List (Html.Attribute msg) -> List (Html.Attribute msg)
+addCurrentFloat raw getValue itemState attrs =
+    case raw of
+        Just rawVal ->
+            A.value rawVal :: attrs
+
+        Nothing ->
+            case itemState of
+                Creating _ ->
+                    attrs
+
+                Updating _ current ->
+                    case getValue current of
+                        Nothing ->
+                            attrs
+
+                        Just num ->
+                            (A.value <| Future.String.fromFloat num) :: attrs
+
+
+addDefaultFloat : (item -> Maybe Float) -> Item item -> List (Html.Attribute msg) -> List (Html.Attribute msg)
+addDefaultFloat getValue itemState attrs =
+    case itemState of
+        Creating _ ->
+            attrs
+
+        Updating original _ ->
+            case getValue original of
+                Nothing ->
+                    attrs
+
+                Just num ->
+                    (A.defaultValue <| Future.String.fromFloat num) :: attrs
+
+
+checkboxField : (item -> Bool) -> Item item -> msg -> FieldMeta -> List (Html msg)
+checkboxField getValue itemState toggleMsg meta =
     let
         checked =
-            Maybe.map getter maybeRec |> Maybe.withDefault False
+            case itemState of
+                Creating item ->
+                    getValue item
+
+                Updating _ item ->
+                    getValue item
     in
     [ Html.div [ Css.flex ]
         [ Html.input
@@ -598,7 +818,7 @@ checkboxField maybeRec getter toggleMsg meta =
             , A.name meta.name
             , A.type_ "checkbox"
             , A.checked checked
-            , E.onClick <| toggleMsg maybeRec
+            , E.onClick toggleMsg
             , Css.label
             ]
             []
@@ -626,15 +846,15 @@ helpLabel { help } =
                 [ Html.text h ]
 
 
-submitButton : Maybe a -> Html msg
-submitButton maybeItem =
+submitButton : Item a -> Html msg
+submitButton item =
     let
         txt =
-            case maybeItem of
-                Nothing ->
+            case item of
+                Creating _ ->
                     "Create"
 
-                Just _ ->
+                Updating _ _ ->
                     "Update"
     in
     Html.button
@@ -646,27 +866,22 @@ submitButton maybeItem =
         [ Html.text txt ]
 
 
-type alias MultiSelectField msg a =
+type alias MultiSelectField msg a b =
     { items : RL.RemoteList { a | pk : Int }
-    , selectedPks : Maybe (List Int)
-    , defaultPks : Maybe (List Int)
+    , getPks : b -> List Int
+    , item : Item b
     , filter : Regex.Regex
     , filterMsg : String -> msg
-    , itemView : Maybe (List Int) -> { a | pk : Int } -> Html msg
-    , selectedView : Maybe (List Int) -> { a | pk : Int } -> Html msg
+    , itemView : List Int -> { a | pk : Int } -> Html msg
+    , selectedView : List Int -> { a | pk : Int } -> Html msg
     }
 
 
-multiSelectField : MultiSelectField msg a -> FieldMeta -> List (Html msg)
+multiSelectField : MultiSelectField msg a b -> FieldMeta -> List (Html msg)
 multiSelectField props meta =
     let
         pks =
-            case props.selectedPks of
-                Nothing ->
-                    props.defaultPks
-
-                Just pks_ ->
-                    Just pks_
+            props.getPks (itemGetCurrent props.item)
     in
     [ label meta
     , helpLabel meta
@@ -684,7 +899,7 @@ multiSelectField props meta =
 
 type alias MultiSelectItemProps msg a =
     { itemToStr : { a | pk : Int } -> String
-    , maybeSelectedPks : Maybe (List Int)
+    , selectedPks : List Int
     , itemToKey : { a | pk : Int } -> String
     , toggleMsg : Int -> msg
     , itemToId : { a | pk : Int } -> String
@@ -693,15 +908,6 @@ type alias MultiSelectItemProps msg a =
 
 multiSelectItemHelper : MultiSelectItemProps msg { a | pk : Int } -> { a | pk : Int } -> Html msg
 multiSelectItemHelper props item =
-    let
-        selectedPks =
-            case props.maybeSelectedPks of
-                Nothing ->
-                    []
-
-                Just pks ->
-                    pks
-    in
     Html.Keyed.node "div"
         [ E.onClick <| props.toggleMsg item.pk
         , A.id <| props.itemToId item
@@ -710,7 +916,7 @@ multiSelectItemHelper props item =
         ]
         [ ( props.itemToKey item
           , Html.div []
-                [ selectedIcon selectedPks item
+                [ selectedIcon props.selectedPks item
                 , Html.text <| props.itemToStr item
                 ]
           )
@@ -730,17 +936,12 @@ multiSelectItemLabelHelper itemToStr toggleMsg item =
         [ Html.text <| itemToStr item ]
 
 
-selectedItemsView : Maybe (List Int) -> (Maybe (List Int) -> { a | pk : Int } -> Html msg) -> RL.RemoteList { a | pk : Int } -> List (Html msg)
-selectedItemsView maybePks render rl =
-    case maybePks of
-        Nothing ->
-            []
-
-        Just pks ->
-            rl
-                |> RL.toList
-                |> List.filter (\x -> List.member x.pk pks)
-                |> List.map (render maybePks)
+selectedItemsView : List Int -> (List Int -> { a | pk : Int } -> Html msg) -> RL.RemoteList { a | pk : Int } -> List (Html msg)
+selectedItemsView pks render rl =
+    rl
+        |> RL.toList
+        |> List.filter (\x -> List.member x.pk pks)
+        |> List.map (render pks)
 
 
 loadingMessage : RL.RemoteList a -> Html msg
@@ -774,29 +975,55 @@ fieldMessage message =
     Html.div [ Css.fieldError ] [ Html.text message ]
 
 
+showArchiveNotice :
+    List { item | is_archived : Bool }
+    -> ({ item | is_archived : Bool } -> a)
+    -> Form { item | is_archived : Bool } b
+    -> Bool
+showArchiveNotice items getter form =
+    case form of
+        Loading ->
+            False
+
+        Item404 ->
+            False
+
+        Error _ ->
+            False
+
+        Saving _ _ ->
+            False
+
+        Editing item _ _ ->
+            let
+                archivedValues =
+                    items
+                        |> List.filter .is_archived
+                        |> List.map getter
+            in
+            case item of
+                Creating current ->
+                    List.member (getter current) archivedValues
+
+                Updating original current ->
+                    case getter original == getter current of
+                        True ->
+                            False
+
+                        False ->
+                            List.member (getter current) archivedValues
+
+
 
 -- Sending SMS Forms
 
 
-contentField : Int -> (String -> msg) -> String -> FieldMeta -> List (Html msg)
-contentField smsCharLimit msg content meta =
-    [ label meta
-    , Html.textarea
-        [ A.id meta.id
-        , A.name meta.name
-        , A.rows (smsCharLimit |> toFloat |> (/) 160 |> ceiling)
-        , A.cols 40
-        , E.onInput msg
-        , A.value content
-        , Css.formInput
-        ]
-        []
-    ]
-
-
-timeField : (DateTimePicker.State -> Maybe Date.Date -> msg) -> DateTimePicker.State -> Maybe Date.Date -> FieldMeta -> List (Html msg)
-timeField msg datePickerState date meta =
-    dateTimeField msg datePickerState date meta
+contentField : Int -> { getValue : item -> String, item : Item item, onInput : String -> msg } -> FieldMeta -> List (Html msg)
+contentField smsCharLimit data meta =
+    longTextField
+        (ceiling <| (toFloat smsCharLimit / 160))
+        data
+        meta
 
 
 

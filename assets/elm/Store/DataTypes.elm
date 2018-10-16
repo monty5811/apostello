@@ -116,19 +116,19 @@ dt_from_page p =
         SendGroup _ ->
             [ Groups Nothing ]
 
-        GroupForm _ maybepK ->
-            [ Groups Nothing, Groups maybepK ]
+        GroupForm { maybePk } ->
+            [ Groups Nothing, Groups maybePk ]
 
-        ContactForm _ maybePk ->
-            case maybePk of
+        ContactForm cfModel ->
+            case cfModel.maybePk of
                 Nothing ->
-                    [ Contacts maybePk ]
+                    [ Contacts cfModel.maybePk ]
 
                 Just _ ->
-                    [ IncomingSms, Contacts maybePk, Contacts Nothing ]
+                    [ IncomingSms, Contacts cfModel.maybePk, Contacts Nothing ]
 
-        KeywordForm _ maybeK ->
-            [ Keywords maybeK, Keywords Nothing, Groups Nothing, Users ]
+        KeywordForm { maybeId } ->
+            [ Keywords maybeId, Keywords Nothing, Groups Nothing, Users ]
 
         Error404 ->
             []
@@ -151,8 +151,8 @@ dt_from_page p =
         Help ->
             []
 
-        UserProfileForm _ _ ->
-            [ UserProfiles ]
+        UserProfileForm _ ->
+            []
 
         ContactImport _ ->
             []

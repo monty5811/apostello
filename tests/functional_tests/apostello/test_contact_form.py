@@ -110,6 +110,6 @@ class TestContactForm:
         def _test():
             assert '/recipient/new/' in b.current_url
             assert 'There is already a Contact that with that number in the archive'.lower() in b.page_source.lower()
-            assert 'Or you can restore the contact here:'.lower() in b.page_source.lower()
+            assert 'You can restore the contact here:'.lower() in b.page_source.lower()
 
         assert_with_timeout(_test, 10 * driver_wait_time)
