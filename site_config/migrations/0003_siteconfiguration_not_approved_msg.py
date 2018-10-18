@@ -7,14 +7,15 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('site_config', '0002_auto_20160221_1135'),
-    ]
+    dependencies = [("site_config", "0002_auto_20160221_1135")]
 
     operations = [
         migrations.AddField(
-            model_name='siteconfiguration',
-            name='not_approved_msg',
-            field=models.TextField(default='\n\nYour account has not yet been approved.\n\nAll new accounts require approval to help prevent abuse. Someone should approve your account soon.\n\nPlease get in touch if you believe you are seeing this in error.\n', help_text='This message will be shown on the "not approved" page.'),
-        ),
+            model_name="siteconfiguration",
+            name="not_approved_msg",
+            field=models.TextField(
+                default="\n\nYour account has not yet been approved.\n\nAll new accounts require approval to help prevent abuse. Someone should approve your account soon.\n\nPlease get in touch if you believe you are seeing this in error.\n",
+                help_text='This message will be shown on the "not approved" page.',
+            ),
+        )
     ]

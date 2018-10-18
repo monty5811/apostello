@@ -5,15 +5,15 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('apostello', '0022_auto_20171212_1500'),
-    ]
+    dependencies = [("apostello", "0022_auto_20171212_1500")]
 
     operations = [
         migrations.AddField(
-            model_name='smsoutbound',
-            name='status',
-            field=models.CharField(default='unknown', help_text='Status of SMS (from Twilio)', max_length=50, verbose_name='Status'),
+            model_name="smsoutbound",
+            name="status",
+            field=models.CharField(
+                default="unknown", help_text="Status of SMS (from Twilio)", max_length=50, verbose_name="Status"
+            ),
             preserve_default=False,
-        ),
+        )
     ]

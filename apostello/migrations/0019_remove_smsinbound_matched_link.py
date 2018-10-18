@@ -7,13 +7,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('apostello', '0018_auto_20170808_1045'),
-    ]
+    dependencies = [("apostello", "0018_auto_20170808_1045")]
 
-    operations = [
-        migrations.RemoveField(
-            model_name='smsinbound',
-            name='matched_link',
-        ),
-    ]
+    operations = [migrations.RemoveField(model_name="smsinbound", name="matched_link")]

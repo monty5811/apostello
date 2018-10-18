@@ -26,3 +26,6 @@ setup_env:
 
 heroku_create_build:
 	@heroku builds:create # requires https://github.com/heroku/heroku-builds
+
+format:
+	black -l 120 --py36 apostello/ api/ elvanto/ site_config/ graphs/ onebody/ tests/ docs/ settings/

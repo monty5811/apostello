@@ -1,7 +1,7 @@
 from functools import wraps
 
 from django.conf import settings
-from django.http import (HttpRequest, HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed)
+from django.http import HttpRequest, HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from twilio.request_validator import RequestValidator
 from twilio.rest import Client
@@ -11,7 +11,7 @@ from site_config.models import ConfigurationError, SiteConfiguration
 
 def get_twilio_client():
     twilio_settings = SiteConfiguration.get_twilio_settings()
-    return Client(twilio_settings['sid'], twilio_settings['auth_token'])
+    return Client(twilio_settings["sid"], twilio_settings["auth_token"])
 
 
 def twilio_view(f):
@@ -61,29 +61,25 @@ def twilio_view(f):
         # Turn off Twilio authentication when explicitly requested, or
         # in debug mode. Otherwise things do not work properly. For
         # more information, see the docs.
-        use_forgery_protection = getattr(
-            settings,
-            'DJANGO_TWILIO_FORGERY_PROTECTION',
-            not settings.DEBUG,
-        )
+        use_forgery_protection = getattr(settings, "DJANGO_TWILIO_FORGERY_PROTECTION", not settings.DEBUG)
         if use_forgery_protection:
 
-            if request.method not in ['GET', 'POST']:
+            if request.method not in ["GET", "POST"]:
                 return HttpResponseNotAllowed(request.method)
 
             # Forgery check
             try:
                 twilio_settings = SiteConfiguration.get_twilio_settings()
-                validator = RequestValidator(twilio_settings['auth_token'])
+                validator = RequestValidator(twilio_settings["auth_token"])
                 url = request.build_absolute_uri()
-                signature = request.META['HTTP_X_TWILIO_SIGNATURE']
+                signature = request.META["HTTP_X_TWILIO_SIGNATURE"]
             except (AttributeError, KeyError, ConfigurationError):
                 return HttpResponseForbidden()
 
-            if request.method == 'POST':
+            if request.method == "POST":
                 if not validator.validate(url, request.POST, signature):
                     return HttpResponseForbidden()
-            if request.method == 'GET':
+            if request.method == "GET":
                 if not validator.validate(url, request.GET, signature):
                     return HttpResponseForbidden()
 

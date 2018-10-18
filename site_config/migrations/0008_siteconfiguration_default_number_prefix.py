@@ -8,14 +8,18 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('site_config', '0007_siteconfiguration_auto_add_new_groups'),
-    ]
+    dependencies = [("site_config", "0007_siteconfiguration_auto_add_new_groups")]
 
     operations = [
         migrations.AddField(
-            model_name='siteconfiguration',
-            name='default_number_prefix',
-            field=models.CharField(blank=True, default='', help_text="This value will be used to prepopulate the new contact form use this if you don't want to have to type +xx every time.", max_length=5, validators=[apostello.validators.validate_starts_with_plus]),
-        ),
+            model_name="siteconfiguration",
+            name="default_number_prefix",
+            field=models.CharField(
+                blank=True,
+                default="",
+                help_text="This value will be used to prepopulate the new contact form use this if you don't want to have to type +xx every time.",
+                max_length=5,
+                validators=[apostello.validators.validate_starts_with_plus],
+            ),
+        )
     ]

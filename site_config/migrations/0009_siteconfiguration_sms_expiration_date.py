@@ -7,14 +7,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('site_config', '0008_siteconfiguration_default_number_prefix'),
-    ]
+    dependencies = [("site_config", "0008_siteconfiguration_default_number_prefix")]
 
     operations = [
         migrations.AddField(
-            model_name='siteconfiguration',
-            name='sms_expiration_date',
-            field=models.DateField(help_text='If this date is set, any messages older than this will beremoved from the database.', null=True, verbose_name='SMS Expiration Date'),
-        ),
+            model_name="siteconfiguration",
+            name="sms_expiration_date",
+            field=models.DateField(
+                help_text="If this date is set, any messages older than this will beremoved from the database.",
+                null=True,
+                verbose_name="SMS Expiration Date",
+            ),
+        )
     ]

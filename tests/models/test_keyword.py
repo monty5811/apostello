@@ -9,77 +9,77 @@ from apostello.utils import fetch_default_reply
 
 
 @pytest.mark.django_db
-class TestKeywords():
+class TestKeywords:
     def test_display(self, keywords):
-        assert str(keywords['test']) == "test"
+        assert str(keywords["test"]) == "test"
 
     def test_disabled_reply(self, keywords, recipients):
-        assert keywords['test_do_not_reply'].construct_reply(recipients['calvin']) == ''
+        assert keywords["test_do_not_reply"].construct_reply(recipients["calvin"]) == ""
 
     def test_expired(self, recipients, keywords):
-        assert keywords['test_expired'].construct_reply(recipients['calvin']) == recipients['calvin'].personalise(
-            fetch_default_reply('default_no_keyword_not_live').replace("%keyword%", str(keywords['test_expired']))
+        assert keywords["test_expired"].construct_reply(recipients["calvin"]) == recipients["calvin"].personalise(
+            fetch_default_reply("default_no_keyword_not_live").replace("%keyword%", str(keywords["test_expired"]))
         )
 
     def test_early(self, recipients, keywords):
-        assert keywords['test_early'].construct_reply(recipients['calvin']) == recipients['calvin'].personalise(
-            fetch_default_reply('default_no_keyword_not_live').replace("%keyword%", str(keywords['test_early']))
+        assert keywords["test_early"].construct_reply(recipients["calvin"]) == recipients["calvin"].personalise(
+            fetch_default_reply("default_no_keyword_not_live").replace("%keyword%", str(keywords["test_early"]))
         )
 
     def test_no_end(self, recipients, keywords):
-        assert keywords['test_no_end'].construct_reply(recipients['calvin']) == "Will always reply"
+        assert keywords["test_no_end"].construct_reply(recipients["calvin"]) == "Will always reply"
 
     def test_custom_reply(self, recipients, keywords):
-        assert keywords['test'].construct_reply(recipients['calvin']) == "Test custom response with John"
+        assert keywords["test"].construct_reply(recipients["calvin"]) == "Test custom response with John"
 
     def test_custom_reply_new_person(self, recipients, keywords):
-        assert keywords['test'].construct_reply(recipients['unknown']) == "Thanks new person!"
+        assert keywords["test"].construct_reply(recipients["unknown"]) == "Thanks new person!"
 
     def test_no_custom_reply(self, recipients, keywords):
-        assert keywords['test2'].construct_reply(recipients['calvin']) == recipients['calvin'].personalise(
-            fetch_default_reply('default_no_keyword_auto_reply')
+        assert keywords["test2"].construct_reply(recipients["calvin"]) == recipients["calvin"].personalise(
+            fetch_default_reply("default_no_keyword_auto_reply")
         )
 
     def test_deactivated_custom_reply(self, recipients, keywords):
-        assert keywords['test_deac_resp'].construct_reply(recipients['calvin']) == "Too slow, Joe!"
+        assert keywords["test_deac_resp"].construct_reply(recipients["calvin"]) == "Too slow, Joe!"
 
     def test_deactivated_custom_reply_no_deac_time(self, recipients, keywords):
-        assert keywords['test_deac_resp_fail'].construct_reply(recipients['calvin']) == "Hi!"
+        assert keywords["test_deac_resp_fail"].construct_reply(recipients["calvin"]) == "Hi!"
 
     def test_too_early_custom_reply(self, recipients, keywords):
-        assert keywords['test_early_with_response'].construct_reply(recipients['calvin']) == "This is far too early"
+        assert keywords["test_early_with_response"].construct_reply(recipients["calvin"]) == "This is far too early"
 
     def test_fetch_matched_responses(self, keywords, smsin):
-        assert len(keywords['test'].fetch_matches()) == 2
-        assert str(keywords['test'].fetch_matches()[0]) == str(SmsInbound.objects.filter(content="test message")[0])
+        assert len(keywords["test"].fetch_matches()) == 2
+        assert str(keywords["test"].fetch_matches()[0]) == str(SmsInbound.objects.filter(content="test message")[0])
 
     def test_fetch_archived_matched_responses(self, keywords, smsin):
-        assert len(keywords['test'].fetch_archived_matches()) == 1
-        assert str(keywords['test'].fetch_archived_matches()[0]) == str(
+        assert len(keywords["test"].fetch_archived_matches()) == 1
+        assert str(keywords["test"].fetch_archived_matches()[0]) == str(
             SmsInbound.objects.filter(content="archived message")[0]
         )
 
     def test_num_matches(self, keywords, smsin):
-        keywords['test'].save()  # refresh cache
-        assert keywords['test'].num_matches == 2
+        keywords["test"].save()  # refresh cache
+        assert keywords["test"].num_matches == 2
 
     def test_num_archived_matches(self, keywords, smsin):
-        keywords['test'].save()  # refresh cache
-        assert keywords['test'].num_archived_matches == 1
+        keywords["test"].save()  # refresh cache
+        assert keywords["test"].num_archived_matches == 1
 
     def test_archiving(self, keywords, smsin):
-        keywords['test'].archive()
-        assert keywords['test'].is_archived
-        assert len(keywords['test'].fetch_matches()) == 0
+        keywords["test"].archive()
+        assert keywords["test"].is_archived
+        assert len(keywords["test"].fetch_matches()) == 0
 
     def test_is_locked(self, keywords, users):
-        assert keywords['test'].is_locked
-        assert keywords['test2'].is_locked is False
+        assert keywords["test"].is_locked
+        assert keywords["test2"].is_locked is False
 
     def test_access(self, keywords, users):
-        assert keywords['test'].can_user_access(users['notstaff2']) is False
-        assert keywords['test'].can_user_access(users['notstaff'])
-        assert keywords['test'].can_user_access(users['staff'])
+        assert keywords["test"].can_user_access(users["notstaff2"]) is False
+        assert keywords["test"].can_user_access(users["notstaff"])
+        assert keywords["test"].can_user_access(users["staff"])
 
     def test_match(self, keywords):
         keyword_ = Keyword.match("test matching")
@@ -87,53 +87,52 @@ class TestKeywords():
         assert type(keyword_) == Keyword
 
     def test_no_match(self, keywords):
-        assert Keyword.match("nope") == 'No Match'
+        assert Keyword.match("nope") == "No Match"
 
     def test_lookup_colour_test(self, keywords):
-        assert Keyword.lookup_colour('test') == '#098f6b'
+        assert Keyword.lookup_colour("test") == "#098f6b"
 
     def test_stop(self):
-        assert Keyword.match("Stop it!") == 'stop'
-        assert Keyword.match("stop    ") == 'stop'
-        assert Keyword.match("\nSTOP    ") == 'stop'
+        assert Keyword.match("Stop it!") == "stop"
+        assert Keyword.match("stop    ") == "stop"
+        assert Keyword.match("\nSTOP    ") == "stop"
         for x in ["stopall", "unsubscribe", "cancel", "end", "quit"]:
-            assert Keyword.match("{0}".format(x)) == 'stop'
+            assert Keyword.match("{0}".format(x)) == "stop"
 
     def test_start(self):
         for x in ["start", "yes"]:
-            assert Keyword.match("{0}".format(x)) == 'start'
+            assert Keyword.match("{0}".format(x)) == "start"
 
     def test_info(self):
         for x in ["help", "info"]:
-            assert Keyword.match("{0}".format(x)) == 'info'
+            assert Keyword.match("{0}".format(x)) == "info"
 
     def test_name(self):
-        assert Keyword.match("name John Calvin") == 'name'
+        assert Keyword.match("name John Calvin") == "name"
 
     def test_empty(self):
         assert Keyword.match("") == "No Match"
 
     def test_lookup_colour_stop(self):
-        assert Keyword.lookup_colour('stop') == '#FFCDD2'
+        assert Keyword.lookup_colour("stop") == "#FFCDD2"
 
     def test_lookup_colour_name(self):
-        assert Keyword.lookup_colour('name John Calvin') == '#BBDEFB'
+        assert Keyword.lookup_colour("name John Calvin") == "#BBDEFB"
 
     def test_lookup_colour_none(self):
-        assert Keyword.lookup_colour('nope') == '#B6B6B6'
+        assert Keyword.lookup_colour("nope") == "#B6B6B6"
 
     def test_dates_wrong_way_round(self):
         k = Keyword.objects.create(
             keyword="time_test",
-            description="This is an active test keyword with no "
-            "custom response",
+            description="This is an active test keyword with no " "custom response",
             custom_response="",
             activate_time=timezone.make_aware(
-                datetime.strptime('Jun 1 2000  1:33PM', '%b %d %Y %I:%M%p'), timezone.get_current_timezone()
+                datetime.strptime("Jun 1 2000  1:33PM", "%b %d %Y %I:%M%p"), timezone.get_current_timezone()
             ),
             deactivate_time=timezone.make_aware(
-                datetime.strptime('Jun 1 1970  1:33PM', '%b %d %Y %I:%M%p'), timezone.get_current_timezone()
-            )
+                datetime.strptime("Jun 1 1970  1:33PM", "%b %d %Y %I:%M%p"), timezone.get_current_timezone()
+            ),
         )
         with pytest.raises(ValidationError):
             k.full_clean()

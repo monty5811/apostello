@@ -4,7 +4,7 @@ from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
 
 
-class Table():
+class Table:
     def __init__(self, col_names, col_ids, responses):
         self.col_names = col_names
         self.col_ids = col_ids
@@ -23,7 +23,7 @@ class Table():
         return [n.ljust(w) for n, w in zip(cells, self.col_widths)]
 
     def _add_pipes(self, cells):
-        return '| {0} |'.format(' | '.join(cells))
+        return "| {0} |".format(" | ".join(cells))
 
     def header_str(self):
         justified = self._justify(self.col_names)
@@ -36,26 +36,18 @@ class Table():
 
     def __str__(self):
         header = self.header_str()
-        header_underline = "|{0}|".format('-' * (len(header) - 2))
+        header_underline = "|{0}|".format("-" * (len(header) - 2))
         rows = [self.row_str(r) for r in self.responses]
-        return '\n'.join([header, header_underline] + rows)
+        return "\n".join([header, header_underline] + rows)
 
 
 def create_email_body(keyword, new_responses):
     """Create email body for nightly digest"""
-    col_names = [
-        'From',
-        'Message',
-        'Time Received',
-    ]
-    col_ids = [
-        'sender_name',
-        'content',
-        'time_received',
-    ]
+    col_names = ["From", "Message", "Time Received"]
+    col_ids = ["sender_name", "content", "time_received"]
     context = {
-        'keyword': keyword,
-        'table': Table(col_names, col_ids, new_responses),
-        'domain': Site.objects.all()[0].domain,
+        "keyword": keyword,
+        "table": Table(col_names, col_ids, new_responses),
+        "domain": Site.objects.all()[0].domain,
     }
-    return render_to_string('apostello/email_digest.txt', context)
+    return render_to_string("apostello/email_digest.txt", context)

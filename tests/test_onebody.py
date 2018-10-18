@@ -14,7 +14,7 @@ class TestImporting:
         import_onebody_csv()
         assert models.RecipientGroup.objects.count() == 1
         assert models.Recipient.objects.count() == 7
-        assert models.RecipientGroup.objects.get(name='[onebody]').recipient_set.count() == 7
+        assert models.RecipientGroup.objects.get(name="[onebody]").recipient_set.count() == 7
 
     @onebody_no_csv_vcr
     def test_csv_fails(self):

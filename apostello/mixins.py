@@ -15,6 +15,6 @@ class ProfilePermsMixin(LoginRequiredMixin):
         """Wraps view with `check_user_perms` decorator."""
         view = super(ProfilePermsMixin, cls).as_view(**initkwargs)
         try:
-            return check_user_perms(view, require=initkwargs['required_perms'])
+            return check_user_perms(view, require=initkwargs["required_perms"])
         except KeyError:
             return check_user_perms(view)

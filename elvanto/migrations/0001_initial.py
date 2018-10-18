@@ -9,21 +9,18 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='ElvantoGroup',
+            name="ElvantoGroup",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('sync', models.BooleanField(default=False, verbose_name='Automatic Sync')),
-                ('name', models.CharField(max_length=255, verbose_name='Group Name')),
-                ('e_id', models.CharField(max_length=36, unique=True, verbose_name='Elvanto ID')),
-                ('last_synced', models.DateTimeField(blank=True, null=True)),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("sync", models.BooleanField(default=False, verbose_name="Automatic Sync")),
+                ("name", models.CharField(max_length=255, verbose_name="Group Name")),
+                ("e_id", models.CharField(max_length=36, unique=True, verbose_name="Elvanto ID")),
+                ("last_synced", models.DateTimeField(blank=True, null=True)),
             ],
-            options={
-                'ordering': ['name'],
-            },
-        ),
+            options={"ordering": ["name"]},
+        )
     ]

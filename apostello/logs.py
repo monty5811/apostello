@@ -9,7 +9,7 @@ from site_config.models import SiteConfiguration
 from .models import Keyword, Recipient, SmsInbound, SmsOutbound
 from .twilio import get_twilio_client
 
-logger = logging.getLogger('apostello')
+logger = logging.getLogger("apostello")
 
 
 def has_expired(dt_):
@@ -62,8 +62,8 @@ def handle_incoming_sms(msg):
     if created:
         sender, s_created = Recipient.objects.get_or_create(number=msg.from_)
         if s_created:
-            sender.first_name = 'Unknown'
-            sender.last_name = 'Person'
+            sender.first_name = "Unknown"
+            sender.last_name = "Person"
             sender.save()
 
         sms.content = msg.body
@@ -85,8 +85,8 @@ def handle_outgoing_sms(msg):
         if created:
             recip, r_created = Recipient.objects.get_or_create(number=msg.to)
             if r_created:
-                recip.first_name = 'Unknown'
-                recip.last_name = 'Person'
+                recip.first_name = "Unknown"
+                recip.last_name = "Person"
                 recip.save()
 
             sms.content = msg.body
@@ -96,24 +96,24 @@ def handle_outgoing_sms(msg):
             sms.status = msg.status
             sms.save()
     except Exception:
-        logger.error('Could not import sms.', exc_info=True, extra={'msg': msg})
+        logger.error("Could not import sms.", exc_info=True, extra={"msg": msg})
 
 
 def fetch_generator(direction):
     """Fetch generator from twilio."""
     twilio_num = str(SiteConfiguration.get_solo().twilio_from_num)
-    if direction == 'in':
+    if direction == "in":
         return get_twilio_client().messages.list(to=twilio_num)
-    if direction == 'out':
+    if direction == "out":
         return get_twilio_client().messages.list(from_=twilio_num)
     return []
 
 
 def check_log(direction):
     """Abstract check log function."""
-    if direction == 'in':
+    if direction == "in":
         sms_handler = handle_incoming_sms
-    elif direction == 'out':
+    elif direction == "out":
         sms_handler = handle_outgoing_sms
 
     # we want to iterate over all the incoming messages
@@ -125,9 +125,9 @@ def check_log(direction):
 
 def check_incoming_log():
     """Check Twilio's logs for messages that have been sent to our number."""
-    check_log('in')
+    check_log("in")
 
 
 def check_outgoing_log():
     """Check Twilio's logs for messages that we have sent."""
-    check_log('out')
+    check_log("out")

@@ -7,14 +7,14 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('apostello', '0005_auto_20160221_1135'),
-    ]
+    dependencies = [("apostello", "0005_auto_20160221_1135")]
 
     operations = [
         migrations.AddField(
-            model_name='userprofile',
-            name='show_tour',
-            field=models.BooleanField(default=True, help_text='If true, the user will be shown popup tour on index page.'),
-        ),
+            model_name="userprofile",
+            name="show_tour",
+            field=models.BooleanField(
+                default=True, help_text="If true, the user will be shown popup tour on index page."
+            ),
+        )
     ]

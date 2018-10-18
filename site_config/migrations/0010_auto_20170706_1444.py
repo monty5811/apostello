@@ -7,19 +7,25 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('site_config', '0009_siteconfiguration_sms_expiration_date'),
-    ]
+    dependencies = [("site_config", "0009_siteconfiguration_sms_expiration_date")]
 
     operations = [
         migrations.AddField(
-            model_name='siteconfiguration',
-            name='sms_rolling_expiration_days',
-            field=models.PositiveIntegerField(help_text='The number of days a message will be kept by apostello before being deleted. If blank, then messages will be kept forever.', null=True, verbose_name='Rolling SMS Expiration'),
+            model_name="siteconfiguration",
+            name="sms_rolling_expiration_days",
+            field=models.PositiveIntegerField(
+                help_text="The number of days a message will be kept by apostello before being deleted. If blank, then messages will be kept forever.",
+                null=True,
+                verbose_name="Rolling SMS Expiration",
+            ),
         ),
         migrations.AlterField(
-            model_name='siteconfiguration',
-            name='sms_expiration_date',
-            field=models.DateField(help_text='If this date is set, any messages older than this will be removed from the database.', null=True, verbose_name='SMS Expiration Date'),
+            model_name="siteconfiguration",
+            name="sms_expiration_date",
+            field=models.DateField(
+                help_text="If this date is set, any messages older than this will be removed from the database.",
+                null=True,
+                verbose_name="SMS Expiration Date",
+            ),
         ),
     ]

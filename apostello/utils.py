@@ -6,16 +6,17 @@ gsm_regex = re.compile(r'^[\w@?£!1$"¥#è?¤é%ù&ì\\ò(Ç)*:Ø+;ÄäøÆ,<LÖ
 non_gsm_regex = re.compile(r'[^\w@?£!1$"¥#è?¤é%ù&ì\\ò(Ç)*:Ø+;ÄäøÆ,<LÖlöæ\-=ÑñÅß.>ÜüåÉ/§à¡¿\'\s]')
 
 
-def fetch_default_reply(msg=''):
+def fetch_default_reply(msg=""):
     """Fetch default reply from database."""
     from site_config.models import DefaultResponses
+
     replies = DefaultResponses.get_solo().__dict__
     return replies[msg]
 
 
 def retry_request(url, http_method, *args, **kwargs):
     """Make a http request and retry 3 times if it fails."""
-    assert http_method in ['get', 'post', 'delete', 'patch', 'put']
+    assert http_method in ["get", "post", "delete", "patch", "put"]
     MAX_TRIES = 3
     r_func = getattr(requests, http_method)
     tries = 0

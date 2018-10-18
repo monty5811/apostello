@@ -9,14 +9,14 @@ from elvanto.exceptions import ElvantoException, NotValidPhoneNumber
 
 def elvanto(end_point, **kwargs):
     """Shortcut to create Elvanto API instance."""
-    base_url = 'https://api.elvanto.com/v1/'
-    e_url = '{0}{1}.json'.format(base_url, end_point)
-    resp = retry_request(e_url, 'post', json=kwargs, auth=(settings.ELVANTO_KEY, '_'))
+    base_url = "https://api.elvanto.com/v1/"
+    e_url = "{0}{1}.json".format(base_url, end_point)
+    resp = retry_request(e_url, "post", json=kwargs, auth=(settings.ELVANTO_KEY, "_"))
     data = json.loads(resp.text)
-    if data['status'] == 'ok':
+    if data["status"] == "ok":
         return data
     else:
-        raise ElvantoException(data['error'])
+        raise ElvantoException(data["error"])
 
 
 def fix_elvanto_numbers(num_string):
@@ -26,10 +26,10 @@ def fix_elvanto_numbers(num_string):
     TODO: modify for other locales.
     """
     number = re.sub("[^0-9]", "", num_string)
-    if number.startswith(settings.COUNTRY_CODE + '7'):
+    if number.startswith(settings.COUNTRY_CODE + "7"):
         number = "+" + number
         return number
-    if number.startswith('07'):
+    if number.startswith("07"):
         number = "+" + settings.COUNTRY_CODE + number[1:]
         return number
 

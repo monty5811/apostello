@@ -7,13 +7,8 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('apostello', '0016_auto_20170605_1537'),
-    ]
+    dependencies = [("apostello", "0016_auto_20170605_1537")]
 
     operations = [
-        migrations.AlterIndexTogether(
-            name='smsinbound',
-            index_together=set([('is_archived', 'matched_keyword')]),
-        ),
+        migrations.AlterIndexTogether(name="smsinbound", index_together=set([("is_archived", "matched_keyword")]))
     ]

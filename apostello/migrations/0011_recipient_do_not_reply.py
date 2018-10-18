@@ -7,14 +7,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('apostello', '0010_auto_20160421_1411'),
-    ]
+    dependencies = [("apostello", "0010_auto_20160421_1411")]
 
     operations = [
         migrations.AddField(
-            model_name='recipient',
-            name='do_not_reply',
-            field=models.BooleanField(default=False, help_text='Tick this box to disable automated replies for this person.', verbose_name='Do not reply'),
-        ),
+            model_name="recipient",
+            name="do_not_reply",
+            field=models.BooleanField(
+                default=False,
+                help_text="Tick this box to disable automated replies for this person.",
+                verbose_name="Do not reply",
+            ),
+        )
     ]

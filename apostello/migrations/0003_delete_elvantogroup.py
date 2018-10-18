@@ -7,12 +7,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('apostello', '0002_siteconfiguration_disable_email_login_form'),
-    ]
+    dependencies = [("apostello", "0002_siteconfiguration_disable_email_login_form")]
 
-    operations = [
-        migrations.DeleteModel(
-            name='ElvantoGroup',
-        ),
-    ]
+    operations = [migrations.DeleteModel(name="ElvantoGroup")]

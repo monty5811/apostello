@@ -13,7 +13,7 @@ from django.core.wsgi import get_wsgi_application
 
 from apostello.loaddotenv import loaddotenv
 
-if os.environ.get('DYNO_RAM') is None:
+if os.environ.get("DYNO_RAM") is None:
     loaddotenv()
 
 application = get_wsgi_application()

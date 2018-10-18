@@ -9,8 +9,9 @@ class Command(BaseCommand):
     Checks Twilio's incoming logs for our number and updates the
     database to match.
     """
-    args = ''
-    help = 'Import incoming messages from twilio'
+
+    args = ""
+    help = "Import incoming messages from twilio"
 
     def handle(self, *args, **options):
         """Handle the command."""

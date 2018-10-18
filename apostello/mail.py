@@ -7,6 +7,7 @@ class ApostelloEmailBackend(EmailBackend):
     def __init__(self, *args, **kwargs):
         super(ApostelloEmailBackend, self).__init__(*args, **kwargs)
         from site_config.models import SiteConfiguration
+
         s = SiteConfiguration.get_solo()
         self.host = s.email_host
         self.port = s.email_port

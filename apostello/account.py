@@ -11,5 +11,6 @@ class ApostelloAccountAdapter(DefaultAccountAdapter):
     def get_from_email(self):
         """Override to use SiteConfiguration."""
         from site_config.models import SiteConfiguration
+
         s = SiteConfiguration.get_solo()
         return s.email_from

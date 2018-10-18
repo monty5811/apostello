@@ -7,13 +7,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('apostello', '0009_userprofile_message_cost_limit'),
-    ]
+    dependencies = [("apostello", "0009_userprofile_message_cost_limit")]
 
-    operations = [
-        migrations.AlterModelOptions(
-            name='userprofile',
-            options={'ordering': ['user__email']},
-        ),
-    ]
+    operations = [migrations.AlterModelOptions(name="userprofile", options={"ordering": ["user__email"]})]

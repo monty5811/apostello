@@ -7,13 +7,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('apostello', '0014_queuedsms'),
-    ]
+    dependencies = [("apostello", "0014_queuedsms")]
 
-    operations = [
-        migrations.AlterModelOptions(
-            name='queuedsms',
-            options={'ordering': ['time_to_send']},
-        ),
-    ]
+    operations = [migrations.AlterModelOptions(name="queuedsms", options={"ordering": ["time_to_send"]})]

@@ -14,13 +14,13 @@ today = timezone.localdate()
 
 class MockMsg:
     def __init__(self, from_):
-        self.sid = 'a' * 34
-        self.body = 'test message'
+        self.sid = "a" * 34
+        self.body = "test message"
         self.from_ = from_
-        self.to = settings.to = '447922537999'
+        self.to = settings.to = "447922537999"
         self.date_created = timezone.now()
         self.date_sent = timezone.now()
-        self.status = 'unknown'
+        self.status = "unknown"
 
 
 @pytest.mark.django_db
@@ -123,12 +123,12 @@ class TestExpiry:
         config.sms_expiration_date = today - timedelta(days=100)
         config.save()
         sms = models.SmsInbound.objects.create(
-            content='test message',
+            content="test message",
             time_received=timezone.now() - timedelta(50),
             sender_name="John Calvin",
             sender_num="+447927401749",
             matched_keyword="test",
-            sid='12345'
+            sid="12345",
         )
         sms.save()
         assert models.SmsInbound.objects.count() == 1  # we have one sms
@@ -151,7 +151,7 @@ class TestSmsHandlers:
         config.sms_expiration_date = None
         config.save()
 
-        msg = MockMsg('447922537999')
+        msg = MockMsg("447922537999")
         logs.handle_incoming_sms(msg)
         assert models.SmsInbound.objects.all()[0].content == msg.body
         assert models.SmsInbound.objects.count() == 1
@@ -164,7 +164,7 @@ class TestSmsHandlers:
         config.sms_expiration_date = None
         config.save()
 
-        msg = MockMsg('447932537999')
+        msg = MockMsg("447932537999")
         cnp = logs.handle_outgoing_sms(msg)
         assert models.SmsOutbound.objects.all()[0].content == msg.body
         assert models.SmsOutbound.objects.count() == 1
@@ -177,16 +177,16 @@ class TestSmsHandlers:
 class TestFetchingClients:
     @twilio_vcr
     def test_fetch_all_in(self):
-        i = logs.fetch_generator('in')
+        i = logs.fetch_generator("in")
         for msg in i:
             str(i)
 
     @twilio_vcr
     def test_fetch_all_out(self):
-        i = logs.fetch_generator('out')
+        i = logs.fetch_generator("out")
         for msg in i:
             str(i)
 
     @twilio_vcr
     def test_fetch_all_bad(self):
-        assert isinstance(logs.fetch_generator('nope'), list)
+        assert isinstance(logs.fetch_generator("nope"), list)

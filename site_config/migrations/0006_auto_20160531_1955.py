@@ -8,14 +8,18 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('site_config', '0005_auto_20160531_1814'),
-    ]
+    dependencies = [("site_config", "0005_auto_20160531_1814")]
 
     operations = [
         migrations.AlterField(
-            model_name='defaultresponses',
-            name='keyword_no_match',
-            field=models.TextField(blank=True, default='Thank you, %name%, your message has not matched any of our keywords. Please correct your message and try again.', help_text='Reply to use when an SMS does not match any keywords. ("%name%" will be replaced with the user\'s first name)', max_length=1000, validators=[apostello.validators.less_than_sms_char_limit]),
-        ),
+            model_name="defaultresponses",
+            name="keyword_no_match",
+            field=models.TextField(
+                blank=True,
+                default="Thank you, %name%, your message has not matched any of our keywords. Please correct your message and try again.",
+                help_text='Reply to use when an SMS does not match any keywords. ("%name%" will be replaced with the user\'s first name)',
+                max_length=1000,
+                validators=[apostello.validators.less_than_sms_char_limit],
+            ),
+        )
     ]

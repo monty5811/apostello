@@ -7,8 +7,9 @@ from apostello.tasks import update_msgs_name
 
 class Command(BaseCommand):
     """Updates names on messages for all existing contacts."""
-    args = ''
-    help = 'Update from_name fields'
+
+    args = ""
+    help = "Update from_name fields"
 
     def handle(self, *args, **options):
         """Handle the command."""

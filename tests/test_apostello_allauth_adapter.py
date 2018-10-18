@@ -10,9 +10,9 @@ def test_get_email():
     s = SiteConfiguration.get_solo()
     a = ApostelloAccountAdapter()
     # test env var is migrated into db:
-    assert s.email_from == 'test@apostello.ninja'
-    assert a.get_from_email() == 'test@apostello.ninja'
+    assert s.email_from == "test@apostello.ninja"
+    assert a.get_from_email() == "test@apostello.ninja"
     # test change in db
-    s.email_from = 'test2@apostello.ninja'
+    s.email_from = "test2@apostello.ninja"
     s.save()
-    assert a.get_from_email() == 'test2@apostello.ninja'
+    assert a.get_from_email() == "test2@apostello.ninja"

@@ -7,19 +7,15 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('apostello', '0015_auto_20170530_1336'),
-    ]
+    dependencies = [("apostello", "0015_auto_20170530_1336")]
 
     operations = [
         migrations.AlterField(
-            model_name='smsinbound',
-            name='is_archived',
-            field=models.BooleanField(db_index=True, default=False, verbose_name='Is Archived'),
+            model_name="smsinbound",
+            name="is_archived",
+            field=models.BooleanField(db_index=True, default=False, verbose_name="Is Archived"),
         ),
         migrations.AlterField(
-            model_name='smsinbound',
-            name='matched_keyword',
-            field=models.CharField(db_index=True, max_length=12),
+            model_name="smsinbound", name="matched_keyword", field=models.CharField(db_index=True, max_length=12)
         ),
     ]

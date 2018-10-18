@@ -8,14 +8,18 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('site_config', '0016_auto_20171122_1458'),
-    ]
+    dependencies = [("site_config", "0016_auto_20171122_1458")]
 
     operations = [
         migrations.AlterField(
-            model_name='defaultresponses',
-            name='auto_name_request',
-            field=models.TextField(blank=True, default="Hi there, I'm afraid we currently don't have your number in our address book. Could you please reply in the format\n'name John Smith'", help_text='Message to send when we first receive a message from someone not in the contacts list.', max_length=1000, validators=[apostello.validators.less_than_sms_char_limit]),
-        ),
+            model_name="defaultresponses",
+            name="auto_name_request",
+            field=models.TextField(
+                blank=True,
+                default="Hi there, I'm afraid we currently don't have your number in our address book. Could you please reply in the format\n'name John Smith'",
+                help_text="Message to send when we first receive a message from someone not in the contacts list.",
+                max_length=1000,
+                validators=[apostello.validators.less_than_sms_char_limit],
+            ),
+        )
     ]

@@ -11,35 +11,19 @@ def handle_form(view, request, user=None):
     """
     try:
         # try and get an existing object, if it exists:
-        form_kwargs = {
-            'instance': view.model_class.objects.get(pk=request.data['pk']),
-        }
+        form_kwargs = {"instance": view.model_class.objects.get(pk=request.data["pk"])}
     except KeyError:
         # object, does not exist, we must be creating one:
         form_kwargs = {}
 
     if user is not None:
-        form_kwargs['user'] = user
+        form_kwargs["user"] = user
 
     form = view.form_class(request.data, **form_kwargs)
     if form.is_valid():
         form.full_clean()
         form.save()
-        msg = {
-            'type_': 'info',
-            'text': 'Your change has been saved!',
-        }
-        return Response(
-            {
-                'messages': [msg],
-                'errors': {},
-            }, status=status.HTTP_200_OK
-        )
+        msg = {"type_": "info", "text": "Your change has been saved!"}
+        return Response({"messages": [msg], "errors": {}}, status=status.HTTP_200_OK)
     else:
-        return Response(
-            {
-                'messages': [],
-                'errors': form.errors,
-            },
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        return Response({"messages": [], "errors": form.errors}, status=status.HTTP_400_BAD_REQUEST)

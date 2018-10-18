@@ -7,15 +7,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('apostello', '0003_delete_elvantogroup'),
-    ]
+    dependencies = [("apostello", "0003_delete_elvantogroup")]
 
-    operations = [
-        migrations.DeleteModel(
-            name='DefaultResponses',
-        ),
-        migrations.DeleteModel(
-            name='SiteConfiguration',
-        ),
-    ]
+    operations = [migrations.DeleteModel(name="DefaultResponses"), migrations.DeleteModel(name="SiteConfiguration")]

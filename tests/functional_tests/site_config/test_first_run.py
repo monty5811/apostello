@@ -4,7 +4,7 @@ import pytest
 from django.contrib.auth.models import User
 from tests.functional_tests.utils import assert_with_timeout
 
-URI = '/config/first_run/'
+URI = "/config/first_run/"
 
 
 @pytest.mark.django_db
@@ -20,19 +20,19 @@ class TestFirstRun:
         browser.get(live_server + URI)
         assert URI in browser.current_url
         sleep(driver_wait_time)
-        email_input_box = browser.find_elements_by_id('admin_email')[0]
+        email_input_box = browser.find_elements_by_id("admin_email")[0]
         email_input_box.clear()
-        email_input_box.send_keys('test@example.com')
+        email_input_box.send_keys("test@example.com")
 
-        pass1_input_box = browser.find_elements_by_id('admin_pass1')[0]
+        pass1_input_box = browser.find_elements_by_id("admin_pass1")[0]
         pass1_input_box.clear()
-        pass1_input_box.send_keys('password')
+        pass1_input_box.send_keys("password")
 
-        pass2_input_box = browser.find_elements_by_id('admin_pass2')[0]
+        pass2_input_box = browser.find_elements_by_id("admin_pass2")[0]
         pass2_input_box.clear()
-        pass2_input_box.send_keys('password')
+        pass2_input_box.send_keys("password")
 
-        submit_button = browser.find_elements_by_id('create_admin_button')[0]
+        submit_button = browser.find_elements_by_id("create_admin_button")[0]
         submit_button.click()
 
         def _test():

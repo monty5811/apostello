@@ -6,19 +6,16 @@ from django.urls.resolvers import URLPattern, URLResolver, RegexPattern, RoutePa
 
 from apostello.urls import urlpatterns
 
-arg_re = re.compile(r'<\w*>')
+arg_re = re.compile(r"<\w*>")
 
-IGNORED_URLS = ('/accounts/confirm-', '/accounts/password/reset/', '/admin', '/__debug__', '/sw', '/.*')
+IGNORED_URLS = ("/accounts/confirm-", "/accounts/password/reset/", "/admin", "/__debug__", "/sw", "/.*")
 
-TYPES = {
-    'pk': 'Int',
-    'keyword': 'String',
-}
+TYPES = {"pk": "Int", "keyword": "String"}
 
 
 def safe_name(name):
-    name = name.replace('-', '_')
-    name = name.replace(':', '_')
+    name = name.replace("-", "_")
+    name = name.replace(":", "_")
     return name
 
 
@@ -27,11 +24,11 @@ def extract_types(url, optional):
     args_ = []
     matches = arg_re.findall(url)
     for m_ in matches:
-        m = m_.replace('<', '').replace('>', '')
+        m = m_.replace("<", "").replace(">", "")
         if m in TYPES:
             t = TYPES[m]
             if optional:
-                t = f'Maybe {t}'
+                t = f"Maybe {t}"
             types.append(t)
             args_.append(m)
 
@@ -39,32 +36,32 @@ def extract_types(url, optional):
 
 
 def indent(n):
-    return '    ' * n
+    return "    " * n
 
 
 def case_template(a, convert_b):
-    t = f'''"
+    t = f""""
         ++ (case {a} of
                 Just b ->
                     {convert_b} ++ "/"
 
                 Nothing ->
                     ""
-           )'''
+           )"""
 
     return t
 
 
 def argTypeConv(a, t, optional):
     if optional:
-        if t == 'String':
+        if t == "String":
             s = case_template(a, "b")
-        elif t == 'Maybe String':
+        elif t == "Maybe String":
             s = case_template(a, "b")
-        elif t == 'Maybe Int':
+        elif t == "Maybe Int":
             s = case_template(a, "Future.String.fromInt b")
     else:
-        if t == 'String':
+        if t == "String":
             s = f'" ++ {a} ++ "/'
         else:
             s = f'" ++ Future.String.fromInt {a} ++ "/'
@@ -77,37 +74,37 @@ def extract_body(url, types, args_, optional):
         return f'"{url}"'
 
     for t, a in zip(types, args_):
-        arg_w_brackets = '<' + a + '>/'
+        arg_w_brackets = "<" + a + ">/"
         url = url.replace(arg_w_brackets, argTypeConv(a, t, optional))
 
-    if not url.endswith(')'):
+    if not url.endswith(")"):
         url = url + '"'
 
     return '"' + url
 
 
 def clean_url(url):
-    url = url.replace('(?:(?P', '')
-    url = url.replace('\\w+)', '')
-    url = url.replace('\\d+)', '')
-    url = url.replace('[\\d|\\w]+)', '')
-    url = url.replace('(?P', '')
-    url = url.replace('^', '')
-    url = url.replace('$', '')
-    url = url.replace('[-:\w]+)', '')
-    url = url.replace(')?', '')
-    url = url.replace('[0-9]+)', '')
+    url = url.replace("(?:(?P", "")
+    url = url.replace("\\w+)", "")
+    url = url.replace("\\d+)", "")
+    url = url.replace("[\\d|\\w]+)", "")
+    url = url.replace("(?P", "")
+    url = url.replace("^", "")
+    url = url.replace("$", "")
+    url = url.replace("[-:\w]+)", "")
+    url = url.replace(")?", "")
+    url = url.replace("[0-9]+)", "")
 
-    if url.startswith('/'):
+    if url.startswith("/"):
         return url
     else:
-        return '/' + url
+        return "/" + url
 
 
 def convert_to_elm(u):
-    name = u['name']
-    url = u['url']
-    optional = '(?:' in url
+    name = u["name"]
+    url = u["url"]
+    optional = "(?:" in url
 
     url = clean_url(url)
     if url.startswith(IGNORED_URLS):
@@ -122,18 +119,18 @@ def convert_to_elm(u):
 
     typeDef = f'{name} : {" -> ".join(types + ["String"])}'
     funcDef = " ".join([name] + args_ + ["="])
-    funcBody = f'    {body}'
-    return '\n'.join([typeDef, funcDef, funcBody])
+    funcBody = f"    {body}"
+    return "\n".join([typeDef, funcDef, funcBody])
 
 
 def add_namespacing(top, url):
     if top.namespace is not None:
-        url['name'] = top.namespace + ':' + url['name']
+        url["name"] = top.namespace + ":" + url["name"]
 
-    if isinstance(url['url'], tuple):
-        url['url'] = url['url'][0]
+    if isinstance(url["url"], tuple):
+        url["url"] = url["url"][0]
 
-    url['url'] = top.pattern.regex.pattern + url['url']
+    url["url"] = top.pattern.regex.pattern + url["url"]
     return url
 
 
@@ -151,10 +148,7 @@ def extract_urls(urlpatterns):
     for u in urlpatterns:
         if isinstance(u, URLPattern):
             if u.name is not None:
-                url_data.append({
-                    'url': pattern2url(u.pattern),
-                    'name': u.name,
-                })
+                url_data.append({"url": pattern2url(u.pattern), "name": u.name})
         elif isinstance(u, URLResolver):
             tmp_urls = extract_urls(u.url_patterns)
             tmp_urls = [add_namespacing(u, tmp) for tmp in tmp_urls]
@@ -170,21 +164,22 @@ def generate_module():
     funcs = [f for f in funcs if f is not None]
     funcs = sorted(list(set(funcs)))
 
-    module = 'module Urls exposing (..)\n\nimport Future.String\n\n\n' + '\n\n\n'.join(funcs) + '\n'
+    module = "module Urls exposing (..)\n\nimport Future.String\n\n\n" + "\n\n\n".join(funcs) + "\n"
 
     return module
 
 
 class Command(BaseCommand):
     """Parse urls and write to Elm file."""
-    args = ''
-    help = 'Parse urls and write to Elm file.'
+
+    args = ""
+    help = "Parse urls and write to Elm file."
 
     def handle(self, *args, **options):
         """Handle the command."""
         module = generate_module()
 
-        with open('assets/elm/Urls.elm', 'w') as f:
+        with open("assets/elm/Urls.elm", "w") as f:
             f.write(module)
 
-        subprocess.run(f'elm-format --yes assets/elm/Urls.elm'.split())
+        subprocess.run(f"elm-format --yes assets/elm/Urls.elm".split())

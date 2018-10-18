@@ -7,29 +7,44 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('site_config', '0012_auto_20171025_1028'),
-    ]
+    dependencies = [("site_config", "0012_auto_20171025_1028")]
 
     operations = [
         migrations.AlterField(
-            model_name='siteconfiguration',
-            name='email_from',
-            field=models.EmailField(blank=True, help_text='Email will be sent from this address. This will override values in settings.py', max_length=254, null=True),
+            model_name="siteconfiguration",
+            name="email_from",
+            field=models.EmailField(
+                blank=True,
+                help_text="Email will be sent from this address. This will override values in settings.py",
+                max_length=254,
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='siteconfiguration',
-            name='email_host',
-            field=models.URLField(blank=True, help_text='Email host. This will override values in settings.py', null=True),
+            model_name="siteconfiguration",
+            name="email_host",
+            field=models.URLField(
+                blank=True, help_text="Email host. This will override values in settings.py", null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='siteconfiguration',
-            name='email_password',
-            field=models.CharField(blank=True, help_text='Email password. This will override values in settings.py', max_length=255, null=True),
+            model_name="siteconfiguration",
+            name="email_password",
+            field=models.CharField(
+                blank=True,
+                help_text="Email password. This will override values in settings.py",
+                max_length=255,
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='siteconfiguration',
-            name='email_username',
-            field=models.CharField(blank=True, help_text='Email user name. This will override values in settings.py', max_length=255, null=True),
+            model_name="siteconfiguration",
+            name="email_username",
+            field=models.CharField(
+                blank=True,
+                help_text="Email user name. This will override values in settings.py",
+                max_length=255,
+                null=True,
+            ),
         ),
     ]

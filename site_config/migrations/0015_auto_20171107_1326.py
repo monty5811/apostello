@@ -7,34 +7,34 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('site_config', '0014_auto_20171025_1053'),
-    ]
+    dependencies = [("site_config", "0014_auto_20171025_1053")]
 
     operations = [
         migrations.AlterField(
-            model_name='siteconfiguration',
-            name='email_from',
-            field=models.EmailField(blank=True, help_text='Email will be sent from this address.', max_length=254, null=True),
+            model_name="siteconfiguration",
+            name="email_from",
+            field=models.EmailField(
+                blank=True, help_text="Email will be sent from this address.", max_length=254, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='siteconfiguration',
-            name='email_host',
-            field=models.CharField(blank=True, help_text='Email host.', max_length=255, null=True),
+            model_name="siteconfiguration",
+            name="email_host",
+            field=models.CharField(blank=True, help_text="Email host.", max_length=255, null=True),
         ),
         migrations.AlterField(
-            model_name='siteconfiguration',
-            name='email_password',
-            field=models.CharField(blank=True, help_text='Email password.', max_length=255, null=True),
+            model_name="siteconfiguration",
+            name="email_password",
+            field=models.CharField(blank=True, help_text="Email password.", max_length=255, null=True),
         ),
         migrations.AlterField(
-            model_name='siteconfiguration',
-            name='email_port',
-            field=models.PositiveIntegerField(blank=True, help_text='Email host port.', null=True),
+            model_name="siteconfiguration",
+            name="email_port",
+            field=models.PositiveIntegerField(blank=True, help_text="Email host port.", null=True),
         ),
         migrations.AlterField(
-            model_name='siteconfiguration',
-            name='email_username',
-            field=models.CharField(blank=True, help_text='Email user name.', max_length=255, null=True),
+            model_name="siteconfiguration",
+            name="email_username",
+            field=models.CharField(blank=True, help_text="Email user name.", max_length=255, null=True),
         ),
     ]
