@@ -24,25 +24,11 @@
     - python3-dev
     - python3-pip
     - python3-pycurl
+    - python3-venv
     - software-properties-common
     - supervisor
-  tags: packages
-
-- name: Install Ubuntu 14.04 packages
-  apt: name={{ item }} update_cache={{ update_apt_cache }} force=yes state=present
-  with_items:
-    - python3.4-venv
-  tags: packages
-  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '14.04'
-
-- name: Install Ubuntu 16.04 packages
-  apt: name={{ item }} update_cache={{ update_apt_cache }} force=yes state=present
-  with_items:
     - sudo
-    - python3-venv
   tags: packages
-  when: (ansible_distribution == 'Ubuntu' and ansible_distribution_version == '16.04') or
-    (ansible_distribution == 'Ubuntu' and ansible_distribution_version == '18.04')
 
 - name: Start supervisor
   service: name=supervisor state=started enabled=yes

@@ -15,11 +15,6 @@ ansible-playbook --ask-vault-pass -i sms.example.com,  production.yml
 
 Tested on:
 
- - Ubuntu 16.04 LTS x64
- - Ubuntu 14.04 LTS x64
-
-Should work:
-
- - Ubuntu 18.04 LTS x64 - the deployment tests, when run with docker, fail for 18.04, but when using a real server, they pass. For the minute 18.04 is not officially supported, but it should work if you want to try.
+ - Ubuntu 18.04 LTS x64
 
 Originally derived from https://www.calazan.com/using-docker-and-docker-compose-for-local-django-development-replacing-virtualenv/

@@ -2,7 +2,7 @@
 
 - name: Generate strong Diffie-Hellman group
   command: "openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048"
-  args:  
+  args:
     creates: /etc/ssl/certs/dhparam.pem
   notify: reload nginx
 
@@ -23,13 +23,13 @@
 
 - name: Fetch certificate
   command: "./letsencrypt-auto certonly --agree-tos --renew-by-default --config /etc/letsencrypt/{{ nginx_server_name }}.ini"
-  args:  
+  args:
     chdir: "{{ le_repo_path }}"
     creates: /etc/letsencrypt/live/{{ nginx_server_name }}/fullchain.pem
   notify: reload nginx
 
 - name: Setup renewal cronjob
-  cron: name="renew le cert" 
-        day="1" 
+  cron: name="renew le cert"
+        day="1"
         user="root"
         job="cd {{le_repo_path}} && ./letsencrypt-auto certonly --agree-tos --renew-by-default --config /etc/letsencrypt/{{ nginx_server_name }}.ini && service nginx reload"

@@ -17,10 +17,12 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
  - Bug in keyword form that put the wrong reply in one of the fields
+ - Bugs in forms when there was any server error
 
 ### Removed
 
  - Web push notifcation support - just use the slack integration and point it at zapier if you want something more flexible
+ - Ubuntu 14.04 & 16.04 are no longer supported by ansible install
 
 ## [v2.8.0]
 
