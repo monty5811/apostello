@@ -8,6 +8,7 @@ RUN apt-get update && \
         libffi-dev \
         curl \
         sudo \
+        redis-server \
         && apt-get clean \
         && rm -rf /var/cache/apt/* /var/lib/apt/lists/*
 RUN pip install -U setuptools
@@ -18,3 +19,4 @@ ENV LANG en_US.utf8
 RUN mkdir /code
 WORKDIR /code
 ADD . /code/
+RUN redis-server --daemonize yes

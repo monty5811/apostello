@@ -1,4 +1,7 @@
 set -e
+# this is a hack to get redis running inside the container
+# the setup appears to work fine on a real ubuntu 18.04 box:
+redis-server --daemonize yes
 # run test ansible setup
 ansible-playbook -i 127.0.0.1, test.yml --connection=local
 # check if login page is there
