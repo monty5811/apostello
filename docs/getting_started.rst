@@ -66,7 +66,7 @@ Once you have apostello setup we need to tell Twilio what url to talk to when it
 * In the "Request URL field" add the url to your server, followed by ``/sms/``. If you are using Heroku it may look like ``https://apostello-demo.herokuapp.com/sms/`` or if your site is hosted at ``https://sms.example.com``, your URL would be ``https://sms.example.com/sms``
 * Click save
 
-Now you should be able to test your setup - send a message to your number and you should receive an automated reply. If not, raise an `issue <https://github.com/monty5811/apostello/issues/new?title=[Setup%20Help]>`_ or get in touch on `slack <http://chat.church.io>`_.
+Now you should be able to test your setup - send a message to your number and you should receive an automated reply. If not, raise an `issue <https://github.com/monty5811/apostello/issues/new?title=[Setup%20Help]>`_.
 
 .. _email-setup:
 

@@ -16,8 +16,6 @@ Guidelines for code contributions:
 * Please run ``./scripts/run_yapf.py`` before committing to maintain code style
 * Please add only a single feature per pull request
 
-Please do not hesitate to ask for help in the `chat <http://chat.church.io/>`_.
-
 
 Development Environment
 #######################
