@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 # setup some constants
-AP_VER=v2.8.0
+AP_VER=v2.9.0
 REPO_URL=https://github.com/monty5811/apostello.git
 HOME_DIR=/home/apostello
 CUSTOM_VARS_FILE=$HOME_DIR/custom_vars.yml
