@@ -1,0 +1,50 @@
+version: v1.0
+name: apostello
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+
+blocks:
+  - name: "elm"
+    task:
+      env_vars:
+        - name: TWILIO_SENDING_COST
+          value: 0.04
+        - name: DJANGO_SETTINGS_MODULE
+          value: settings.test
+        - name: COUNTRY_CODE
+          value: 44
+      jobs:
+      - name: elm test
+        commands:
+          - checkout
+          - cd assets
+          - nvm use 8
+          - yarn install
+          - yarn run elm-test
+
+  - name: "python"
+    task:
+      jobs:
+      - name: tox
+        commands:
+          - checkout
+          - wget https://github.com/mozilla/geckodriver/releases/download/v0.19.0/geckodriver-v0.19.0-linux64.tar.gz
+          - tar -xvf geckodriver-v0.19.0-linux64.tar.gz
+          - sudo mv geckodriver /usr/bin/geckodriver
+          - sudo apt update && sudo apt install -y firefox
+          - pip install tox
+          - tox
+          - pip install coveralls
+          - coveralls
+
+  - name: "deploymnet"
+    task:
+      jobs:
+      - name: ansible
+        commands:
+          - checkout
+          - cd ansible
+          - docker-compose build
+          - docker-compose run test_ubuntu_18.04
