@@ -6,7 +6,7 @@ agent:
     os_image: ubuntu1804
 
 blocks:
-  - name: "elm"
+  - name: "tests"
     task:
       env_vars:
         - name: TWILIO_SENDING_COST
@@ -15,22 +15,21 @@ blocks:
           value: settings.test
         - name: COUNTRY_CODE
           value: "44"
+      prologue:
+        commands:
+          - checkout
       jobs:
       - name: elm test
         commands:
-          - checkout
           - cd assets
           - nvm use 8
           - yarn install
           - yarn run elm-test
-
-  - name: "python"
-    task:
-      jobs:
       - name: tox
         commands:
           - sem-version python 3.7
-          - checkout
+          - sem-service start redis
+          - sem-service start postgres
           - wget https://github.com/mozilla/geckodriver/releases/download/v0.19.0/geckodriver-v0.19.0-linux64.tar.gz
           - tar -xvf geckodriver-v0.19.0-linux64.tar.gz
           - sudo mv geckodriver /usr/bin/geckodriver
@@ -39,13 +38,8 @@ blocks:
           - tox
           - pip install coveralls
           - coveralls
-
-  - name: "deploymnet"
-    task:
-      jobs:
-      - name: ansible
+      - name: ansible deploy
         commands:
-          - checkout
           - cd ansible
           - docker-compose build
           - docker-compose run test_ubuntu_18.04
