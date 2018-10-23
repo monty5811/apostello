@@ -29,6 +29,7 @@ blocks:
       jobs:
       - name: tox
         commands:
+          - sem-version python 3.6.4
           - checkout
           - wget https://github.com/mozilla/geckodriver/releases/download/v0.19.0/geckodriver-v0.19.0-linux64.tar.gz
           - tar -xvf geckodriver-v0.19.0-linux64.tar.gz
