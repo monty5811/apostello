@@ -8,6 +8,8 @@ agent:
 blocks:
   - name: "tests"
     task:
+      secrets:
+        - name: apostello-coveralls
       env_vars:
         - name: TWILIO_SENDING_COST
           value: "0.04"
