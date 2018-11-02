@@ -1,7 +1,7 @@
 ---
 
 # Application settings.
-virtualenv_path: "/webapps/{{ application_name }}_py36"
+virtualenv_path: "/webapps/{{ application_name }}_py37"
 project_path: "{{ virtualenv_path }}/{{ project_name }}"
 application_path: "{{ project_path }}"
 application_log_dir: "{{ virtualenv_path }}/logs"

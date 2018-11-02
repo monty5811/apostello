@@ -37,7 +37,7 @@
   pip: name=virtualenv executable=pip3
   tags: packages
 
-- include: setup_py36.yml
+- include: setup_py37.yml
 
 - include: setup_ufw.yml
   when: setup_ufw

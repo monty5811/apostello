@@ -1,0 +1,17 @@
+---
+- name: "[py37] check already exists"
+  stat: path=/usr/bin/python3.7
+  register: py37bin
+
+- name: "[py37] add deadsnakes ppa"
+  apt_repository:
+    repo: "ppa:deadsnakes/ppa"
+  when: py37bin.stat.exists == false
+
+- name: "[py37] install"
+  apt: name={{ item }} update_cache={{ update_apt_cache }} force=yes state=present
+  with_items:
+    - python3.7
+    - python3.7-dev
+    - python3.7-venv
+  when: py37bin.stat.exists == false

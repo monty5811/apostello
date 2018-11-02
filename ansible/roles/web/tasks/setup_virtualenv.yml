@@ -4,7 +4,7 @@
   file: path={{ virtualenv_path }} state=directory
 
 - name: Create the virtualenv
-  command: python3.6 -m venv "{{ virtualenv_path }}"
+  command: python3.7 -m venv "{{ virtualenv_path }}"
            creates={{ virtualenv_path }}/bin/activate
 
 - name: Update pip and setuptools
