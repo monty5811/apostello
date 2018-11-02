@@ -48,8 +48,3 @@ def elm_settings(user):
         "blockedKeywords": blocked_keywords,
     }
     return mark_safe(json.dumps(elm))
-
-
-@register.simple_tag
-def gcm_sender_id():
-    return settings.CM_SENDER_ID

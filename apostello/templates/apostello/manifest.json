@@ -44,6 +44,5 @@
     ],
     "display": "standalone",
     "theme_color": "#5a589b",
-    "background_color": "#5a589b",
-    "gcm_sender_id": "{% gcm_sender_id %}"
+    "background_color": "#5a589b"
 }
