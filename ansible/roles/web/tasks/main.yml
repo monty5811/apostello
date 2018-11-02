@@ -14,7 +14,12 @@
 
 - include: set_file_permissions.yml
 
+- name: Check that the LE cert exists
+  stat:
+    path: /etc/letsencrypt/live/{{ nginx_server_name}}/fullchain.pem
+  register: le_cert
+
 - include: setup_nginx.yml
 
 - include: setup_le.yml
-  when: setup_lets_encrypt == 'yes'
+  when: setup_lets_encrypt

@@ -22,7 +22,7 @@
   file: path=/tmp/letsencrypt-auto state=directory
 
 - name: Fetch certificate
-  command: "./letsencrypt-auto certonly --agree-tos --renew-by-default --config /etc/letsencrypt/{{ nginx_server_name }}.ini"
+  command: "./letsencrypt-auto certonly --agree-tos --renew-by-default --non-interactive --config /etc/letsencrypt/{{ nginx_server_name }}.ini"
   args:
     chdir: "{{ le_repo_path }}"
     creates: /etc/letsencrypt/live/{{ nginx_server_name }}/fullchain.pem
@@ -33,3 +33,15 @@
         day="1"
         user="root"
         job="cd {{le_repo_path}} && ./letsencrypt-auto certonly --agree-tos --renew-by-default --config /etc/letsencrypt/{{ nginx_server_name }}.ini && service nginx reload"
+
+- name: Check that the LE cert exists
+  stat:
+    path: /etc/letsencrypt/live/{{ nginx_server_name}}/fullchain.pem
+  register: le_cert
+
+- fail:
+    msg: "Failed to provision let's encrypt certificate"
+  when: not le_cert.stat.exists
+
+# setup nginx again now the cert exist
+- include: setup_nginx.yml

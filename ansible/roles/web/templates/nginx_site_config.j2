@@ -5,7 +5,7 @@ upstream wsgi_server {
 
   server unix:{{ virtualenv_path }}/run/gunicorn.sock fail_timeout=0;
 }
-{% if setup_lets_encrypt %}
+{% if (setup_lets_encrypt and le_cert.stat.exists) %}
 server {
   listen 80 default deferred;
   server_name {{ nginx_server_name }};
@@ -14,11 +14,11 @@ server {
 {% endif %}
 server {
     listen              80;
-    {% if setup_lets_encrypt %}
+    {% if (setup_lets_encrypt and le_cert.stat.exists) %}
     listen              443 ssl;
     {% endif %}
     server_name         {{ nginx_server_name }};
-    {% if setup_lets_encrypt %}
+    {% if (setup_lets_encrypt and le_cert.stat.exists) %}
     ssl_certificate /etc/letsencrypt/live/{{ nginx_server_name}}/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/{{ nginx_server_name }}/privkey.pem;
 
@@ -37,9 +37,9 @@ server {
     access_log {{ nginx_access_log_file }};
     error_log {{ nginx_error_log_file }};
 
-    location /.well-known/acme-challenge {
+    location /.well-known/acme-challenge/ {
       default_type  "text/plain";
-      root          /tmp/letsencrypt-auto;
+      root          /tmp/letsencrypt-auto/;
     }
 
     location /static/ {
@@ -59,7 +59,7 @@ server {
         }
 
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        {% if setup_lets_encrypt %}
+        {% if (setup_lets_encrypt and le_cert.stat.exists) %}
         proxy_set_header X-Forwarded-Proto https;
         {% endif %}
         proxy_set_header Host $http_host;
